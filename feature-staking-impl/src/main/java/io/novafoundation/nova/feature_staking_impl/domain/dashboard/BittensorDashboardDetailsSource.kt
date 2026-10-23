@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshot
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -13,6 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRecommendedYieldInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,11 +27,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
+import java.math.BigInteger
 
 /** Lifetime is bound to the selected account by the dashboard interactor. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,6 +41,7 @@ class BittensorDashboardDetailsSource(
     private val positions: BittensorPositionRepository,
     private val validators: BittensorValidatorInteractor,
     private val recommendedYields: BittensorRecommendedYieldInteractor,
+    private val snapshots: BittensorDashboardSnapshotRepository,
     private val logger: Logger
 ) {
 
@@ -51,33 +58,97 @@ class BittensorDashboardDetailsSource(
         val chain = chains.firstOrNull { chain ->
             chain.assets.any { Chain.Asset.StakingType.BITTENSOR_ROOT in it.staking }
         } ?: return flowOf(emptyMap())
-        val coldKey = account.accountIdIn(chain)
+        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null)
+
+        return flow { emitAll(observe(chain, coldKey)) }
+    }
+
+    private fun observe(chain: Chain, coldKey: AccountId?): Flow<Map<String, BittensorDashboardDetails>> {
         val portfolio = if (coldKey != null) {
             positions.observePortfolio(chain.id, coldKey)
         } else {
             flowOf(BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh))
         }
+        // Like iOS persisted dashboard details: shown until positions are known again (cold start, offline).
+        val restored = coldKey?.let { snapshots.snapshot(chain.id, it) }
+        var lastSaved = restored
+        val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(null)
         val rootRates = refreshed { validators.yields(BittensorNetuid.Root) }
         val subnetRates = portfolio
             .map { it.positions?.subnets.orEmpty().map { position -> position.subnetId }.toSet() }
             .distinctUntilChanged()
             .flatMapLatest(::observeSubnetRates)
-        val maximumRates = refreshed { recommendedYields.maximumYields() }
+        val maximumRates = combine(portfolio, claimable) { state, rewards -> hasActiveStake(state.positions, rewards, restored) }
+            .distinctUntilChanged()
+            .flatMapLatest { active ->
+                // As iOS: the start-staking yield is only needed, and requested, without an active stake.
+                if (active) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else refreshed { recommendedYields.maximumYields() }
+            }
 
-        return combine(portfolio, rootRates, subnetRates, maximumRates) { state, root, subnets, maximum ->
-            val details = mapBittensorDashboardDetails(
-                positions = state.positions,
-                rootYields = root.dataOrNull.orEmpty(),
-                subnetYields = subnets.values,
-                recommendedYields = maximum.dataOrNull.orEmpty()
-            ).copy(
-                rootYieldLoading = root is ExtendedLoadingState.Loading,
-                subnetYieldLoading = subnets.loading,
-                maximumYieldLoading = maximum is ExtendedLoadingState.Loading
+        return combine(portfolio, rootRates, subnetRates, maximumRates, claimable) { state, root, subnets, maximum, rewards ->
+            val snapshot = restored.takeIf { state.positions == null }
+            val details = if (snapshot != null) {
+                snapshot.toDetails(rateLoading = state.status is BittensorDataStatus.Loading)
+            } else {
+                mapBittensorDashboardDetails(
+                    positions = state.positions,
+                    rootYields = root.dataOrNull.orEmpty(),
+                    subnetYields = subnets.values,
+                    recommendedYields = emptyMap()
+                ).copy(
+                    rootYieldLoading = root is ExtendedLoadingState.Loading,
+                    subnetYieldLoading = subnets.loading
+                )
+            }.copy(
+                maximumAnnualPercentageYield = maximumYield(maximum.dataOrNull.orEmpty()),
+                maximumYieldLoading = maximum is ExtendedLoadingState.Loading,
+                claimableRootRewardsInPlanks = rewards
             )
+
+            if (coldKey != null && state.status is BittensorDataStatus.Fresh && details.pricing != BittensorDashboardDetails.Pricing.LOADING) {
+                val toSave = details.toSnapshot(lastSaved)
+                if (toSave != lastSaved) {
+                    snapshots.saveSnapshot(chain.id, coldKey, toSave)
+                    lastSaved = toSave
+                }
+            }
+
             mapOf(chain.id to details)
         }
     }
+
+    private fun hasActiveStake(
+        positions: BittensorPortfolioPositions?,
+        claimableRewards: BigInteger?,
+        restored: BittensorDashboardSnapshot?
+    ): Boolean {
+        if (claimableRewards?.isPositive() == true) return true
+        if (positions != null) return positions.root.isNotEmpty() || positions.subnets.isNotEmpty()
+        return restored != null && (restored.rootStakeInPlanks != null || restored.subnetCount > 0)
+    }
+
+    private fun BittensorDashboardSnapshot.toDetails(rateLoading: Boolean) = BittensorDashboardDetails(
+        totalStakeInPlanks = totalStakeInPlanks,
+        rootStakeInPlanks = rootStakeInPlanks,
+        subnetCount = subnetCount,
+        rootAnnualPercentageYield = rootAnnualPercentageYield,
+        subnetAnnualPercentageYield = subnetAnnualPercentageYield,
+        maximumAnnualPercentageYield = null,
+        pricing = if (totalStakeInPlanks != null) BittensorDashboardDetails.Pricing.KNOWN else BittensorDashboardDetails.Pricing.UNKNOWN,
+        rootYieldLoading = rateLoading && rootAnnualPercentageYield == null,
+        subnetYieldLoading = rateLoading && subnetAnnualPercentageYield == null
+    )
+
+    // A rate that is still loading or failed keeps the last known one while that part is still held.
+    private fun BittensorDashboardDetails.toSnapshot(previous: BittensorDashboardSnapshot?) = BittensorDashboardSnapshot(
+        totalStakeInPlanks = totalStakeInPlanks,
+        rootStakeInPlanks = rootStakeInPlanks,
+        subnetCount = subnetCount,
+        rootAnnualPercentageYield = rootAnnualPercentageYield
+            ?: previous?.rootAnnualPercentageYield?.takeIf { rootStakeInPlanks != null && previous.rootStakeInPlanks != null },
+        subnetAnnualPercentageYield = subnetAnnualPercentageYield
+            ?: previous?.subnetAnnualPercentageYield?.takeIf { subnetCount > 0 && previous.subnetCount > 0 }
+    )
 
     private fun observeSubnetRates(
         subnets: Set<BittensorNetuid.Subnet>

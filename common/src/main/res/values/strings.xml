@@ -3011,6 +3011,7 @@
     <string name="bittensor_claim_completed">Rewards claimed</string>
     <string name="bittensor_claim_completed_description">The claim was confirmed in a finalized block.</string>
     <string name="bittensor_claim_available">Claimable rewards</string>
+    <string name="bittensor_portfolio_root_claimable">Claimable rewards: %s</string>
     <string name="bittensor_portfolio_chart_disclaimer">Partial portfolio history reported by the provider. It may not include every operation.</string>
     <string name="bittensor_subnet_execution_buying">Buying %1$s %2$s with TAO</string>
     <string name="bittensor_subnet_execution_operation">1 of 1 operation</string>

@@ -3,7 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.dashboard
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepositoryTest
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -28,6 +30,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
@@ -68,7 +71,9 @@ class BittensorDashboardDetailsSourceTest {
 
     private val portfolioState = MutableStateFlow(BittensorPortfolioState(portfolio, BittensorDataStatus.Fresh))
 
-    private val source = BittensorDashboardDetailsSource(positions, validators, recommendations, logger)
+    private val snapshots = RealBittensorDashboardSnapshotRepository(BittensorDashboardSnapshotRepositoryTest.InMemoryPreferences())
+
+    private val source = BittensorDashboardDetailsSource(positions, validators, recommendations, snapshots, logger)
 
     @Test
     fun `owned network timeout clears rate and independently recovers on refresh`() = runTest {
@@ -87,7 +92,6 @@ class BittensorDashboardDetailsSourceTest {
         assertEquals(BigInteger.TEN, emitted.last().totalStakeInPlanks)
         assertNull(emitted.last().rootAnnualPercentageYield)
         assertFalse(emitted.last().rootYieldLoading)
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
 
         advanceTimeBy(60_000)
         runCurrent()
@@ -129,6 +133,67 @@ class BittensorDashboardDetailsSourceTest {
         assertEquals(BigInteger.ZERO, details.totalStakeInPlanks)
         assertEquals(BigDecimal.ONE, details.maximumAnnualPercentageYield)
         verifyNoInteractions(positions)
+    }
+
+    @Test
+    fun `active stake does not request start staking recommendations`() = runTest {
+        prepare()
+        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        runCurrent()
+        advanceTimeBy(120_000)
+        runCurrent()
+        verifyNoInteractions(recommendations)
+        job.cancel()
+    }
+
+    @Test
+    fun `no stake requests recommendations and claimable rewards count as active`() = runTest {
+        prepare()
+        portfolioState.value = BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh)
+        val emitted = mutableListOf<BittensorDashboardDetails>()
+        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        runCurrent()
+        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        verify(recommendations, times(1)).maximumYields()
+
+        snapshots.saveClaimableRootRewards("chain", coldKey, BigInteger.TEN)
+        runCurrent()
+        assertEquals(BigInteger.TEN, emitted.last().claimableRootRewardsInPlanks)
+        assertTrue(emitted.last().showsClaimableRewardsPanel)
+        advanceTimeBy(120_000)
+        runCurrent()
+        verify(recommendations, times(1)).maximumYields()
+        job.cancel()
+    }
+
+    @Test
+    fun `fresh figures are persisted and shown while positions are unavailable on the next start`() = runTest {
+        prepare()
+        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        runCurrent()
+        first.cancel()
+        val stored = requireNotNull(snapshots.snapshot("chain", coldKey))
+        assertEquals(BigInteger.TEN, stored.rootStakeInPlanks)
+        assertEquals(0, BigDecimal.TEN.compareTo(stored.rootAnnualPercentageYield))
+
+        // Cold start offline: positions never load, rates fail.
+        portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Stale(IllegalStateException("offline")))
+        `when`(validators.yields(BittensorNetuid.Root)).thenThrow(IllegalStateException("offline"))
+        val details = source.observe(account, listOf(chain)).first().getValue("chain")
+
+        assertEquals(BittensorDashboardDetails.Pricing.KNOWN, details.pricing)
+        assertEquals(BigInteger.TEN, details.totalStakeInPlanks)
+        assertEquals(BigInteger.TEN, details.panelStakeInPlanks)
+        assertEquals(0, BigDecimal.TEN.compareTo(details.panelAnnualPercentageYield))
+        assertFalse(details.panelYieldLoading)
+    }
+
+    @Test
+    fun `without a stored snapshot unknown positions stay loading`() = runTest {
+        prepare()
+        portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Loading)
+        val details = source.observe(account, listOf(chain)).first().getValue("chain")
+        assertEquals(BittensorDashboardDetails.Pricing.LOADING, details.pricing)
     }
 
     private suspend fun prepare() {

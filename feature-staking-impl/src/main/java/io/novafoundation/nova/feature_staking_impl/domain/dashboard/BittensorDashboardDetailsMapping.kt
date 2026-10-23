@@ -42,9 +42,13 @@ internal fun mapBittensorDashboardDetails(
         subnetCount = positions?.subnets?.map { it.subnetId }?.distinct()?.size ?: 0,
         rootAnnualPercentageYield = rootRate,
         subnetAnnualPercentageYield = subnetRate.takeUnless { pricingPending },
-        maximumAnnualPercentageYield = recommendedYields.values.filter { it.isNonNegative }.maxOrNull(),
+        maximumAnnualPercentageYield = maximumYield(recommendedYields),
         pricing = pricing
     )
+}
+
+internal fun maximumYield(recommendedYields: Map<BittensorNetuid.Subnet, BigDecimal>): BigDecimal? {
+    return recommendedYields.values.filter { it.isNonNegative }.maxOrNull()
 }
 
 private data class WeightedRate(val annualPercentageYield: BigDecimal?, val stake: BigInteger?)

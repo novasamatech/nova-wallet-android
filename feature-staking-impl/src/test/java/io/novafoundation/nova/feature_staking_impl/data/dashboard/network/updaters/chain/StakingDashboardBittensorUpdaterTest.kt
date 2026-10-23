@@ -5,7 +5,9 @@ import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepositoryTest
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimPreview
@@ -30,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -57,6 +60,8 @@ class StakingDashboardBittensorUpdaterTest {
     private val blockNumbers = MutableStateFlow(BigInteger.ONE)
 
     private val cache = RecordingCache()
+
+    private val snapshots = RealBittensorDashboardSnapshotRepository(BittensorDashboardSnapshotRepositoryTest.InMemoryPreferences())
 
     private val coldKey: AccountId = ByteArray(32)
 
@@ -127,22 +132,89 @@ class StakingDashboardBittensorUpdaterTest {
         positionRepository,
         cache,
         rootClaims,
+        snapshots,
         logger
     )
 
     @Test
-    fun `redeemable rewards keep zero stake wallet in staking dashboard`() = runBlocking {
+    fun `claimable rewards keep zero stake wallet in staking dashboard`() = runBlocking {
         prepare()
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
-        val preview = BittensorRootClaimPreview(AccountIdKey(ByteArray(32)), BigInteger.TEN, BigInteger.ONE, BigInteger.ZERO)
-        val claims = BittensorRootClaims(listOf(preview), BigInteger.TEN)
-        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(claims)
+        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(claims(redeemable = BigInteger.TEN, minimum = BigInteger.TEN))
 
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 
         assertTrue(requireNotNull(cache.item).hasStake)
         assertEquals(BigInteger.ZERO, cache.item?.stake)
+        assertEquals(BigInteger.TEN, snapshots.claimableRootRewards(chain.id, coldKey))
     }
+
+    @Test
+    fun `rewards below the claim minimum do not keep an active card`() = runBlocking {
+        prepare()
+        cache.item = stakingItem()
+        `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
+        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(claims(redeemable = BigInteger.ONE, minimum = BigInteger.TEN))
+
+        withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
+
+        assertFalse(requireNotNull(cache.item).hasStake)
+        assertNull(snapshots.claimableRootRewards(chain.id, coldKey))
+    }
+
+    @Test
+    fun `full exit with unavailable rewards does not retain the stored staking classification`() = runBlocking {
+        prepare()
+        cache.item = stakingItem()
+        `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
+        `when`(rootClaims.claims(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
+
+        withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
+
+        assertFalse(requireNotNull(cache.item).hasStake)
+    }
+
+    @Test
+    fun `stake clears stored claimable rewards so a later exit cannot reuse them`() = runBlocking {
+        prepare()
+        snapshots.saveClaimableRootRewards(chain.id, coldKey, BigInteger.TEN)
+
+        withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
+
+        assertTrue(requireNotNull(cache.item).hasStake)
+        assertNull(snapshots.claimableRootRewards(chain.id, coldKey))
+    }
+
+    @Test
+    fun `unavailable rewards reuse the last known claimable amount`() = runBlocking {
+        prepare()
+        snapshots.saveClaimableRootRewards(chain.id, coldKey, BigInteger.TEN)
+        `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
+        `when`(rootClaims.claims(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
+
+        withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
+
+        assertTrue(requireNotNull(cache.item).hasStake)
+        assertEquals(BigInteger.TEN, snapshots.claimableRootRewards(chain.id, coldKey))
+    }
+
+    private fun claims(redeemable: BigInteger, minimum: BigInteger): BittensorRootClaims {
+        val preview = BittensorRootClaimPreview(AccountIdKey(ByteArray(32)), redeemable, redeemable, BigInteger.ZERO)
+        return BittensorRootClaims(listOf(preview), minimum)
+    }
+
+    private fun stakingItem() = StakingDashboardItemLocal.staking(
+        chainId = ChainGeneses.BITTENSOR,
+        chainAssetId = 0,
+        stakingType = "bittensor-root",
+        stake = BigInteger.TEN,
+        stakeStatusAccount = coldKey,
+        rewardsAccount = coldKey,
+        metaId = 1L,
+        status = null,
+        rewards = null,
+        estimatedEarnings = null
+    )
 
     private class RecordingCache : StakingDashboardCache {
 
