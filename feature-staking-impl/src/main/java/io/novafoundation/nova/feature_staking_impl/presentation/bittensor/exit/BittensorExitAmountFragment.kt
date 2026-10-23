@@ -3,7 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setMessageOrHide
 
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import androidx.core.os.bundleOf
+import io.novafoundation.nova.common.utils.ltrIsolated
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
@@ -23,7 +27,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorExitAmountBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
@@ -50,17 +53,16 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
 
     override fun initViews() = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
-        val payload = argument<BittensorExitPositionPayload>(PAYLOAD)
-        if (payload.netuid().isRoot()) {
-            toolbar.hideRightAction()
-        } else {
-            toolbar.setRightActionClickListener { viewModel.openSlippageSettings() }
-        }
         onBackPressed { viewModel.back() }
         amount.setTitle(getString(if (viewModel.isRoot) R.string.bittensor_exit_you_unstake else R.string.bittensor_exit_you_sell))
         amount.setAssetIconRounded(!viewModel.isRoot)
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
-        amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
+        if (viewModel.isRoot) {
+            amount.setMaxActionAvailability(MaxActionAvailability.NotAvailable)
+            stakedHeader.setOnClickListener { viewModel.maxClicked() }
+        } else {
+            amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
+        }
         receive.isVisible = !viewModel.isRoot
         rate.isVisible = !viewModel.isRoot
         averagePrice.isVisible = !viewModel.isRoot
@@ -83,6 +85,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.amountModel.observe { it?.let(amount::setChooseAmountModel) }
         viewModel.amount.observe { if (amount.amountInput.text.toString() != it) amount.amountInput.setText(it) }
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)
+        viewModel.stakedHeader.observe(::showStakedHeader)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
         viewModel.amountError.observe(amount::setError)
         viewModel.validator.observe(validator::showBittensorLoadingValue)
@@ -142,5 +145,18 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
     override fun onPause() {
         viewModel.onHidden()
         super.onPause()
+    }
+
+    private fun showStakedHeader(header: BittensorStakedHeaderUi?) = with(binder.stakedHeader) {
+        isVisible = header != null
+        header ?: return@with
+        val link = getString(R.string.staking_unstake_all)
+        val text = getString(R.string.bittensor_exit_staked_header, header.staked.ltrIsolated(), link)
+        val linkColor = requireContext().getColor(if (header.isEnabled) R.color.button_text_accent else R.color.text_secondary)
+        val start = text.lastIndexOf(link)
+        this.text = SpannableString(text).apply {
+            if (start >= 0) setSpan(ForegroundColorSpan(linkColor), start, start + link.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        isEnabled = header.isEnabled
     }
 }
