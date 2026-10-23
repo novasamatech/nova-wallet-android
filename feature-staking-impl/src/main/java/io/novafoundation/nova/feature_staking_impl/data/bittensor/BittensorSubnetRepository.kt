@@ -142,7 +142,7 @@ internal fun mapBittensorBackendCatalogue(remote: BittensorSubnetCatalogueRemote
         require(registration.signum() >= 0) { "Invalid subnet registration" }
         BittensorSubnet(
             id = id,
-            name = requireNotNull(row.name).trim(),
+            name = normalizeBittensorSubnetName(requireNotNull(row.name)),
             symbol = requireNotNull(row.symbol).trim(),
             logoUrl = null,
             priceInRao = prices[id],
