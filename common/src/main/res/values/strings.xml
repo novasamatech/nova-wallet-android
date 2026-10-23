@@ -3027,6 +3027,7 @@
     <string name="bittensor_hide_unusual_apy">Hide unusual APY</string>
     <string name="bittensor_validator_search_hint">Search by name or address</string>
     <string name="bittensor_validator_list_count">Validators: %1$d of %2$d</string>
+    <string name="bittensor_validator_list_count_loading">Validators: — of —</string>
     <string name="bittensor_validator_list_sort">Rewards (APY) · By %1$s</string>
     <string name="bittensor_validator_list_subtitle">%1$s staked · take %2$s%%</string>
     <string name="bittensor_validator_apy_value">APY: %1$s%%</string>

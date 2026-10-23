@@ -48,6 +48,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import java.util.Locale
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 class BittensorSelectValidatorViewModel(
     private val analytics: AnalyticsService,
@@ -124,21 +126,41 @@ class BittensorSelectValidatorViewModel(
     }
         .shareInBackground()
 
-    private val filteredRows = combine(validatorsState, filters, selectedAddress, yields, stakeDisplay) { state, filters, address, yields, stake ->
-        mapValidatorRows(state, filters.sorting, address, yields, filters.hideUnusualApy, stake)
+    private val filteredList = combine(validatorsState, filters, selectedAddress, yields, stakeDisplay) { state, filters, address, yields, stake ->
+        BittensorValidatorRows(
+            rows = mapValidatorRows(state, filters.sorting, address, yields, filters.hideUnusualApy, stake),
+            total = state.dataOrNull?.size
+        )
     }
         .shareInBackground()
 
-    val rows = combine(filteredRows, query) { rows, text -> rows.filter { matchesBittensorValidator(it.eligibility, text) } }
+    private val filteredRows = filteredList.map { it.rows }
         .shareInBackground()
 
-    val header = combine(rows, validatorsState, filters) { rows, state, filters ->
+    // Shown and total counts come from one directory snapshot, so the header can never read "more of fewer".
+    private val visibleList = combine(filteredList, query) { list, text ->
+        list.copy(rows = list.rows.filter { matchesBittensorValidator(it.eligibility, text) })
+    }
+        .shareInBackground()
+
+    val rows = visibleList.map { it.rows }
+        .shareInBackground()
+
+    val header = combine(visibleList, filters) { list, filters ->
+        val total = list.total
         BittensorValidatorListHeader(
-            resources.getString(R.string.bittensor_validator_list_count, rows.size, state.dataOrNull.orEmpty().size),
+            if (total == null) {
+                resources.getString(R.string.bittensor_validator_list_count_loading)
+            } else {
+                resources.getString(R.string.bittensor_validator_list_count, list.rows.size, total)
+            },
             resources.getString(R.string.bittensor_validator_list_sort, sortingDisplay(filters.sorting).uppercase(Locale.getDefault()))
         )
     }
         .shareInBackground()
+
+    private val _inactiveValidatorEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val inactiveValidatorEvents: SharedFlow<Unit> = _inactiveValidatorEvents
 
     val isLoading = validatorsState.map { it.isLoading() }
         .shareInBackground()
@@ -216,7 +238,11 @@ class BittensorSelectValidatorViewModel(
     }
 
     fun select(row: BittensorValidatorUi) = launchUnit {
-        if (row.eligibility.canSelect && row in rows.first()) selectedValidatorAddress.value = row.eligibility.address
+        if (row !in rows.first()) return@launchUnit
+        when {
+            row.eligibility.inactive -> _inactiveValidatorEvents.tryEmit(Unit)
+            row.eligibility.canSelect -> selectedValidatorAddress.value = row.eligibility.address
+        }
     }
 
     fun infoClicked(row: BittensorValidatorUi) = launchUnit {

@@ -69,7 +69,8 @@ class BittensorValidatorAdapter(
             icon.setImageDrawable(model.icon)
             info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)
             info.setOnClickListener { onInfo(model) }
-            root.setOnClickListener { if (row.canSelect) onSelected(model) }
+            // Inactive rows stay tappable so the screen can explain why they cannot be selected.
+            root.setOnClickListener { if (row.canSelect || row.inactive) onSelected(model) }
         }
 
         private fun bindAccessibility(selected: Boolean) {
