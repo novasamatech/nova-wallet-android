@@ -55,6 +55,19 @@ data class BittensorExitPreflight(
             groupMembers.values.sumOf { it.drawable(withdrawalFloor) }.min(availability.available)
         }
 
+    /** The stake on [hotkey] alone; the position's stake when it has a single validator. */
+    fun stakeOn(hotkey: AccountIdKey): BigInteger = if (groupStakes.size <= 1) totalStake else groupStakes[hotkey] ?: stake
+
+    /**
+     * What [hotkey] alone can release, never more than [maximumAmount]. With several validators this is the amount
+     * a single-validator exit takes: it can pay its fee from the stake, which a batched exit across validators cannot.
+     */
+    fun maximumAmountOn(hotkey: AccountIdKey): BigInteger {
+        if (groupStakes.size <= 1) return maximumAmount
+        val drawable = groupMembers[hotkey]?.drawable(withdrawalFloor) ?: stakeOn(hotkey)
+        return drawable.min(maximumAmount)
+    }
+
     /**
      * Equality key for background refreshes: ignores per-block price drift and hold countdowns (only whether a
      * hotkey is held matters before the fresh validation read), so unchanged chain state does not re-quote.

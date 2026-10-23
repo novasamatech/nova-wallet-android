@@ -273,7 +273,13 @@ class BittensorExitAmountViewModel(
 
     private val maximumAmount = combine(position, selectedSlippage) { position, slippage ->
         position?.let {
-            val maximum = bittensorExitInteractor.maximumAmount(it, slippage).coerceAtLeast(BigInteger.ZERO)
+            // Root shows one validator and "Staked: X · Unstake all" for it: with several validators, Unstake all fills
+            // that validator's stake (a single-validator exit that can pay its fee from the stake), not the total.
+            val maximum = if (isRoot) {
+                bittensorExitInteractor.selectedValidatorMaximumAmount(it, slippage)
+            } else {
+                bittensorExitInteractor.maximumAmount(it, slippage)
+            }.coerceAtLeast(BigInteger.ZERO)
             val symbol = if (isRoot) it.asset.token.configuration.symbol else TokenSymbol(it.subnet?.symbol?.ifBlank { "—" } ?: "—")
             BittensorMaxAmount(BigDecimal(maximum, it.amountPrecision), symbol)
         }
@@ -286,12 +292,12 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    /** Root only, iOS `createHeader`: "Staked: <total> · Unstake all"; the link fills the maximum like Max does. */
+    /** Root only, iOS `createHeader`: "Staked: <stake on the shown validator> · Unstake all"; the link fills its maximum. */
     val stakedHeader = combine(position, maximumAmount) { position, maximum ->
         if (!isRoot || position == null) return@combine null
         val token = position.asset.token
         BittensorStakedHeaderUi(
-            staked = tokenFormatter.formatToken(token.amountFromPlanks(position.preflight.totalStake), token.configuration.symbol).toString(),
+            staked = tokenFormatter.formatToken(token.amountFromPlanks(position.preflight.stakeOn(position.hotkey)), token.configuration.symbol).toString(),
             isEnabled = maximum != null && maximum.amount.signum() > 0
         )
     }
@@ -416,14 +422,17 @@ class BittensorExitAmountViewModel(
     val continueButtonState = combine(
         positionState,
         prepared,
-        validating
-    ) { position, prepared, validating ->
-        val label = resources.getString(R.string.common_continue)
-        when {
-            validating || position.isLoading() || prepared.isLoading() -> DescriptiveButtonState.Loading
-            prepared.dataOrNull == null -> DescriptiveButtonState.Disabled(label)
-            else -> DescriptiveButtonState.Enabled(label)
-        }
+        validating,
+        input
+    ) { position, prepared, validating, input ->
+        bittensorExitButtonState(
+            validating = validating,
+            input = input.text,
+            loading = position.isLoading() || prepared.isLoading(),
+            ready = prepared.dataOrNull != null,
+            continueLabel = resources.getString(R.string.common_continue),
+            enterAmountLabel = resources.getString(R.string.common_enter_amount)
+        )
     }
         .shareInBackground()
 
@@ -636,3 +645,19 @@ class BittensorExitAmountViewModel(
 }
 
 data class BittensorStakedHeaderUi(val staked: String, val isEnabled: Boolean)
+
+/** iOS `SubtensorUnstakeSetupViewModelFactory.createAction`: an empty or zero amount asks for one ("Enter amount…"). */
+internal fun bittensorExitButtonState(
+    validating: Boolean,
+    input: String,
+    loading: Boolean,
+    ready: Boolean,
+    continueLabel: String,
+    enterAmountLabel: String
+): DescriptiveButtonState = when {
+    validating -> DescriptiveButtonState.Loading
+    input.toBigDecimalOrNull()?.isPositive != true -> DescriptiveButtonState.Disabled(enterAmountLabel)
+    loading -> DescriptiveButtonState.Loading
+    !ready -> DescriptiveButtonState.Disabled(continueLabel)
+    else -> DescriptiveButtonState.Enabled(continueLabel)
+}

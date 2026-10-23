@@ -126,6 +126,11 @@ class BittensorExitInteractor(
         return position.preflight.withWithdrawalFloor(position.netuid, slippageFraction = slippageFraction).maximumAmount
     }
 
+    /** The Max of the validator the exit was opened for (the largest one, which a partial exit draws from first). */
+    fun selectedValidatorMaximumAmount(position: BittensorExitPosition, slippageFraction: BigDecimal = slippage.fraction): BigInteger {
+        return position.preflight.withWithdrawalFloor(position.netuid, slippageFraction = slippageFraction).maximumAmountOn(position.hotkey)
+    }
+
     suspend fun quote(
         position: BittensorExitPosition,
         amount: BigInteger,
