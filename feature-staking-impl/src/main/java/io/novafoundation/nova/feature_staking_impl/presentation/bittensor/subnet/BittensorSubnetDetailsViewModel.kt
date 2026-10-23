@@ -44,7 +44,8 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChart
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorRegistrationEpochSeconds
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.clipBittensorSubnetHistory
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
@@ -292,17 +293,8 @@ class BittensorSubnetDetailsViewModel(
             ) {
                 flowOf { loadChartHistory(request) }
             }
-                .map { BittensorSubnetChart(request.period, it) }
+                .map { SubnetChartData(request.period, it) }
         }
-        .shareInBackground()
-
-    val charts = combine(chartData, isFiatMode, ::mapCharts)
-        .shareInBackground()
-
-    val priceChangeFormatter = combine(chartData, period) { chart, selected ->
-        val covered = chart.period == selected && hasBittensorSubnetHistoryCoverage(chart.points.dataOrNull.orEmpty(), selected)
-        BittensorChartChangeTextInjector(periodLabel(selected), covered)
-    }
         .shareInBackground()
 
     private val ageState = subnetState.flatMapLatest { state ->
@@ -318,6 +310,25 @@ class BittensorSubnetDetailsViewModel(
                 flowOf { subnetSafetyInteractor.ageInDays(subnet) }
             }
         }
+    }
+        .shareInBackground()
+
+    // Until the age is known the history is shown unclipped, as on iOS; it is re-clipped once the registration time arrives.
+    private val registrationEpochSeconds = ageState.map { state ->
+        state.dataOrNull?.let { days -> bittensorRegistrationEpochSeconds(days, System.currentTimeMillis() / 1000) }
+    }
+        .distinctUntilChanged()
+
+    private val visibleChart = combine(chartData, registrationEpochSeconds) { data, registration -> data.clipped(registration) }
+        .shareInBackground()
+
+    val charts = combine(visibleChart, isFiatMode, ::mapCharts)
+        .shareInBackground()
+
+    val priceChangeFormatter = combine(visibleChart, period) { chart, selected ->
+        val points = chart.points.dataOrNull.orEmpty()
+        val covered = chart.period == selected && hasBittensorSubnetHistoryCoverage(points, selected)
+        BittensorChartChangeTextInjector(periodLabel(selected), covered)
     }
         .shareInBackground()
 
@@ -488,9 +499,10 @@ class BittensorSubnetDetailsViewModel(
         router.back()
     }
 
-    private suspend fun loadChartHistory(request: BittensorSubnetChartRequest): List<BittensorSubnetPricePoint> {
+    /** Null when the subnet has no market listing, so no price history exists for any period. */
+    private suspend fun loadChartHistory(request: BittensorSubnetChartRequest): List<BittensorSubnetPricePoint>? {
         val priceId = request.nativePriceId ?: return emptyList()
-        return bittensorSubnetDetailsInteractor.history(
+        return bittensorSubnetDetailsInteractor.listedHistory(
             subnetId,
             priceId,
             request.currency,
@@ -498,19 +510,20 @@ class BittensorSubnetDetailsViewModel(
         )
     }
 
-    private fun mapCharts(data: BittensorSubnetChart, isFiatMode: Boolean): List<PriceChartModel> = chartPeriods.map { period ->
+    private fun mapCharts(data: SubnetChartData, isFiatMode: Boolean): List<PriceChartModel> = chartPeriods.map { period ->
         mapChart(data, period, isFiatMode)
     }
 
-    private fun mapChart(data: BittensorSubnetChart, period: BittensorSubnetChartPeriod, isFiatMode: Boolean): PriceChartModel {
+    private fun mapChart(data: SubnetChartData, period: BittensorSubnetChartPeriod, isFiatMode: Boolean): PriceChartModel {
         val label = periodLabel(period)
         if (period != data.period) return PriceChartModel.Loading(label)
 
         return when (val state = data.points) {
             is ExtendedLoadingState.Loading -> PriceChartModel.Loading(label)
-            is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, "")
+            is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, resources.getString(R.string.bittensor_price_history_failed))
             is ExtendedLoadingState.Loaded -> {
-                if (state.data.isEmpty()) return PriceChartModel.Empty(label, "")
+                // Unlisted subnets and windows without points show the iOS empty state; the spot price still comes from the pool.
+                if (state.data.isEmpty()) return PriceChartModel.Empty(label, unavailableChartMessage())
 
                 val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, if (isFiatMode) it.fiat else it.tao) }
                 PriceChartModel.Chart(
@@ -523,6 +536,9 @@ class BittensorSubnetDetailsViewModel(
         }
     }
 
+    private fun unavailableChartMessage(): String = resources.getString(R.string.bittensor_price_history_unavailable) + "\n" +
+        resources.getString(R.string.bittensor_price_history_source)
+
     private fun reportFailure(
         step: String,
         cause: Throwable
@@ -531,4 +547,16 @@ class BittensorSubnetDetailsViewModel(
         logger.log(cause)
         showError(resources.getString(R.string.common_retry_message))
     }
+}
+
+/** [points] holds null while the subnet is known to have no market listing. */
+private class SubnetChartData(
+    val period: BittensorSubnetChartPeriod,
+    private val history: ExtendedLoadingState<List<BittensorSubnetPricePoint>?>,
+    private val registrationEpochSeconds: Long? = null
+) {
+
+    val points: ExtendedLoadingState<List<BittensorSubnetPricePoint>> = history.map { clipBittensorSubnetHistory(it.orEmpty(), registrationEpochSeconds) }
+
+    fun clipped(registrationEpochSeconds: Long?) = SubnetChartData(period, history, registrationEpochSeconds)
 }

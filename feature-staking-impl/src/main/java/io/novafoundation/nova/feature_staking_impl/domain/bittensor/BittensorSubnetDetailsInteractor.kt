@@ -31,9 +31,17 @@ class BittensorSubnetDetailsInteractor(
         taoPriceId: String,
         currency: Currency,
         period: BittensorSubnetChartPeriod
-    ): List<BittensorSubnetPricePoint> =
+    ): List<BittensorSubnetPricePoint> = listedHistory(subnetId, taoPriceId, currency, period).orEmpty()
+
+    /** Null when the subnet has no market listing, as opposed to a listed market without points in the window. */
+    suspend fun listedHistory(
+        subnetId: BittensorNetuid.Subnet,
+        taoPriceId: String,
+        currency: Currency,
+        period: BittensorSubnetChartPeriod
+    ): List<BittensorSubnetPricePoint>? =
         withTimeout(25_000L) {
-            val alphaId = markets.priceId(subnetId) ?: return@withTimeout emptyList()
+            val alphaId = markets.priceId(subnetId) ?: return@withTimeout null
             coroutineScope {
                 val sourcePeriod = period.source
                 val alpha = async { prices.getLastHistoryForPeriod(alphaId, currency, sourcePeriod) }

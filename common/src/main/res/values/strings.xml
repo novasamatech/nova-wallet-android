@@ -2833,6 +2833,9 @@
     <string name="bittensor_sort_week_description">Biggest 7-day move first</string>
     <string name="bittensor_sort_name_description">A to Z</string>
     <string name="bittensor_no_price_history">No price history yet</string>
+    <string name="bittensor_price_history_unavailable">Price history not available for this subnet</string>
+    <string name="bittensor_price_history_source">Spot price comes from the chain pool ratio</string>
+    <string name="bittensor_price_history_failed">Couldn’t load price history</string>
     <string name="bittensor_thin_pool_description">Below 2K %1$s · price moves more</string>
     <string name="bittensor_you_stake">You stake</string>
     <string name="bittensor_validator">Validator</string>
