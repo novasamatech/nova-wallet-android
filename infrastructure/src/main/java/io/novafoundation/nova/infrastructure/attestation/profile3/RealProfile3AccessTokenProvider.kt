@@ -73,7 +73,8 @@ class RealProfile3AccessTokenProvider(
             if (current != null && (!current.shouldRefresh(now) || state.rejected || now < state.cooldownUntil)) {
                 return@withLock TokenDecision(current, null)
             }
-            if (state.rejected) throw AttestationUnsupportedException("Profile-3 registration was refused")
+            // A backend refusal is not a device limitation (iOS keeps authorizationDenied apart from unsupported).
+            if (state.rejected) throw AttestationUnavailableException("Profile-3 registration was refused")
             if (now < state.cooldownUntil) {
                 if (state.unsupported) throw AttestationUnsupportedException("Profile-3 attestation is unsupported on this device")
                 throw AttestationUnavailableException("Profile-3 bootstrap is cooling down")
@@ -158,7 +159,7 @@ class RealProfile3AccessTokenProvider(
                 } else {
                     state.cooldownUntil = backoffDeadline(state)
                 }
-                state.unsupported || state.rejected
+                state.unsupported
             }
             if (unsupported) throw AttestationUnsupportedException("Profile-3 bootstrap failed", failure)
             throw AttestationUnavailableException("Profile-3 bootstrap failed", failure)

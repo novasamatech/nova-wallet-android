@@ -51,8 +51,9 @@ class AttestationFailedException(message: String) : IOException(message)
 open class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
 
 /**
- * This device cannot attest at all - Play Integrity is missing or unusable here, or the backend refused this client -
- * so retrying will not help. Callers should explain the device limitation instead of offering a retry.
+ * This device cannot attest at all - Play Integrity is missing or unusable here - so retrying will not help.
+ * Callers should explain the device limitation instead of offering a retry. A backend refusal is not this: it stays an
+ * [AttestationUnavailableException] so it is retried and reported like any other failure.
  */
 class AttestationUnsupportedException(message: String, cause: Throwable? = null) : AttestationUnavailableException(message, cause)
 

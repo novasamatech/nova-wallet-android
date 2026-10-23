@@ -179,12 +179,16 @@ class Profile3AccessTokenProviderTest {
     }
 
     @Test
-    fun `negative platform verdict is reported as unsupported device`() = runTest {
+    fun `backend refusal stays a retryable unavailability rather than an unsupported device`() = runTest {
         val fixture = Profile3Fixture(backgroundScope)
         fixture.api.failure = httpFailure(401, "attestation_failed")
         val provider = fixture.provider()
-        assertTrue(runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull() is AttestationUnsupportedException)
-        assertTrue(runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull() is AttestationUnsupportedException)
+        val first = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
+        assertTrue(first is AttestationUnavailableException)
+        assertFalse(first!!.isAttestationUnsupported())
+        val refused = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
+        assertTrue(refused is AttestationUnavailableException)
+        assertFalse(refused!!.isAttestationUnsupported())
     }
 
     @Test
