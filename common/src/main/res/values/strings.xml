@@ -2901,7 +2901,12 @@
     <string name="bittensor_positions">Positions</string>
     <string name="bittensor_add_position">Add position</string>
     <string name="bittensor_add_stake">Add stake</string>
-    <string name="bittensor_no_positions">You have no Bittensor staking positions yet</string>
+    <string name="bittensor_portfolio_empty_caption">Bittensor · estimated</string>
+    <string name="bittensor_portfolio_empty_subnet_title">Put TAO to work on a subnet</string>
+    <string name="bittensor_portfolio_empty_subnet_subtitle">Rewards arrive as subnet tokens · value moves with the market</string>
+    <string name="bittensor_portfolio_empty_root_title">Or stake to root · the calm option</string>
+    <string name="bittensor_portfolio_empty_unstake_title">Unstake any time</string>
+    <string name="bittensor_portfolio_empty_unstake_subtitle">No waiting period</string>
     <string name="bittensor_positions_stale">Could not refresh positions. Showing the last available data.</string>
     <string name="bittensor_load_failed_message">Data loading failed. Would you like to retry?</string>
     <string name="bittensor_load_slow_title">Network is slow</string>
@@ -3006,8 +3011,9 @@
     <string name="bittensor_exit_fee_from_stake">The network fee is taken from your root stake. %1$s returns to your free balance after confirmation.</string>
     <string name="bittensor_exit_unstaking_progress">Unstaking from root</string>
     <string name="bittensor_exit_selling_progress">Selling %1$s for %2$s</string>
-    <string name="bittensor_exit_root_completed">Unstake completed</string>
-    <string name="bittensor_exit_root_completed_description">The root withdrawal was confirmed in a finalized block.</string>
+    <string name="bittensor_exit_root_unstaked_title">You unstaked %1$s</string>
+    <string name="bittensor_exit_root_unstaked_description">It is back in your free balance. Your root stake is now %1$s.</string>
+    <string name="bittensor_exit_root_unstaked_all_description">It is back in your free balance.</string>
     <string name="bittensor_exit_sell">Sell</string>
     <string name="bittensor_exit_buy">Buy</string>
     <string name="bittensor_exit_position">Staking position</string>

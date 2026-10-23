@@ -499,20 +499,7 @@ class BittensorExitReviewViewModel(
                 null
             }
             is ExitExecution.Success -> if (isRoot) {
-                state.draft.let { draft ->
-                    BittensorStakeResultUi.Success(
-                        resources.getString(R.string.bittensor_exit_root_completed),
-                        resources.getString(R.string.bittensor_exit_root_completed_description),
-                        validator,
-                        state.outcome.formatNetworkFee(draft.fee, draft.position.chain, resources, tokenFormatter),
-                        amount = formatBittensorNativeResult(
-                            state.outcome?.actualRootStakeMoved(),
-                            draft.quote.amount,
-                            draft.position.chain,
-                            tokenFormatter
-                        )
-                    )
-                }
+                rootUnstakeSuccess(state.draft, state.outcome)
             } else {
                 null
             }
@@ -520,6 +507,29 @@ class BittensorExitReviewViewModel(
         }
     }
         .shareInBackground()
+
+    /** iOS done sheet: "You unstaked X", the root stake left after it, and the fee. */
+    private fun rootUnstakeSuccess(draft: BittensorExitDraft, outcome: BittensorOperationOutcome?): BittensorStakeResultUi.Success {
+        val token = draft.position.asset.token
+        val moved = outcome?.actualRootStakeMoved() ?: draft.quote.amount
+        val after = if (draft.quote.fullExit) BigInteger.ZERO else (draft.position.preflight.totalStake - moved).max(BigInteger.ZERO)
+        val stakeAfter = tokenFormatter.formatToken(token.amountFromPlanks(after), token.configuration.symbol).toString()
+        val description = if (after.signum() == 0) {
+            resources.getString(R.string.bittensor_exit_root_unstaked_all_description)
+        } else {
+            resources.getString(R.string.bittensor_exit_root_unstaked_description, stakeAfter)
+        }
+        return BittensorStakeResultUi.Success(
+            title = resources.getString(
+                R.string.bittensor_exit_root_unstaked_title,
+                formatBittensorNativeResult(outcome?.actualRootStakeMoved(), draft.quote.amount, draft.position.chain, tokenFormatter).token
+            ),
+            description = description,
+            validator = null,
+            fee = outcome.formatNetworkFee(draft.fee, draft.position.chain, resources, tokenFormatter),
+            stakeAfter = stakeAfter
+        )
+    }
 
     init {
         feeLoaderMixin.connectWith(request) { _, request ->
