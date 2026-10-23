@@ -36,6 +36,8 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.common.utils.ltrIsolated
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawal
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
@@ -66,6 +68,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -222,7 +225,8 @@ class BittensorSubnetPositionViewModel(
     }.map { it.isLoading() }.shareInBackground()
 
     val withdrawalHint = combine(withdrawalState, subnet) { state, subnet ->
-        val withdrawal = state.dataOrNull ?: return@combine null
+        // iOS shows no withdrawal caption while the whole stake is free to sell.
+        val withdrawal = state.dataOrNull?.takeIf { it.hasWithdrawalRestriction() } ?: return@combine null
         val symbol = subnet?.symbol?.takeIf { it.isNotBlank() } ?: return@combine null
         withdrawalFormatter.format(withdrawal, BittensorProtocolUnits.ALPHA_PRECISION, TokenSymbol(symbol))
     }.shareInBackground()
@@ -250,9 +254,17 @@ class BittensorSubnetPositionViewModel(
     )
         .shareInBackground()
 
-    val averageChartPrice = costBasisState.map {
+    private val averageChartPrice = costBasisState.map {
         it.dataOrNull?.forSubnet(subnetId.value)
             ?.averagePrice
+    }
+
+    /** iOS `ui.avg.buy.chart.format`: "Avg buy 0.0055", the TAO price without the ticker. */
+    val averageChartLine = averageChartPrice.map { price ->
+        price?.let {
+            val value = tokenFormatter.formatToken(it, TokenSymbol(""), TokenConfig(includeAssetTicker = false)).toString().trim()
+            BittensorChartReferenceLine(it.toFloat(), resources.getString(R.string.bittensor_avg_buy_chart, value))
+        }
     }
         .shareInBackground()
 
@@ -316,7 +328,7 @@ class BittensorSubnetPositionViewModel(
             TokenSymbol(
                 subnet?.symbol.orEmpty().ifBlank { "—" }
             )
-        ).toString()
+        ).toString().ltrIsolated()
     }
         .shareInBackground()
 
@@ -530,3 +542,7 @@ class BittensorSubnetPositionViewModel(
 
     fun back() = router.back()
 }
+
+internal fun BittensorPositionWithdrawal.hasWithdrawalRestriction(): Boolean = locked.signum() > 0 || holdDurationMillis.signum() > 0
+
+data class BittensorChartReferenceLine(val value: Float, val label: String)

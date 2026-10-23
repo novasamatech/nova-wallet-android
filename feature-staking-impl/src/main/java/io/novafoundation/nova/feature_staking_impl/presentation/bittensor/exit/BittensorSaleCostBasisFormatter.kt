@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEst
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import javax.inject.Inject
 import java.math.BigDecimal
+import java.math.BigInteger
 
 data class BittensorSaleProfitUi(val amount: AmountModel, @ColorRes val colorRes: Int)
 
@@ -101,6 +103,17 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
         )
     }
 
+    /** "You earned" on a completed sale; null without settled purchase totals, so the row stays hidden (iOS). */
+    fun completedProfit(
+        totals: BittensorEstimatedPurchaseTotals?,
+        quote: BittensorExitQuote,
+        outcome: BittensorOperationOutcome?,
+        token: TokenBase
+    ): BittensorSaleProfitUi? {
+        totals ?: return null
+        return profit(token.amountFromPlanks(completedSaleProfit(totals, quote, outcome)), token)
+    }
+
     fun profit(basis: BittensorEstimatedCostBasis?, draft: BittensorExitDraft?, netuid: Int): BittensorSaleProfitUi {
         val totals = basis?.forSubnet(netuid)
         if (totals == null || draft == null) return BittensorSaleProfitUi(AmountModel("—", null), R.color.text_secondary)
@@ -133,3 +146,16 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
 
 internal fun estimatedSaleProfit(totals: BittensorEstimatedPurchaseTotals, quote: BittensorExitQuote) =
     totals.estimatedProfit(quote.amount, quote.estimatedTaoOut - quote.serviceFee)
+
+/** Only settled totals back "You will earn", so only they may back "You earned". */
+internal fun settledPurchaseTotals(sale: BittensorSaleCostBasis?): BittensorEstimatedPurchaseTotals? =
+    (sale as? BittensorSaleCostBasis.Known)?.takeIf { it.settled }?.totals
+
+/** The executed sale when the chain reported it (alpha sold, TAO out before the network fee), the reviewed quote otherwise. */
+internal fun completedSaleProfit(totals: BittensorEstimatedPurchaseTotals, quote: BittensorExitQuote, outcome: BittensorOperationOutcome?): BigInteger {
+    val soldAlpha = outcome?.alpha
+    val executedTao = outcome?.tao
+    val paidService = if (quote.serviceFee.signum() == 0) BigInteger.ZERO else outcome?.serviceFee
+    if (soldAlpha == null || executedTao == null || paidService == null) return estimatedSaleProfit(totals, quote)
+    return totals.estimatedProfit(soldAlpha, executedTao - paidService)
+}

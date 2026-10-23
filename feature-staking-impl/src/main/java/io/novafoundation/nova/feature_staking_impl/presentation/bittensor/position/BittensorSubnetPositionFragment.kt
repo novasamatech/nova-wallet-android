@@ -24,7 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetPositionBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
@@ -82,7 +82,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.subnet.observe { subnet ->
-            val name = subnet?.title(requireContext()) ?: getString(R.string.bittensor_exit_position)
+            val name = subnet?.displayName(requireContext()) ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)
             subnetCaption.text = name
             subnetIcon.setIcon(
@@ -112,9 +112,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
             chart.setCharts(charts)
         }
-        viewModel.averageChartPrice.observe { value ->
-            chart.setReferencePrice(value?.toFloat(), getString(R.string.bittensor_exit_avg_buy_price))
-        }
+        viewModel.averageChartLine.observe { line -> chart.setReferencePrice(line?.value, line?.label.orEmpty()) }
         viewModel.holding.observe { holding.text = it }
         viewModel.hasStake.observe { activeStatus.isVisible = it }
         viewModel.worth.observe(worth::showBittensorLoadingAmount)
