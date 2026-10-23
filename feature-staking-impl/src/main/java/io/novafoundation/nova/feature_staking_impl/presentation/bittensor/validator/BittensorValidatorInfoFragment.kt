@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.valid
 import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorValidatorInfoBinding
@@ -32,6 +34,8 @@ class BittensorValidatorInfoFragment : BaseFragment<BittensorValidatorInfoViewMo
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         account.setOnClickListener { viewModel.accountClicked() }
+        totalStake.setOnClickListener { showDescription(R.string.staking_total_staked, viewModel.totalStakeDescription) }
+        take.setOnClickListener { showDescription(R.string.bittensor_validator_info_take, viewModel.takeDescription) }
     }
 
     override fun subscribe(viewModel: BittensorValidatorInfoViewModel) = with(binder) {
@@ -56,5 +60,9 @@ class BittensorValidatorInfoFragment : BaseFragment<BittensorValidatorInfoViewMo
             if (amount == null) totalStake.showValue("—") else totalStake.showAmount(amount)
         }
         viewModel.coverage.observe(coverage::showBittensorLoadingValue)
+    }
+
+    private fun showDescription(titleRes: Int, description: String) {
+        DescriptionBottomSheet(requireContext(), getString(titleRes), description).show()
     }
 }
