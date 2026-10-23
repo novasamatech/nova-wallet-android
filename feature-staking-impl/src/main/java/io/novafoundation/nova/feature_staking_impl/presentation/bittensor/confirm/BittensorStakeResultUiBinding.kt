@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 fun BaseFragmentMixin<*>.bindBittensorStakeResults(
     results: Flow<BittensorStakeResultUi?>,
@@ -34,36 +33,6 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
             if (!sheet.isShowing) sheet.show()
         }
     }
-}
-
-/** For a view model with one callback per button: the sheet offers the buttons those callbacks cover. */
-fun BaseFragmentMixin<*>.bindBittensorStakeResults(
-    results: Flow<BittensorStakeResultUi?>,
-    onDismiss: () -> Unit,
-    onTryAgain: () -> Unit,
-    onViewPosition: () -> Unit,
-    onDiscoverSubnets: () -> Unit = {},
-    onUnconfirmedDone: () -> Unit = {}
-) = bindBittensorStakeResults(results.map { it?.withCallbackActions() }) { action ->
-    when (action) {
-        BittensorResultAction.TRY_AGAIN -> {
-            onDismiss()
-            onTryAgain()
-        }
-        BittensorResultAction.VIEW_POSITION, BittensorResultAction.YOUR_BITTENSOR -> onViewPosition()
-        BittensorResultAction.DISCOVER_SUBNETS -> onDiscoverSubnets()
-        BittensorResultAction.DONE -> onUnconfirmedDone()
-        BittensorResultAction.CLOSE, BittensorResultAction.BACK_TO_POSITION -> onDismiss()
-    }
-}
-
-private fun BittensorStakeResultUi.withCallbackActions(): BittensorStakeResultUi = when {
-    actions.isNotEmpty() -> this
-    this is BittensorStakeResultUi.Success -> copy(
-        actions = listOfNotNull(BittensorResultAction.DISCOVER_SUBNETS.takeIf { canDiscoverSubnets }, BittensorResultAction.VIEW_POSITION)
-    )
-    this is BittensorStakeResultUi.Unconfirmed -> copy(actions = listOf(BittensorResultAction.DONE))
-    else -> this
 }
 
 internal fun BittensorStakeResultBottomSheet?.dismissWithoutResultCallback(): BittensorStakeResultBottomSheet? {

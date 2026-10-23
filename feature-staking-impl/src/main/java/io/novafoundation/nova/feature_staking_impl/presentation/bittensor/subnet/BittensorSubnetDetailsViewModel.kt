@@ -353,6 +353,9 @@ class BittensorSubnetDetailsViewModel(
 
     private val selectedValidatorAddress = MutableStateFlow(initialValidatorAddress)
 
+    /** The automatic preset once loaded, kept after the user picks another validator (iOS `recommendedHotkey`). */
+    private var presetAddress: String? = null
+
     private val validatorCandidates = selectedValidatorAddress.flatMapLatest { address ->
         if (address != null) {
             flowOf { selectedValidatorPreviews(address) }.withSafeLoading()
@@ -432,7 +435,9 @@ class BittensorSubnetDetailsViewModel(
 
     private fun openValidatorSelection(address: String?, completesOnSelection: Boolean) {
         completesOnValidatorSelection = completesOnSelection
-        validatorCommunicator.openRequest(BittensorSelectValidatorCommunicator.Request(subnetId.value, address, selectionState))
+        validatorCommunicator.openRequest(
+            BittensorSelectValidatorCommunicator.Request(subnetId.value, address, selectionState, recommendedAddress = presetAddress)
+        )
     }
 
     private fun periodLabel(period: BittensorSubnetChartPeriod): String = resources.getString(period.labelRes())
@@ -535,6 +540,7 @@ class BittensorSubnetDetailsViewModel(
                 subnetId.value,
                 address,
                 validatorIsPreset = isPreset,
+                recommendedAddress = presetAddress,
                 replaceAmount = replaceAmount,
                 selectionState = selectionState
             )
@@ -547,6 +553,7 @@ class BittensorSubnetDetailsViewModel(
      */
     private suspend fun automaticValidatorPreviews(): List<BittensorValidatorPreview> {
         val preset = presetValidatorInteractor.preset(subnetId).preset ?: return emptyList()
+        presetAddress = validatorInteractor.chain().addressOf(preset.validator.hotkey.value)
         return listOf(BittensorValidatorPreview(preset.validator, canPreselect = true))
     }
 

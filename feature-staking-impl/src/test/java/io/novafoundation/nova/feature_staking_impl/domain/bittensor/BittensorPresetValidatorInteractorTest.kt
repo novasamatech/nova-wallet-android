@@ -59,7 +59,7 @@ class BittensorPresetValidatorInteractorTest {
 
     @Test
     fun `known highest yield recommendation is checked and selected`() = runBlocking<Unit> {
-        assertEquals(second, interactor.validators(subnet).first())
+        assertEquals(second, interactor.preset(subnet).preset)
         verify(repository).validate(chain, subnet, second.validator)
         verify(repository, never()).validate(chain, subnet, first.validator)
     }
@@ -67,7 +67,7 @@ class BittensorPresetValidatorInteractorTest {
     @Test
     fun `inactive highest yield is skipped even when recommendation and gates allow it`() = runBlocking<Unit> {
         stubDirectory(second.copy(inactive = true), first, third)
-        assertEquals(first, interactor.validators(subnet).first())
+        assertEquals(first, interactor.preset(subnet).preset)
         verify(repository, never()).validate(chain, subnet, second.validator)
     }
 
@@ -75,31 +75,30 @@ class BittensorPresetValidatorInteractorTest {
     fun `unavailable automatic candidate falls back once`() = runBlocking<Unit> {
         doThrow(IllegalStateException("inactive")).`when`(repository).validate(chain, subnet, second.validator)
 
-        assertEquals(first, interactor.validators(subnet).first())
+        assertEquals(first, interactor.preset(subnet).preset)
         verify(repository).validate(chain, subnet, first.validator)
     }
 
     @Test
-    fun `two failures are reported without searching the whole directory`() = runBlocking<Unit> {
+    fun `two failures leave the preset empty without searching the whole directory`() = runBlocking<Unit> {
         doThrow(IllegalStateException("inactive")).`when`(repository).validate(chain, subnet, second.validator)
         doThrow(IllegalStateException("inactive")).`when`(repository).validate(chain, subnet, first.validator)
 
-        val failure = runCatching { interactor.validators(subnet) }.exceptionOrNull()
-        assertEquals("No eligible recommended validator in this subnet", failure?.message)
+        assertNull(interactor.preset(subnet).preset)
         verify(repository, never()).validate(chain, subnet, third.validator)
     }
 
     @Test
     fun `missing optional yields do not prevent a preset`() = runBlocking<Unit> {
         `when`(yields.alphaYields(chain, subnet)).thenThrow(IllegalStateException("unavailable"))
-        assertEquals(first, interactor.validators(subnet).first())
+        assertEquals(first, interactor.preset(subnet).preset)
     }
 
     @Test(expected = CancellationException::class)
     fun `cancellation does not select a fallback`() = runBlocking<Unit> {
         doThrow(CancellationException()).`when`(repository).validate(chain, subnet, second.validator)
         try {
-            interactor.validators(subnet)
+            interactor.preset(subnet)
         } finally {
             verify(repository, never()).validate(chain, subnet, first.validator)
         }
@@ -108,7 +107,7 @@ class BittensorPresetValidatorInteractorTest {
     @Test
     fun `unrecommended and disabled rows are never preset candidates`() = runBlocking<Unit> {
         stubDirectory(second.copy(recommended = false), first.copy(selectable = false), third)
-        assertEquals(third, interactor.validators(subnet).first())
+        assertEquals(third, interactor.preset(subnet).preset)
         verify(repository, never()).validate(chain, subnet, second.validator)
     }
 
@@ -148,8 +147,6 @@ class BittensorPresetValidatorInteractorTest {
         stubDirectory(first.copy(recommended = false), second.copy(inactive = true))
 
         assertNull(interactor.preset(subnet).preset)
-        val failure = runCatching { interactor.validators(subnet) }.exceptionOrNull()
-        assertEquals("No eligible recommended validator in this subnet", failure?.message)
     }
 
     @Test

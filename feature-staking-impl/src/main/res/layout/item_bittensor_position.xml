@@ -28,6 +28,11 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:ellipsize="end" />
+        <ProgressBar
+            android:id="@+id/positionTitleProgress"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/positionSubtitle"

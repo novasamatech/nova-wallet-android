@@ -42,7 +42,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWee
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.passesBittensorThinPoolFilter
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorSubnets
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetsFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
@@ -108,9 +110,12 @@ class BittensorChooseSubnetViewModel(
 
     val hideThinPools = MutableStateFlow(payload.browseState.hideThinPools)
 
+    private val catalogueRetry = BittensorInlineRetry()
+
     private val catalogueState = retryController.observe(
         step = "subnet catalogue",
         analytics = subnetsReads,
+        inlineRetry = catalogueRetry,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { browseRepository.subnets() }
@@ -119,6 +124,13 @@ class BittensorChooseSubnetViewModel(
 
     private val catalogue = catalogueState.filterLoaded()
         .onStart { emit(emptyList()) }
+        .shareInBackground()
+
+    // As on iOS, a failed catalogue keeps the root row and explains itself below it, with Try again unless no retry can help.
+    val catalogueFailure = catalogueState.map { state ->
+        (state as? ExtendedLoadingState.Error)?.exception?.bittensorSubnetsFailure(resources)
+    }
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val query = MutableStateFlow("")
@@ -287,6 +299,10 @@ class BittensorChooseSubnetViewModel(
             analytics.track(BittensorAnalyticsEvent.SubnetSearch())
         }
         this.query.value = query.trim()
+    }
+
+    fun retryCatalogue() {
+        catalogueRetry.retry()
     }
 
     fun select(row: BittensorSubnetRowUi) = launchUnit {

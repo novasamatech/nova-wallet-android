@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorValidatorInfoBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
@@ -35,10 +36,16 @@ class BittensorValidatorInfoFragment : BaseFragment<BittensorValidatorInfoViewMo
 
     override fun subscribe(viewModel: BittensorValidatorInfoViewModel) = with(binder) {
         setupExternalActions(viewModel)
+        // As iOS, Skip on a failed validator read closes the screen.
+        observeBittensorRetries(viewModel.retryEvents, onSkip = viewModel::back)
         viewModel.account.observe(account::setAddressModel)
-        status.showValue(viewModel.status.text)
-        status.setPrimaryValueStyle(viewModel.status.style)
-        take.showValue(viewModel.take)
+        status.showProgress()
+        viewModel.status.observe {
+            status.showValue(it.text)
+            status.setPrimaryValueStyle(it.style)
+        }
+        take.showProgress()
+        viewModel.take.observe(take::showValue)
         reward.showProgress()
         viewModel.reward.observe {
             reward.showValue(it.value, it.detail)

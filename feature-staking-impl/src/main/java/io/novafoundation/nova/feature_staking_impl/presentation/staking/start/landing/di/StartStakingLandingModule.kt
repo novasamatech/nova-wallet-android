@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
@@ -69,7 +70,8 @@ class StartStakingLandingModule {
         analyticsService: AnalyticsService,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         bittensorRecommendedYieldInteractor: BittensorRecommendedYieldInteractor,
-        bittensorRetryController: BittensorRetryController
+        bittensorRetryController: BittensorRetryController,
+        walletGate: BittensorWalletGate
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -90,7 +92,8 @@ class StartStakingLandingModule {
             analyticsService = analyticsService,
             bittensorSubnetInteractor = bittensorSubnetInteractor,
             bittensorRecommendedYieldInteractor = bittensorRecommendedYieldInteractor,
-            bittensorRetryController = bittensorRetryController
+            bittensorRetryController = bittensorRetryController,
+            walletGate = walletGate
         )
     }
 

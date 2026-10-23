@@ -62,27 +62,13 @@ class BittensorResultNavigation(
         finish(exit, exit.doneAnalyticsAction)
     }
 
-    /** "View position": the new position on the portfolio, otherwise the position the flow started from. */
-    fun viewPosition(emptiesPosition: Boolean = false) {
-        val exit = bittensorCompletedFlowExit(newPosition, emptiesPosition)
-        val action = when {
-            newPosition -> StakingResultAction.VIEW_POSITION
-            exit == BittensorFlowExit.PORTFOLIO -> StakingResultAction.YOUR_BITTENSOR
-            else -> StakingResultAction.BACK_TO_POSITION
-        }
-        finish(exit, action)
-    }
-
-    /**
-     * Only offered on a new position, as iOS `createDoneSheet`; [network] is the chain name for `staking_flow_opened`,
-     * which follows the result action as in iOS `activate(action:)`.
-     */
-    fun discoverSubnets(network: String = BittensorAnalyticsEvent.NETWORK) {
+    /** Only offered on a new position, as iOS `createDoneSheet`; `staking_flow_opened` follows the result action as in iOS `activate(action:)`. */
+    private fun discoverSubnets() {
         if (finished) return
         finished = true
 
         track(StakingResultAction.DISCOVER_SUBNETS)
-        if (trackActions) analytics.track(AnalyticsEvent.StakingFlowOpened(network, StakingFlowSource.RESULT_DISCOVER.value))
+        if (trackActions) analytics.track(AnalyticsEvent.StakingFlowOpened(BittensorAnalyticsEvent.NETWORK, StakingFlowSource.RESULT_DISCOVER.value))
         router.finishBittensorFlow(BittensorFlowExit.SUBNET_DISCOVERY)
     }
 

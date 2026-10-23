@@ -88,6 +88,14 @@
                 android:visibility="gone"
                 app:alertMode="warning" />
 
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/validatorFailure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
+
             <LinearLayout
                 android:id="@+id/selectedSubnetCard"
                 android:layout_width="match_parent"

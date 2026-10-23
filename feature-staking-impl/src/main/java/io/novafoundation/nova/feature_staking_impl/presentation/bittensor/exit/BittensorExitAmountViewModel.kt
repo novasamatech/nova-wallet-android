@@ -58,7 +58,6 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
@@ -79,6 +78,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageS
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitFailureValues
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -372,11 +372,17 @@ class BittensorExitAmountViewModel(
 
     val fiatAmount = combine(
         position,
-        amount
-    ) { position, text ->
+        amount,
+        requestState
+    ) { position, text, state ->
         position ?: return@combine null
         val input = text.toBigDecimalOrNull() ?: return@combine null
-        val tao = if (isRoot) input else position.subnet?.priceInRao?.let { input * position.asset.token.amountFromPlanks(it) } ?: return@combine null
+        val tao = if (isRoot) {
+            input
+        } else {
+            val spot = bittensorAlphaSpotPrice(position, state.dataOrNull?.exit?.quote) ?: return@combine null
+            input * position.asset.token.amountFromPlanks(spot)
+        }
         val fiat = position.asset.token.toFiatOrNull(tao) ?: return@combine null
         fiatFormatter.formatFiat(fiat, position.asset.token.currency)
     }
@@ -720,7 +726,8 @@ class BittensorExitAmountViewModel(
         if (group.hotkeys.size > 1) {
             validatorPicker.value = createValidatorPicker(position, group, selection).event()
         } else {
-            externalActions.showAddressActions(position.chain.addressOf(group.anchor(selection).value), position.chain)
+            val address = position.chain.addressOf(group.anchor(selection).value)
+            router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(payload.netuid, address))
         }
     }
 

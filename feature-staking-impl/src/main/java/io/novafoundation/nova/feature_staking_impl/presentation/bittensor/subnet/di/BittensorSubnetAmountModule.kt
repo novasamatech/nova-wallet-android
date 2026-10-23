@@ -81,6 +81,7 @@ class BittensorSubnetAmountModule {
         presetValidatorInteractor = presetValidatorInteractor,
         validatorAddress = payload.validatorAddress,
         validatorIsPreset = payload.validatorIsPreset,
+        recommendedAddress = payload.recommendedAddress,
         bittensorSubnetInteractor = bittensorSubnetInteractor,
         router = router,
         resources = resources,

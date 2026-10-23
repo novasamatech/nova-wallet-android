@@ -10,6 +10,7 @@ import io.novafoundation.nova.analytics.AnalyticsService
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.address.AccountIdKey
 import java.math.BigDecimal
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectoryStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
@@ -36,7 +38,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.toValidatorInfoDetail
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorValidatorsFailure
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flatMapLatest
@@ -64,7 +69,8 @@ class BittensorSelectValidatorViewModel(
     private val logger: Logger,
     private val retryController: BittensorRetryController,
     private val tokenFormatter: TokenFormatter,
-    private val subnetInteractor: BittensorSubnetInteractor
+    private val subnetInteractor: BittensorSubnetInteractor,
+    private val abandonment: BittensorChooseSubnetAbandonment
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.VALIDATOR_SELECT)
@@ -96,8 +102,11 @@ class BittensorSelectValidatorViewModel(
         .onStart { emit(null) }
         .shareInBackground()
 
+    private val directoryRetry = BittensorInlineRetry()
+
     private val directoryState = observeBittensorValidatorDirectory(
         retryController = retryController,
+        inlineRetry = directoryRetry,
         hideUnusualApy = filters.map { it.hideUnusualApy }.distinctUntilChanged(),
         loadDirectory = { bittensorValidatorInteractor.directory(netuid) },
         rankDirectory = { bittensorValidatorInteractor.rankDirectory(netuid, it) }
@@ -112,6 +121,13 @@ class BittensorSelectValidatorViewModel(
                 partial = directory.status.completeness == BittensorValidatorDirectoryStatus.Completeness.PARTIAL
             )
         }
+        .shareInBackground()
+
+    // As on iOS, a failed list replaces the header and the rows, with Try again unless no retry can help.
+    val failure = validatorsState.map { state ->
+        (state as? ExtendedLoadingState.Error)?.exception?.bittensorValidatorsFailure(resources)
+    }
+        .distinctUntilChanged()
         .shareInBackground()
 
     // A STALE ranking still drives the quick picks, so the list says so instead of using it silently.
@@ -184,7 +200,7 @@ class BittensorSelectValidatorViewModel(
     val isLoading = validatorsState.map { it.isLoading() }
         .shareInBackground()
 
-    val isEmpty = combine(rows, isLoading) { rows, loading -> rows.isEmpty() && !loading }
+    val isEmpty = combine(rows, validatorsState) { rows, state -> rows.isEmpty() && state is ExtendedLoadingState.Loaded }
         .shareInBackground()
 
     val canRemoveFilters = combine(filteredRows, validatorsState, filters) { rows, state, filters ->
@@ -252,6 +268,10 @@ class BittensorSelectValidatorViewModel(
         query.value = text
     }
 
+    fun retry() {
+        directoryRetry.retry()
+    }
+
     fun applyFilters(value: BittensorValidatorFilters) {
         filters.value = value
     }
@@ -274,10 +294,7 @@ class BittensorSelectValidatorViewModel(
             BittensorValidatorInfoPayload(
                 subnetId = request.subnetId,
                 address = validator.address,
-                name = validator.validator.name.trim().takeIf { it.isNotEmpty() && it != validator.address },
-                reportedStake = validator.validator.reportedStake,
-                commissionRate = validator.commissionRate,
-                inactive = validator.inactive
+                detail = validator.toValidatorInfoDetail()
             )
         )
     }
@@ -301,6 +318,12 @@ class BittensorSelectValidatorViewModel(
     fun back() {
         communicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState()))
         router.back()
+    }
+
+    /** iOS `becomeActive`: names this list the abandoned stage of a subnet picker visit; outside a visit nothing is tracked. */
+    fun becomeActive() {
+        val target = if (netuid.isRoot()) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET
+        abandonment.becomeActive(request.selectionState.flowId, BittensorScreen.VALIDATOR_SELECT, target)
     }
 
     private fun selectionState(): BittensorSelectionState = request.selectionState.withFilters(netuid, filters.value)

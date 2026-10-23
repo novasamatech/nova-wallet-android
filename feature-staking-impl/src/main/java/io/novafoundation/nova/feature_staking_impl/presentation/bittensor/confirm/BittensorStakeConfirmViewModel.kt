@@ -58,9 +58,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.titleAndMessage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -190,6 +193,9 @@ class BittensorStakeConfirmViewModel(
 
     private val validating = MutableStateFlow(false)
 
+    /** Set once the stake is confirmed, also when it then fails (iOS `abandonTracker.markProceeded`). */
+    private var flowContinued = false
+
     val confirmButtonState = combine(
         stakingDetailsState,
         validating,
@@ -218,7 +224,13 @@ class BittensorStakeConfirmViewModel(
         when {
             submission.value is BittensorSubmissionState.Submitting -> Unit
             submission.value.isFinished -> resultNavigation.leave()
-            else -> router.back()
+            else -> {
+                // As iOS: leaving the confirmation of a new position before confirming reports it abandoned.
+                if (!flowContinued && !payload.existingPosition) {
+                    analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.CONFIRM, StakingAnalyticsTarget.ROOT))
+                }
+                router.back()
+            }
         }
     }
 
@@ -227,6 +239,10 @@ class BittensorStakeConfirmViewModel(
             account.first().address,
             chain.await()
         )
+    }
+
+    fun validatorClicked() {
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(BittensorNetuid.Root.value, payload.validatorAddress))
     }
 
     fun confirmClicked() = launchUnit {
@@ -263,7 +279,7 @@ class BittensorStakeConfirmViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            submission.value = e.mapBittensorPreSubmissionError().mapResult(resourceManager).toSubmissionState()
+            submission.value = e.mapBittensorPreSubmissionError().mapResult(resourceManager, resultNavigation.landingActions()).toSubmissionState()
         } finally {
             validating.value = false
         }
@@ -285,6 +301,7 @@ class BittensorStakeConfirmViewModel(
             val details = stakingDetails.first()
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
             operationAnalytics.startOperation()
+            flowContinued = true
             analytics.track(
                 BittensorAnalyticsEvent.Confirmed(
                     BittensorAnalyticsEvent.NETWORK,
@@ -301,39 +318,27 @@ class BittensorStakeConfirmViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = result.toSubmissionState(resourceManager)
+                    submission.value = result.toSubmissionState(resourceManager, resultNavigation.landingActions())
                 }
-                is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resourceManager).toSubmissionState()
+                is BittensorOperationResult.Unknown ->
+                    submission.value = result.mapResult(resourceManager, resultNavigation.landingActions()).toSubmissionState()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val result = e.mapBittensorSubmissionError()
             operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.STAKE, mode = analyticsMode)
-            submission.value = result.mapResult(resourceManager).toSubmissionState()
+            submission.value = result.mapResult(resourceManager, resultNavigation.landingActions()).toSubmissionState()
         } finally {
             validating.value = false
         }
     }
 
-    fun resultDismissed() {
-        if (submission.value.isFinished) {
-            resultNavigation.leave()
-        } else {
-            submission.value = submission.value.dismissResult()
-        }
-    }
+    /** A result sheet button, as iOS `activate(action:)`; Try again hides the sheet so the stake can be confirmed again. */
+    fun resultActionClicked(action: BittensorResultAction) {
+        if (action !in submission.value.result?.actions.orEmpty()) return
 
-    fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) resultNavigation.viewPosition()
-    }
-
-    fun unconfirmedDoneClicked() {
-        if (submission.value is BittensorSubmissionState.Unconfirmed) resultNavigation.done()
-    }
-
-    fun discoverSubnetsClicked() = launchUnit {
-        if (submission.value is BittensorSubmissionState.Completed) resultNavigation.discoverSubnets(chain.await().name)
+        resultNavigation.activate(action) { submission.value = submission.value.dismissResult() }
     }
 
     private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {
@@ -379,7 +384,7 @@ class BittensorStakeConfirmViewModel(
             validator = request.validator.name,
             fee = outcome.formatNetworkFee(fee, request.chain, resourceManager, tokenFormatter),
             amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter),
-            canDiscoverSubnets = !payload.existingPosition
+            actions = resultNavigation.completedActions()
         )
     }
 

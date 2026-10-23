@@ -45,7 +45,7 @@ private fun BittensorExitValidationFailure.titleAndMessage(
         BittensorExitValidationFailure.SUBNET_TRADING_DISABLED ->
             resources.getString(R.string.bittensor_validation_staking_disabled_title) to resources.getString(R.string.bittensor_validation_staking_disabled)
         BittensorExitValidationFailure.ORDER_TOO_LARGE ->
-            resources.getString(R.string.bittensor_exit_self_impact_title) to resources.getString(R.string.bittensor_exit_self_impact_message)
+            resources.getString(R.string.bittensor_self_impact_title) to resources.getString(R.string.bittensor_self_impact_message)
         BittensorExitValidationFailure.ROOT_LOCKED -> {
             val message = values.holdEta?.let { resources.getString(R.string.bittensor_exit_locked_message, it) }
             resources.getString(R.string.bittensor_exit_locked_title) to (message ?: resources.getString(R.string.bittensor_validation_root_locked))

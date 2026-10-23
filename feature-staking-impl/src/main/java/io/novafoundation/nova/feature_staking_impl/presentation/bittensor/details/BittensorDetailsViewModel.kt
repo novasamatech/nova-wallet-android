@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import kotlinx.coroutines.flow.onEach
@@ -41,6 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
@@ -77,11 +79,9 @@ class BittensorDetailsViewModel(
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
     private val rowInteractor: BittensorPortfolioRowInteractor,
     private val rootClaimInteractor: BittensorRootClaimInteractor,
+    val walletGate: BittensorWalletGate,
     analyticsSource: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD,
-    private val entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO,
 ) : BaseViewModel(), ExternalActions by externalActions {
-
-    private var entryConsumed = false
 
     /** The source `staking_portfolio_opened` still has to report; null once reported. */
     private val unreportedOpenSource = MutableStateFlow<StakingPortfolioSource?>(analyticsSource)
@@ -143,9 +143,9 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
+    // As on iOS, Add position is never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
     val canAddStake = portfolioState.map { portfolio ->
-        val data = portfolio.dataOrNull
-        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
+        portfolio.dataOrNull?.dataStatus is BittensorDataStatus.Fresh
     }
         .onStart { emit(false) }
         .shareInBackground()
@@ -251,15 +251,6 @@ class BittensorDetailsViewModel(
 
     private val rootRewards = rootClaimStates.map { claims ->
         AccountRowValue(claims.metaId, claims.state.map { it.claims.totalClaimable })
-    }
-        .shareInBackground()
-
-    val entryResolution = if (entry == BittensorPortfolioEntry.DEEP_LINK) {
-        combine(portfolioState, rootClaimStates.onStart { emit(AccountRowValue(null, ExtendedLoadingState.Loading)) }) { state, claims ->
-            resolveBittensorEntry(state.dataOrNull, claims.state.dataOrNull)
-        }
-    } else {
-        flowOf(null)
     }
         .shareInBackground()
 
@@ -385,20 +376,16 @@ class BittensorDetailsViewModel(
 
     fun back() = router.back()
 
-    fun completeEntry(resolution: BittensorEntryResolution) {
-        if (entryConsumed || entry != BittensorPortfolioEntry.DEEP_LINK) return
-        entryConsumed = true
-        if (resolution is BittensorEntryResolution.Start) {
-            analytics.track(AnalyticsEvent.StakingFlowOpened(resolution.network, StakingFlowSource.DEEP_LINK.value))
-            router.replaceBittensorPortfolioWithStart(resolution.payload)
-        }
-    }
-
-    /** Re-entry goes through the same Earn landing as a first stake (iOS `SubtensorPortfolioWireframe.showAddPosition`). */
+    /**
+     * Re-entry goes through the same Earn landing as a first stake (iOS `SubtensorPortfolioWireframe.showAddPosition`), once the
+     * wallet passes the iOS `checkingSupport` gate.
+     */
     fun addPosition() = launchUnit {
         val portfolio = portfolio.first()
-        analytics.track(AnalyticsEvent.StakingFlowOpened(portfolio.chain.name, StakingFlowSource.PORTFOLIO_ADD_POSITION.value))
-        router.openBittensorStartStaking(portfolio.startStakingPayload())
+        walletGate.checkingSupport(portfolio.metaId, StakingFlow.STAKE, target = null) {
+            analytics.track(AnalyticsEvent.StakingFlowOpened(portfolio.chain.name, StakingFlowSource.PORTFOLIO_ADD_POSITION.value))
+            router.openBittensorStartStaking(portfolio.startStakingPayload())
+        }
     }
 
     fun positionClicked(position: BittensorPositionUi) {

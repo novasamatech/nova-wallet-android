@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -52,6 +53,7 @@ class BittensorValidatorInfoModule {
         amountFormatter: BittensorAmountFormatter,
         tokenFormatter: TokenFormatter,
         externalActions: ExternalActions.Presentation,
+        retryController: BittensorRetryController,
         resources: ResourceManager,
         logger: Logger
     ): ViewModel = BittensorValidatorInfoViewModel(
@@ -65,6 +67,7 @@ class BittensorValidatorInfoModule {
         amountFormatter = amountFormatter,
         tokenFormatter = tokenFormatter,
         externalActions = externalActions,
+        retryController = retryController,
         resources = resources,
         logger = logger
     )

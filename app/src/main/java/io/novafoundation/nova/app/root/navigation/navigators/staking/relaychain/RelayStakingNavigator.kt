@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
@@ -414,20 +413,9 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorPortfolio(
-        source: StakingPortfolioSource,
-        entry: BittensorPortfolioEntry
-    ) {
+    override fun openBittensorPortfolio(source: StakingPortfolioSource) {
         navigationBuilder().action(R.id.action_open_bittensor_portfolio)
-            .setArgs(BittensorPortfolioFragment.sourceBundle(source, entry))
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun replaceBittensorPortfolioWithStart(
-        payload: StartStakingLandingPayload
-    ) {
-        navigationBuilder().action(R.id.action_replace_bittensor_portfolio_with_start_staking)
-            .setArgs(StartStakingLandingFragment.getBundle(payload))
+            .setArgs(BittensorPortfolioFragment.sourceBundle(source))
             .navigateInFirstAttachedContext()
     }
 
@@ -452,7 +440,7 @@ class RelayStakingNavigator(
             }
 
             BittensorFlowExitPlan.OpenPortfolioOverDashboard -> navigationBuilder().action(R.id.action_finish_bittensor_flow_to_portfolio)
-                .setArgs(BittensorPortfolioFragment.sourceBundle(StakingPortfolioSource.RESULT, BittensorPortfolioEntry.PORTFOLIO))
+                .setArgs(BittensorPortfolioFragment.sourceBundle(StakingPortfolioSource.RESULT))
                 .navigateInFirstAttachedContext()
         }
     }

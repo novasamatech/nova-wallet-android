@@ -83,4 +83,9 @@ class BittensorValidatorInteractor(
         val chain = chain()
         return validatorRepository.rankDirectory(chain, netuid, directory)
     }
+
+    suspend fun chainValidator(netuid: BittensorNetuid, hotkey: AccountIdKey): BittensorSubnetValidator {
+        val chain = chain()
+        return validatorRepository.chainValidator(chain, netuid, hotkey)
+    }
 }

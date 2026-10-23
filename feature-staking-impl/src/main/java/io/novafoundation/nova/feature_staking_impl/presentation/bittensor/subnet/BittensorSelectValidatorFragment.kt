@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSelectValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setBittensorFailure
 
 private const val PAYLOAD_KEY = "payload"
 
@@ -69,6 +70,11 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             progress.isVisible = it
         }
         viewModel.isEmpty.observe { emptyState.isVisible = it }
+        viewModel.failure.observe {
+            failure.setBittensorFailure(it, viewModel::retry)
+            header.isVisible = it == null
+            list.isVisible = it == null
+        }
         viewModel.inactiveValidatorEvents.observe {
             dialog(requireContext()) {
                 setTitle(R.string.bittensor_inactive_validator_title)
@@ -81,6 +87,11 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             removeFilters.isVisible = it
             emptyIcon.isVisible = it
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.becomeActive()
     }
 
     override fun onDestroyView() {

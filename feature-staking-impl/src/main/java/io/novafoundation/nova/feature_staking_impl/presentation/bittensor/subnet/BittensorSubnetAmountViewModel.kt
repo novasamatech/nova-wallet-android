@@ -67,7 +67,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorPositionCostBasis
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorValidatorsFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorNeedsFunding
@@ -132,6 +134,7 @@ class BittensorSubnetAmountViewModel(
     private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     validatorAddress: String?,
     validatorIsPreset: Boolean,
+    private val recommendedAddress: String?,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
     private val resources: ResourceManager,
@@ -162,6 +165,9 @@ class BittensorSubnetAmountViewModel(
     private var isNoBalanceTracked = false
 
     private var isTypeSelectedTracked = false
+
+    /** Set once the setup moves on to the review (iOS `abandonTracker.markProceeded`). */
+    private var flowContinued = false
 
     private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SETUP)
     private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SETUP)
@@ -204,6 +210,11 @@ class BittensorSubnetAmountViewModel(
     private val selectionRetry = MutableStateFlow(0)
 
     private val validatorRetry = MutableStateFlow(0)
+
+    // Only a new position without a chosen validator presets one (as on iOS).
+    private val presetsValidator = !existingPosition && validatorAddress == null
+
+    private val presetRetry = BittensorInlineRetry()
 
     val subnetState = (
         if (quickPickOrder != null) {
@@ -258,6 +269,7 @@ class BittensorSubnetAmountViewModel(
             retryController.observe(
                 step = "subnet validators",
                 analytics = validatorsReads,
+                inlineRetry = presetRetry.takeIf { presetsValidator },
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf {
@@ -295,17 +307,18 @@ class BittensorSubnetAmountViewModel(
 
     val selectionLoading = subnetState.map { it.isLoading() }.shareInBackground()
 
-    val selectionError = combine(subnetState, validatorsState) { subnet, validators ->
-        if (quickPickOrder == null) {
-            null
-        } else {
-            when {
-                subnet.isError() -> resources.getString(R.string.bittensor_quick_selection_failed)
-                validators.isError() -> resources.getString(R.string.bittensor_quick_validator_failed)
-                else -> null
-            }
-        }
+    val selectionError = subnetState.map { subnet ->
+        if (quickPickOrder != null && subnet.isError()) resources.getString(R.string.bittensor_quick_selection_failed) else null
     }.shareInBackground()
+
+    // As on iOS, a failed validator preset (a quick pick presets one too) shows on the card with Try again unless no retry can help;
+    // picking a validator instead hides it.
+    val validatorFailure = combine(validatorsState, selectedValidatorOverride) { state, explicitAddress ->
+        val failed = state as? ExtendedLoadingState.Error ?: return@combine null
+        if (quickPickOrder != null || presetsValidator && explicitAddress == null) failed.exception.bittensorValidatorsFailure(resources) else null
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
 
     private val selectedSlippage = slippageSettings.observe()
         .shareInBackground()
@@ -461,7 +474,7 @@ class BittensorSubnetAmountViewModel(
 
     val validator = combine(validatorsState, selectedValidatorAddress) { state, address ->
         state.map { loaded ->
-            if (address == null) return@map resources.getString(R.string.bittensor_select_validator)
+            if (address == null) return@map resources.getString(R.string.bittensor_select_validator_title)
             loaded.validators.firstOrNull { it.address == address }?.validator?.name?.takeIf { it.isNotBlank() } ?: address
         }
     }
@@ -754,11 +767,11 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun retrySelection() = launchUnit {
-        if (subnetState.first().isError()) {
-            selectionRetry.value += 1
-        } else if (validatorsState.first().isError()) {
-            validatorRetry.value += 1
-        }
+        if (subnetState.first().isError()) selectionRetry.value += 1
+    }
+
+    fun retryValidators() {
+        if (quickPickOrder != null) validatorRetry.value += 1 else presetRetry.retry()
     }
 
     private fun logSelectionFailure(cause: Throwable) {
@@ -779,7 +792,9 @@ class BittensorSubnetAmountViewModel(
 
     private suspend fun openValidatorPicker() {
         val subnetId = subnet.first()?.id ?: return
-        val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first(), selectionState)
+        // As iOS `recommendedHotkey`: the preset of this screen, otherwise the one subnet details showed.
+        val recommended = validatorsState.replayCache.lastOrNull()?.dataOrNull?.presetAddress ?: recommendedAddress
+        val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first(), selectionState, recommended)
         validatorCommunicator.openRequest(request)
     }
 
@@ -871,6 +886,7 @@ class BittensorSubnetAmountViewModel(
         validating.value = false
         if (quoteRequest.first() != request) return@launchUnit
         reviewShown.value = true
+        flowContinued = true
         analytics.track(
             BittensorAnalyticsEvent.Initiated(
                 BittensorAnalyticsEvent.NETWORK,
@@ -933,6 +949,12 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun back() {
+        // As iOS: leaving the setup of a new position before continuing reports it abandoned, with no target while a quick pick
+        // has not found its subnet.
+        if (!flowContinued && !existingPosition) {
+            val target = StakingAnalyticsTarget.SUBNET.takeIf { initialSubnetId != null || subnetState.replayCache.lastOrNull()?.dataOrNull != null }
+            analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SETUP, target))
+        }
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
     }

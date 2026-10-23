@@ -74,6 +74,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -105,6 +106,7 @@ import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.rootHoldBlocks
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitFailureValues
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.analytics.StakingValidationKind
 import io.novafoundation.nova.common.utils.inBackground
@@ -207,8 +209,6 @@ class BittensorExitReviewViewModel(
 
     private val execution = MutableStateFlow<ExitExecution>(ExitExecution.Idle)
 
-    private val sheetDismissed = MutableStateFlow(false)
-
     // As on iOS confirm, the rows show the latest block re-quote; the fee and the limit Confirm checks against stay with the acknowledged quote.
     private val quotes = MutableStateFlow(BittensorExitReviewQuotes(payload.quote()))
 
@@ -299,7 +299,7 @@ class BittensorExitReviewViewModel(
 
     val primaryAmount = prepared.map {
         it.dataOrNull?.let { draft ->
-            exitFormatter.amount(draft.position, draft.quote.amount, !isRoot).let {
+            exitFormatter.amount(draft.position, draft.quote.amount, !isRoot, draft.quote).let {
                 if (draft.quote.fullExit) {
                     it.copy(
                         token = "≈ " + it.token
@@ -327,7 +327,7 @@ class BittensorExitReviewViewModel(
             SwapAssetsView.Model(
                 SwapAssetView.Model(
                     inIcon,
-                    exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true).let {
+                    exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true, draft.quote).let {
                         if (actualAlpha == null) it.copy(token = "≈ " + it.token) else it.copy(fiat = null)
                     },
                     iconSizeDp = 48,
@@ -556,10 +556,8 @@ class BittensorExitReviewViewModel(
 
     val resultState = combine(
         prepared,
-        execution,
-        sheetDismissed
-    ) { prepared, state, dismissed ->
-        if (dismissed) return@combine null
+        execution
+    ) { prepared, state ->
         when (state) {
             is ExitExecution.Unconfirmed -> if (isRoot) state.model else null
             is ExitExecution.Failure -> if (isRoot) state.model else null
@@ -583,7 +581,8 @@ class BittensorExitReviewViewModel(
                             draft.quote.amount,
                             draft.position.chain,
                             tokenFormatter
-                        )
+                        ),
+                        actions = resultNavigation.landingActions(draft.quote.fullExit)
                     )
                 }
             } else {
@@ -770,7 +769,6 @@ class BittensorExitReviewViewModel(
     }
 
     private suspend fun submit(draft: BittensorExitDraft) {
-        sheetDismissed.value = false
         try {
             operationAnalytics.startOperation()
             val result = bittensorExitInteractor.execute(draft)
@@ -786,21 +784,22 @@ class BittensorExitReviewViewModel(
                         execution.value = ExitExecution.Idle
                         return
                     }
-                    val model = result.mapResult(resources)
+                    val model = result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit))
                     execution.value = when (model) {
                         is BittensorStakeResultUi.Failure -> ExitExecution.Failure(model)
                         is BittensorStakeResultUi.Unconfirmed -> ExitExecution.Unconfirmed(model, draft)
                         else -> error("Unexpected failure presentation")
                     }
                 }
-                is BittensorOperationResult.Unknown -> execution.value = ExitExecution.Unconfirmed(result.mapResult(resources), draft)
+                is BittensorOperationResult.Unknown ->
+                    execution.value = ExitExecution.Unconfirmed(result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit)), draft)
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val result = e.mapBittensorSubmissionError()
             trackOutcome(result, draft)
-            execution.value = ExitExecution.Unconfirmed(result.mapResult(resources), draft)
+            execution.value = ExitExecution.Unconfirmed(result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit)), draft)
         }
     }
 
@@ -825,22 +824,27 @@ class BittensorExitReviewViewModel(
         )
     }
 
-    fun validatorClicked() = launchUnit {
-        externalActions.showAddressActions(validator, chain.await())
+    fun validatorClicked() {
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(payload.position.netuid, validator))
     }
 
-    fun resultDismissed() {
-        sheetDismissed.value = true
-        finishedEmptiesPosition()?.let(resultNavigation::leave)
+    /** A root result sheet button, as iOS `activate(action:)`; Try again returns to the refreshed review. */
+    fun resultActionClicked(action: BittensorResultAction) {
+        if (!isRoot || action !in shownResultActions()) return
+
+        resultNavigation.activate(action, finishedEmptiesPosition() ?: false) { retryClicked() }
+    }
+
+    /** The subnet failure page button, as iOS `createPageAction`: Try again when a retry can succeed, otherwise Close leaves the flow. */
+    fun failureActionClicked() {
+        val failure = execution.value as? ExitExecution.Failure ?: return
+        val action = if (failure.model.canRetry) BittensorResultAction.TRY_AGAIN else BittensorResultAction.CLOSE
+
+        resultNavigation.activate(action) { retryClicked() }
     }
 
     fun doneClicked() {
         finishedEmptiesPosition()?.let(resultNavigation::done)
-    }
-
-    fun viewPositionClicked() {
-        val state = execution.value as? ExitExecution.Success ?: return
-        resultNavigation.viewPosition(state.draft.quote.fullExit)
     }
 
     fun back() {
@@ -849,6 +853,13 @@ class BittensorExitReviewViewModel(
             is ExitExecution.Success, is ExitExecution.Unconfirmed -> resultNavigation.leave(finishedEmptiesPosition() ?: false)
             else -> router.back()
         }
+    }
+
+    private fun shownResultActions(): List<BittensorResultAction> = when (val state = execution.value) {
+        is ExitExecution.Success -> resultNavigation.landingActions(state.draft.quote.fullExit)
+        is ExitExecution.Unconfirmed -> state.model.actions
+        is ExitExecution.Failure -> state.model.actions
+        else -> emptyList()
     }
 
     /** Whether the finished exit emptied the position (iOS `emptiesPosition`); null while nothing has finished. */

@@ -2910,6 +2910,12 @@
     <string name="bittensor_load_slow_message">The Bittensor network is taking too long to respond. Would you like to retry?</string>
     <string name="bittensor_load_device_title">Unavailable on this device</string>
     <string name="bittensor_load_device_message">This device can’t load Bittensor staking data right now. Your stake is not affected.</string>
+    <string name="bittensor_subnets_fetch_failed">Unable to fetch subnets</string>
+    <string name="bittensor_subnets_fetch_failed_message">The subnet list did not load. Your stake is not affected.</string>
+    <string name="bittensor_subnets_fetch_device_message">This device can’t load the subnet list right now. Your stake is not affected.</string>
+    <string name="bittensor_validators_fetch_failed">Unable to fetch validators</string>
+    <string name="bittensor_validators_fetch_failed_message">The validator list did not load. Your stake is not affected.</string>
+    <string name="bittensor_validators_fetch_device_message">This device can’t load the validator list right now. Your stake is not affected.</string>
     <string name="bittensor_valuation_unavailable">Some subnet prices are unavailable. Total stake cannot be calculated.</string>
     <string name="bittensor_apy_unavailable">APY unavailable</string>
     <string name="bittensor_subnet_number">Subnet %1$d</string>
@@ -2930,7 +2936,6 @@
     <string name="bittensor_quick_first_apy">FIRST BY APY</string>
     <string name="bittensor_quick_selection_loading">Choosing a subnet…</string>
     <string name="bittensor_quick_selection_failed">Could not choose a subnet. Try again or choose a subnet manually.</string>
-    <string name="bittensor_quick_validator_failed">Could not choose an available validator. Try again or choose a validator manually.</string>
     <string name="bittensor_monthly_tokens">Earn tokens a month</string>
     <string name="bittensor_fee_on_review">On confirmation</string>
     <string name="bittensor_slippage_title">Slippage tolerance</string>
@@ -2974,7 +2979,7 @@
     <string name="bittensor_sale_profit_description">The difference between what you paid for these tokens on average and what you get for them now, in %1$s, before the network fee. The average price comes from your purchases.</string>
     <string name="bittensor_swap_rate_buy_description">How many %1$s you get for 1 %2$s right now. The rate is set by the subnet’s liquidity pool and changes with every trade. It already includes the %3$s%% Nova Wallet fee.</string>
     <string name="bittensor_slippage_description">The most the price may move while your order fills. If it moves more than %1$s, the network cancels the order and only the network fee is charged.</string>
-    <string name="bittensor_validator_description">The validator stakes your tokens on the subnet and pays out the rewards. A recommended validator is preset for you; you can choose another one.</string>
+    <string name="bittensor_validator_description">The validator stakes your tokens on the subnet and pays out the rewards. A validator is preset for you; tap Validator on the subnet details to pick another one.</string>
     <string name="bittensor_monthly_rewards_description">An estimate of the tokens you could earn in a month based on the selected validator’s APY. APY and the token price fluctuate, so actual rewards and their value may differ.</string>
     <string name="bittensor_network_fee_buy_description">Paid to the Bittensor network for including your transaction in a block. It is taken from your free %1$s balance, not from the amount you stake.</string>
     <string name="bittensor_subnet_metadata_unavailable">Subnet details unavailable</string>
@@ -3032,7 +3037,6 @@
     <string name="bittensor_safety_age_days">≈ %1$s days</string>
     <string name="bittensor_safety_observed_days">%1$s days of observed prices</string>
     <string name="bittensor_adds_to_current">Adds to current</string>
-    <string name="bittensor_recommended_validator">Recommended</string>
     <string name="bittensor_monthly_projection">Estimated monthly rewards</string>
     <string name="bittensor_estimated_profit">Estimated profit</string>
     <string name="bittensor_exit_full_position">You withdraw the full position, including rewards accrued before execution.</string>
@@ -3065,8 +3069,6 @@
     <string name="bittensor_exit_position_changed_title">Staking data may be out of date</string>
     <string name="bittensor_exit_below_minimum">You can\'t unstake less than the network minimum value (%s) unless you unstake everything.</string>
     <string name="bittensor_exit_exceeds_available">You can unstake at most %s from this validator.</string>
-    <string name="bittensor_exit_self_impact_title">Order too large for your tolerance</string>
-    <string name="bittensor_exit_self_impact_message">Your order alone moves the price beyond your slippage tolerance. Reduce the amount or raise the tolerance.</string>
     <string name="bittensor_exit_price_moved">Price moved — quote updated. Check the amounts before you confirm.</string>
     <string name="bittensor_exit_confirm_new_rate">Confirm at the new rate</string>
     <string name="bittensor_exit_remainder_below_minimum">The remaining stake would be below the network minimum.</string>

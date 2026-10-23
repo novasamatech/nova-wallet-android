@@ -7,7 +7,11 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -21,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootC
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.portfolioHistoryResponse
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorImmediateExecution
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartInteractor
@@ -34,6 +39,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -205,11 +211,24 @@ class BittensorDetailsRetryTest {
 
     private val axisFormatterFactory = BittensorChartAxisFormatter.Factory(fiatFormatter, tokenFormatter)
 
+    private val actionLauncherFactory = object : ActionBottomSheetLauncherFactory {
+        override fun create(): ActionBottomSheetLauncher = mock(ActionBottomSheetLauncher::class.java)
+    }
+
+    private val walletGate = BittensorWalletGate(
+        BittensorImmediateExecution(mock(SignerProvider::class.java)),
+        accountRepository,
+        resources,
+        analytics,
+        actionLauncherFactory
+    )
+
     private lateinit var viewModel: BittensorDetailsViewModel
 
     @Before
     fun prepare(): Unit = runBlocking {
         `when`(metaAccount.id).thenReturn(1L)
+        `when`(metaAccount.type).thenReturn(LightMetaAccount.Type.SECRETS)
         `when`(chain.id).thenReturn("chain")
         `when`(chain.name).thenReturn("Bittensor")
         `when`(chainRegistry.getChain("chain")).thenReturn(chain)
@@ -368,15 +387,11 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `add stake follows immediate capability and still requires fresh positions`() = runBlocking<Unit> {
+    fun `add stake requires fresh positions whatever the wallet executes`() = runBlocking<Unit> {
         portfolioUpdates.value = portfolioUpdates.value.copy(supportsImmediateOperations = false)
         createViewModel()
 
         withTimeout(3_000L) {
-            viewModel.isLoading.first { !it }
-            assertFalse(viewModel.canAddStake.first())
-
-            portfolioUpdates.value = portfolioUpdates.value.copy(supportsImmediateOperations = true)
             viewModel.canAddStake.first { it }
 
             portfolioUpdates.value = portfolioUpdates.value.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException("Offline")))
@@ -384,15 +399,12 @@ class BittensorDetailsRetryTest {
 
             portfolioUpdates.value = portfolioUpdates.value.copy(dataStatus = BittensorDataStatus.Fresh)
             viewModel.canAddStake.first { it }
-
-            portfolioUpdates.value = portfolioUpdates.value.copy(supportsImmediateOperations = false)
-            viewModel.canAddStake.first { !it }
         }
     }
 
     private fun portfolioOpenedSources() = analyticsService.events.toList().filter { it.name == "staking_portfolio_opened" }.map { it.properties["source"] }
 
-    private fun createViewModel(entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO) {
+    private fun createViewModel() {
         viewModel = BittensorDetailsViewModel(
             analytics, bittensorPortfolioInteractor = portfolioInteractor,
             router = router,
@@ -405,22 +417,8 @@ class BittensorDetailsRetryTest {
             chartAxisFormatterFactory = axisFormatterFactory,
             rowInteractor = rowInteractor,
             rootClaimInteractor = rootClaimInteractor,
-            entry = entry
+            walletGate = walletGate
         )
-    }
-
-    @Test
-    fun `deep link with no stake replaces portfolio with start exactly once`() = runBlocking {
-        portfolioUpdates.value = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
-        createViewModel(BittensorPortfolioEntry.DEEP_LINK)
-
-        val resolution = withTimeout(3_000L) { viewModel.entryResolution.first { it != null } }
-        assertTrue(resolution is BittensorEntryResolution.Start)
-        val start = resolution as BittensorEntryResolution.Start
-        viewModel.completeEntry(start)
-        viewModel.completeEntry(start)
-
-        verify(router).replaceBittensorPortfolioWithStart(start.payload)
     }
 
     @Test
@@ -443,44 +441,24 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `deep link with stake stays on portfolio`() = runBlocking {
-        createViewModel(BittensorPortfolioEntry.DEEP_LINK)
+    fun `add position from a proxied wallet is blocked without opening the landing`() = runBlocking {
+        `when`(metaAccount.type).thenReturn(LightMetaAccount.Type.PROXIED)
+        createViewModel()
+        withTimeout(3_000L) { viewModel.canAddStake.first { it } }
 
-        val resolution = withTimeout(3_000L) { viewModel.entryResolution.first { it != null } }
-        assertEquals(BittensorEntryResolution.Portfolio, resolution)
-        viewModel.completeEntry(requireNotNull(resolution))
+        viewModel.addPosition()
 
+        val blocked = withTimeout(3_000L) {
+            while (analyticsService.events.none { it.name == "staking_blocked" }) delay(10L)
+            analyticsService.events.single { it.name == "staking_blocked" }
+        }
+        assertEquals("stake", blocked.properties["flow"])
+        assertEquals("proxy", blocked.properties["reason"])
+        assertEquals("proxied", blocked.properties["wallet_type"])
+        assertFalse(blocked.properties.containsKey("target"))
+        assertTrue(analyticsService.events.none { it.name == "staking_flow_opened" })
         verify(router).bittensorPortfolioReopenings
         verifyNoMoreInteractions(router)
-    }
-
-    @Test
-    fun `entry does not interpret loading stale or missing rewards as no stake`() {
-        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
-        val claims = rootClaims.value
-        assertNull(resolveBittensorEntry(emptyPortfolio.copy(dataStatus = BittensorDataStatus.Loading), claims))
-        assertNull(resolveBittensorEntry(emptyPortfolio.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException())), claims))
-        assertNull(resolveBittensorEntry(emptyPortfolio, null))
-        assertNull(resolveBittensorEntry(emptyPortfolio, claims.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException()))))
-        assertNull(resolveBittensorEntry(emptyPortfolio, claims.copy(metaId = 2L)))
-    }
-
-    @Test
-    fun `root rewards below the claim minimum without stake resolve to start staking`() {
-        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList(), subnets = emptyList()))
-        val preview = BittensorRootClaimPreview(hotkey, BigInteger.ONE, BigInteger.ONE, BigInteger.ZERO)
-        val claims = BittensorRootClaims(listOf(preview), BigInteger.TEN)
-
-        assertTrue(resolveBittensorEntry(emptyPortfolio, rootClaims.value.copy(claims = claims)) is BittensorEntryResolution.Start)
-    }
-
-    @Test
-    fun `redeemable root rewards without stake keep portfolio accessible`() {
-        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
-        val preview = BittensorRootClaimPreview(hotkey, BigInteger.TEN, BigInteger.TEN, BigInteger.ZERO)
-        val claims = BittensorRootClaims(listOf(preview), BigInteger.ONE)
-
-        assertEquals(BittensorEntryResolution.Portfolio, resolveBittensorEntry(emptyPortfolio, rootClaims.value.copy(claims = claims)))
     }
 
     @Test

@@ -163,6 +163,10 @@ class StakingDashboardViewModel(
         pendingDeepLinkTarget.value = null
     }
 
+    fun onResume() {
+        interactor.refreshMaximumYields()
+    }
+
     /**
      * As iOS `StakingDashboardPresenter`: waits until the dashboard settles the item, and once [pendingDeepLinkTimeout]
      * passes takes the item as it is or drops the link.

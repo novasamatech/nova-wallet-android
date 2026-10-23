@@ -35,10 +35,11 @@ class BittensorPortfolioRowInteractor(
     }
 
     suspend fun weeklyChanges(nativePriceId: String, subnetIds: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigDecimal> {
-        return weeklySummaries(nativePriceId, subnetIds).mapValues { it.value.changePercent }
+        return weeklySummaries(nativePriceId, subnetIds).mapNotNull { (subnet, summary) -> summary?.let { subnet to it.changePercent } }.toMap()
     }
 
-    suspend fun weeklySummaries(nativePriceId: String, subnetIds: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BittensorWeeklyPriceSummary> {
+    /** Every listed market of [subnetIds]; a null summary is listed without a computable change, as iOS `.unavailable`. */
+    suspend fun weeklySummaries(nativePriceId: String, subnetIds: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BittensorWeeklyPriceSummary?> {
         if (subnetIds.isEmpty()) return emptyMap()
         return withTimeout(25_000L) {
             val usd = requireNotNull(currencies.getCurrency("usd")) { "USD currency unavailable" }
@@ -46,11 +47,11 @@ class BittensorPortfolioRowInteractor(
                 val marketRows = async { markets.weeklyMarkets() }
                 val nativeHistory = prices.getLastHistoryForPeriod(nativePriceId, usd, PricePeriod.WEEK)
                 val now = System.currentTimeMillis()
-                marketRows.await().filterKeys { it in subnetIds }.mapNotNull { (subnet, market) ->
+                marketRows.await().filterKeys { it in subnetIds }.mapValues { (_, market) ->
                     weeklyChangeInTao(market, nativeHistory, now)?.let { change ->
-                        subnet to BittensorWeeklyPriceSummary(change, weeklySparklineInTao(market.weeklySparkline?.price.orEmpty(), nativeHistory))
+                        BittensorWeeklyPriceSummary(change, weeklySparklineInTao(market.weeklySparkline?.price.orEmpty(), nativeHistory))
                     }
-                }.toMap()
+                }
             }
         }
     }

@@ -32,10 +32,11 @@ class BittensorExitFormatter(
         const val IMPACT_SCALE = 6
     }
 
-    fun amount(position: BittensorExitPosition, planks: BigInteger, alpha: Boolean): AmountModel {
+    /** Alpha is valued at [quote]'s spot price when there is one, as [bittensorAlphaSpotPrice]. */
+    fun amount(position: BittensorExitPosition, planks: BigInteger, alpha: Boolean, quote: BittensorExitQuote? = null): AmountModel {
         val token = position.asset.token
         val value = if (alpha) BigDecimal(planks, position.amountPrecision) else token.amountFromPlanks(planks)
-        val tao = if (alpha) position.subnet?.priceInRao?.let { value * token.amountFromPlanks(it) } else value
+        val tao = if (alpha) bittensorAlphaSpotPrice(position, quote)?.let { value * token.amountFromPlanks(it) } else value
         val fiat = tao?.let(token::toFiatOrNull)
         val symbol = if (alpha) TokenSymbol(alphaSymbol(position)) else token.configuration.symbol
         return AmountModel(
@@ -107,4 +108,9 @@ class BittensorExitFormatter(
     }
 
     private fun alphaSymbol(position: BittensorExitPosition): String = bittensorAlphaSymbol(position.netuid.value, position.subnet?.symbol)
+}
+
+/** iOS `alphaSpotPrice`: the spot price of the current [quote], otherwise the subnet price; null unless it is positive. */
+internal fun bittensorAlphaSpotPrice(position: BittensorExitPosition, quote: BittensorExitQuote?): BigInteger? {
+    return (quote?.spotPrice ?: position.subnet?.priceInRao)?.takeIf { it.isPositive() }
 }

@@ -17,8 +17,8 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectory
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.observeBittensorValidatorDirectory
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -221,11 +222,9 @@ class BittensorSubnetValidatorRepositoryTest {
     fun `without the unusual APY filter the directory stays selectable through a ranking failure and its retry`() = runBlocking<Unit> {
         prepare(directoryMetadata())
         `when`(api.rankedValidators(RANKING_URL)).thenReturn(Response.error(503, "".toResponseBody()))
-        val resources = mock(ResourceManager::class.java)
-        val logger = mock(Logger::class.java)
-        val controller = BittensorRetryController(resources, logger)
-        `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
+        val controller = BittensorRetryController(mock(ResourceManager::class.java), mock(Logger::class.java))
+        val inlineRetry = BittensorInlineRetry()
+        val rankingFailed = CompletableDeferred<Unit>()
         val retryStarted = CompletableDeferred<Unit>()
         val finishRetry = CompletableDeferred<Unit>()
         val recovered = CompletableDeferred<Unit>()
@@ -235,6 +234,7 @@ class BittensorSubnetValidatorRepositoryTest {
         val collection = launch {
             observeBittensorValidatorDirectory(
                 retryController = controller,
+                inlineRetry = inlineRetry,
                 hideUnusualApy = flowOf(false),
                 loadDirectory = { repository.unrankedDirectory(chain, subnet) },
                 rankDirectory = { directory ->
@@ -243,7 +243,9 @@ class BittensorSubnetValidatorRepositoryTest {
                         retryStarted.complete(Unit)
                         finishRetry.await()
                     }
-                    repository.rankDirectory(chain, subnet, directory)
+                    runCatching { repository.rankDirectory(chain, subnet, directory) }
+                        .onFailure { rankingFailed.complete(Unit) }
+                        .getOrThrow()
                 }
             ).collect { state ->
                 state.dataOrNull?.let { directory ->
@@ -256,13 +258,13 @@ class BittensorSubnetValidatorRepositoryTest {
 
         try {
             withTimeout(3_000L) {
-                val retry = controller.events.first()
+                rankingFailed.await()
                 directoryVisible.await()
                 assertEquals("Directory name", directories.last().validators.single().validator.name)
                 assertTrue(directories.last().validators.single().canSelect)
                 assertFalse(directories.last().validators.single().recommended)
                 prepare(directoryMetadata())
-                retry.onRetry()
+                inlineRetry.retry()
                 retryStarted.await()
                 assertFalse(directories.last().validators.single().recommended)
                 assertTrue(directories.all { it.validators.single().canSelect })
@@ -273,6 +275,7 @@ class BittensorSubnetValidatorRepositoryTest {
             assertTrue(directories.last().validators.single().recommended)
             verify(api, times(1)).validators(DIRECTORY_URL)
             verify(api, times(2)).rankedValidators(RANKING_URL)
+            assertNull(withTimeoutOrNull(100L) { controller.events.first() })
         } finally {
             collection.cancelAndJoin()
         }
@@ -282,15 +285,13 @@ class BittensorSubnetValidatorRepositoryTest {
     fun `unusual APY filter waits for the ranking and fails with it`() = runBlocking<Unit> {
         prepare(directoryMetadata())
         `when`(api.rankedValidators(RANKING_URL)).thenReturn(Response.error(503, "".toResponseBody()))
-        val resources = mock(ResourceManager::class.java)
-        `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
         val hideUnusualApy = MutableStateFlow(true)
         val states = mutableListOf<ExtendedLoadingState<BittensorValidatorDirectory>>()
 
         withTimeout(3_000L) {
             observeBittensorValidatorDirectory(
-                retryController = BittensorRetryController(resources, mock(Logger::class.java)),
+                retryController = BittensorRetryController(mock(ResourceManager::class.java), mock(Logger::class.java)),
+                inlineRetry = BittensorInlineRetry(),
                 hideUnusualApy = hideUnusualApy,
                 loadDirectory = { repository.unrankedDirectory(chain, subnet) },
                 rankDirectory = { repository.rankDirectory(chain, subnet, it) }

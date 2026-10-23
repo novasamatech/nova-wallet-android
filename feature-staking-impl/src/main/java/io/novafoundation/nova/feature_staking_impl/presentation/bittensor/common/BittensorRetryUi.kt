@@ -6,8 +6,13 @@ import io.novafoundation.nova.common.view.dialog.retryDialog
 import io.novafoundation.nova.feature_staking_impl.R
 import kotlinx.coroutines.flow.Flow
 
-fun BaseFragmentMixin<*>.observeBittensorRetries(events: Flow<BittensorReadFailure>) {
+/** [onSkip] runs when the user leaves a failure without retrying it, e.g. to close a screen that cannot show without the read. */
+fun BaseFragmentMixin<*>.observeBittensorRetries(events: Flow<BittensorReadFailure>, onSkip: () -> Unit = {}) {
     events.observeWhenVisible { error ->
+        val skip = {
+            error.onDismiss()
+            onSkip()
+        }
         if (error.retryable) {
             retryDialog(
                 context = fragment.requireContext(),
@@ -16,10 +21,10 @@ fun BaseFragmentMixin<*>.observeBittensorRetries(events: Flow<BittensorReadFailu
                 setTitle(error.title)
                 setMessage(error.message)
                 // iOS offers Skip beside Retry on a failed read.
-                setNegativeButton(R.string.common_skip) { _, _ -> error.onDismiss() }
+                setNegativeButton(R.string.common_skip) { _, _ -> skip() }
             }
         } else {
-            errorDialog(fragment.requireContext(), onConfirm = error::onDismiss) {
+            errorDialog(fragment.requireContext(), onConfirm = skip) {
                 setTitle(error.title)
                 setMessage(error.message)
             }

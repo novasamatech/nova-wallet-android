@@ -55,13 +55,6 @@ class BittensorPresetValidatorInteractor @Inject constructor(
         BittensorValidatorPreset(rows.withPreset(preset), preset)
     }
 
-    /** Quick pick: the preset first, followed by the rest of the directory. Fails when nothing qualifies. */
-    suspend fun validators(subnet: BittensorNetuid.Subnet): List<BittensorSubnetValidator> {
-        val result = preset(subnet)
-        val preset = checkNotNull(result.preset) { "No eligible recommended validator in this subnet" }
-        return listOf(preset) + result.directory.filter { it.validator.hotkey != preset.validator.hotkey }
-    }
-
     private suspend fun optionalDirectory(chain: Chain, subnet: BittensorNetuid.Subnet): Result<BittensorValidatorDirectory> = try {
         Result.success(repository.directory(chain, subnet))
     } catch (cancelled: CancellationException) {

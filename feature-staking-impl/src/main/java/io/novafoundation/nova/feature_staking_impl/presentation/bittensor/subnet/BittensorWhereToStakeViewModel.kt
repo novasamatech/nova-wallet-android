@@ -47,7 +47,7 @@ class BittensorWhereToStakeViewModel(
 
     fun quickPick(order: BittensorQuickPickOrder) {
         val browseState = BittensorSubnetBrowseState.fromQuickPick(order)
-        val visitState = selectionState.copy(browseState = browseState)
+        val visitState = selectionState.copy(browseState = browseState, quickPick = true)
         router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(quickPickOrder = order, selectionState = visitState))
     }
 

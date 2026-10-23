@@ -14,6 +14,6 @@ internal fun requireAvailableBittensorComponent(component: BittensorRecommendati
     }
 }
 
-/** Automatic picks (preselection, recommended badges) follow iOS: a STALE recommendation generation recommends nothing. */
+/** Whether the recommendation generation is FRESH. A STALE generation still recommends; the validator list shows it as outdated. */
 internal fun hasFreshBittensorRecommendations(meta: BittensorRecommendationsRemote.Meta?): Boolean =
     meta?.components?.recommendations?.let { it.availability == "AVAILABLE" && it.freshness == "FRESH" } == true

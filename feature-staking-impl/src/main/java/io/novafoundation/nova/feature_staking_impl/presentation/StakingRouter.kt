@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
@@ -135,12 +134,7 @@ interface StakingRouter {
         selectionState: BittensorSelectionState = BittensorSelectionState()
     )
 
-    fun openBittensorPortfolio(
-        source: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD,
-        entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO
-    )
-
-    fun replaceBittensorPortfolioWithStart(payload: StartStakingLandingPayload)
+    fun openBittensorPortfolio(source: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD)
 
     /** Opens the Bittensor Earn landing on top of the current screen ("Add position" on the portfolio). */
     fun openBittensorStartStaking(payload: StartStakingLandingPayload)

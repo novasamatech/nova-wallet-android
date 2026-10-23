@@ -10,10 +10,13 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSubnetCatalogue
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverageInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -33,6 +36,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -47,6 +51,7 @@ class BittensorValidatorInfoViewModelTest {
     }
     private val validatorInteractor = mock(BittensorValidatorInteractor::class.java)
     private val subnetCatalogue = mock(BittensorValidatorSubnetCatalogue::class.java)
+    private val logger = mock(Logger::class.java)
     private val models = mutableListOf<BittensorValidatorInfoViewModel>()
 
     @Before
@@ -63,15 +68,47 @@ class BittensorValidatorInfoViewModelTest {
     }
 
     @Test
-    fun `row snapshot is shown as status and take`() {
+    fun `row snapshot is shown as status and take`() = runBlocking<Unit> {
         val active = createViewModel(payload(inactive = false))
-        assertEquals(R.string.common_active.toString(), active.status.text)
-        assertEquals(TableCellView.FieldStyle.POSITIVE, active.status.style)
-        assertEquals("${R.string.bittensor_validator_info_take_value}|18", active.take)
+        val activeStatus = withTimeout(5_000) { active.status.first() }
+        assertEquals(R.string.common_active.toString(), activeStatus.text)
+        assertEquals(TableCellView.FieldStyle.POSITIVE, activeStatus.style)
+        assertEquals("${R.string.bittensor_validator_info_take_value}|18", withTimeout(5_000) { active.take.first() })
 
-        val inactive = createViewModel(payload(inactive = true))
-        assertEquals(R.string.staking_nominator_status_inactive.toString(), inactive.status.text)
-        assertEquals(TableCellView.FieldStyle.SECONDARY, inactive.status.style)
+        val inactive = withTimeout(5_000) { createViewModel(payload(inactive = true)).status.first() }
+        assertEquals(R.string.staking_nominator_status_inactive.toString(), inactive.text)
+        assertEquals(TableCellView.FieldStyle.SECONDARY, inactive.style)
+    }
+
+    @Test
+    fun `without a row snapshot the validator is read from the chain`() = runBlocking<Unit> {
+        val chain = mock(Chain::class.java)
+        val hotkey = AccountIdKey(ByteArray(32) { 7 })
+        Mockito.doReturn(chain).`when`(validatorInteractor).chain()
+        val address = chain.addressOf(hotkey)
+        val validator = BittensorSubnetValidator(
+            BittensorValidator(hotkey, "Validator"),
+            address,
+            commissionRate = BigDecimal("0.18"),
+            selectable = false,
+            inactive = true
+        )
+        `when`(validatorInteractor.chainValidator(BittensorNetuid.Subnet(5), hotkey)).thenReturn(validator)
+        val viewModel = createViewModel(BittensorValidatorInfoPayload(subnetId = 5, address = address))
+
+        val status = withTimeout(5_000) { viewModel.status.first() }
+
+        assertEquals(R.string.staking_nominator_status_inactive.toString(), status.text)
+        assertEquals("${R.string.bittensor_validator_info_take_value}|18", withTimeout(5_000) { viewModel.take.first() })
+    }
+
+    @Test
+    fun `failed validator read offers a retry`() = runBlocking<Unit> {
+        val viewModel = createViewModel(BittensorValidatorInfoPayload(subnetId = 5, address = "address"))
+
+        val failure = withTimeout(5_000) { viewModel.retryEvents.first() }
+
+        assertTrue(failure.retryable)
     }
 
     @Test
@@ -132,10 +169,12 @@ class BittensorValidatorInfoViewModelTest {
     private fun payload(inactive: Boolean, stake: BigDecimal? = null, address: String = "address") = BittensorValidatorInfoPayload(
         subnetId = 5,
         address = address,
-        name = "Validator",
-        reportedStake = stake,
-        commissionRate = BigDecimal("0.18"),
-        inactive = inactive
+        detail = BittensorValidatorInfoPayload.Detail(
+            name = "Validator",
+            reportedStake = stake,
+            commissionRate = BigDecimal("0.18"),
+            inactive = inactive
+        )
     )
 
     private fun createViewModel(payload: BittensorValidatorInfoPayload) = BittensorValidatorInfoViewModel(
@@ -149,7 +188,8 @@ class BittensorValidatorInfoViewModelTest {
         amountFormatter = mock(BittensorAmountFormatter::class.java),
         tokenFormatter = mock(TokenFormatter::class.java),
         externalActions = mock(ExternalActions.Presentation::class.java),
+        retryController = BittensorRetryController(resources, logger),
         resources = resources,
-        logger = mock(Logger::class.java)
+        logger = logger
     ).also { models += it }
 }

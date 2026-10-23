@@ -75,6 +75,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
@@ -601,9 +603,8 @@ class BittensorRootClaimViewModel(
 
     fun validatorClicked() = launchUnit {
         prepared.first().dataOrNull?.let {
-            externalActions.showAddressActions(
-                it.state.chain.addressOf(it.preview.hotkey.value),
-                it.state.chain
+            router.openBittensorValidatorInfo(
+                BittensorValidatorInfoPayload(BittensorNetuid.Root.value, it.state.chain.addressOf(it.preview.hotkey.value))
             )
         }
     }

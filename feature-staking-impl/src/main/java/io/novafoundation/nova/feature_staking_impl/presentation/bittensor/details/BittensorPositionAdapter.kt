@@ -38,6 +38,8 @@ class BittensorPositionAdapter(
                 error(R.drawable.ic_fallback_network_icon)
             }
             positionTitle.text = item.title
+            positionTitle.isVisible = !item.isTitleLoading
+            positionTitleProgress.isVisible = item.isTitleLoading
             val isValidator = item.action is BittensorPositionAction.ValidatorDetails
             positionTitle.setTextAppearance(
                 if (isValidator) R.style.TextAppearance_NovaFoundation_SemiBold_SubHeadline else R.style.TextAppearance_NovaFoundation_SemiBold_Body

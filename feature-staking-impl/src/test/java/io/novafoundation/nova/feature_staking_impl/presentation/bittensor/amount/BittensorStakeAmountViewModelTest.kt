@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -238,7 +239,7 @@ class BittensorStakeAmountViewModelTest {
     @Before
     fun prepare() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        `when`(resources.getString(R.string.bittensor_select_validator)).thenReturn("Choose validator")
+        `when`(resources.getString(R.string.bittensor_select_validator_title)).thenReturn("Select validator")
         `when`(resources.getString(R.string.common_continue)).thenReturn("Continue")
         `when`(resources.getString(R.string.common_enter_amount)).thenReturn("Enter amount")
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
@@ -260,7 +261,7 @@ class BittensorStakeAmountViewModelTest {
         createViewModel()
     }
 
-    private fun createViewModel(payload: BittensorStakeAmountPayload? = null) {
+    private fun createViewModel(payload: BittensorStakeAmountPayload? = null, selectionState: BittensorSelectionState = BittensorSelectionState()) {
         if (::viewModel.isInitialized) {
             runBlocking { viewModel.coroutineContext.job.cancelAndJoin() }
         }
@@ -281,7 +282,8 @@ class BittensorStakeAmountViewModelTest {
             feeLoaderMixinFactory = feeLoaderFactory,
             externalActions = externalActions,
             getAssetOptionsMixinFactory = getAssetOptionsFactory,
-            payload = payload
+            payload = payload,
+            initialSelectionState = selectionState
         )
     }
 
@@ -392,6 +394,28 @@ class BittensorStakeAmountViewModelTest {
     fun `where to stake root card is titled as a quick pick`() {
         createViewModel(BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true))
         assertEquals(R.string.bittensor_earn_title, viewModel.titleRes)
+    }
+
+    @Test
+    fun `quick pick switched to root keeps the quick pick title`() {
+        createViewModel(selectionState = BittensorSelectionState(quickPick = true))
+        assertEquals(R.string.bittensor_earn_title, viewModel.titleRes)
+
+        createViewModel()
+        assertEquals(R.string.bittensor_stake_to_root, viewModel.titleRes)
+    }
+
+    @Test
+    fun `leaving the setup of a new root position reports it abandoned at setup`() {
+        createViewModel()
+        viewModel.back()
+
+        createViewModel(BittensorStakeAmountPayload(metaId = 1L, validatorAddress = "validator"))
+        viewModel.back()
+
+        val abandoned = analyticsService.events.single { it.name == "staking_abandoned" }
+        assertEquals("setup", abandoned.properties["stage"])
+        assertEquals("root", abandoned.properties["target"])
     }
 
     @Test

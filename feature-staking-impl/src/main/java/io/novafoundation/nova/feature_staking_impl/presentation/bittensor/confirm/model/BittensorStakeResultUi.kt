@@ -33,8 +33,6 @@ sealed interface BittensorStakeResultUi {
         val outcome: BittensorOperationOutcome? = null,
         val amount: AmountModel? = null,
         val stakeAfter: String? = null,
-        /** "Discover subnets" is offered only after opening a new position (iOS `createDoneSheet`). */
-        val canDiscoverSubnets: Boolean = false,
         override val actions: List<BittensorResultAction> = emptyList()
     ) : BittensorStakeResultUi
 

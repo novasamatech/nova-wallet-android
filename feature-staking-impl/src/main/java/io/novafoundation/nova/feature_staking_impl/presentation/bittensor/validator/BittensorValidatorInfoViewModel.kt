@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -32,6 +35,9 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.catch
@@ -51,67 +57,66 @@ class BittensorValidatorInfoViewModel(
     private val amountFormatter: BittensorAmountFormatter,
     private val tokenFormatter: TokenFormatter,
     private val externalActions: ExternalActions.Presentation,
+    private val retryController: BittensorRetryController,
     private val resources: ResourceManager,
     private val logger: Logger
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val netuid = BittensorNetuid.from(payload.subnetId)
 
-    val account = flowOf {
-        addressIconGenerator.createAccountAddressModel(validatorInteractor.chain(), payload.address, payload.name)
+    val retryEvents = retryController.events
+
+    // Without the list row the listing names the validator and the chain reports its take and status, as iOS loadDetail.
+    private val detail: Flow<ExtendedLoadingState<BittensorValidatorInfoPayload.Detail>> = when (val known = payload.detail) {
+        null -> retryController.observe(
+            step = "validator detail",
+            transform = { it.withSafeLoading() }
+        ) {
+            flowOf { validatorInteractor.chainValidator(netuid, hotkey()).toValidatorInfoDetail() }
+        }
+        else -> flowOf { ExtendedLoadingState.Loaded(known) }
     }
         .shareInBackground()
 
-    val status = BittensorValidatorStatusUi(
-        text = resources.getString(if (payload.inactive) R.string.staking_nominator_status_inactive else R.string.common_active),
-        style = if (payload.inactive) TableCellView.FieldStyle.SECONDARY else TableCellView.FieldStyle.POSITIVE
-    )
+    private val loadedDetail = detail.filterLoaded()
+        .shareInBackground()
 
-    /** Null means no reported stake or no FRESH subnet price to value it at. Fiat follows the native price. */
-    val totalStake: Flow<AmountModel?> = flow {
-        var emitted = false
-        val amounts = flow<AmountModel?> {
-            val stake = payload.reportedStake?.let { nativeStake(it) }
-            if (stake == null) {
-                emit(null)
-                return@flow
-            }
-            val symbol = validatorInteractor.chain().utilityAsset.symbol
-            emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
-            emitAll(
-                subnetInteractor.observeAsset().map { asset ->
-                    amountFormatter.amount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
-                }
-            )
-        }
-        emitAll(
-            amounts
-                .onEach { emitted = true }
-                .catch { cause ->
-                    if (cause is CancellationException) throw cause
-                    logger.log("[BittensorValidatorInfo] Validator stake value unavailable")
-                    logger.log(cause)
-                    // Keep the amount already shown; otherwise resolve the cell instead of leaving it loading.
-                    if (!emitted) emit(null)
-                }
+    val account = detail.map { it.dataOrNull?.name }
+        .distinctUntilChanged()
+        .map { name -> addressIconGenerator.createAccountAddressModel(validatorInteractor.chain(), payload.address, name) }
+        .shareInBackground()
+
+    val status = loadedDetail.map { detail ->
+        BittensorValidatorStatusUi(
+            text = resources.getString(if (detail.inactive) R.string.staking_nominator_status_inactive else R.string.common_active),
+            style = if (detail.inactive) TableCellView.FieldStyle.SECONDARY else TableCellView.FieldStyle.POSITIVE
         )
     }
         .shareInBackground()
 
-    val take: String = resources.getString(
-        R.string.bittensor_validator_info_take_value,
-        payload.commissionRate.movePointRight(2).setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
-    )
+    /** Null means no reported stake or no FRESH subnet price to value it at. Fiat follows the native price. */
+    val totalStake: Flow<AmountModel?> = loadedDetail.flatMapLatest { stakeAmounts(it.reportedStake) }
+        .shareInBackground()
+
+    val take = loadedDetail.map { detail ->
+        resources.getString(
+            R.string.bittensor_validator_info_take_value,
+            detail.commissionRate.movePointRight(2).setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
+        )
+    }
+        .shareInBackground()
 
     /** The reliable rate only, whatever the list filter shows; a failed read shows no rate. */
-    val reward: Flow<BittensorValidatorRewardUi> = flowOf<BigDecimal?> { validatorInteractor.yields(netuid, includeUnreliable = false)[hotkey()] }
+    private val rewardRate = flowOf<BigDecimal?> { validatorInteractor.yields(netuid, includeUnreliable = false)[hotkey()] }
         .catch { cause ->
             if (cause is CancellationException) throw cause
             logger.log("[BittensorValidatorInfo] Validator reward rate unavailable")
             logger.log(cause)
             emit(null)
         }
-        .map(::formatReward)
+
+    // As on iOS, the reward shows with the rest of the validator's staking details.
+    val reward: Flow<BittensorValidatorRewardUi> = combine(loadedDetail, rewardRate) { _, rate -> formatReward(rate) }
         .shareInBackground()
 
     val coverage: Flow<ExtendedLoadingState<CharSequence?>> = flowOf { coverageInteractor.coverage(hotkey()) }
@@ -147,6 +152,35 @@ class BittensorValidatorInfoViewModel(
     }
 
     private suspend fun hotkey() = AccountIdKey(validatorInteractor.chain().accountIdOf(payload.address))
+
+    private fun stakeAmounts(reportedStake: BigDecimal?): Flow<AmountModel?> = flow {
+        var emitted = false
+        val amounts = flow<AmountModel?> {
+            val stake = reportedStake?.let { nativeStake(it) }
+            if (stake == null) {
+                emit(null)
+                return@flow
+            }
+            val symbol = validatorInteractor.chain().utilityAsset.symbol
+            emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
+            emitAll(
+                subnetInteractor.observeAsset().map { asset ->
+                    amountFormatter.amount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
+                }
+            )
+        }
+        emitAll(
+            amounts
+                .onEach { emitted = true }
+                .catch { cause ->
+                    if (cause is CancellationException) throw cause
+                    logger.log("[BittensorValidatorInfo] Validator stake value unavailable")
+                    logger.log(cause)
+                    // Keep the amount already shown; otherwise resolve the cell instead of leaving it loading.
+                    if (!emitted) emit(null)
+                }
+        )
+    }
 
     /** Root stake is TAO; subnet stake is valued at the FRESH backend price, as iOS values it on this screen. */
     private suspend fun nativeStake(reportedStake: BigDecimal): BigDecimal? = when (val netuid = netuid) {

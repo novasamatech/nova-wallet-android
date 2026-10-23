@@ -5,19 +5,29 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorFailureStage
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.isRetryable
 
-fun BittensorOperationResult.Unknown.mapResult(resources: ResourceManager): BittensorStakeResultUi.Unconfirmed =
+/** [landingActions] are the unconfirmed sheet buttons, as iOS `createUnconfirmedSheet`. */
+fun BittensorOperationResult.Unknown.mapResult(
+    resources: ResourceManager,
+    landingActions: List<BittensorResultAction> = emptyList()
+): BittensorStakeResultUi.Unconfirmed =
     BittensorStakeResultUi.Unconfirmed(
         title = resources.getString(R.string.bittensor_result_unconfirmed_title),
         description = resources.getString(R.string.bittensor_result_unconfirmed_description),
-        transactionHash = transactionHash
+        transactionHash = transactionHash,
+        actions = landingActions
     )
 
-fun BittensorOperationResult.Failure.mapResult(resources: ResourceManager): BittensorStakeResultUi {
+fun BittensorOperationResult.Failure.mapResult(
+    resources: ResourceManager,
+    landingActions: List<BittensorResultAction> = emptyList()
+): BittensorStakeResultUi {
     if (stage == BittensorFailureStage.UNKNOWN || stage == BittensorFailureStage.DISPATCHED && transactionHash == null) {
-        return BittensorOperationResult.Unknown(transactionHash).mapResult(resources)
+        return BittensorOperationResult.Unknown(transactionHash).mapResult(resources, landingActions)
     }
 
     return BittensorStakeResultUi.Failure(
@@ -26,12 +36,16 @@ fun BittensorOperationResult.Failure.mapResult(resources: ResourceManager): Bitt
             if (stage == BittensorFailureStage.NOT_SUBMITTED) R.string.bittensor_result_not_submitted else R.string.bittensor_result_dispatched_failure
         ),
         error = transactionHash?.let { resources.getString(R.string.bittensor_result_transaction_hash, it) }
-            ?: resources.getString(R.string.common_error_general_title)
+            ?: resources.getString(R.string.common_error_general_title),
+        canRetry = isRetryable
     )
 }
 
-fun BittensorOperationResult.Failure.toSubmissionState(resources: ResourceManager): BittensorSubmissionState =
-    if (isSigningCancelled) BittensorSubmissionState.Ready else mapResult(resources).toSubmissionState()
+fun BittensorOperationResult.Failure.toSubmissionState(
+    resources: ResourceManager,
+    landingActions: List<BittensorResultAction> = emptyList()
+): BittensorSubmissionState =
+    if (isSigningCancelled) BittensorSubmissionState.Ready else mapResult(resources, landingActions).toSubmissionState()
 
 fun BittensorStakeResultUi.toSubmissionState(): BittensorSubmissionState = when (this) {
     is BittensorStakeResultUi.Progress -> BittensorSubmissionState.Submitting(this)

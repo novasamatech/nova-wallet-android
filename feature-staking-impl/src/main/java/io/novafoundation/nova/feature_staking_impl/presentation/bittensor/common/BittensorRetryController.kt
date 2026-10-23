@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** Screen-local recovery for reads. Never retries a submitted transaction. */
 class BittensorRetryController(private val resources: ResourceManager, private val logger: Logger) {
@@ -31,9 +32,14 @@ class BittensorRetryController(private val resources: ResourceManager, private v
 
     val events: Flow<BittensorReadFailure> = pending.filterNotNull()
 
+    /**
+     * A read with [inlineRetry] is shown failed in place, as on iOS, and restarts from the screen's own Try again; only a slow
+     * network still raises its dialog.
+     */
     fun <T, R> observe(
         step: String,
         analytics: BittensorReadAnalytics? = null,
+        inlineRetry: BittensorInlineRetry? = null,
         transform: (Flow<T>) -> Flow<R>,
         source: () -> Flow<T>
     ): Flow<R> {
@@ -46,20 +52,26 @@ class BittensorRetryController(private val resources: ResourceManager, private v
                     currentCoroutineContext().ensureActive()
                     if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
                     analytics?.failed(cause)
-                    report(step, cause) {
-                        analytics?.retry()
-                        reload.update { it + 1 }
+                    logger.log("[Bittensor] Failed to load $step")
+                    logger.log(cause)
+                    // The dialog and the inline Try again may both offer this failure; only the first restarts the read.
+                    val retried = AtomicBoolean(false)
+                    val onRetry = {
+                        if (retried.compareAndSet(false, true)) {
+                            analytics?.retry()
+                            reload.update { it + 1 }
+                        }
                     }
+                    val kind = cause.bittensorReadFailureKind()
+                    inlineRetry?.add(onRetry)
+                    if (inlineRetry == null || kind == BittensorReadFailureKind.SLOW_NETWORK) report(kind, onRetry)
                     throw cause
                 }
             transform(attempt)
         }
     }
 
-    private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
-        logger.log("[Bittensor] Failed to load $step")
-        logger.log(cause)
-        val kind = cause.bittensorReadFailureKind()
+    private fun report(kind: BittensorReadFailureKind, onRetry: () -> Unit) {
         synchronized(pendingRetries) {
             val shown = pending.value
             if (shown != null) {
@@ -94,5 +106,20 @@ class BittensorRetryController(private val resources: ResourceManager, private v
             pendingRetries.toList().also { pendingRetries.clear() }
         }
         if (retry) retries.forEach { it() }
+    }
+}
+
+/** The Try again of reads a screen shows failed in place; it restarts every one of them that failed since the last retry. */
+class BittensorInlineRetry {
+
+    private val pending = mutableListOf<() -> Unit>()
+
+    fun retry() {
+        val retries = synchronized(pending) { pending.toList().also { pending.clear() } }
+        retries.forEach { it() }
+    }
+
+    internal fun add(onRetry: () -> Unit) {
+        synchronized(pending) { pending += onRetry }
     }
 }

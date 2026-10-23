@@ -14,6 +14,7 @@ data class BittensorPositionUi(
     val action: BittensorPositionAction,
     val iconSizeDp: Int = 40,
     val isAmountLoading: Boolean = false,
+    val isTitleLoading: Boolean = false,
     val isSubtitleLoading: Boolean = false,
     val change: BittensorPositionChange? = null,
     val isChangeLoading: Boolean = false,

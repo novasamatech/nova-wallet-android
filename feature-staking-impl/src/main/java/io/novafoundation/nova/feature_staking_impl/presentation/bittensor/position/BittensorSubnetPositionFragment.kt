@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetPositionBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
@@ -81,6 +82,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
     override fun subscribe(viewModel: BittensorSubnetPositionViewModel) = with(binder) {
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
+        observeActionBottomSheet(viewModel.walletGate)
         viewModel.subnet.observe { subnet ->
             val name = subnet?.title(requireContext()) ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)

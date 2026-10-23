@@ -51,7 +51,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
 
     override fun initViews() = with(binder) {
         toolbar.setTitle(viewModel.title)
-        retryExecution.setOnClickListener { viewModel.retryClicked() }
+        retryExecution.setOnClickListener { viewModel.failureActionClicked() }
         execution.toolbar.setHomeButtonListener { viewModel.back() }
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
@@ -76,9 +76,6 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             height = 18.dp(requireContext())
         }
         validator.setOnClickListener { viewModel.validatorClicked() }
-        validator.title.setOnClickListener {
-            showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
-        }
         if (viewModel.isRoot) validator.setPrimaryValueEndIcon(R.drawable.ic_info)
         information.setOnAccountClickedListener { viewModel.accountClicked() }
         saleAccount.setOnClickListener { viewModel.accountClicked() }
@@ -197,7 +194,8 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         viewModel.executionSubtitle.observe { execution.subtitle.text = it }
         viewModel.executionFailure.observe {
             execution.showFailure(it)
-            retryExecution.isVisible = it?.canRetry == true
+            retryExecution.isVisible = it != null
+            retryExecution.setText(if (it?.canRetry == false) R.string.common_close else R.string.common_try_again)
         }
         viewModel.canFinish.observe { done.isVisible = it && !viewModel.isRoot }
         viewModel.executionUnconfirmed.observe { state ->
@@ -206,13 +204,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
                 retryExecution.isVisible = false
             }
         }
-        bindBittensorStakeResults(
-            results = viewModel.resultState,
-            onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::retryClicked,
-            onViewPosition = viewModel::viewPositionClicked,
-            onUnconfirmedDone = viewModel::doneClicked
-        )
+        bindBittensorStakeResults(viewModel.resultState, viewModel::resultActionClicked)
     }
 
     private fun showLegs(legs: List<BittensorExitLegUi>) = with(binder) {

@@ -75,8 +75,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -151,6 +153,9 @@ class BittensorSubnetReviewViewModel(
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.CONFIRM)
+
+    /** Set once the stake is confirmed, also when it then fails (iOS `abandonTracker.markProceeded`). */
+    private var flowContinued = false
 
     val retryEvents = retryController.events
 
@@ -474,6 +479,10 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
+    fun validatorClicked() {
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(subnetId.value, validatorAddress))
+    }
+
     fun confirmClicked() = launchUnit {
         if (!submission.value.canSubmit || hasError.first() || validating.value) return@launchUnit
         val prepared = acknowledgedDraft.first() ?: return@launchUnit
@@ -545,6 +554,7 @@ class BittensorSubnetReviewViewModel(
         submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
             operationAnalytics.startOperation()
+            flowContinued = true
             analytics.track(
                 BittensorAnalyticsEvent.Confirmed(
                     BittensorAnalyticsEvent.NETWORK,
@@ -668,6 +678,14 @@ class BittensorSubnetReviewViewModel(
         retryRequotes.tryEmit(Unit)
     }
 
+    /** The failure page button, as iOS `createPageAction`: Try again when a retry can succeed, otherwise Close leaves the flow. */
+    fun failureActionClicked() {
+        val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return
+        val action = if (failure.canRetry) BittensorResultAction.TRY_AGAIN else BittensorResultAction.CLOSE
+
+        resultNavigation.activate(action) { retryClicked() }
+    }
+
     fun viewPositionClicked() {
         if (submission.value.isFinished) resultNavigation.done()
     }
@@ -676,7 +694,13 @@ class BittensorSubnetReviewViewModel(
         when {
             submission.value is BittensorSubmissionState.Submitting -> Unit
             submission.value.isFinished -> resultNavigation.leave()
-            else -> router.back()
+            else -> {
+                // As iOS: leaving the review of a new position before confirming reports it abandoned.
+                if (!flowContinued && !existingPosition) {
+                    analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.CONFIRM, StakingAnalyticsTarget.SUBNET))
+                }
+                router.back()
+            }
         }
     }
 }

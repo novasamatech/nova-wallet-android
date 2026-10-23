@@ -94,11 +94,7 @@ class BittensorValidatorAdapter(
             val context = binder.root.context
             val commissionPercentage = validator.commissionRate.movePointRight(2)
                 .setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
-            val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
-            return when {
-                validator.recommended -> context.getString(R.string.bittensor_recommended_validator) + " · " + fee
-                else -> fee
-            }
+            return context.getString(R.string.bittensor_validator_take, commissionPercentage)
         }
     }
 
