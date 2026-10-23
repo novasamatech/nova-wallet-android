@@ -8,17 +8,11 @@ import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 /**
- * Successful transfers to current/historical Nova fee recipients are hidden,
- * including standalone transfers, matching the approved iOS recipient rule.
- *
- * For subnet-prefix filtering, hash alone does not prove a technical transfer.
- * Require a successful direct staking call in the same page, block and account
- * context. Missing/cross-page evidence keeps non-fee-recipient transfers.
- *
- * The separate subnet-prefix rule remains conservative: the current client DTO
- * has no nested calls, so utility/proxy/multisig prefix transfers remain visible.
- * Synthetic fixtures cover this contract; live Bittensor indexer co-occurrence
- * of the extrinsic and transfer rows has not been established.
+ * Mirrors iOS SubtensorHistoryFiltersProvider:
+ * - successful transfers to current/historical Nova fee recipients are hidden, including standalone ones;
+ * - transfers from/to a subnet account (`modlsubtensr` prefix) are hidden when they carry an extrinsic
+ *   hash, i.e. they happened inside an extrinsic (stake, unstake, a batch with the Nova fee). The staking
+ *   extrinsic itself stays visible. Transfers without a hash keep showing.
  */
 internal fun filterBittensorTechnicalTransfers(
     nodes: List<Node>,
@@ -29,8 +23,6 @@ internal fun filterBittensorTechnicalTransfers(
     if (!supportsBittensorTransferFiltering(chain, asset)) return nodes
 
     val feeRecipients = feeRecipientAddresses.mapNotNull { chain.accountIdOrNull(it)?.let(::AccountIdKey) }.toSet()
-    val extrinsics = nodes.filter { it.extrinsic != null }
-        .groupBy { it.extrinsicContext() }
 
     return nodes.filter { node ->
         if (!node.isSuccessfulNativeTransfer()) return@filter true
@@ -39,16 +31,11 @@ internal fun filterBittensorTechnicalTransfers(
         val recipient = chain.accountIdOrNull(transfer.to)?.let(::AccountIdKey)
         if (recipient in feeRecipients) return@filter false
 
-        if (node.extrinsic != null) return@filter true
-        val context = node.extrinsicContext() ?: return@filter true
-        val parents = extrinsics[context].orEmpty()
-        if (parents.isEmpty() || parents.any { !it.isSuccessfulDirectStakeCall() }) return@filter true
+        if (!node.hasExtrinsicHash()) return@filter true
 
         !chain.isSubnetAccount(transfer.from) && !chain.isSubnetAccount(transfer.to)
     }
 }
-
-private data class ExtrinsicContext(val hash: String, val blockNumber: Long, val address: String)
 
 private fun supportsBittensorTransferFiltering(chain: Chain, asset: Chain.Asset): Boolean {
     return chain.id == ChainGeneses.BITTENSOR &&
@@ -64,18 +51,9 @@ private fun Node.isSuccessfulNativeTransfer(): Boolean {
         swap == null
 }
 
-private fun Node.extrinsicContext(): ExtrinsicContext? {
-    val hash = extrinsicHash?.removePrefix("0x") ?: return null
-    if (hash.length != 64 || hash.any { it !in '0'..'9' && it !in 'a'..'f' && it !in 'A'..'F' }) return null
-    val accountAddress: String? = address
-    // Gson supplies zero for an absent primitive blockNumber. It is not evidence.
-    if (blockNumber <= 0 || accountAddress.isNullOrBlank()) return null
-    return ExtrinsicContext(hash.lowercase(), blockNumber, accountAddress)
-}
-
-private fun Node.isSuccessfulDirectStakeCall(): Boolean {
-    val call = extrinsic ?: return false
-    return call.success && call.module.equals("subtensorModule", ignoreCase = true) && call.call in DIRECT_STAKE_CALLS
+private fun Node.hasExtrinsicHash(): Boolean {
+    val hash = extrinsicHash?.removePrefix("0x") ?: return false
+    return hash.length == 64 && hash.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }
 }
 
 private fun Chain.isSubnetAccount(address: String): Boolean {
@@ -84,11 +62,3 @@ private fun Chain.isSubnetAccount(address: String): Boolean {
 }
 
 private val SUBNET_ACCOUNT_PREFIX = "modlsubtensr".toByteArray(Charsets.UTF_8)
-
-private val DIRECT_STAKE_CALLS = setOf(
-    "addStake", "add_stake",
-    "addStakeLimit", "add_stake_limit",
-    "removeStake", "remove_stake",
-    "removeStakeLimit", "remove_stake_limit",
-    "removeStakeFullLimit", "remove_stake_full_limit"
-)
