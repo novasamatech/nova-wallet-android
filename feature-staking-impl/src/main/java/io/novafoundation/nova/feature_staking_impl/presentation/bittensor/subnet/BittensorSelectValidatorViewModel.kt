@@ -27,7 +27,6 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
@@ -36,6 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
@@ -221,7 +221,13 @@ class BittensorSelectValidatorViewModel(
             val amount = nativeStake?.let { tokenFormatter.formatToken(it, requireNotNull(stake).symbol).toString() } ?: "—"
             val take = validator.commissionRate.movePointRight(2).setScale(2, java.math.RoundingMode.HALF_EVEN).toStripTrailingZerosString()
             val subtitle = resources.getString(R.string.bittensor_validator_list_subtitle, amount, take)
-            rowsByAddress.getValue(validator.address).copy(apy = rate?.formatAsPercentage(), apyColorRes = bittensorYieldColor(rate), subtitle = subtitle)
+            rowsByAddress.getValue(validator.address).copy(
+                apy = rate?.formatAsPercentage(),
+                apyColorRes = bittensorYieldColor(rate),
+                subtitle = subtitle,
+                stakeInNative = nativeStake,
+                annualYield = rate
+            )
         }
     }
 
@@ -245,14 +251,19 @@ class BittensorSelectValidatorViewModel(
         }
     }
 
-    fun infoClicked(row: BittensorValidatorUi) = launchUnit {
-        try {
-            externalActions.showAddressActions(row.eligibility.address, bittensorValidatorInteractor.chain())
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            reportFailure(e)
-        }
+    fun infoClicked(row: BittensorValidatorUi) {
+        val validator = row.eligibility
+        router.openBittensorValidatorInfo(
+            BittensorValidatorInfoPayload(
+                subnetId = request.subnetId,
+                address = validator.address,
+                name = validator.validator.name.trim().takeIf { it.isNotEmpty() && it != validator.address },
+                stakeInNative = row.stakeInNative,
+                commissionRate = validator.commissionRate,
+                inactive = validator.inactive,
+                annualYield = row.annualYield
+            )
+        )
     }
 
     fun confirmClicked() = launchUnit {
@@ -290,11 +301,5 @@ class BittensorSelectValidatorViewModel(
             AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
         return BittensorValidatorUi(validator, icon)
-    }
-
-    private fun reportFailure(cause: Throwable) {
-        logger.log("[BittensorSelectValidator] Failed to load validators or address actions")
-        logger.log(cause)
-        showError(resources.getString(R.string.common_retry_message))
     }
 }

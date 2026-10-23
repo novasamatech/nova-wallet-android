@@ -3090,6 +3090,11 @@
     <string name="bittensor_dashboard_max_apy">up to %1$s</string>
     <string name="bittensor_inactive_validator_title">Validator is inactive</string>
     <string name="bittensor_inactive_validator_message">This validator is inactive, so new stake earns nothing until it’s active again.</string>
+    <string name="bittensor_validator_info_take">Validator take</string>
+    <string name="bittensor_validator_info_take_value">%1$s%%</string>
+    <string name="bittensor_validator_info_coverage">Subnets validated</string>
+    <string name="bittensor_validator_info_coverage_value">%1$d of %2$d</string>
+    <string name="bittensor_validator_info_reward_average">30-day average</string>
     <string name="bittensor_remove_validator_filters">Remove all filters</string>
     <string name="bittensor_validators_filtered_empty">No quick-pick validators for this subnet yet. Remove filters to see all validators.</string>
     <string name="bittensor_validators_search_empty">No validators for ‘%s’</string>

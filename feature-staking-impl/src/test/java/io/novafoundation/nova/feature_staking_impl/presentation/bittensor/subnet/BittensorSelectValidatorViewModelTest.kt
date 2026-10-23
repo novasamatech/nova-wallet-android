@@ -24,6 +24,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -194,6 +195,26 @@ class BittensorSelectValidatorViewModelTest {
         assertEquals("address-1", viewModel.selectedAddress.value)
     }
 
+    @Test
+    fun `info opens the validator info screen with the row snapshot`() = runBlocking<Unit> {
+        val validator = validator(1, "Alpha", stake = "10").copy(commissionRate = BigDecimal("0.18"))
+        val directory = directory(listOf(validator))
+        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
+        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
+        val row = withTimeout(5_000) { viewModel.rows.first { it.isNotEmpty() } }.single()
+
+        viewModel.infoClicked(row)
+
+        val captor = org.mockito.ArgumentCaptor.forClass(BittensorValidatorInfoPayload::class.java)
+        Mockito.verify(router).openBittensorValidatorInfo(captor.capture() ?: placeholderPayload)
+        val payload = captor.value
+        assertEquals("address-1", payload.address)
+        assertEquals("Alpha", payload.name)
+        assertEquals(BigDecimal("0.18"), payload.commissionRate)
+        assertEquals(0, payload.subnetId)
+    }
+
     private fun createViewModel(request: BittensorSelectValidatorCommunicator.Request): BittensorSelectValidatorViewModel {
         return BittensorSelectValidatorViewModel(
             analytics, request, communicator, interactor, icons, router, externalActions, resources, logger,
@@ -211,6 +232,8 @@ class BittensorSelectValidatorViewModelTest {
 
     private fun directory(rows: List<BittensorSubnetValidator>) =
         BittensorValidatorDirectory(rows, mock(BittensorValidatorDirectoryStatus::class.java), null)
+
+    private val placeholderPayload = BittensorValidatorInfoPayload(0, "", null, null, BigDecimal.ZERO, false, null)
 
     private class RecordingCommunicator : BittensorSelectValidatorCommunicator {
         val responses = Channel<BittensorSelectValidatorCommunicator.Response>(Channel.UNLIMITED)
