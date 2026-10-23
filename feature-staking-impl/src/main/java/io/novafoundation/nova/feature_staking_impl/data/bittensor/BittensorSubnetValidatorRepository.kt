@@ -264,13 +264,13 @@ class RealBittensorSubnetValidatorRepository(
         chain: Chain,
         netuid: BittensorNetuid.Subnet,
         validator: BittensorValidator
-    ): BittensorSubnetValidator = withTimeout(REQUEST_TIMEOUT_MILLIS) {
+    ): BittensorSubnetValidator = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
         val directory = backend.validators(netuid.value)
         val identifiedValidator = mapCandidates(chain, directory).firstOrNull { it.hotkey == validator.hotkey } ?: validator
         val gates = backend.gates()
         val row = enrich(chain, netuid, listOf(identifiedValidator), gates).singleOrNull()
         requireNotNull(row?.takeIf { it.canAddToExistingPosition }) { "Validator is no longer eligible for additional stake" }
-    }
+    } ?: throw BittensorTimeoutException("Validator eligibility checks")
 
     private suspend fun enrich(
         chain: Chain,
