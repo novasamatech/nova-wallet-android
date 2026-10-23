@@ -28,6 +28,10 @@ data class BittensorRootClaims(
     val totalRedeemable: BigInteger
         get() = previews.fold(BigInteger.ZERO) { total, preview -> total + preview.redeemable }
 
+    /** Rewards that meet the claim minimum, like iOS SubtensorState.totalRootRedeemable. */
+    val totalClaimable: BigInteger
+        get() = claimable.fold(BigInteger.ZERO) { total, preview -> total + preview.redeemable }
+
     val claimable: List<BittensorRootClaimPreview>
         get() = previews.filter { it.redeemable.isPositive() && it.redeemable >= minimum }
             .sortedWith(

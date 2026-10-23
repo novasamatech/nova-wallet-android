@@ -56,11 +56,12 @@ internal fun mapBittensorDashboardItem(
     val label = composition?.let { resources.getString(R.string.bittensor_dashboard_title, option.token.configuration.name, it) }
         ?: option.token.configuration.name
     val panelTitle = when {
+        details.showsClaimableRewardsPanel -> resources.getString(R.string.bittensor_claim_available)
         details.showsRootPanel -> rootTitle
         details.subnetCount == 1 -> subnetTitle
         else -> resources.getString(R.string.bittensor_dashboard_subnets_title)
     }
-    // Like iOS hasActiveStaking: this card exists for positions or redeemable rewards.
+    // Like iOS hasActiveStaking: this card exists for positions or claimable root rewards.
     // Root-validator registration is a separate status on the root position screen.
     val status = mapDashboardStakingStatus(StakingStatus.ACTIVE, resources)
     return StakingDashboardModel.HasStakeItem(

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import com.google.gson.Gson
 import android.os.SystemClock
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorClaimClock
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingClaims
 import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
@@ -229,6 +232,11 @@ class BittensorModule {
         configRepository: BittensorConfigRepository,
         swapSource: BittensorSwapSource
     ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorDashboardSnapshots(preferences: Preferences, gson: Gson): BittensorDashboardSnapshotRepository =
+        RealBittensorDashboardSnapshotRepository(preferences, gson)
 
     @Provides
     @FeatureScope
@@ -520,11 +528,13 @@ class BittensorModule {
         positions: BittensorPositionRepository,
         validators: BittensorValidatorInteractor,
         recommendedYields: BittensorRecommendedYieldInteractor,
+        snapshots: BittensorDashboardSnapshotRepository,
         logger: Logger
     ) = BittensorDashboardDetailsSource(
         positions,
         validators,
         recommendedYields,
+        snapshots,
         logger
     )
 

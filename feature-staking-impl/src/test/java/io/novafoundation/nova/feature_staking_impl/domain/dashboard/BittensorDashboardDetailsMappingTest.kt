@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -121,6 +122,30 @@ class BittensorDashboardDetailsMappingTest {
         assertEquals(Composition.ROOT, mapped.bittensorDetails?.composition)
         assertEquals(n(0), mapped.bittensorDetails?.panelStakeInPlanks)
         assertNull(mapped.bittensorDetails?.panelAnnualPercentageYield)
+    }
+
+    @Test
+    fun `claimable rewards without stake get their own panel instead of a zero root stake`() {
+        `when`(chain.id).thenReturn("chain")
+        val state = AggregatedStakingDashboardOption.HasStake(false, Chain.Asset.StakingType.BITTENSOR_ROOT, n(0), ExtendedLoadingState.Loading)
+        val option = AggregatedStakingDashboardOption(chain, token, state, AggregatedStakingDashboardOption.SyncingStage.SYNCED)
+        val empty = BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap())
+        val details = mapBittensorDashboardDetails(empty, emptyMap(), emptyMap(), emptyMap())
+            .copy(rootYieldLoading = true, claimableRootRewardsInPlanks = n(7))
+        val mapped = requireNotNull(option.withBittensorDetails(mapOf("chain" to details)).bittensorDetails)
+        assertEquals(Composition.NONE, mapped.composition)
+        assertTrue(mapped.showsClaimableRewardsPanel)
+        assertEquals(n(7), mapped.panelStakeInPlanks)
+        assertNull(mapped.panelAnnualPercentageYield)
+        assertFalse(mapped.panelYieldLoading)
+    }
+
+    @Test
+    fun `claimable rewards do not replace an existing stake panel`() {
+        val details = mapBittensorDashboardDetails(portfolio(), mapOf(first to d(8)), emptyMap(), emptyMap())
+            .copy(claimableRootRewardsInPlanks = n(7))
+        assertFalse(details.showsClaimableRewardsPanel)
+        assertEquals(n(10), details.panelStakeInPlanks)
     }
 
     @Test

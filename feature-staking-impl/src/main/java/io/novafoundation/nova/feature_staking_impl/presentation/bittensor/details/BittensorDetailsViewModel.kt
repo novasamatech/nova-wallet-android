@@ -238,7 +238,7 @@ class BittensorDetailsViewModel(
         .shareInBackground()
 
     private val rootRewards = rootClaimStates.map { claims ->
-        AccountRowValue(claims.metaId, claims.state.map { it.claims.totalRedeemable })
+        AccountRowValue(claims.metaId, claims.state.map { it.claims.totalClaimable })
     }
         .shareInBackground()
 

@@ -22,10 +22,12 @@ internal fun <S> AggregatedStakingDashboardOption<S>.withBittensorDetails(
     if (!matches) return this
     var details = detailsByChain[chain.id] ?: mapBittensorDashboardDetails(null, emptyMap(), emptyMap(), emptyMap())
         .copy(rootYieldLoading = true, subnetYieldLoading = true, maximumYieldLoading = true)
-    // The updater's HasStake classification includes redeemable root rewards without stake.
+    // The updater's HasStake classification includes claimable root rewards without stake; those get
+    // their own panel. A zero root panel only bridges the moment until the updater reclassifies.
     if (stakingState is AggregatedStakingDashboardOption.HasStake &&
         details.composition == BittensorDashboardDetails.Composition.NONE &&
-        details.pricing != BittensorDashboardDetails.Pricing.LOADING
+        details.pricing != BittensorDashboardDetails.Pricing.LOADING &&
+        !details.showsClaimableRewardsPanel
     ) {
         details = details.copy(rootStakeInPlanks = BigInteger.ZERO)
     }
