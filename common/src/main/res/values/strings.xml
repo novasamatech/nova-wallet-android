@@ -2921,6 +2921,8 @@
     <string name="bittensor_quick_validator_failed">Could not choose an available validator. Try again or choose a validator manually.</string>
     <string name="bittensor_monthly_tokens">Earn tokens a month</string>
     <string name="bittensor_fee_on_review">On confirmation</string>
+    <string name="bittensor_slippage_title">Slippage tolerance</string>
+    <string name="bittensor_slippage_explanation">If the price moves more than this while your order fills, the network cancels the order and only the network fee is charged.</string>
     <string name="bittensor_slippage_fixed">Slippage tolerance is %1$s%%. The operation is rejected if the price moves beyond this limit; partial staking is not allowed.</string>
     <string name="bittensor_subnet">Subnet</string>
     <string name="bittensor_you_receive">You will get</string>
