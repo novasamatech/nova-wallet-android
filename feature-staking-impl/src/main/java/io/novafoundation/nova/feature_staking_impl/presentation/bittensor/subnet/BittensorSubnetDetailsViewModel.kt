@@ -121,6 +121,7 @@ class BittensorSubnetDetailsViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val amountFormatter: BittensorAmountFormatter,
     private val replaceAmount: Boolean,
+    private val replaceOrigin: BittensorReplaceOrigin = BittensorReplaceOrigin.SUBNET_AMOUNT,
     initialValidatorAddress: String?,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
     private val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER
@@ -532,6 +533,7 @@ class BittensorSubnetDetailsViewModel(
                 validatorIsPreset = isPreset,
                 recommendedAddress = presetAddress(),
                 replaceAmount = replaceAmount,
+                replaceOrigin = replaceOrigin,
                 selectionState = selectionState
             )
         )

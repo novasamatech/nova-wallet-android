@@ -30,6 +30,9 @@ data class BittensorSelectionState(
         response.selectionState.takeIf { accepts(response) } ?: this
 
     fun accepts(response: BittensorSelectValidatorCommunicator.Response): Boolean = response.selectionState.flowId == flowId
+
+    /** The same filters and browse state under a new flow, for a setup screen stacked on top of this one. */
+    fun forkedFlow(): BittensorSelectionState = copy(flowId = UUID.randomUUID().toString())
 }
 
 @Parcelize

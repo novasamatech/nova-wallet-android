@@ -297,7 +297,12 @@ class BittensorChooseSubnetViewModel(
         rememberBrowseState()
         detailsOpen = true
         router.openBittensorSubnetDetails(
-            BittensorSubnetDetailsPayload(row.subnet.id.value, payload.replaceAmount, selectionState = selectionState)
+            BittensorSubnetDetailsPayload(
+                row.subnet.id.value,
+                payload.replaceAmount,
+                replaceOrigin = payload.replaceOrigin,
+                selectionState = selectionState
+            )
         )
     }
 
@@ -330,10 +335,17 @@ class BittensorChooseSubnetViewModel(
         )
         selectionState = selectionState.copy(flowContinued = true)
         rememberBrowseState()
-        if (payload.replaceAmount) {
-            router.replaceBittensorSubnetAmountWithRoot(selectionState)
-        } else {
-            router.openBittensorRootStaking(selectionState = selectionState)
+        when (bittensorPickerRootAction(payload)) {
+            // The picker sits on the root setup it was opened from: return to it instead of stacking another one.
+            BittensorPickerRootAction.RETURN -> {
+                validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
+                router.back()
+            }
+            BittensorPickerRootAction.REPLACE_SUBNET_AMOUNT -> router.replaceBittensorSubnetAmountWithRoot(
+                selectionState,
+                quickPick = payload.quickPick
+            )
+            BittensorPickerRootAction.OPEN -> router.openBittensorRootStaking(selectionState = selectionState)
         }
     }
 
@@ -464,3 +476,13 @@ private data class BrowseInput(
     val yields: Map<BittensorNetuid.Subnet, BigDecimal>,
     val weekly: Map<BittensorNetuid.Subnet, BigDecimal>
 )
+
+internal enum class BittensorPickerRootAction {
+    OPEN, REPLACE_SUBNET_AMOUNT, RETURN
+}
+
+internal fun bittensorPickerRootAction(payload: BittensorChooseSubnetPayload): BittensorPickerRootAction = when {
+    !payload.replaceAmount -> BittensorPickerRootAction.OPEN
+    payload.replaceOrigin == BittensorReplaceOrigin.ROOT_STAKE -> BittensorPickerRootAction.RETURN
+    else -> BittensorPickerRootAction.REPLACE_SUBNET_AMOUNT
+}

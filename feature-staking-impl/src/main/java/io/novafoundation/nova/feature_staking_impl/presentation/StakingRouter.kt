@@ -148,7 +148,8 @@ interface StakingRouter {
     fun openBittensorChooseSubnet(payload: BittensorChooseSubnetPayload = BittensorChooseSubnetPayload())
 
     fun replaceBittensorSubnetAmountWithRoot(
-        selectionState: BittensorSelectionState
+        selectionState: BittensorSelectionState,
+        quickPick: Boolean = false
     )
 
     fun openBittensorWhereToStake()

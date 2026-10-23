@@ -14,6 +14,8 @@ class BittensorSubnetAmountPayload(
     val recommendedAddress: String? = null,
     val existingPosition: Boolean = false,
     val replaceAmount: Boolean = false,
+    /** Which setup screen [replaceAmount] replaces: the subnet setup or the root setup the picker was opened from. */
+    val replaceOrigin: BittensorReplaceOrigin = BittensorReplaceOrigin.SUBNET_AMOUNT,
     val quickPickOrder: BittensorQuickPickOrder? = null,
     val selectionState: BittensorSelectionState = BittensorSelectionState()
 ) : Parcelable {

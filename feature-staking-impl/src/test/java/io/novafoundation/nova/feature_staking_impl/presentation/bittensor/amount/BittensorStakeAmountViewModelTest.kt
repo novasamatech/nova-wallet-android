@@ -1,6 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import org.mockito.ArgumentCaptor
+import org.junit.Assert.assertNotEquals
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetBrowseState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorReplaceOrigin
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -266,7 +272,10 @@ class BittensorStakeAmountViewModelTest {
         createViewModel()
     }
 
-    private fun createViewModel(payload: BittensorStakeAmountPayload? = null) {
+    private fun createViewModel(
+        payload: BittensorStakeAmountPayload? = null,
+        selectionState: BittensorSelectionState = BittensorSelectionState()
+    ) {
         if (::viewModel.isInitialized) {
             runBlocking { viewModel.coroutineContext.job.cancelAndJoin() }
         }
@@ -287,7 +296,8 @@ class BittensorStakeAmountViewModelTest {
             feeLoaderMixinFactory = feeLoaderFactory,
             externalActions = externalActions,
             getAssetOptionsMixinFactory = getAssetOptionsFactory,
-            payload = payload
+            payload = payload,
+            initialSelectionState = selectionState
         )
     }
 
@@ -567,4 +577,46 @@ class BittensorStakeAmountViewModelTest {
             BittensorDataStatus.Fresh
         )
     }
+
+    @Test
+    fun `title follows the root entry`() {
+        createViewModel(QUICK_PICK_ROOT)
+        assertEquals(R.string.bittensor_earn_title, viewModel.titleRes)
+
+        createViewModel()
+        assertEquals(R.string.bittensor_stake_to_root, viewModel.titleRes)
+
+        createViewModel(BittensorStakeAmountPayload(1L, "validator", quickPick = true))
+        assertEquals(R.string.bittensor_add_stake_to_root, viewModel.titleRes)
+    }
+
+    @Test
+    fun `quick pick header opens the plain root setup under its own flow`() {
+        val state = BittensorSelectionState(browseState = BittensorSubnetBrowseState(hideThinPools = true))
+        createViewModel(QUICK_PICK_ROOT, selectionState = state)
+
+        viewModel.quickPickHeaderClicked()
+
+        val captor = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), captor.capture() ?: state)
+        assertNotEquals(state.flowId, captor.value.flowId)
+        assertEquals(state.browseState, captor.value.browseState)
+    }
+
+    @Test
+    fun `see all subnets from root replaces the root setup and add stake has none`() {
+        createViewModel()
+        viewModel.seeAllSubnetsClicked()
+
+        val captor = ArgumentCaptor.forClass(BittensorChooseSubnetPayload::class.java)
+        verify(router).openBittensorChooseSubnet(captor.capture() ?: BittensorChooseSubnetPayload())
+        assertEquals(true, captor.value.replaceAmount)
+        assertEquals(BittensorReplaceOrigin.ROOT_STAKE, captor.value.replaceOrigin)
+
+        createViewModel(BittensorStakeAmountPayload(1L, "validator"))
+        viewModel.seeAllSubnetsClicked()
+        verify(router, org.mockito.Mockito.times(1)).openBittensorChooseSubnet(org.mockito.ArgumentMatchers.any() ?: BittensorChooseSubnetPayload())
+    }
 }
+
+private val QUICK_PICK_ROOT = BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true)

@@ -64,6 +64,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetBrowseState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorReplaceOrigin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLeadingApy
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorValidatorRowUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
@@ -438,13 +439,20 @@ class BittensorStakeAmountViewModel(
 
     fun quickPickHeaderClicked() {
         if (entry != BittensorRootStakeEntry.QUICK_PICK || preparing.value) return
-        router.openBittensorRootStaking(selectionState = selectionState)
+        // The pushed root setup gets its own flow, so a validator picked there does not change this screen.
+        router.openBittensorRootStaking(selectionState = selectionState.forkedFlow())
     }
 
     fun seeAllSubnetsClicked() {
         if (entry == BittensorRootStakeEntry.ADD_STAKE || preparing.value) return
         val browseState = selectionState.browseState ?: BittensorSubnetBrowseState()
-        router.openBittensorChooseSubnet(BittensorChooseSubnetPayload(replaceAmount = true, browseState = browseState, selectionState = selectionState))
+        val payload = BittensorChooseSubnetPayload(
+            replaceAmount = true,
+            browseState = browseState,
+            selectionState = selectionState,
+            replaceOrigin = BittensorReplaceOrigin.ROOT_STAKE
+        )
+        router.openBittensorChooseSubnet(payload)
     }
 
     fun continueClicked() = launchUnit {
