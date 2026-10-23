@@ -211,10 +211,22 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    // Only a search that matches nothing hides the root row and the sort/filter/count row; filters that hide every subnet keep them (as on iOS).
-    private val searchHasNoMatches = combine(subnets, isLoading, hasError, query) { subnets, loading, failed, query ->
-        bittensorSearchHasNoMatches(loading, failed, query, subnets.size)
+    // Only a search that matches nothing in the whole catalogue hides the root row and the sort/filter/count row.
+    // When matches exist but the filters hide them, the controls stay so the user can turn the filters off.
+    private val emptyKind = combine(orderedCatalogue, subnets, isLoading, hasError, query) { catalogue, subnets, loading, failed, query ->
+        bittensorSubnetEmptyKind(
+            loading = loading,
+            failed = failed,
+            query = query,
+            catalogueSize = catalogue.size,
+            queryMatches = catalogue.count { it.matchesQuery(query) },
+            shown = subnets.size
+        )
     }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    private val searchHasNoMatches = emptyKind.map { it == BittensorSubnetEmptyKind.NO_SEARCH_MATCHES }
         .distinctUntilChanged()
         .shareInBackground()
 
@@ -247,18 +259,17 @@ class BittensorChooseSubnetViewModel(
     }
         .shareInBackground()
 
-    val isEmpty = combine(subnets, isLoading, hasError) { subnets, loading, failed -> subnets.isEmpty() && !loading && !failed }
+    val isEmpty = emptyKind.map { it != BittensorSubnetEmptyKind.NONE }
         .shareInBackground()
 
     val controlsVisible = searchHasNoMatches.map { !it }
         .shareInBackground()
 
-    val emptyMessage = query.map { query ->
-        val trimmed = query.trim()
-        if (trimmed.isEmpty()) {
-            resources.getString(R.string.bittensor_no_subnets)
-        } else {
-            resources.getString(R.string.bittensor_subnets_search_no_matches, trimmed)
+    val emptyMessage = combine(emptyKind, query) { kind, query ->
+        when (kind) {
+            BittensorSubnetEmptyKind.NO_SEARCH_MATCHES -> resources.getString(R.string.bittensor_subnets_search_no_matches, query.trim())
+            BittensorSubnetEmptyKind.FILTERED_OUT -> resources.getString(R.string.bittensor_subnet_filter_empty)
+            BittensorSubnetEmptyKind.NONE, BittensorSubnetEmptyKind.NO_SUBNETS -> resources.getString(R.string.bittensor_no_subnets)
         }
     }
         .shareInBackground()

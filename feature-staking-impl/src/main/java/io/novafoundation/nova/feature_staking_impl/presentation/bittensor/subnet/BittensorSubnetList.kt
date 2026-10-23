@@ -25,9 +25,37 @@ internal fun bittensorSubnetList(
     return root + subnets.map { BittensorSubnetListItem.Subnet(it) }
 }
 
-/** A loaded, non-failed list where a non-blank search matched no subnet. */
-internal fun bittensorSearchHasNoMatches(loading: Boolean, failed: Boolean, query: String, matches: Int): Boolean {
-    return !loading && !failed && query.isNotBlank() && matches == 0
+enum class BittensorSubnetEmptyKind {
+    /** At least one row is shown, or the list is not settled yet. */
+    NONE,
+
+    /** The catalogue itself is empty. */
+    NO_SUBNETS,
+
+    /** A non-blank search matches nothing in the unfiltered catalogue: the root row and the controls hide. */
+    NO_SEARCH_MATCHES,
+
+    /** Subnets match, but the filters hide all of them: the controls stay so the filters can be changed. */
+    FILTERED_OUT
+}
+
+/**
+ * [queryMatches] counts catalogue subnets matching the search before filters, [shown] the rows left after filters.
+ */
+internal fun bittensorSubnetEmptyKind(
+    loading: Boolean,
+    failed: Boolean,
+    query: String,
+    catalogueSize: Int,
+    queryMatches: Int,
+    shown: Int
+): BittensorSubnetEmptyKind {
+    return when {
+        loading || failed || shown > 0 -> BittensorSubnetEmptyKind.NONE
+        query.isNotBlank() && queryMatches == 0 -> BittensorSubnetEmptyKind.NO_SEARCH_MATCHES
+        catalogueSize == 0 -> BittensorSubnetEmptyKind.NO_SUBNETS
+        else -> BittensorSubnetEmptyKind.FILTERED_OUT
+    }
 }
 
 /** Signed weekly change with one decimal, as the iOS picker shows it: "+48.5%", "-3.2%". */
