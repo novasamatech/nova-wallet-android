@@ -5,6 +5,7 @@ import io.novafoundation.nova.analytics.StakingPortfolioSource
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorPortfolioBinding
@@ -49,7 +50,6 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         onBackPressed { viewModel.back() }
         positions.adapter = adapter
         addPosition.setOnClickListener { viewModel.addPosition() }
-        priceChart.onContentVisibilityChanged = { chartChange.isVisible = it }
         priceChart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         priceChart.setTitle(getString(R.string.staking_validator_total_stake))
         priceChart.setPlotHeight(156)
@@ -74,7 +74,6 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         }
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
-        viewModel.chartChangeFormatter.observe { it.format(chartChange) }
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)
         viewModel.isLoading.observe {
@@ -86,9 +85,23 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         viewModel.totalStake.observe {
             totalAmount.text = it.token
             totalFiat.text = it.fiat
+            emptyTotal.text = it.token
+            emptyFiat.text = it.fiat
+            emptyFiat.isVisible = it.fiat != null
         }
+        viewModel.emptyRootSubtitle.observe { emptyRootSubtitle.text = it }
         viewModel.positions.observe(adapter::submitList)
-        viewModel.empty.observe { empty.isVisible = it }
+        viewModel.empty.observe {
+            empty.isVisible = it
+            totalCard.isVisible = !it
+            positionsHeader.isVisible = !it
+            // iOS: the only action of an empty portfolio is primary, next to positions it is secondary.
+            addPosition.setAppearance(if (it) PrimaryButton.Appearance.PRIMARY else PrimaryButton.Appearance.SECONDARY)
+        }
+        viewModel.rates.observe { rates ->
+            priceChart.isVisible = rates.showChart
+            if (!rates.showChart) chartDate.isVisible = false
+        }
         viewModel.warning.observe {
             warning.text = it
             warning.isVisible = it != null

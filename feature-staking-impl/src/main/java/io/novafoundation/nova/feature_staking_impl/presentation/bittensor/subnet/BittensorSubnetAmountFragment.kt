@@ -7,6 +7,14 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import coil.load
 import io.novafoundation.nova.common.view.setMessageOrHide
+import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.view.AlertView
+import io.novafoundation.nova.common.view.asStyle
+import io.novafoundation.nova.common.view.setModelOrHide
+import io.novafoundation.nova.common.utils.ltrIsolated
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bindBittensorGetAsset
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setSelectable
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showValidator
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -19,7 +27,6 @@ import io.novafoundation.nova.common.view.ChipLabelView
 import androidx.core.widget.TextViewCompat
 import android.view.ViewGroup
 import android.util.TypedValue
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
@@ -33,7 +40,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.bindGetAsset
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
 
 private const val PAYLOAD_KEY = "payload"
@@ -59,6 +65,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
 
     override fun initViews() = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
+        if (viewModel.existingPosition) toolbar.setHomeButtonIcon(R.drawable.ic_close)
         toolbar.setRightActionClickListener {
             viewModel.slippageClicked()
         }
@@ -75,16 +82,11 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         subnet.setOnClickListener { viewModel.subnetClicked() }
         manualSubnet.setOnClickListener { viewModel.chooseSubnetClicked() }
         manualSubnet.isVisible = viewModel.isQuickPick
-        selectionError.setActionText(getString(R.string.common_try_again))
-        selectionError.setOnLinkClickedListener { viewModel.retrySelection() }
-        selectionError.setButtonText(getString(R.string.bittensor_see_all_subnets))
-        selectionError.setOnButtonClickedListener { viewModel.chooseSubnetClicked() }
         subnet.isClickable = !viewModel.existingPosition
         subnetArrow.isVisible = !viewModel.existingPosition
         projectedAveragePrice.isVisible = viewModel.existingPosition
-        validator.setOnClickListener { viewModel.validatorClicked() }
-        validator.isClickable = !viewModel.existingPosition
-        validator.setPrimaryValueEndIcon(if (viewModel.existingPosition) null else R.drawable.ic_chevron_right)
+        validator.root.setOnClickListener { viewModel.validatorClicked() }
+        validator.setSelectable(!viewModel.existingPosition)
         if (viewModel.existingPosition) {
             toolbar.setTitle(getString(R.string.bittensor_buy_more))
             amount.setTitle(getString(R.string.bittensor_you_pay))
@@ -95,7 +97,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetAmountViewModel) = with(binder) {
-        viewModel.getAssetOptionsMixin.bindGetAsset(fundingCard.getAsset)
+        viewModel.getAssetOptionsMixin.bindBittensorGetAsset(fundingCard.getAsset, viewModel.getAssetLabel)
         viewModel.fundingMessage.observe { fundingCard.message.text = it }
         viewModel.reserveWarning.observe(reserveWarning::setMessageOrHide)
         viewModel.needsFunding.observe {
@@ -105,8 +107,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         observeValidations(viewModel)
         observeRetries(viewModel.feeLoaderMixin)
         observeBittensorRetries(viewModel.retryEvents)
-        viewModel.selectionLoading.observe { selectionLoading.isVisible = it }
-        viewModel.selectionError.observe(selectionError::setMessageOrHide)
+        viewModel.selectionError.observe(::showSelectionError)
         viewModel.subnetChips.observe { chips ->
             subnetChips.removeAllViews()
             subnetChips.isVisible = chips.isNotEmpty()
@@ -126,7 +127,6 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
             }
         }
         viewModel.monthlyEstimate.observe(monthlyTokens::showBittensorLoadingValue)
-        projectedAveragePrice.isVisible = viewModel.existingPosition
         if (viewModel.existingPosition) {
             viewModel.buyMoreTitle.observe(toolbar::setTitle)
             viewModel.averagePriceDescription.observe { description ->
@@ -155,9 +155,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         }
         viewModel.subnet.observe {
             selectedSubnetCard.isVisible = it != null || !viewModel.isQuickPick
-            subnetName.text = it?.let {
-                "\u200e" + it.displayName(requireContext())
-            } ?: "—"
+            selectionSkeleton.root.isVisible = it == null && viewModel.isQuickPick
+            subnetName.text = it?.displayName(requireContext())?.ltrIsolated() ?: "—"
             subnetIcon.load(
                 it?.logoUrl,
                 FeatureUtils.getCommonApi(requireContext())
@@ -166,15 +165,23 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
                 bittensorSubnetIcon()
             }
         }
-        viewModel.validator.observe(validator::showBittensorLoadingValue)
-        viewModel.apy.observe {
-            subnetApy.text = it
-            subnetApy.isVisible = it != null
-        }
-        viewModel.annualYield.observe { subnetApy.setTextColorRes(bittensorYieldColor(it)) }
+        viewModel.validator.observe { validator.showValidator(it, FeatureUtils.getCommonApi(requireContext()).imageLoader()) }
         viewModel.alphaAmount.observe(receive::showBittensorLoadingValue)
         viewModel.rate.observe(rate::showBittensorLoadingValue)
         viewModel.continueButtonState.observe(continueButton::setState)
+    }
+
+    private fun showSelectionError(failure: BittensorSelectionFailureUi?) {
+        val model = failure?.let {
+            AlertModel(
+                style = AlertView.StylePreset.WARNING.asStyle(),
+                message = it.title,
+                subMessage = it.message,
+                linkAction = AlertModel.ActionModel(getString(R.string.common_try_again)) { viewModel.retrySelection() },
+                buttonAction = AlertModel.ActionModel(getString(R.string.bittensor_see_all_subnets)) { viewModel.chooseSubnetClicked() }
+            )
+        }
+        binder.selectionError.setModelOrHide(model)
     }
 
     private fun showInfo(

@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -23,19 +25,19 @@ fun FragmentBittensorSubnetDetailsBinding.bindSubnetParameters(model: BittensorS
         bars.isVisible = false
         when (val state = model.split) {
             ExtendedLoadingState.Loading -> {
-                nativeShare.showProgress()
-                alphaShare.showProgress()
+                nativeShareValue.showShare(nativeShareProgress, null)
+                alphaShareValue.showShare(alphaShareProgress, null)
             }
             is ExtendedLoadingState.Error -> {
-                nativeShare.showValue("—")
-                alphaShare.showValue("—")
+                nativeShareValue.showShare(nativeShareProgress, "—")
+                alphaShareValue.showShare(alphaShareProgress, "—")
             }
             is ExtendedLoadingState.Loaded -> {
                 val split = state.data
-                nativeShare.setTitle(split.nativeTitle)
-                alphaShare.setTitle(split.alphaTitle)
-                nativeShare.showValue(split.nativeShare)
-                alphaShare.showValue(split.alphaShare)
+                nativeShareTitle.text = split.nativeTitle
+                alphaShareTitle.text = split.alphaTitle
+                nativeShareValue.showShare(nativeShareProgress, split.nativeShare)
+                alphaShareValue.showShare(alphaShareProgress, split.alphaShare)
                 val fraction = split.nativeFraction?.takeIf { it.isFinite() && it in 0f..1f }
                 if (fraction != null) {
                     bars.isVisible = true
@@ -50,6 +52,13 @@ fun FragmentBittensorSubnetDetailsBinding.bindSubnetParameters(model: BittensorS
             }
         }
     }
+}
+
+/** `null` shows the progress in place of the share. */
+private fun TextView.showShare(progress: View, share: CharSequence?) {
+    isVisible = share != null
+    progress.isVisible = share == null
+    text = share
 }
 
 private fun TableCellView.bindPoolSide(state: ExtendedLoadingState<BittensorSubnetPoolSideUi>) {

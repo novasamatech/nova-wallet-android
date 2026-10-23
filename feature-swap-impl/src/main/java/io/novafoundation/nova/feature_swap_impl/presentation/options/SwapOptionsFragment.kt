@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -9,11 +10,21 @@ import io.novafoundation.nova.common.view.bottomSheet.description.observeDescrip
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapOptionsBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 
 class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptionsBinding>() {
+
+    companion object {
+
+        private const val KEY_SLIPPAGE_PAYLOAD = "SwapOptionsFragment.slippagePayload"
+
+        fun getBundle(payload: SlippageSettingsPayload) = Bundle().apply {
+            putParcelable(KEY_SLIPPAGE_PAYLOAD, payload)
+        }
+    }
 
     override fun createBinding() = FragmentSwapOptionsBinding.inflate(layoutInflater)
 
@@ -31,8 +42,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptio
             SwapFeatureApi::class.java
         )
             .swapOptions()
-            // Payload-driven slippage opens SlippageSettingsBottomSheet; this screen is Swap's own settings.
-            .create(this, payload = null)
+            .create(this, argumentOrNull<SlippageSettingsPayload>(KEY_SLIPPAGE_PAYLOAD))
             .inject(this)
     }
 

@@ -5,6 +5,9 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -31,7 +34,10 @@ class BittensorAmountFormatterTest {
     private val currency = mock(Currency::class.java)
 
     private val tokenFormatter = object : TokenFormatter {
-        override fun formatToken(amount: BigDecimal, token: TokenSymbol, config: TokenConfig): CharSequence = "${amount.toPlainString()} ${token.value}"
+        override fun formatToken(amount: BigDecimal, token: TokenSymbol, config: TokenConfig): CharSequence {
+            val compactMark = if (config.useCompactAbbreviation) "compact " else ""
+            return "$compactMark${amount.toPlainString()} ${token.value}"
+        }
     }
 
     private val formatter = BittensorAmountFormatter(tokenFormatter, fiatFormatter, resources)
@@ -77,5 +83,37 @@ class BittensorAmountFormatterTest {
         assertEquals("1 CUSTOM", amount.token)
         assertNull(amount.fiat)
         verifyNoInteractions(fiatFormatter)
+    }
+
+    @Test
+    fun `compact amounts ask the token formatter for the compact abbreviation and keep the regular fiat`() {
+        val amount = formatter.compactAmount(BigDecimal("8412"), TokenSymbol("NATIVE"), null, currency)
+
+        assertEquals("compact 8412 NATIVE", amount.token)
+        assertNull(amount.fiat)
+    }
+
+    @Test
+    fun `buy rate is isolated left to right so a right-to-left alpha symbol cannot flip it`() {
+        val quote = mock(BittensorSubnetBuyQuote::class.java)
+        `when`(quote.alphaOutInPlanks).thenReturn(BigInteger("15000000000"))
+        `when`(quote.totalTaoInPlanks).thenReturn(BigInteger("1000000000"))
+        val subnet = BittensorSubnet(id = BittensorNetuid.Subnet(64), name = "Chutes", symbol = "ش", logoUrl = null)
+
+        val rate = formatter.exchangeRate(quote, subnet, token)
+
+        assertEquals("\u2066\u20661 NATIVE\u2069 ≈ \u206615.00 ش\u2069\u2069", rate)
+    }
+
+    @Test
+    fun `rates from ten up show two decimals rounded down as on iOS`() {
+        assertEquals(BigDecimal("28.83"), bittensorRateDisplayValue(BigDecimal("28.837961234")))
+        assertEquals(BigDecimal("10.00"), bittensorRateDisplayValue(BigDecimal("10")))
+    }
+
+    @Test
+    fun `rates below ten keep the regular precision`() {
+        assertEquals(BigDecimal("9.876543210"), bittensorRateDisplayValue(BigDecimal("9.876543210")))
+        assertEquals(BigDecimal("0.034675"), bittensorRateDisplayValue(BigDecimal("0.034675")))
     }
 }

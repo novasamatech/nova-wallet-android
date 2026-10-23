@@ -48,6 +48,16 @@ class BittensorSubnetSortingTest {
         assertEquals(listOf(2, 1), sorted.map { it.id.value })
     }
 
+    @Test
+    fun `name order uses the shown title and compares numbers numerically`() {
+        val rows = listOf(subnet(42, 10, 1).copy(name = ""), subnet(9, 10, 1).copy(name = ""), subnet(3, 10, 1).copy(name = "Apex"))
+        val favorites = BittensorSubnetFavorites(1, emptySet())
+        val sorted = sortBittensorSubnets(rows, BittensorSubnetSorting.NAME, favorites, false, emptyMap(), emptyMap(), emptyList(), Locale.US) {
+            it.name.ifBlank { "Subnet ${it.id.value}" }
+        }
+        assertEquals(listOf(3, 9, 42), sorted.map { it.id.value })
+    }
+
     private fun sort(rows: List<BittensorSubnet>, order: BittensorSubnetSorting, rates: Map<BittensorNetuid.Subnet, BigDecimal> = emptyMap()): List<Int> {
         val favorites = BittensorSubnetFavorites(1, emptySet())
         return sortBittensorSubnets(rows, order, favorites, false, rates, emptyMap(), emptyList(), Locale.US).map { it.id.value }

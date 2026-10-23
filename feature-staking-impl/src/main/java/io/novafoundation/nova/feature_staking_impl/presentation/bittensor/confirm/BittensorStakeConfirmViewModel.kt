@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import java.math.BigInteger
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
@@ -42,7 +43,6 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorPreSubmissionError
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorSubmissionError
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
@@ -75,7 +75,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import java.math.BigDecimal
-import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -160,12 +159,18 @@ class BittensorStakeConfirmViewModel(
     }
         .shareInBackground()
 
+    /** The root stake before this operation, taken from the first fresh positions so a refresh after the stake lands does not count it twice. */
+    private var stakeBeforeSnapshot: BigInteger? = null
+
+    /** Null hides "Stake after": it is shown only when adding to a position whose positions are fresh (iOS `createStakeChange`). */
     val stakeAfter = combine(
         selectedStakingDetailsState,
         stakeRequest
     ) { state, request ->
         state.map { details ->
-            val before = details.position?.stakeInPlanks ?: BigInteger.ZERO
+            if (!bittensorShowsRootStakeAfter(payload.existingPosition, details.dataStatus)) return@map null
+            val before = stakeBeforeSnapshot
+                ?: bittensorRootStakeChange(details.positions, request.validator.hotkey, request.amountInPlanks).before.also { stakeBeforeSnapshot = it }
             val token = details.asset.token
             formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
                 formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
@@ -357,9 +362,14 @@ class BittensorStakeConfirmViewModel(
 
     private fun mapProgress(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): BittensorStakeResultUi.Progress {
         val amount = formatStakeAmount(details, request)
+        val descriptionRes = if (payload.existingPosition) {
+            R.string.bittensor_staking_more_progress_description
+        } else {
+            R.string.bittensor_staking_progress_description
+        }
         return BittensorStakeResultUi.Progress(
             title = resourceManager.getString(R.string.bittensor_staking_progress_title),
-            description = resourceManager.getString(R.string.bittensor_staking_progress_description, amount)
+            description = resourceManager.getString(descriptionRes, amount)
         )
     }
 
@@ -369,15 +379,21 @@ class BittensorStakeConfirmViewModel(
         fee: Fee,
         outcome: BittensorOperationOutcome?
     ): BittensorStakeResultUi.Success {
-        val amount = outcome?.tao?.let { formatToken(details.asset.token.amountFromPlanks(it), details.asset.token.configuration.symbol) }
-            ?: ("≈ " + formatStakeAmount(details, request))
-        return BittensorStakeResultUi.Success(
-            title = resourceManager.getString(R.string.bittensor_staking_success_title, amount),
-            description = resourceManager.getString(R.string.bittensor_staking_success_description),
-            validator = request.validator.name,
-            fee = outcome.formatNetworkFee(fee, request.chain, resourceManager, tokenFormatter),
-            amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter),
-            canDiscoverSubnets = !payload.existingPosition
+        val token = details.asset.token
+        val symbol = token.configuration.symbol
+        val staked = outcome?.tao ?: request.amountInPlanks
+        val estimatePrefix = if (outcome?.tao == null) "≈ " else ""
+        val amount = estimatePrefix + formatToken(token.amountFromPlanks(staked), symbol)
+        val change = bittensorRootStakeChange(details.positions, request.validator.hotkey, staked)
+        val before = stakeBeforeSnapshot ?: change.before
+        return bittensorRootStakeSuccess(
+            resources = resourceManager,
+            existingPosition = payload.existingPosition,
+            amount = amount,
+            stakeAfter = estimatePrefix + formatToken(token.amountFromPlanks(before + staked), symbol),
+            validatorName = request.validator.name,
+            validatorCount = change.validatorCount,
+            fee = outcome.formatNetworkFee(fee, request.chain, resourceManager, tokenFormatter)
         )
     }
 

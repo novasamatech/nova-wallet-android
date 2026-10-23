@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorExitAmountBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
@@ -48,12 +47,6 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
 
     override fun initViews() = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
-        val payload = argument<BittensorExitPositionPayload>(PAYLOAD)
-        if (payload.netuid().isRoot()) {
-            toolbar.hideRightAction()
-        } else {
-            toolbar.setRightActionClickListener { viewModel.openSlippageSettings() }
-        }
         onBackPressed { viewModel.back() }
         amount.setTitle(getString(if (viewModel.isRoot) R.string.bittensor_exit_you_unstake else R.string.bittensor_exit_you_sell))
         amount.setAssetIconRounded(!viewModel.isRoot)
@@ -95,7 +88,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
                 earned.showBittensorLoadingAmount(state.map { it.amount })
                 earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
             }
-            viewModel.received.observe(receive::showBittensorLoadingValue)
+            viewModel.received.observe(receive::showBittensorLoadingAmount)
             viewModel.rate.observe(rate::showBittensorLoadingValue)
             viewModel.swapRateDescription.observe { description ->
                 rate.setOnClickListener {
@@ -107,7 +100,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
             validator.image.isVisible = it != null
             validator.image.setImageDrawable(it)
         }
-        viewModel.fee.observe(fee::showBittensorLoadingValue)
+        viewModel.fee.observe(fee::showBittensorLoadingAmount)
         viewModel.feeCaption.observe {
             caption.text = it
             caption.isVisible = viewModel.isRoot && it != null

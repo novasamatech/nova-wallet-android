@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverage
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverageInteractor
@@ -71,10 +72,10 @@ class BittensorValidatorInfoViewModel(
         var emitted = false
         val amounts = flow {
             val symbol = validatorInteractor.chain().utilityAsset.symbol
-            emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
+            emit(AmountModel(amountFormatter.compactToken(stake, symbol), null))
             emitAll(
                 subnetInteractor.observeAsset().map { asset ->
-                    amountFormatter.amount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
+                    amountFormatter.compactAmount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
                 }
             )
         }
@@ -92,13 +93,24 @@ class BittensorValidatorInfoViewModel(
     }
         .shareInBackground()
 
+    // Root stake is TAO itself; subnet stake is alpha valued in TAO at today's price (as on iOS)
+    val totalStakeDescription: String = resources.getString(
+        if (BittensorNetuid.from(payload.subnetId) == BittensorNetuid.Root) {
+            R.string.bittensor_validator_info_total_staked_root
+        } else {
+            R.string.bittensor_validator_info_total_staked_subnet
+        }
+    )
+
+    val takeDescription: String = resources.getString(R.string.bittensor_validator_info_take_description)
+
     val take: String = resources.getString(
         R.string.bittensor_validator_info_take_value,
         payload.commissionRate.movePointRight(2).setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
     )
 
     val reward = BittensorValidatorRewardUi(
-        value = payload.annualYield?.formatAsPercentage() ?: "—",
+        value = payload.annualYield?.let { resources.getString(R.string.staking_apy, it.formatAsPercentage()) } ?: "—",
         detail = payload.annualYield?.let { resources.getString(R.string.bittensor_validator_info_reward_average) },
         style = if (payload.annualYield != null) TableCellView.FieldStyle.POSITIVE else TableCellView.FieldStyle.SECONDARY
     )

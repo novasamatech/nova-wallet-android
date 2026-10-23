@@ -46,6 +46,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.di.BittensorValidatorInfoComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.di.BittensorValidatorFiltersComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetReviewComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
@@ -162,6 +164,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun bittensorSelectValidatorComponentFactory(): BittensorSelectValidatorComponent.Factory
 
     fun bittensorValidatorInfoComponentFactory(): BittensorValidatorInfoComponent.Factory
+
+    fun bittensorValidatorFiltersComponentFactory(): BittensorValidatorFiltersComponent.Factory
 
     fun bittensorSubnetDetailsComponentFactory(): BittensorSubnetDetailsComponent.Factory
 
@@ -319,6 +323,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
         fun create(
             @BindsInstance unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
             @BindsInstance bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
+            @BindsInstance bittensorValidatorFiltersCommunicator: BittensorValidatorFiltersCommunicator,
             @BindsInstance slippageSettingsCommunicator: SlippageSettingsCommunicator,
             @BindsInstance router: StakingRouter,
 

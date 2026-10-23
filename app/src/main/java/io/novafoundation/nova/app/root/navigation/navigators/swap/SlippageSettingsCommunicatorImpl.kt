@@ -6,7 +6,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
 import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator.Response
-import io.novafoundation.nova.feature_swap_impl.presentation.options.SlippageSettingsBottomSheet
+import io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment
 
 class SlippageSettingsCommunicatorImpl(registry: NavigationHoldersRegistry) :
     SlippageSettingsCommunicator,
@@ -18,6 +18,6 @@ class SlippageSettingsCommunicatorImpl(registry: NavigationHoldersRegistry) :
 
     override fun openRequest(request: SlippageSettingsPayload) {
         super.openRequest(request)
-        navController.navigate(R.id.action_open_slippage_settings, SlippageSettingsBottomSheet.getBundle(request))
+        navController.navigate(R.id.action_open_slippage_settings, SwapOptionsFragment.getBundle(request))
     }
 }

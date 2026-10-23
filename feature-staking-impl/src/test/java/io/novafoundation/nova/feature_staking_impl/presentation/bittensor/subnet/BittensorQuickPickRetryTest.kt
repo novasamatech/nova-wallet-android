@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorRootStakePresentation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
@@ -81,7 +82,11 @@ class BittensorQuickPickRetryTest {
     fun `root opens directly without any quick pick work`() {
         viewModel.rootStaking()
         val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
-        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        verify(router).openBittensorRootStaking(
+            org.mockito.ArgumentMatchers.isNull(),
+            state.capture() ?: BittensorSelectionState(),
+            org.mockito.ArgumentMatchers.eq(BittensorRootStakePresentation.QUICK_PICK) ?: BittensorRootStakePresentation.QUICK_PICK
+        )
         verifyNoMoreInteractions(router)
     }
 
@@ -102,7 +107,11 @@ class BittensorQuickPickRetryTest {
 
         viewModel.rootStaking()
         val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
-        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        verify(router).openBittensorRootStaking(
+            org.mockito.ArgumentMatchers.isNull(),
+            state.capture() ?: BittensorSelectionState(),
+            org.mockito.ArgumentMatchers.eq(BittensorRootStakePresentation.QUICK_PICK) ?: BittensorRootStakePresentation.QUICK_PICK
+        )
         assertEquals(filters, state.value.subnetFilters)
         assertEquals(BittensorValidatorFilters(), state.value.rootFilters)
     }
@@ -118,7 +127,11 @@ class BittensorQuickPickRetryTest {
         viewModel.rootStaking()
 
         val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
-        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        verify(router).openBittensorRootStaking(
+            org.mockito.ArgumentMatchers.isNull(),
+            state.capture() ?: BittensorSelectionState(),
+            org.mockito.ArgumentMatchers.eq(BittensorRootStakePresentation.QUICK_PICK) ?: BittensorRootStakePresentation.QUICK_PICK
+        )
         assertEquals(BittensorValidatorFilters(), state.value.rootFilters)
     }
 

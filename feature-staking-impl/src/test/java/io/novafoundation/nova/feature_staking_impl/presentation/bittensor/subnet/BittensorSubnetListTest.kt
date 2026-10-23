@@ -36,6 +36,40 @@ class BittensorSubnetListTest {
     }
 
     @Test
+    fun `a search with no match in the unfiltered catalogue is a no-match state`() {
+        assertEquals(BittensorSubnetEmptyKind.NO_SEARCH_MATCHES, emptyKind(query = "xyz", queryMatches = 0, shown = 0))
+    }
+
+    @Test
+    fun `search matches hidden by filters keep the controls and show the filters-empty state`() {
+        assertEquals(BittensorSubnetEmptyKind.FILTERED_OUT, emptyKind(query = "chutes", queryMatches = 2, shown = 0))
+    }
+
+    @Test
+    fun `filters hiding every subnet without a search show the filters-empty state`() {
+        assertEquals(BittensorSubnetEmptyKind.FILTERED_OUT, emptyKind(query = "", queryMatches = 64, shown = 0))
+    }
+
+    @Test
+    fun `an empty catalogue without a search shows no subnets`() {
+        assertEquals(BittensorSubnetEmptyKind.NO_SUBNETS, emptyKind(query = " ", catalogueSize = 0, queryMatches = 0, shown = 0))
+    }
+
+    @Test
+    fun `shown rows, loading and failure are never empty states`() {
+        assertEquals(BittensorSubnetEmptyKind.NONE, emptyKind(query = "xyz", queryMatches = 1, shown = 1))
+        assertEquals(BittensorSubnetEmptyKind.NONE, emptyKind(query = "xyz", queryMatches = 0, shown = 0, loading = true))
+        assertEquals(BittensorSubnetEmptyKind.NONE, emptyKind(query = "xyz", queryMatches = 0, shown = 0, failed = true))
+    }
+
+    @Test
+    fun `picker change is signed with one decimal`() {
+        assertEquals("+48.5%", bittensorPickerChangePercent(java.math.BigDecimal("48.4987")))
+        assertEquals("-3.2%", bittensorPickerChangePercent(java.math.BigDecimal("-3.21")))
+        assertEquals("+16%", bittensorPickerChangePercent(java.math.BigDecimal("16.04")))
+    }
+
+    @Test
     fun `grouping preserves the sorted subnet rows and wallet identity`() {
         val rows = listOf(row(9), row(1))
         assertEquals(rows, bittensorSubnetList(icon, rows).filterIsInstance<BittensorSubnetListItem.Subnet>().map { it.row })
@@ -47,6 +81,15 @@ class BittensorSubnetListTest {
 
         assertEquals(icon, root.icon)
     }
+
+    private fun emptyKind(
+        query: String,
+        queryMatches: Int,
+        shown: Int,
+        catalogueSize: Int = 64,
+        loading: Boolean = false,
+        failed: Boolean = false
+    ) = bittensorSubnetEmptyKind(loading, failed, query, catalogueSize, queryMatches, shown)
 
     private fun row(id: Int) = BittensorSubnetRowUi(
         subnet = BittensorSubnet(BittensorNetuid.Subnet(id), "Subnet $id", "alpha", null),
