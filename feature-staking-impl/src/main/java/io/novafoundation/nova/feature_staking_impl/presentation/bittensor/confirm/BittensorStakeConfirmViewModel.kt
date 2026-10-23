@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
@@ -55,8 +55,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.titleAndMessage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
@@ -109,6 +108,9 @@ class BittensorStakeConfirmViewModel(
     private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.CONFIRM)
 
     val retryEvents = retryController.events
+
+    /** As on iOS, confirming an add to an existing root position is titled "Add stake to root". */
+    val titleRes = if (payload.existingPosition) R.string.bittensor_add_stake_to_root else R.string.bittensor_stake_to_root
 
     private val stakeRequest = flowOf { payload.toStakeRequest(chain.await()) }
         .shareInBackground()
@@ -255,7 +257,7 @@ class BittensorStakeConfirmViewModel(
                             )
                         )
                     }
-                    failure.title(resourceManager) to failure.message(resourceManager) { tokenFormatter.formatBittensorRequiredAmount(it, token) }
+                    failure.titleAndMessage(resourceManager, tokenFormatter.bittensorStakeAlertFormat(token))
                 }
             ) { executeStake(request, fee.fee) }
         } catch (e: CancellationException) {

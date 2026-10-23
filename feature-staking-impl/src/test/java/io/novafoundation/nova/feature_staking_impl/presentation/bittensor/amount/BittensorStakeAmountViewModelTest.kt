@@ -389,6 +389,22 @@ class BittensorStakeAmountViewModelTest {
     }
 
     @Test
+    fun `where to stake root card is titled as a quick pick`() {
+        createViewModel(BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true))
+        assertEquals(R.string.bittensor_earn_title, viewModel.titleRes)
+    }
+
+    @Test
+    fun `setup without a validator asks for an amount and then reads continue`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            assets.emit(details(10))
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Disabled("Enter amount") }
+            viewModel.amountChanged("5")
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Disabled("Continue") }
+        }
+    }
+
+    @Test
     fun `zero input retains a placeholder fee without enabling continue`() = runBlocking<Unit> {
         withTimeout(3_000L) {
             assets.emit(details(10).copy(validator = estimateValidator))

@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSlippage
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isError
@@ -34,6 +35,7 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.asUrlIcon
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
@@ -101,12 +103,22 @@ import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 
 class BittensorSubnetReviewViewModel(
     private val analytics: AnalyticsService,
@@ -172,7 +184,17 @@ class BittensorSubnetReviewViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    private val preparationState = retryController.observe(
+    private val retryRequotes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    // As on iOS: every new block re-quotes until the stake is handed to submission, and a retry re-quotes at once.
+    private val requotes = merge(
+        chainStateRepository.bittensorNewBlocks().filter { submission.value is BittensorSubmissionState.Ready },
+        retryRequotes
+    )
+        .inBackground()
+        .shareIn(this, SharingStarted.Eagerly)
+
+    private val preparedStake = retryController.observe(
         step = "stake preparation",
         analytics = chainRpcReads,
         transform = { it.withSafeLoading() }
@@ -192,7 +214,18 @@ class BittensorSubnetReviewViewModel(
     }
         .shareInBackground()
 
+    private val preparationState = preparedStake.flatMapLatest { state ->
+        state.dataOrNull?.let(::requotedEachBlock) ?: flowOf { state }
+    }
+        .shareInBackground()
+
     private val draft = preparationState.map { it.dataOrNull?.draft }
+        .shareInBackground()
+
+    // As on iOS: block re-quotes only update what is shown. The fee and the confirm check keep the prepared (acknowledged) quote,
+    // so a price move past its limit asks for the updated quote before anything is signed.
+    private val acknowledgedDraft = preparedStake.map { it.dataOrNull?.draft }
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val quote = draft.map { it?.operation?.quote }
@@ -244,7 +277,7 @@ class BittensorSubnetReviewViewModel(
     )
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
+    private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map {
             it.takeIf { existingPosition && it.metaId == metaId }
                 ?.let { BittensorEstimateContext(metaId, it.chain) }
@@ -281,7 +314,8 @@ class BittensorSubnetReviewViewModel(
         draft.map { it?.operation?.quote },
         walletContext,
         preparationState
-    ) { state, quote, walletContext, quoteLoading ->
+    ) { costBasis, quote, walletContext, quoteLoading ->
+        val state = costBasis.buyMoreCostBasis(subnetId.value)
         bittensorLoadingValue(state, quoteLoading) {
             val basis = state.dataOrNull
             val current = basis?.forSubnet(subnetId.value)
@@ -305,7 +339,7 @@ class BittensorSubnetReviewViewModel(
     )
 
     val fee = combine(
-        draft,
+        acknowledgedDraft,
         feeLoaderMixin.fee
     ) { draft, status ->
         status.forRequest(draft)
@@ -413,14 +447,13 @@ class BittensorSubnetReviewViewModel(
         fee
     ) { draft, validating, submission, failed, fee ->
         val label = resources.getString(R.string.common_confirm)
-        val canConfirm = draft != null && !validating && submission.canSubmit && !failed && fee.loadedFeeOrNull()
-            ?.request == draft
+        val canConfirm = draft != null && !validating && submission.canSubmit && !failed && fee.loadedFeeOrNull() != null
         if (canConfirm) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
     }
         .shareInBackground()
 
     init {
-        feeLoaderMixin.connectWith(draft) { _, draft ->
+        feeLoaderMixin.connectWith(acknowledgedDraft) { _, draft ->
             draft?.let {
                 val fee = bittensorSubnetStakingInteractor.estimateFee(it)
                 BittensorFeeEstimate(it, fee)
@@ -443,15 +476,19 @@ class BittensorSubnetReviewViewModel(
 
     fun confirmClicked() = launchUnit {
         if (!submission.value.canSubmit || hasError.first() || validating.value) return@launchUnit
-        val prepared = draft.first() ?: return@launchUnit
+        val prepared = acknowledgedDraft.first() ?: return@launchUnit
         val fee = fee.first()
             .loadedFeeOrNull()
             ?.takeIf { it.request == prepared } ?: return@launchUnit
         val token = walletContext.first().asset.token
+        val subnet = preparedStake.first().dataOrNull?.subnet
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
-                .copy(inactiveValidatorAccepted = inactiveValidatorAccepted)
+                .copy(inactiveValidatorAccepted = inactiveValidatorAccepted, slippage = BittensorSlippage(selectedSlippage))
+            val alertFormat = tokenFormatter.bittensorStakeAlertFormat(token) { quote ->
+                subnet?.let { bittensorAmountFormatter.exchangeRate(quote, it, token) } ?: "—"
+            }
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
@@ -461,7 +498,7 @@ class BittensorSubnetReviewViewModel(
                         failure,
                         actions,
                         resources,
-                        formatAmount = { tokenFormatter.formatBittensorRequiredAmount(it, token) },
+                        alertFormat,
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(
@@ -474,7 +511,9 @@ class BittensorSubnetReviewViewModel(
                                     )
                                 )
                             }
-                        }
+                        },
+                        // As on iOS, a moved price is acknowledged before anything is signed: Confirm prepares the stake at the new rate.
+                        acceptRate = { preparationRefresh.value += 1 }
                     ) { preparationRefresh.value += 1 }
                 }
             ) { validated ->
@@ -607,10 +646,26 @@ class BittensorSubnetReviewViewModel(
         return bittensorAmountFormatter.exchangeRate(prepared.draft.operation.quote, prepared.subnet, token)
     }
 
+    /** iOS shows the acknowledged quote while the latest is missing: a failed re-quote falls back to the prepared stake. */
+    private fun requotedEachBlock(prepared: BittensorPreparedSubnetStake): Flow<ExtendedLoadingState<BittensorPreparedSubnetStake>> = requotes
+        .mapLatest {
+            try {
+                val quote = bittensorSubnetInteractor.quote(subnetId, totalInPlanks, BittensorSlippage(selectedSlippage))
+                prepared.copy(draft = prepared.draft.requoted(quote))
+            } catch (cause: Exception) {
+                if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+                chainRpcReads.failed(cause)
+                prepared
+            }
+        }
+        .map<BittensorPreparedSubnetStake, ExtendedLoadingState<BittensorPreparedSubnetStake>> { ExtendedLoadingState.Loaded(it) }
+        .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
+
     fun retryClicked() {
         val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return
         if (!failure.canRetry) return
         submission.value = BittensorSubmissionState.Ready
+        retryRequotes.tryEmit(Unit)
     }
 
     fun viewPositionClicked() {

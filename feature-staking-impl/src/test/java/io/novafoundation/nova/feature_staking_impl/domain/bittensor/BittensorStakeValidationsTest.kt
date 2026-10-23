@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorColdkeySwapValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorMinimumStakeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorOrderToleranceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteAvailabilityValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
@@ -184,12 +185,41 @@ class BittensorStakeValidationsTest {
     }
 
     @Test
-    fun `slippage rejects equality with limit`() = runBlocking {
-        val validation = BittensorSlippageValidation()
+    fun `order that reaches its own limit is too large for the tolerance`() = runBlocking {
+        val validation = BittensorOrderToleranceValidation()
         val quote = quote()
         assertEquals(BigInteger.TEN.pow(9), quote.postTradePrice())
         assertNull(validation.validate(payload.copy(quote = quote)).notValidOrNull())
-        assertFailure(validation, payload.copy(quote = quote.copy(limitPrice = quote.postTradePrice())), BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED)
+        assertFailure(validation, payload.copy(quote = quote.copy(limitPrice = quote.postTradePrice())), BittensorStakeValidationFailure.SELF_IMPACT)
+    }
+
+    @Test
+    fun `market move past the limit is a warning`() = runBlocking {
+        val validation = BittensorSlippageValidation()
+        val quote = quote()
+        val moved = quote.copy(limitPrice = quote.postTradePrice())
+        assertNull(validation.validate(payload.copy(quote = quote, latestQuote = quote)).notValidOrNull())
+
+        val failure = validation.validate(payload.copy(quote = quote, latestQuote = moved)).notValidOrNull()
+
+        assertEquals(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED, failure?.reason)
+        assertEquals(DefaultFailureLevel.WARNING, failure?.level)
+    }
+
+    @Test
+    fun `unread market blocks a subnet stake`() = runBlocking {
+        val validation = BittensorSlippageValidation()
+        val failure = validation.validate(payload.copy(quote = quote(), latestQuote = null)).notValidOrNull()
+
+        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, failure?.reason)
+        assertEquals(DefaultFailureLevel.ERROR, failure?.level)
+    }
+
+    @Test
+    fun `self impacting order is reported before the balance`() = runBlocking {
+        val quote = quote()
+        val value = payload.copy(netuid = quote.subnetId, quote = quote.copy(limitPrice = quote.postTradePrice()), amount = BigDecimal("1.1"))
+        assertEquals(BittensorStakeValidationFailure.SELF_IMPACT, system.validate(value).getOrThrow().notValidOrNull()?.reason)
     }
 
     @Test
@@ -210,6 +240,39 @@ class BittensorStakeValidationsTest {
         val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
         val value = payload.copy(quote = highImpact, preflight = snapshot.copy(safeModeActive = true))
         assertEquals(BittensorStakeValidationFailure.SAFE_MODE_ACTIVE, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+    }
+
+    @Test
+    fun `missing subnet quote is reported before the balance`() = runBlocking {
+        val value = payload.copy(netuid = BittensorNetuid.Subnet(1), amount = BigDecimal("1.1"))
+        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+    }
+
+    @Test
+    fun `inactive validator warning comes before price impact warning`() = runBlocking {
+        val quote = quote()
+        val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
+        val value = payload.copy(netuid = quote.subnetId, quote = highImpact, latestQuote = highImpact, inactiveValidator = true)
+
+        assertEquals(BittensorStakeValidationFailure.INACTIVE_VALIDATOR, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+        assertEquals(
+            BittensorStakeValidationFailure.HIGH_PRICE_IMPACT,
+            system.validate(value.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull()?.reason
+        )
+    }
+
+    @Test
+    fun `market move warning comes after price impact warning`() = runBlocking {
+        val quote = quote()
+        val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
+        val moved = highImpact.copy(limitPrice = highImpact.postTradePrice())
+        val value = payload.copy(netuid = quote.subnetId, quote = highImpact, latestQuote = moved)
+
+        assertEquals(BittensorStakeValidationFailure.HIGH_PRICE_IMPACT, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+        assertEquals(
+            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED,
+            system.validate(value.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()?.reason
+        )
     }
 
     @Test

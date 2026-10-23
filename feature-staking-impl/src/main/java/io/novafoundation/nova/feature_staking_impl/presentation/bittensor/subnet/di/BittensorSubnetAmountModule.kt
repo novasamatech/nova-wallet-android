@@ -72,7 +72,8 @@ class BittensorSubnetAmountModule {
         costBasisFormatter: BittensorSaleCostBasisFormatter,
         quickPickInteractor: BittensorQuickPickInteractor,
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
-        subnetFactsInteractor: BittensorSubnetFactsInteractor
+        subnetFactsInteractor: BittensorSubnetFactsInteractor,
+        chainStateRepository: ChainStateRepository
     ): ViewModel = BittensorSubnetAmountViewModel(
         analytics, initialSubnetId = payload.subnetId?.let { BittensorNetuid.Subnet(it) },
         quickPickOrder = payload.quickPickOrder,
@@ -101,6 +102,7 @@ class BittensorSubnetAmountModule {
         validatorCommunicator = validatorCommunicator,
         getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
         subnetFactsInteractor = subnetFactsInteractor,
+        chainStateRepository = chainStateRepository,
         initialSelectionState = payload.selectionState
     )
 

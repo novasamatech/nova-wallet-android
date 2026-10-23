@@ -184,4 +184,9 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         DescriptionBottomSheet(requireContext(), getString(title), message)
             .show()
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
+    }
 }

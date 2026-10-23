@@ -25,6 +25,10 @@ data class BittensorStakeValidationPayload(
 
 sealed interface BittensorStakeValidationFailure {
 
+    data object LEDGER_NOT_SUPPORTED : BittensorStakeValidationFailure
+
+    data object PROXIED_NOT_SUPPORTED : BittensorStakeValidationFailure
+
     data object DELAYED_EXECUTION : BittensorStakeValidationFailure
 
     data object NON_POSITIVE_AMOUNT : BittensorStakeValidationFailure
@@ -48,6 +52,10 @@ sealed interface BittensorStakeValidationFailure {
 
     data object QUOTE_EXPIRED : BittensorStakeValidationFailure
 
+    /** The order alone moves the price past its slippage limit, so no quote at this tolerance can fill it. */
+    data object SELF_IMPACT : BittensorStakeValidationFailure
+
+    /** The market moved: the latest quote no longer fills within the limit the user acknowledged. */
     data object SLIPPAGE_EXCEEDED : BittensorStakeValidationFailure
 
     data object HIGH_PRICE_IMPACT : BittensorStakeValidationFailure
@@ -59,8 +67,13 @@ typealias BittensorStakeValidationSystem = ValidationSystem<BittensorStakeValida
 
 typealias BittensorStakeValidation = Validation<BittensorStakeValidationPayload, BittensorStakeValidationFailure>
 
-fun bittensorStakeValidationSystem(validations: List<BittensorStakeValidation>): BittensorStakeValidationSystem = ValidationSystem {
+/** As on iOS, a subnet stake checks its quote ([quoteValidations]) before the balance and the remaining [validations]. */
+fun bittensorStakeValidationSystem(
+    quoteValidations: List<BittensorStakeValidation>,
+    validations: List<BittensorStakeValidation>
+): BittensorStakeValidationSystem = ValidationSystem {
     positiveAmount(amount = { it.amount }, error = { BittensorStakeValidationFailure.NON_POSITIVE_AMOUNT })
+    quoteValidations.forEach(::validate)
     sufficientBalance(
         fee = { it.fee },
         amount = { it.amount },

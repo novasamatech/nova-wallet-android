@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
@@ -31,6 +31,8 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -40,8 +42,10 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetStakeOperation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedCostBasis
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickInteractor
@@ -62,6 +66,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorPositionCostBasis
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
@@ -86,26 +91,38 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetFactsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetFacts
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.shareIn
 
 class BittensorSubnetAmountViewModel(
     private val analytics: AnalyticsService,
@@ -136,6 +153,7 @@ class BittensorSubnetAmountViewModel(
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     subnetFactsInteractor: BittensorSubnetFactsInteractor,
+    chainStateRepository: ChainStateRepository,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState()
 ) : BaseViewModel(), Validatable by validationExecutor {
 
@@ -167,6 +185,18 @@ class BittensorSubnetAmountViewModel(
     private val validating = MutableStateFlow(false)
 
     private val quoteRefresh = MutableStateFlow(0)
+
+    private val reviewShown = MutableStateFlow(false)
+
+    private val reviewClosed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    // As on iOS: every new block re-quotes unless the review is on top, and coming back from it re-quotes at once.
+    private val requotes = merge(
+        chainStateRepository.bittensorNewBlocks().filter { !reviewShown.value },
+        reviewClosed
+    )
+        .inBackground()
+        .shareIn(this, SharingStarted.Eagerly)
 
     // A preset handed over by subnet details stays a preset: it is not the user's choice (analytics, re-preset on details).
     private val selectedValidatorOverride = MutableStateFlow(validatorAddress.takeUnless { validatorIsPreset })
@@ -214,8 +244,8 @@ class BittensorSubnetAmountViewModel(
             combine(validatorRetry, selectedValidatorOverride) { _, explicitAddress -> explicitAddress }.flatMapLatest { explicitAddress ->
                 flowOf {
                     if (explicitAddress == null) {
-                        val validators = presetValidatorInteractor.validators(subnet.id)
-                        SubnetValidators(validators, validators.first().address)
+                        // As on iOS, a subnet without a qualifying preset asks for a validator instead of failing the pick.
+                        presetValidatorInteractor.preset(subnet.id).let { SubnetValidators(it.directory, it.preset?.address) }
                     } else {
                         val validators = bittensorSubnetStakingInteractor.validators(subnet.id)
                         require(validators.any { it.address == explicitAddress && it.canSelect }) { "Selected validator is unavailable" }
@@ -353,7 +383,7 @@ class BittensorSubnetAmountViewModel(
     }
         .shareInBackground()
 
-    private val quoteState = combine(
+    private val preparedQuoteState = combine(
         estimateQuoteRequest,
         quoteRefresh
     ) { request, _ -> request }
@@ -373,6 +403,11 @@ class BittensorSubnetAmountViewModel(
         }
         .shareInBackground()
 
+    private val quoteState = preparedQuoteState.flatMapLatest { state ->
+        state.dataOrNull?.let(::requotedEachBlock) ?: flowOf { state }
+    }
+        .shareInBackground()
+
     private val enteredQuoteState = combine(
         quoteRequest,
         quoteState
@@ -387,9 +422,15 @@ class BittensorSubnetAmountViewModel(
     private val draft = currentQuote.map { it?.draft }
         .shareInBackground()
 
-    private val feeDraft = combine(estimateQuoteRequest, quoteState) { request, state ->
+    private val estimateDraft = combine(estimateQuoteRequest, quoteState) { request, state ->
         state.dataOrNull?.takeIf { it.request == request }?.draft
     }
+        .shareInBackground()
+
+    private val feeDraft = combine(estimateQuoteRequest, preparedQuoteState) { request, state ->
+        state.dataOrNull?.takeIf { it.request == request }?.feeDraft
+    }
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val yieldState = subnet.flatMapLatest { subnet ->
@@ -401,7 +442,7 @@ class BittensorSubnetAmountViewModel(
     }
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
+    private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map { wallet ->
             if (existingPosition) BittensorEstimateContext(wallet.metaId, wallet.chain) else null
         }
@@ -459,8 +500,9 @@ class BittensorSubnetAmountViewModel(
         enteredQuoteState,
         walletContext,
         subnet
-    ) { state, quoteState, wallet, subnet ->
+    ) { costBasis, quoteState, wallet, subnet ->
         val subnetId = subnet?.id?.value ?: return@combine ExtendedLoadingState.Loading
+        val state = costBasis.buyMoreCostBasis(subnetId)
         if (state.dataOrNull?.forSubnet(subnetId) == null || quoteState.isError()) {
             return@combine state.map { basis ->
                 costBasisFormatter.projectedAveragePrice(basis, null, subnetId, wallet.asset.token, subnet.symbol)
@@ -572,7 +614,7 @@ class BittensorSubnetAmountViewModel(
     val rate = combine(
         quoteState,
         subnet,
-        feeDraft,
+        estimateDraft,
         walletContext
     ) { state, subnet, result, wallet ->
         state.map {
@@ -599,21 +641,46 @@ class BittensorSubnetAmountViewModel(
     }
         .shareInBackground()
 
-    val continueButtonState = combine(
+    private val quotedContinueButtonState = combine(
         quoteButtonState,
         fee,
-        validating,
-        needsFunding,
         reserveWarning
-    ) { quoteButtonState, fee, validating, needsFunding, reserveWarning ->
+    ) { quoteButtonState, fee, reserveWarning ->
         when {
-            needsFunding -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_continue))
-            validating -> DescriptiveButtonState.Loading
             quoteButtonState !is DescriptiveButtonState.Enabled -> quoteButtonState
             fee is FeeStatus.Loading -> DescriptiveButtonState.Loading
             reserveWarning != null -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_continue))
             fee.loadedFeeOrNull() == null -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_continue))
             else -> quoteButtonState
+        }
+    }
+
+    /** As on iOS, a new position left without a validator (no qualifying preset, or the preset failed) picks one from the button. */
+    private val needsValidatorPick = combine(subnetState, validatorsState, selectedValidatorAddress) { subnet, validators, address ->
+        !existingPosition && subnet.dataOrNull != null && !validators.isLoading() && address == null
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    private val hasAmount = combine(walletState, amount) { wallet, input ->
+        val value = input.toBigDecimalOrNull()?.takeIf { it.isPositive } ?: return@combine false
+        wallet.dataOrNull?.asset?.token?.configuration?.planksFromAmount(value)?.isPositive() ?: true
+    }
+        .distinctUntilChanged()
+
+    val continueButtonState = combine(
+        quotedContinueButtonState,
+        validating,
+        needsFunding,
+        needsValidatorPick,
+        hasAmount
+    ) { quotedButtonState, validating, needsFunding, needsValidatorPick, hasAmount ->
+        when {
+            needsFunding -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_continue))
+            validating -> DescriptiveButtonState.Loading
+            needsValidatorPick -> DescriptiveButtonState.Enabled(resources.getString(R.string.bittensor_select_validator_title))
+            !hasAmount -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_enter_amount))
+            else -> quotedButtonState
         }
     }
         .shareInBackground()
@@ -682,6 +749,10 @@ class BittensorSubnetAmountViewModel(
         amountChooser.setAmountInput(value, initiatedByUser = true)
     }
 
+    fun onResume() {
+        if (reviewShown.compareAndSet(expect = true, update = false)) reviewClosed.tryEmit(Unit)
+    }
+
     fun retrySelection() = launchUnit {
         if (subnetState.first().isError()) {
             selectionRetry.value += 1
@@ -703,7 +774,11 @@ class BittensorSubnetAmountViewModel(
 
     fun validatorClicked() = launchUnit {
         if (existingPosition || validating.value) return@launchUnit
-        val subnetId = subnet.first()?.id ?: return@launchUnit
+        openValidatorPicker()
+    }
+
+    private suspend fun openValidatorPicker() {
+        val subnetId = subnet.first()?.id ?: return
         val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first(), selectionState)
         validatorCommunicator.openRequest(request)
     }
@@ -735,17 +810,26 @@ class BittensorSubnetAmountViewModel(
 
     fun continueClicked() = launchUnit {
         if (validating.value) return@launchUnit
+        if (needsValidatorPick.first()) {
+            openValidatorPicker()
+            return@launchUnit
+        }
         val request = quoteRequest.first() ?: return@launchUnit
         val quote = currentQuote.first() ?: return@launchUnit
         if (quote.request != request) return@launchUnit
         val fee = fee.first()
             .loadedFeeOrNull()
-            ?.takeIf { it.request == quote.draft } ?: return@launchUnit
+            ?.takeIf { it.request == quote.feeDraft } ?: return@launchUnit
 
         val token = walletContext.first().asset.token
+        val selectedSubnet = subnet.first()
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(quote.draft, fee.fee)
+                .copy(slippage = BittensorSlippage(request.slippage))
+            val alertFormat = tokenFormatter.bittensorStakeAlertFormat(token) { quote ->
+                selectedSubnet?.let { bittensorAmountFormatter.exchangeRate(quote, it, token) } ?: "—"
+            }
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
@@ -755,7 +839,7 @@ class BittensorSubnetAmountViewModel(
                         failure,
                         actions,
                         resources,
-                        formatAmount = { tokenFormatter.formatBittensorRequiredAmount(it, token) },
+                        alertFormat,
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(
@@ -768,7 +852,9 @@ class BittensorSubnetAmountViewModel(
                                     )
                                 )
                             }
-                        }
+                        },
+                        // As on iOS, confirming the new rate continues to the review.
+                        acceptRate = { actions.resumeFlow() }
                     ) { quoteRefresh.value += 1 }
                 }
             ) { validated -> openReview(request, validated.inactiveValidatorAccepted) }
@@ -784,6 +870,7 @@ class BittensorSubnetAmountViewModel(
     private fun openReview(request: QuoteRequest, inactiveValidatorAccepted: Boolean) = launchUnit {
         validating.value = false
         if (quoteRequest.first() != request) return@launchUnit
+        reviewShown.value = true
         analytics.track(
             BittensorAnalyticsEvent.Initiated(
                 BittensorAnalyticsEvent.NETWORK,
@@ -822,6 +909,23 @@ class BittensorSubnetAmountViewModel(
         return QuoteResult(request, draft)
     }
 
+    /** As on iOS, the shown quote stays until a block re-quote replaces it, and a failed re-quote clears it until the next block. */
+    private fun requotedEachBlock(initial: QuoteResult): Flow<ExtendedLoadingState<QuoteResult>> = requotes
+        .mapLatest<Unit, ExtendedLoadingState<QuoteResult>> {
+            try {
+                val request = initial.request
+                val quote = bittensorSubnetInteractor.quote(request.subnetId, request.amount, BittensorSlippage(request.slippage))
+                ExtendedLoadingState.Loaded(initial.requoted(quote))
+            } catch (cause: Exception) {
+                if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+                logger.log("[BittensorSubnetAmount] Block re-quote failed")
+                logger.log(cause)
+                chainRpcReads.failed(cause)
+                ExtendedLoadingState.Error(cause)
+            }
+        }
+        .onStart { emit(ExtendedLoadingState.Loaded(initial)) }
+
     private fun reportFailure(cause: Throwable) {
         logger.log("[BittensorSubnetAmount] Failed to calculate maximum stake")
         logger.log(cause)
@@ -853,12 +957,16 @@ class BittensorSubnetAmountViewModel(
         val validator: BittensorValidator?
     )
 
+    /** [feeDraft] is the first draft of [request]: block re-quotes move only the limit price, which leaves the fee unchanged. */
     private data class QuoteResult(
         val request: QuoteRequest,
-        val draft: BittensorSubnetStakeDraft
+        val draft: BittensorSubnetStakeDraft,
+        val feeDraft: BittensorSubnetStakeDraft = draft
     ) {
 
         val quote: BittensorSubnetBuyQuote get() = draft.operation.quote
+
+        fun requoted(quote: BittensorSubnetBuyQuote) = copy(draft = draft.requoted(quote))
     }
 
     private companion object {
@@ -872,3 +980,22 @@ internal fun bittensorStakeValidatorSource(existingPosition: Boolean, selectedAd
     selectedAddress != presetAddress -> StakingValidatorSource.MANUAL
     else -> StakingValidatorSource.RECOMMENDED
 }
+
+/** A history still settling an own trade may miss that purchase: without totals for [netuid] it is unknown, never "no purchases". */
+internal fun BittensorPositionCostBasis.buyMoreCostBasis(netuid: Int): ExtendedLoadingState<BittensorEstimatedCostBasis?> =
+    state.map { basis -> basis.takeUnless { isSettling && basis?.forSubnet(netuid) == null } }
+
+/** Every block after the current one; a lost subscription is restored after a short pause. */
+internal fun ChainStateRepository.bittensorNewBlocks(): Flow<Unit> = flowOfAll { currentRemoteBlockNumberFlow(ChainGeneses.BITTENSOR) }
+    .drop(1)
+    .map { Unit }
+    .retryWhen { cause, _ ->
+        if (cause is CancellationException) throw cause
+        delay(BLOCKS_RESUBSCRIBE_DELAY_MILLIS)
+        true
+    }
+
+internal fun BittensorSubnetStakeDraft.requoted(quote: BittensorSubnetBuyQuote) =
+    copy(operation = BittensorSubnetStakeOperation(quote, operation.hotkey, operation.beneficiary))
+
+private const val BLOCKS_RESUBSCRIBE_DELAY_MILLIS = 5_000L

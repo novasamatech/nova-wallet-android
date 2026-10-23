@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
@@ -58,8 +58,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorNeedsFunding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.titleAndMessage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
@@ -129,8 +128,12 @@ class BittensorStakeAmountViewModel(
 
     val retryEvents = retryController.events
 
-    /** As on iOS, adding to an existing root position is titled "Add stake to root". */
-    val titleRes = if (payload?.validatorAddress != null) R.string.bittensor_add_stake_to_root else R.string.bittensor_stake_to_root
+    /** As on iOS, adding to an existing root position is titled "Add stake to root" and the Where to stake root card "Earn with Bittensor". */
+    val titleRes = when {
+        payload?.validatorAddress != null -> R.string.bittensor_add_stake_to_root
+        payload?.quickPick == true -> R.string.bittensor_earn_title
+        else -> R.string.bittensor_stake_to_root
+    }
 
     private val stakingDetailsState = retryController.observe(
         step = "root staking details",
@@ -220,7 +223,7 @@ class BittensorStakeAmountViewModel(
     ) { state, fee ->
         val details = state.dataOrNull
         val networkFee = details?.let { fee.loadedFeeOrNull()?.maxAmountDeductionFor(it.asset.token.configuration) }
-        bittensorNeedsFunding(details?.asset?.transferableInPlanks, networkFee, locked = payload != null)
+        bittensorNeedsFunding(details?.asset?.transferableInPlanks, networkFee, locked = payload?.metaId != null)
     }
         .distinctUntilChanged()
         .shareInBackground()
@@ -253,7 +256,7 @@ class BittensorStakeAmountViewModel(
         val details = state.dataOrNull ?: return@combine null
         val stake = details.position?.stakeInPlanks?.takeIf { it.isPositive() } ?: return@combine null
         val validator = details.validator ?: return@combine null
-        if (payload == null || funding || details.dataStatus !is BittensorDataStatus.Fresh) return@combine null
+        if (payload?.metaId == null || funding || details.dataStatus !is BittensorDataStatus.Fresh) return@combine null
         val name = validator.name.ifBlank { details.chain.addressOf(validator.hotkey).ellipsizeAddress() }
         val amount = formatToken(details.asset.token.amountFromPlanks(stake), details.asset.token.configuration.symbol)
         resourceManager.getString(R.string.bittensor_adds_to_position, amount, name)
@@ -427,7 +430,7 @@ class BittensorStakeAmountViewModel(
                             )
                         )
                     }
-                    failure.title(resourceManager) to failure.message(resourceManager) { tokenFormatter.formatBittensorRequiredAmount(it, token) }
+                    failure.titleAndMessage(resourceManager, tokenFormatter.bittensorStakeAlertFormat(token))
                 }
             ) { openConfirmation(request) }
         } catch (e: CancellationException) {
@@ -439,10 +442,10 @@ class BittensorStakeAmountViewModel(
     }
 
     private fun observeStakingDetails(): Flow<BittensorRootStakingDetails> {
-        return when {
-            payload == null -> bittensorStakingInteractor.observeRootStakingDetails()
-            payload.validatorAddress == null -> bittensorStakingInteractor.observeRootStakingDetails(payload.metaId)
-            else -> bittensorStakingInteractor.observeRootAccountDetails(payload.metaId)
+        val metaId = payload?.metaId ?: return bittensorStakingInteractor.observeRootStakingDetails()
+        return when (payload.validatorAddress) {
+            null -> bittensorStakingInteractor.observeRootStakingDetails(metaId)
+            else -> bittensorStakingInteractor.observeRootAccountDetails(metaId)
         }
     }
 
@@ -521,10 +524,11 @@ class BittensorStakeAmountViewModel(
         fee: FeeStatus<BittensorFeeEstimate<BittensorRootStakeRequest>, FeeDisplay>
     ): DescriptiveButtonState {
         val label = resourceManager.getString(R.string.common_continue)
-        val validator = details.validator ?: return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.bittensor_select_validator))
+        // As on iOS, the root button never asks for a validator: it reads "Enter amount" until an amount is entered.
         if (amount == null || !amount.isPositive()) {
             return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
         }
+        val validator = details.validator ?: return DescriptiveButtonState.Disabled(label)
 
         if (fee is FeeStatus.Loading) return DescriptiveButtonState.Loading
         val loadedFee = fee.loadedFeeOrNull() ?: return DescriptiveButtonState.Disabled(label)

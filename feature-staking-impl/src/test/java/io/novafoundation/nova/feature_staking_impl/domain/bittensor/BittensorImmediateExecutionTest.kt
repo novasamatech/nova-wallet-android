@@ -7,13 +7,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertFalse
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.verifyNoMoreInteractions
 
 class BittensorImmediateExecutionTest {
@@ -42,22 +43,50 @@ class BittensorImmediateExecutionTest {
         `when`(signerProvider.rootSignerFor(wallet)).thenReturn(signer)
         `when`(signer.callExecutionType()).thenReturn(CallExecutionType.DELAYED)
 
-        assertFalse(capability.isSupported(wallet))
+        assertEquals(BittensorWalletSupport.DELAYED_EXECUTION, capability.support(wallet))
         assertTrue(runCatching { capability.requireSupported(wallet) }.exceptionOrNull() is IllegalArgumentException)
     }
 
     @Test
-    fun `delayed nested execution is rejected even when root wallet is not multisig`() = runBlocking {
+    fun `proxied wallet is refused by type even behind an immediate proxy`() = runBlocking {
         `when`(wallet.type).thenReturn(LightMetaAccount.Type.PROXIED)
         `when`(signerProvider.rootSignerFor(wallet)).thenReturn(signer)
-        // The root signer's result already includes the nested signer chain.
-        `when`(signer.callExecutionType()).thenReturn(CallExecutionType.DELAYED)
+        `when`(signer.callExecutionType()).thenReturn(CallExecutionType.IMMEDIATE)
 
-        assertFalse(capability.isSupported(wallet))
+        assertEquals(BittensorWalletSupport.PROXIED_NOT_SUPPORTED, capability.support(wallet))
+        assertTrue(runCatching { capability.requireSupported(wallet) }.exceptionOrNull() is IllegalArgumentException)
+        verifyNoInteractions(signerProvider)
+    }
+
+    @Test
+    fun `generic and legacy ledger wallets are refused by type`() = runBlocking {
+        for (type in listOf(LightMetaAccount.Type.LEDGER, LightMetaAccount.Type.LEDGER_LEGACY)) {
+            `when`(wallet.type).thenReturn(type)
+
+            assertEquals(BittensorWalletSupport.LEDGER_NOT_SUPPORTED, capability.support(wallet))
+        }
+        verifyNoInteractions(signerProvider)
+    }
+
+    @Test
+    fun `secrets, vault, parity signer and watch-only wallets pass without a signer lookup`() = runBlocking {
+        val types = listOf(
+            LightMetaAccount.Type.SECRETS,
+            LightMetaAccount.Type.POLKADOT_VAULT,
+            LightMetaAccount.Type.PARITY_SIGNER,
+            LightMetaAccount.Type.WATCH_ONLY
+        )
+        for (type in types) {
+            `when`(wallet.type).thenReturn(type)
+
+            assertEquals(BittensorWalletSupport.SUPPORTED, capability.support(wallet))
+        }
+        verifyNoInteractions(signerProvider)
     }
 
     @Test
     fun `execution gate rechecks capability instead of retaining preview result`() = runBlocking {
+        `when`(wallet.type).thenReturn(LightMetaAccount.Type.MULTISIG)
         `when`(signerProvider.rootSignerFor(wallet)).thenReturn(signer)
         `when`(signer.callExecutionType()).thenReturn(CallExecutionType.IMMEDIATE, CallExecutionType.DELAYED)
 
@@ -67,6 +96,7 @@ class BittensorImmediateExecutionTest {
 
     @Test
     fun `immediate execution gate does not request signing or bypass signer permissions`() = runBlocking {
+        `when`(wallet.type).thenReturn(LightMetaAccount.Type.MULTISIG)
         `when`(signerProvider.rootSignerFor(wallet)).thenReturn(signer)
         `when`(signer.callExecutionType()).thenReturn(CallExecutionType.IMMEDIATE)
 
@@ -80,6 +110,7 @@ class BittensorImmediateExecutionTest {
     @Test
     fun `unavailable signer fails closed`() = runBlocking {
         val failure = IllegalStateException("Signatory is unavailable")
+        `when`(wallet.type).thenReturn(LightMetaAccount.Type.MULTISIG)
         `when`(signerProvider.rootSignerFor(wallet)).thenThrow(failure)
 
         assertSame(failure, runCatching { capability.requireSupported(wallet) }.exceptionOrNull())
@@ -88,6 +119,7 @@ class BittensorImmediateExecutionTest {
     @Test
     fun `cancellation is not converted to a capability verdict`() = runBlocking {
         val cancellation = CancellationException("Cancelled")
+        `when`(wallet.type).thenReturn(LightMetaAccount.Type.MULTISIG)
         `when`(signerProvider.rootSignerFor(wallet)).thenReturn(signer)
         `when`(signer.callExecutionType()).thenThrow(cancellation)
 
