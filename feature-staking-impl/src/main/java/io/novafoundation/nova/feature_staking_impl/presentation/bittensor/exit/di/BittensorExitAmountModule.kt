@@ -28,7 +28,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.B
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPrecisionValidator
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -57,7 +56,6 @@ class BittensorExitAmountModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         exitFormatter: BittensorExitFormatter,
         slippageSettings: BittensorSlippageSettings,
-        slippageSettingsCommunicator: SlippageSettingsCommunicator,
         costBasisFormatter: BittensorSaleCostBasisFormatter,
         precisionValidator: BittensorExitPrecisionValidator,
         validatorInteractor: BittensorValidatorInteractor
@@ -79,7 +77,6 @@ class BittensorExitAmountModule {
             feeLoaderMixinFactory,
             exitFormatter,
             slippageSettings = slippageSettings,
-            slippageSettingsCommunicator = slippageSettingsCommunicator,
             costBasisFormatter = costBasisFormatter,
             precisionValidator = precisionValidator,
             validatorInteractor = validatorInteractor

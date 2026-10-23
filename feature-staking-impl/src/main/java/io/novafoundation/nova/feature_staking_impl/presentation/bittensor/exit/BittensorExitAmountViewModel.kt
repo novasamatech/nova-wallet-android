@@ -1,7 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
@@ -63,7 +64,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -125,7 +125,6 @@ class BittensorExitAmountViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val exitFormatter: BittensorExitFormatter,
     private val slippageSettings: BittensorSlippageSettings,
-    private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
     private val costBasisFormatter: BittensorSaleCostBasisFormatter,
     precisionValidator: BittensorExitPrecisionValidator,
     validatorInteractor: BittensorValidatorInteractor
@@ -249,7 +248,7 @@ class BittensorExitAmountViewModel(
         } else {
             resources.getString(
                 R.string.bittensor_exit_sell_title,
-                it?.subnet?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, payload.netuid)
+                it?.subnet?.displayName(resources) ?: resources.getString(R.string.bittensor_subnet_number, payload.netuid)
             )
         }
     }
@@ -282,7 +281,18 @@ class BittensorExitAmountViewModel(
         .shareInBackground()
 
     val maxAmount = maximumAmount.map { maximum ->
-        maximum?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString() }
+        maximum?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString().ltrIsolated() }
+    }
+        .shareInBackground()
+
+    /** Root only, iOS `createHeader`: "Staked: <total> · Unstake all"; the link fills the maximum like Max does. */
+    val stakedHeader = combine(position, maximumAmount) { position, maximum ->
+        if (!isRoot || position == null) return@combine null
+        val token = position.asset.token
+        BittensorStakedHeaderUi(
+            staked = tokenFormatter.formatToken(token.amountFromPlanks(position.preflight.totalStake), token.configuration.symbol).toString(),
+            isEnabled = maximum != null && maximum.amount.signum() > 0
+        )
     }
         .shareInBackground()
 
@@ -421,15 +431,6 @@ class BittensorExitAmountViewModel(
             .onEach { maximum -> input.update { it.updateMax(maximum?.amount) } }
             .launchIn(this)
 
-        if (!isRoot) {
-            slippageSettingsCommunicator.responseFlow
-                .onEach {
-                    slippageSettings.set(BigDecimal.valueOf(it.fraction))
-                    analytics.track(it.bittensorAnalyticsEvent())
-                }
-                .launchIn(this)
-        }
-
         feeLoaderMixin.connectWith(request) { _, request ->
             request?.let {
                 val fee = bittensorExitInteractor.estimateFee(it.position, it.quote)
@@ -440,10 +441,6 @@ class BittensorExitAmountViewModel(
 
     fun amountChanged(value: String) {
         input.update { it.edit(value) }
-    }
-
-    fun openSlippageSettings() {
-        if (!isRoot) slippageSettingsCommunicator.openRequest(slippageSettings.payload())
     }
 
     fun maxClicked() = launchUnit {
@@ -636,3 +633,5 @@ class BittensorExitAmountViewModel(
         return ExitAmountRequest(request, BittensorExitRequest(position, quote), estimateOnly)
     }
 }
+
+data class BittensorStakedHeaderUi(val staked: String, val isEnabled: Boolean)
