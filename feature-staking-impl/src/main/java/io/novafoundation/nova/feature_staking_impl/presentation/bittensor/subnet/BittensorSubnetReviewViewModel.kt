@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
@@ -211,7 +212,7 @@ class BittensorSubnetReviewViewModel(
         preparation.dataOrNull?.let { prepared ->
             resources.getString(
                 R.string.bittensor_swap_rate_buy_description,
-                prepared.subnet.name,
+                prepared.subnet.title(resources),
                 wallet.asset.token.configuration.symbol.value,
                 prepared.draft.operation.quote.serviceFeeRate.movePointRight(2).toStripTrailingZerosString()
             )
@@ -226,7 +227,7 @@ class BittensorSubnetReviewViewModel(
 
     val averagePriceDescription = preparationState.map { preparation ->
         preparation.dataOrNull?.subnet?.let { subnet ->
-            resources.getString(R.string.bittensor_average_price_description, subnet.symbol, subnet.name)
+            resources.getString(R.string.bittensor_average_price_description, subnet.symbol, subnet.title(resources))
         }
     }
         .shareInBackground()
@@ -346,7 +347,7 @@ class BittensorSubnetReviewViewModel(
         } else {
             resources.getString(
                 R.string.bittensor_subnet_execution_buying,
-                prepared.dataOrNull?.subnet?.name.orEmpty(),
+                prepared.dataOrNull?.subnet?.title(resources).orEmpty(),
                 prepared.dataOrNull?.subnet?.symbol.orEmpty()
             )
         }

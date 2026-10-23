@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
@@ -197,8 +198,8 @@ class BittensorSubnetAmountViewModel(
         // Waits for the catalogue so the title does not flash "Subnet N" before the name arrives.
         if (state.isLoading()) return@mapNotNull null
         val subnet = state.dataOrNull
-        val name = subnet?.name?.takeIf { it.isNotBlank() }
-            ?: resources.getString(R.string.bittensor_subnet_number, subnet?.id?.value ?: initialSubnetId?.value ?: 0)
+        val name = subnet?.title(resources)
+            ?: resources.getString(R.string.bittensor_subnet_number, initialSubnetId?.value ?: 0)
         resources.getString(R.string.bittensor_buy_more_subnet, name)
     }
         .shareInBackground()
@@ -472,7 +473,7 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     val averagePriceDescription = subnet.map { subnet ->
-        subnet?.let { resources.getString(R.string.bittensor_average_price_description, it.symbol, it.name) }
+        subnet?.let { resources.getString(R.string.bittensor_average_price_description, it.symbol, it.title(resources)) }
     }
         .shareInBackground()
 

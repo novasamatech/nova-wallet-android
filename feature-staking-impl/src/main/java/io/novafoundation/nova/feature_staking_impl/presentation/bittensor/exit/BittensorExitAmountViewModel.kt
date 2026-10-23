@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
@@ -248,10 +249,7 @@ class BittensorExitAmountViewModel(
         } else {
             resources.getString(
                 R.string.bittensor_exit_sell_title,
-                it?.subnet?.name?.ifBlank { resources.getString(R.string.bittensor_subnet_number, payload.netuid) } ?: resources.getString(
-                    R.string.bittensor_subnet_number,
-                    payload.netuid
-                )
+                it?.subnet?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, payload.netuid)
             )
         }
     }
@@ -320,7 +318,7 @@ class BittensorExitAmountViewModel(
         .shareInBackground()
 
     val averagePriceDescription = position.map { position ->
-        position?.subnet?.let { resources.getString(R.string.bittensor_average_price_description, it.symbol, it.name) }
+        position?.subnet?.let { resources.getString(R.string.bittensor_average_price_description, it.symbol, it.title(resources)) }
     }
         .shareInBackground()
 
@@ -367,7 +365,7 @@ class BittensorExitAmountViewModel(
         resources.getString(
             R.string.bittensor_swap_rate_sell_description,
             request.position.asset.token.configuration.symbol.value,
-            request.position.subnet?.name.orEmpty(),
+            request.position.subnet?.title(resources).orEmpty(),
             percentage
         )
     }
