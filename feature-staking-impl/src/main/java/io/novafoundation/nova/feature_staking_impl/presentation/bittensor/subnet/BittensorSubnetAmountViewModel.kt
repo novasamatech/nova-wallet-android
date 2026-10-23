@@ -20,6 +20,9 @@ import io.novafoundation.nova.analytics.SlippageBucket
 import io.novafoundation.nova.analytics.AnalyticsService
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -31,7 +34,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
@@ -64,6 +66,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorValidatorRowUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLeadingApy
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorNeedsFunding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeValidationFailureUi
@@ -87,6 +92,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
@@ -136,6 +142,7 @@ class BittensorSubnetAmountViewModel(
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     subnetFactsInteractor: BittensorSubnetFactsInteractor,
+    private val iconGenerator: AddressIconGenerator,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState()
 ) : BaseViewModel(), Validatable by validationExecutor {
 
@@ -263,15 +270,19 @@ class BittensorSubnetAmountViewModel(
         }
     }.shareInBackground()
 
-    val selectionLoading = subnetState.map { it.isLoading() }.shareInBackground()
-
     val selectionError = combine(subnetState, validatorsState) { subnet, validators ->
         if (quickPickOrder == null) {
             null
         } else {
             when {
-                subnet.isError() -> resources.getString(R.string.bittensor_quick_selection_failed)
-                validators.isError() -> resources.getString(R.string.bittensor_quick_validator_failed)
+                subnet.isError() -> BittensorSelectionFailureUi(
+                    resources.getString(R.string.bittensor_quick_selection_failed_title),
+                    resources.getString(R.string.bittensor_quick_selection_failed)
+                )
+                validators.isError() -> BittensorSelectionFailureUi(
+                    resources.getString(R.string.bittensor_quick_validator_failed_title),
+                    resources.getString(R.string.bittensor_quick_validator_failed)
+                )
                 else -> null
             }
         }
@@ -418,15 +429,24 @@ class BittensorSubnetAmountViewModel(
     }
         .shareInBackground()
 
-    val validator = combine(validatorsState, selectedValidatorAddress) { state, address ->
+    val validator = combine(
+        validatorsState,
+        selectedValidatorAddress,
+        // The name never waits for the yields: the rate line appears once they load.
+        annualYield.onStart { emit(null) },
+        walletState
+    ) { state, address, annual, wallet ->
         state.map { loaded ->
-            if (address == null) return@map resources.getString(R.string.bittensor_select_validator)
-            loaded.validators.firstOrNull { it.address == address }?.validator?.name?.takeIf { it.isNotBlank() } ?: address
+            if (address == null) return@map BittensorValidatorRowUi(resources.getString(R.string.bittensor_select_validator), icon = null, rate = null)
+            val name = loaded.validators.firstOrNull { it.address == address }?.validator?.name?.takeIf { it.isNotBlank() } ?: address
+            BittensorValidatorRowUi(
+                name = name,
+                icon = wallet.dataOrNull?.let { validatorIcon(it.chain, address) },
+                rate = resources.bittensorLeadingApy(annual),
+                rateColorRes = bittensorYieldColor(annual)
+            )
         }
     }
-        .shareInBackground()
-
-    val apy = annualYield.map { it?.formatAsPercentage() }
         .shareInBackground()
 
     val monthlyEstimate = combine(
@@ -445,10 +465,7 @@ class BittensorSubnetAmountViewModel(
                     BigDecimal(quote.alphaOutInPlanks, BittensorProtocolUnits.ALPHA_PRECISION),
                     annual
                 )
-                "≈ " + tokenFormatter.formatToken(
-                    alpha,
-                    TokenSymbol(subnet.symbol.ifBlank { "—" })
-                )
+                ("≈ " + tokenFormatter.formatToken(alpha, TokenSymbol(subnet.symbol.ifBlank { "—" }))).ltrIsolated()
             }
         }
     }
@@ -542,6 +559,9 @@ class BittensorSubnetAmountViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
+    val getAssetLabel = walletContext.map { resources.getString(R.string.bittensor_get_asset_action, it.asset.token.configuration.symbol.value) }
+        .shareInBackground()
+
     val fundingMessage = walletContext.map { wallet ->
         val balance = tokenFormatter.formatToken(wallet.asset.transferable, wallet.asset.token.configuration.symbol)
         resources.getString(R.string.bittensor_get_asset_message, balance, wallet.asset.token.configuration.symbol.value)
@@ -561,10 +581,7 @@ class BittensorSubnetAmountViewModel(
         state.map {
             if (subnet == null || result == null) return@map "—"
             val amount = BigDecimal(result.quote.alphaOutInPlanks, BITTENSOR_ALPHA_DECIMALS)
-            "≈ \u200e" + tokenFormatter.formatToken(
-                amount,
-                TokenSymbol(subnet.symbol.ifBlank { "—" })
-            )
+            ("≈ " + tokenFormatter.formatToken(amount, TokenSymbol(subnet.symbol.ifBlank { "—" }))).ltrIsolated()
         }
     }
         .shareInBackground()
@@ -585,12 +602,15 @@ class BittensorSubnetAmountViewModel(
         quoteRequest,
         currentQuote,
         walletState,
-        quoteState
+        quoteState,
+        amount
     ) {
-            request, quote, wallet, quoteState ->
+            request, quote, wallet, quoteState, input ->
         val label = resources.getString(R.string.common_continue)
         when {
             wallet.isLoading() -> DescriptiveButtonState.Loading
+            // As on iOS: an empty or zero amount asks for one; the no-TAO case is handled by the funding state.
+            input.toBigDecimalOrNull()?.isPositive != true -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_enter_amount))
             request == null || wallet.isError() || quoteState.isError() -> DescriptiveButtonState.Disabled(label)
             wallet.dataOrNull?.let { request.amount > it.asset.transferableInPlanks } == true -> DescriptiveButtonState.Disabled(label)
             quote == null -> DescriptiveButtonState.Loading
@@ -687,6 +707,22 @@ class BittensorSubnetAmountViewModel(
             selectionRetry.value += 1
         } else if (validatorsState.first().isError()) {
             validatorRetry.value += 1
+        }
+    }
+
+    private suspend fun validatorIcon(chain: Chain, address: String): Icon? {
+        return try {
+            Icon.FromDrawable(
+                iconGenerator.createAddressIcon(
+                    chain.accountIdOf(address),
+                    AddressIconGenerator.SIZE_SMALL,
+                    AddressIconGenerator.BACKGROUND_TRANSPARENT
+                )
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
         }
     }
 
@@ -872,3 +908,6 @@ internal fun bittensorStakeValidatorSource(existingPosition: Boolean, selectedAd
     selectedAddress != presetAddress -> StakingValidatorSource.MANUAL
     else -> StakingValidatorSource.RECOMMENDED
 }
+
+/** The quick-pick warning above the placeholder card: "Couldn't load rates" / "Unable to fetch validators" as on iOS. */
+class BittensorSelectionFailureUi(val title: String, val message: String)
