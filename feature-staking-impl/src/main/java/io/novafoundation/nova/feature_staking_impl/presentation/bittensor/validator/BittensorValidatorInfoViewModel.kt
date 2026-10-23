@@ -44,7 +44,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.flow
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.ext.utilityAsset
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 
 class BittensorValidatorInfoViewModel(
     private val payload: BittensorValidatorInfoPayload,
@@ -172,7 +171,7 @@ class BittensorValidatorInfoViewModel(
                 return@flow
             }
             val symbol = validatorInteractor.chain().utilityAsset.symbol
-            emit(AmountModel(tokenFormatter.formatToken(stake, symbol, TokenConfig(useCompactAbbreviation = true)), null))
+            emit(AmountModel(amountFormatter.compactToken(stake, symbol), null))
             emitAll(
                 subnetInteractor.observeAsset().map { asset ->
                     amountFormatter.compactAmount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)

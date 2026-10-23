@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import kotlinx.coroutines.CompletableDeferred
@@ -65,7 +65,7 @@ class BittensorSelectValidatorViewModelTest {
     private val icon = mock(Drawable::class.java)
     private val router = mock(StakingRouter::class.java)
     private val externalActions = mock(ExternalActions.Presentation::class.java)
-    private val tokenFormatter = mock(TokenFormatter::class.java)
+    private val amountFormatter = mock(BittensorAmountFormatter::class.java)
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
     private val communicator = RecordingCommunicator()
     private val filtersCommunicator = RecordingFiltersCommunicator()
@@ -269,6 +269,19 @@ class BittensorSelectValidatorViewModelTest {
     }
 
     @Test
+    fun `system back closes an open search before leaving`() {
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
+
+        viewModel.searchClicked()
+        viewModel.backPressed()
+
+        assertEquals(false, viewModel.searchVisible.value)
+        Mockito.verify(router, Mockito.never()).back()
+        viewModel.backPressed()
+        Mockito.verify(router).back()
+    }
+
+    @Test
     fun `closing the search clears the query`() = runBlocking<Unit> {
         val directory = directory(listOf(validator(1, "Alpha"), validator(2, "Beta")))
         `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
@@ -289,7 +302,7 @@ class BittensorSelectValidatorViewModelTest {
     private fun createViewModel(request: BittensorSelectValidatorCommunicator.Request): BittensorSelectValidatorViewModel {
         return BittensorSelectValidatorViewModel(
             analytics, request, communicator, interactor, icons, router, externalActions, resources, logger,
-            retryController, tokenFormatter, subnetInteractor, filtersCommunicator
+            retryController, amountFormatter, subnetInteractor, filtersCommunicator
         ).also { models += it }
     }
 

@@ -67,7 +67,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorSubnetAge
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.labelRes
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorChartChangeTextInjector
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -119,6 +119,7 @@ class BittensorSubnetDetailsViewModel(
     private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val addressIconGenerator: AddressIconGenerator,
+    private val amountFormatter: BittensorAmountFormatter,
     private val replaceAmount: Boolean,
     initialValidatorAddress: String?,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
@@ -217,7 +218,7 @@ class BittensorSubnetDetailsViewModel(
             val nativeAmount = subnet.taoReserveInPlanks?.let(asset.token::amountFromPlanks)
             BittensorSubnetPoolSideUi(
                 title = resources.getString(R.string.bittensor_token_in_pool, asset.token.configuration.symbol.value),
-                amount = nativeAmount?.let { tokenFormatter.formatToken(it, asset.token.configuration.symbol, COMPACT_TOKEN_CONFIG) } ?: "—",
+                amount = nativeAmount?.let { amountFormatter.compactToken(it, asset.token.configuration.symbol) } ?: "—",
                 fiat = nativeAmount?.let(asset.token::toFiatOrNull)?.let { fiatFormatter.formatFiat(it, asset.token.currency) }
             )
         }
@@ -244,9 +245,7 @@ class BittensorSubnetDetailsViewModel(
                     ?.let(asset.token::amountFromPlanks)
                 BittensorSubnetPoolSideUi(
                     title = alphaTitle,
-                    amount = alphaAmount?.let {
-                        tokenFormatter.formatToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" }), COMPACT_TOKEN_CONFIG).ltrIsolated()
-                    } ?: "—",
+                    amount = alphaAmount?.let { amountFormatter.compactToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" })).ltrIsolated() } ?: "—",
                     fiat = nativeValue?.let(asset.token::toFiatOrNull)?.let { fiatFormatter.formatFiat(it, asset.token.currency) }
                 )
             },
@@ -665,6 +664,3 @@ private class SubnetChartData(
 
     fun clipped(registrationEpochSeconds: Long?) = SubnetChartData(period, history, registrationEpochSeconds)
 }
-
-// Pool totals are compact, as on iOS: "8.4K TAO", "1.54M ψ"
-private val COMPACT_TOKEN_CONFIG = TokenConfig(useCompactAbbreviation = true)
