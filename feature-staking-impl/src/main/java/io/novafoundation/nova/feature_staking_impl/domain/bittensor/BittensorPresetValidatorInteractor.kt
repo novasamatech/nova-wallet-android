@@ -11,6 +11,8 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -35,12 +37,16 @@ class BittensorPresetValidatorInteractor @Inject constructor(
 ) {
 
     /** Fails only when the directory or recommendations cannot be loaded, so callers can offer a retry. */
-    suspend fun preset(subnet: BittensorNetuid.Subnet): BittensorValidatorPreset {
+    suspend fun preset(subnet: BittensorNetuid.Subnet): BittensorValidatorPreset = coroutineScope {
         val chain = chains.getChain(ChainGeneses.BITTENSOR)
+        // Positions and yields are independent of the directory; load them alongside it instead of after it.
+        val existingHotkey = async { existingPrimaryHotkey(subnet) }
+        val rates = async { optionalYields(chain, subnet) }
+        // A directory failure cancels both loads with the scope.
         val directory = repository.validators(chain, subnet)
-        val existing = existingPrimaryHotkey(subnet)?.let { hotkey -> directory.firstOrNull { it.validator.hotkey == hotkey && it.canSelect } }
-        val preset = existing ?: recommendedPreset(chain, subnet, directory)
-        return BittensorValidatorPreset(directory, preset)
+        val existing = existingHotkey.await()?.let { hotkey -> directory.firstOrNull { it.validator.hotkey == hotkey && it.canSelect } }
+        val preset = existing ?: recommendedPreset(chain, subnet, directory, rates.await())
+        BittensorValidatorPreset(directory, preset)
     }
 
     /** Quick pick: the preset first, followed by the rest of the directory. Fails when nothing qualifies. */
@@ -53,17 +59,9 @@ class BittensorPresetValidatorInteractor @Inject constructor(
     private suspend fun recommendedPreset(
         chain: Chain,
         subnet: BittensorNetuid.Subnet,
-        directory: List<BittensorSubnetValidator>
+        directory: List<BittensorSubnetValidator>,
+        rates: Map<AccountIdKey, BigDecimal>
     ): BittensorSubnetValidator? {
-        val rates = try {
-            yields.alphaYields(chain, subnet)
-        } catch (cancelled: CancellationException) {
-            throw cancelled
-        } catch (failure: Exception) {
-            logger.log("[BittensorPreset] Optional yields unavailable")
-            logger.log(failure)
-            emptyMap()
-        }
         for (candidate in bittensorPresetCandidates(directory, rates).take(MAX_ATTEMPTS)) {
             try {
                 repository.validate(chain, subnet, candidate.validator)
@@ -76,6 +74,16 @@ class BittensorPresetValidatorInteractor @Inject constructor(
             }
         }
         return null
+    }
+
+    private suspend fun optionalYields(chain: Chain, subnet: BittensorNetuid.Subnet): Map<AccountIdKey, BigDecimal> = try {
+        yields.alphaYields(chain, subnet)
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (failure: Exception) {
+        logger.log("[BittensorPreset] Optional yields unavailable")
+        logger.log(failure)
+        emptyMap()
     }
 
     private suspend fun existingPrimaryHotkey(subnet: BittensorNetuid.Subnet): AccountIdKey? = try {
@@ -108,8 +116,22 @@ internal fun bittensorPresetCandidates(
 ): List<BittensorSubnetValidator> = directory.filter { it.canSelect && it.recommended }
     .sortedWith(compareByDescending { rates[it.validator.hotkey] })
 
-/** The validator holding the largest stake of the account on [subnet], as iOS picks a position's primary hotkey. */
+/**
+ * The validator holding the largest stake of the account on [subnet], as iOS picks a position's primary hotkey;
+ * equal stakes resolve to the lexicographically smaller hotkey bytes.
+ */
 internal fun bittensorPrimaryHotkey(positions: List<BittensorSubnetPosition>, subnet: BittensorNetuid.Subnet): AccountIdKey? = positions
     .filter { it.subnetId == subnet && it.alphaInPlanks.signum() > 0 }
-    .maxByOrNull { it.alphaInPlanks }
+    .minWithOrNull(
+        compareByDescending<BittensorSubnetPosition> { it.alphaInPlanks }
+            .thenComparator { left, right -> compareUnsignedBytes(left.validatorHotkey.value, right.validatorHotkey.value) }
+    )
     ?.validatorHotkey
+
+private fun compareUnsignedBytes(left: ByteArray, right: ByteArray): Int {
+    for (index in 0 until minOf(left.size, right.size)) {
+        val difference = left[index].toUByte().compareTo(right[index].toUByte())
+        if (difference != 0) return difference
+    }
+    return left.size.compareTo(right.size)
+}

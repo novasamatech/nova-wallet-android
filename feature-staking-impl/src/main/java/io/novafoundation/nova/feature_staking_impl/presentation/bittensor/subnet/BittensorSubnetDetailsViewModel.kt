@@ -459,6 +459,7 @@ class BittensorSubnetDetailsViewModel(
     fun continueClicked() = launchUnit {
         if (!canContinue.first()) return@launchUnit
         val address = currentValidatorAddress()
+        val isPreset = selectedValidatorAddress.value == null && address != null
         analytics.track(
             BittensorAnalyticsEvent.TypeSelected(
                 BittensorAnalyticsEvent.NETWORK,
@@ -468,7 +469,13 @@ class BittensorSubnetDetailsViewModel(
             )
         )
         router.openBittensorSubnetAmount(
-            BittensorSubnetAmountPayload(subnetId.value, address, replaceAmount = replaceAmount, selectionState = selectionState)
+            BittensorSubnetAmountPayload(
+                subnetId.value,
+                address,
+                validatorIsPreset = isPreset,
+                replaceAmount = replaceAmount,
+                selectionState = selectionState
+            )
         )
     }
 

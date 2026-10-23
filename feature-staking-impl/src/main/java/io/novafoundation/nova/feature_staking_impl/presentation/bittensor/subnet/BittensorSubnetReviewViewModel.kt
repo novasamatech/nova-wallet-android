@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
@@ -460,7 +461,7 @@ class BittensorSubnetReviewViewModel(
                         failure,
                         actions,
                         resources,
-                        formatAmount = { tokenFormatter.formatToken(token.amountFromPlanks(it), token.configuration.symbol) },
+                        formatAmount = { tokenFormatter.formatBittensorRequiredAmount(it, token) },
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(

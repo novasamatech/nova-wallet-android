@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
@@ -68,7 +69,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -113,6 +113,7 @@ class BittensorSubnetAmountViewModel(
     private val quickPickInteractor: BittensorQuickPickInteractor,
     private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     validatorAddress: String?,
+    validatorIsPreset: Boolean,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
     private val resources: ResourceManager,
@@ -166,7 +167,8 @@ class BittensorSubnetAmountViewModel(
 
     private val quoteRefresh = MutableStateFlow(0)
 
-    private val selectedValidatorOverride = MutableStateFlow(validatorAddress)
+    // A preset handed over by subnet details stays a preset: it is not the user's choice (analytics, re-preset on details).
+    private val selectedValidatorOverride = MutableStateFlow(validatorAddress.takeUnless { validatorIsPreset })
 
     private val selectionRetry = MutableStateFlow(0)
 
@@ -191,7 +193,10 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     /** "Buy more <subnet>" for an existing position; new positions keep the screen's default title. */
-    val buyMoreTitle = subnet.map { subnet ->
+    val buyMoreTitle = subnetState.mapNotNull { state ->
+        // Waits for the catalogue so the title does not flash "Subnet N" before the name arrives.
+        if (state.isLoading()) return@mapNotNull null
+        val subnet = state.dataOrNull
         val name = subnet?.name?.takeIf { it.isNotBlank() }
             ?: resources.getString(R.string.bittensor_subnet_number, subnet?.id?.value ?: initialSubnetId?.value ?: 0)
         resources.getString(R.string.bittensor_buy_more_subnet, name)
@@ -231,7 +236,10 @@ class BittensorSubnetAmountViewModel(
                             SubnetValidators(listOf(validator), validator.address)
                         }
                         // An address chosen on subnet details or in the validator list is never replaced by the preset.
-                        validatorAddress != null -> SubnetValidators(bittensorSubnetStakingInteractor.validators(subnet.id), null)
+                        validatorAddress != null -> SubnetValidators(
+                            bittensorSubnetStakingInteractor.validators(subnet.id),
+                            presetAddress = validatorAddress.takeIf { validatorIsPreset }
+                        )
                         else -> presetValidatorInteractor.preset(subnet.id).let { SubnetValidators(it.directory, it.preset?.address) }
                     }
                 }
@@ -711,7 +719,8 @@ class BittensorSubnetAmountViewModel(
             subnetId = selectedSubnet.id.value,
             analyticsSource = SubnetDetailsSource.SETUP,
             replaceAmount = true,
-            validatorAddress = selectedValidatorAddress.first(),
+            // Only a user choice travels; details recomputes the same preset otherwise.
+            validatorAddress = selectedValidatorOverride.value,
             selectionState = selectionState
         )
         router.openBittensorSubnetDetails(payload)
@@ -745,7 +754,7 @@ class BittensorSubnetAmountViewModel(
                         failure,
                         actions,
                         resources,
-                        formatAmount = { tokenFormatter.formatToken(token.amountFromPlanks(it), token.configuration.symbol) },
+                        formatAmount = { tokenFormatter.formatBittensorRequiredAmount(it, token) },
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(
@@ -779,11 +788,11 @@ class BittensorSubnetAmountViewModel(
                 BittensorAnalyticsEvent.NETWORK,
                 StakingAnalyticsTarget.SUBNET,
                 if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION,
-                when {
-                    existingPosition -> StakingValidatorSource.EXISTING_HOTKEY
-                    request.validatorAddress != validatorsState.replayCache.lastOrNull()?.dataOrNull?.presetAddress -> StakingValidatorSource.MANUAL
-                    else -> StakingValidatorSource.RECOMMENDED
-                },
+                bittensorStakeValidatorSource(
+                    existingPosition,
+                    request.validatorAddress,
+                    validatorsState.replayCache.lastOrNull()?.dataOrNull?.presetAddress
+                ),
                 SlippageBucket.from(request.slippage.movePointRight(2)),
                 null
             )
@@ -855,4 +864,10 @@ class BittensorSubnetAmountViewModel(
 
         const val QUOTE_DEBOUNCE_MILLIS = 350L
     }
+}
+
+internal fun bittensorStakeValidatorSource(existingPosition: Boolean, selectedAddress: String, presetAddress: String?): StakingValidatorSource = when {
+    existingPosition -> StakingValidatorSource.EXISTING_HOTKEY
+    selectedAddress != presetAddress -> StakingValidatorSource.MANUAL
+    else -> StakingValidatorSource.RECOMMENDED
 }

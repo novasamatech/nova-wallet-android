@@ -151,6 +151,16 @@ class BittensorPresetValidatorInteractorTest {
     }
 
     @Test
+    fun `equal existing stakes resolve to the lexicographically smaller hotkey like iOS`() {
+        val low = candidate(1)
+        val high = candidate(0x90)
+        val positions = listOf(position(high, 20), position(low, 20))
+
+        assertEquals(low.validator.hotkey, bittensorPrimaryHotkey(positions, subnet))
+        assertEquals(high.validator.hotkey, bittensorPrimaryHotkey(listOf(position(high, 21), position(low, 20)), subnet))
+    }
+
+    @Test
     fun `inactive existing validator falls back to the recommendation`() = runBlocking<Unit> {
         val held = candidate(7).copy(inactive = true)
         `when`(repository.validators(chain, subnet)).thenReturn(listOf(first, second, held))

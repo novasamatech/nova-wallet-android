@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
@@ -426,7 +427,7 @@ class BittensorStakeAmountViewModel(
                             )
                         )
                     }
-                    failure.title(resourceManager) to failure.message(resourceManager) { formatToken(token.amountFromPlanks(it), token.configuration.symbol) }
+                    failure.title(resourceManager) to failure.message(resourceManager) { tokenFormatter.formatBittensorRequiredAmount(it, token) }
                 }
             ) { openConfirmation(request) }
         } catch (e: CancellationException) {

@@ -79,6 +79,7 @@ class BittensorSubnetAmountModule {
         quickPickInteractor = quickPickInteractor,
         presetValidatorInteractor = presetValidatorInteractor,
         validatorAddress = payload.validatorAddress,
+        validatorIsPreset = payload.validatorIsPreset,
         bittensorSubnetInteractor = bittensorSubnetInteractor,
         router = router,
         resources = resources,

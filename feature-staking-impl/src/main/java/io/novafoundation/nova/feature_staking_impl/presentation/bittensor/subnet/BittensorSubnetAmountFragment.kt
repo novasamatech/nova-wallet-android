@@ -86,6 +86,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         validator.isClickable = !viewModel.existingPosition
         validator.setPrimaryValueEndIcon(if (viewModel.existingPosition) null else R.drawable.ic_chevron_right)
         if (viewModel.existingPosition) {
+            toolbar.setTitle(getString(R.string.bittensor_buy_more))
             amount.setTitle(getString(R.string.bittensor_you_pay))
         }
         rate.title.setOnClickListener { showInfo(R.string.bittensor_exchange_rate, getString(R.string.swap_rate_description)) }
