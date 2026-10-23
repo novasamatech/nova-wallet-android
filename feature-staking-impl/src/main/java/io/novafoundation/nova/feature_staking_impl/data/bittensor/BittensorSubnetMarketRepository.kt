@@ -56,7 +56,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
                 if (markets.size < MARKET_PAGE_SIZE) break
             }
         }
-    } ?: error("Subnet markets timed out")
+    } ?: throw BittensorTimeoutException("Subnet markets")
 }
 
 internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {

@@ -179,7 +179,7 @@ class BittensorSubnetValidatorRepositoryTest {
         val logger = mock(Logger::class.java)
         val controller = BittensorRetryController(resources, logger)
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
+        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
         val retryStarted = CompletableDeferred<Unit>()
         val finishRetry = CompletableDeferred<Unit>()
         val recovered = CompletableDeferred<Unit>()

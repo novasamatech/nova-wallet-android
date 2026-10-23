@@ -8,6 +8,9 @@ import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.utils.IntegrityService
+import kotlinx.coroutines.CancellationException
+import io.novafoundation.nova.common.utils.isIntegrityUnsupportedOnDevice
+import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.RealInfrastructureUrls
 import io.novafoundation.nova.infrastructure.attestation.AttestationKeyPairStore
@@ -66,7 +69,16 @@ class AttestationModule {
     @Provides
     @ApplicationScope
     fun provideIntegrityTokenSource(integrityService: IntegrityService): IntegrityTokenSource =
-        IntegrityTokenSource { integrityService.getIntegrityToken(it) }
+        IntegrityTokenSource { requestHash ->
+            try {
+                integrityService.getIntegrityToken(requestHash)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (failure: Exception) {
+                if (failure.isIntegrityUnsupportedOnDevice()) throw AttestationUnsupportedException("Play Integrity is unavailable on this device", failure)
+                throw failure
+            }
+        }
 
     @Provides
     @ApplicationScope

@@ -18,6 +18,8 @@ class BittensorReadAnalytics(
     private val failureReported = AtomicBoolean(false)
 
     fun failed(cause: Throwable) {
+        // As on iOS, a device that cannot attest is not a data failure.
+        if (cause.bittensorReadFailureKind() == BittensorReadFailureKind.DEVICE_UNSUPPORTED) return
         val reason = when {
             cause is HttpException && cause.code() == 429 -> BittensorDataFailureReason.RATE_LIMITED
             cause is HttpException && cause.code() in 400..499 -> BittensorDataFailureReason.REJECTED

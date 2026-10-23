@@ -2898,6 +2898,11 @@
     <string name="bittensor_add_stake">Add stake</string>
     <string name="bittensor_no_positions">You have no Bittensor staking positions yet</string>
     <string name="bittensor_positions_stale">Could not refresh positions. Showing the last available data.</string>
+    <string name="bittensor_load_failed_message">Data loading failed. Would you like to retry?</string>
+    <string name="bittensor_load_slow_title">Network is slow</string>
+    <string name="bittensor_load_slow_message">The Bittensor network is taking too long to respond. Would you like to retry?</string>
+    <string name="bittensor_load_device_title">Unavailable on this device</string>
+    <string name="bittensor_load_device_message">This device can’t load Bittensor staking data: it needs Google Play services. Your stake is not affected.</string>
     <string name="bittensor_valuation_unavailable">Some subnet prices are unavailable. Total stake cannot be calculated.</string>
     <string name="bittensor_apy_unavailable">APY unavailable</string>
     <string name="bittensor_subnet_number">Subnet %1$d</string>

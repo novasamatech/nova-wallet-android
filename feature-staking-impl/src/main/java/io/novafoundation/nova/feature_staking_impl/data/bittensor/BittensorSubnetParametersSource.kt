@@ -45,7 +45,7 @@ class BittensorSubnetParametersSource @Inject constructor(
             }
             BittensorSubnetEmissionSnapshot(rows.await(), enabled.await())
         }
-    } ?: error("Subnet parameter snapshot timed out")
+    } ?: throw BittensorTimeoutException("Subnet parameter snapshot")
 
     private companion object {
     }

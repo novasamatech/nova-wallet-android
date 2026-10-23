@@ -4,6 +4,8 @@ import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.attestation.AttestationKeyPairStore
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnavailableException
+import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
+import io.novafoundation.nova.infrastructure.attestation.isAttestationUnsupported
 import io.novafoundation.nova.infrastructure.attestation.errorCodeOf
 import io.novafoundation.nova.infrastructure.attestation.signedContext
 import java.io.IOException
@@ -49,6 +51,9 @@ class RealProfile3AccessTokenProvider(
         var failures = 0
 
         var rejected = false
+
+        // The last bootstrap failed because this device cannot attest; later refusals keep saying so.
+        var unsupported = false
     }
 
     private class TokenDecision(val usable: Profile3TokenRecord?, val issuance: Deferred<Profile3TokenRecord>?)
@@ -68,8 +73,11 @@ class RealProfile3AccessTokenProvider(
             if (current != null && (!current.shouldRefresh(now) || state.rejected || now < state.cooldownUntil)) {
                 return@withLock TokenDecision(current, null)
             }
-            if (state.rejected) throw AttestationUnavailableException("Profile-3 registration was refused")
-            if (now < state.cooldownUntil) throw AttestationUnavailableException("Profile-3 bootstrap is cooling down")
+            if (state.rejected) throw AttestationUnsupportedException("Profile-3 registration was refused")
+            if (now < state.cooldownUntil) {
+                if (state.unsupported) throw AttestationUnsupportedException("Profile-3 attestation is unsupported on this device")
+                throw AttestationUnavailableException("Profile-3 bootstrap is cooling down")
+            }
             if (state.issuance == null) {
                 val work = ownerScope.async(start = CoroutineStart.LAZY) { loadToken(identity, origin, state) }
                 state.issuance = work
@@ -128,12 +136,14 @@ class RealProfile3AccessTokenProvider(
                 state.token = record
                 state.failures = 0
                 state.cooldownUntil = 0
+                state.unsupported = false
             }
             return record
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (failure: Exception) {
-            mutex.withLock {
+            val unsupported = mutex.withLock {
+                state.unsupported = failure.isAttestationUnsupported()
                 if (failure is HttpException) {
                     val code = failure.backendCode()
                     state.rejected = failure.code() in listOf(400, 403, 409) ||
@@ -148,7 +158,9 @@ class RealProfile3AccessTokenProvider(
                 } else {
                     state.cooldownUntil = backoffDeadline(state)
                 }
+                state.unsupported || state.rejected
             }
+            if (unsupported) throw AttestationUnsupportedException("Profile-3 bootstrap failed", failure)
             throw AttestationUnavailableException("Profile-3 bootstrap failed", failure)
         } finally {
             val job = currentCoroutineContext()[Job]

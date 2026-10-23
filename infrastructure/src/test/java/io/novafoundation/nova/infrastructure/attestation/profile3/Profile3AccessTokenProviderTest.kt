@@ -1,5 +1,8 @@
 package io.novafoundation.nova.infrastructure.attestation.profile3
 
+import io.novafoundation.nova.infrastructure.attestation.AttestationUnavailableException
+import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
+import io.novafoundation.nova.infrastructure.attestation.isAttestationUnsupported
 import java.io.IOException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
@@ -173,6 +176,43 @@ class Profile3AccessTokenProviderTest {
         assertTrue(runCatching { provider.token(fixture.configuredOrigin) }.isFailure)
         assertEquals(1, fixture.api.tokenRequests.size)
         assertEquals(identity.scope, fixture.identities.current()?.scope)
+    }
+
+    @Test
+    fun `negative platform verdict is reported as unsupported device`() = runTest {
+        val fixture = Profile3Fixture(backgroundScope)
+        fixture.api.failure = httpFailure(401, "attestation_failed")
+        val provider = fixture.provider()
+        assertTrue(runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull() is AttestationUnsupportedException)
+        assertTrue(runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull() is AttestationUnsupportedException)
+    }
+
+    @Test
+    fun `device without play integrity is unsupported even while cooling down and recovers once attested`() = runTest {
+        val fixture = Profile3Fixture(backgroundScope)
+        fixture.integrityFailure = AttestationUnsupportedException("Play Integrity is unavailable on this device")
+        val provider = fixture.provider()
+        val first = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
+        assertTrue(first is AttestationUnsupportedException)
+        val cooling = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
+        assertTrue(cooling is AttestationUnsupportedException)
+        assertTrue(fixture.api.registrationRequests.isEmpty())
+
+        fixture.integrityFailure = null
+        fixture.clock.now += 60_000
+        provider.token(fixture.configuredOrigin)
+        assertEquals(1, fixture.api.registrationRequests.size)
+    }
+
+    @Test
+    fun `transient bootstrap failure stays retryable`() = runTest {
+        val fixture = Profile3Fixture(backgroundScope)
+        fixture.api.failure = IOException("offline")
+        val provider = fixture.provider()
+        val failure = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
+        assertTrue(failure is AttestationUnavailableException)
+        assertFalse(failure!!.isAttestationUnsupported())
+        assertFalse(runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()!!.isAttestationUnsupported())
     }
 
     @Test
