@@ -3,9 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setMessageOrHide
 
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import io.novafoundation.nova.common.utils.ltrIsolated
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
@@ -55,15 +53,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         amount.setTitle(getString(if (viewModel.isRoot) R.string.bittensor_exit_you_unstake else R.string.bittensor_exit_you_sell))
         amount.setAssetIconRounded(!viewModel.isRoot)
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
-        if (viewModel.isRoot) {
-            amount.setTitle(null)
-            amount.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
-            amount.setMaxActionAvailability(MaxActionAvailability.NotAvailable)
-            rootAmountHeader.isVisible = true
-            unstakeAll.setOnClickListener { viewModel.maxClicked() }
-        } else {
-            amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
-        }
+        amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
         receive.isVisible = !viewModel.isRoot
         rate.isVisible = !viewModel.isRoot
         averagePrice.isVisible = !viewModel.isRoot
@@ -86,7 +76,6 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.amountModel.observe { it?.let(amount::setChooseAmountModel) }
         viewModel.amount.observe { if (amount.amountInput.text.toString() != it) amount.amountInput.setText(it) }
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)
-        viewModel.stakedHeader.observe(::showStakedHeader)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
         viewModel.amountError.observe(amount::setError)
         viewModel.validator.observe(validator::showBittensorLoadingValue)
@@ -101,7 +90,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
                 earned.showBittensorLoadingAmount(state.map { it.amount })
                 earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
             }
-            viewModel.received.observe(receive::showBittensorLoadingValue)
+            viewModel.received.observe(receive::showBittensorLoadingAmount)
             viewModel.rate.observe(rate::showBittensorLoadingValue)
             viewModel.swapRateDescription.observe { description ->
                 rate.setOnClickListener {
@@ -129,7 +118,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
                 onCancel = action.onCancel
             ).show()
         }
-        viewModel.fee.observe(fee::showBittensorLoadingValue)
+        viewModel.fee.observe(fee::showBittensorLoadingAmount)
         viewModel.feeCaption.observe {
             caption.text = it
             caption.isVisible = viewModel.isRoot && it != null
@@ -148,9 +137,4 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         super.onPause()
     }
 
-    private fun showStakedHeader(header: BittensorStakedHeaderUi?) = with(binder) {
-        stakedValue.text = header?.let { getString(R.string.bittensor_exit_staked_header, it.staked.ltrIsolated()) }
-        unstakeAll.isEnabled = header?.isEnabled == true
-        unstakeAll.setTextColorRes(if (header?.isEnabled == true) R.color.button_text_accent else R.color.text_secondary)
-    }
 }

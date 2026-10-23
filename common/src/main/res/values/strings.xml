@@ -3005,7 +3005,6 @@
     <string name="bittensor_validator_apr_period">APR · 30 days</string>
     <string name="bittensor_exit_root_title">Unstake from root</string>
     <string name="bittensor_exit_sell_title">Sell %1$s</string>
-    <string name="bittensor_exit_staked_header">Staked: %1$s ·</string>
     <string name="bittensor_exit_review_sale">Review sale</string>
     <string name="bittensor_exit_you_unstake">You unstake</string>
     <string name="bittensor_exit_you_sell">You sell</string>
