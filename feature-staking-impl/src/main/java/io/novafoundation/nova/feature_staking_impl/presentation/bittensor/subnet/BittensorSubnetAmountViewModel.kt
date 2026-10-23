@@ -54,7 +54,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.initialBittensorValidatorAddress
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -183,18 +182,19 @@ class BittensorSubnetAmountViewModel(
     private val validatorsState = subnetState.flatMapLatest { state ->
         val subnet = state.dataOrNull
         if (subnet == null) {
-            flowOf<ExtendedLoadingState<List<BittensorSubnetValidator>>> {
-                if (state.isLoading()) ExtendedLoadingState.Loading else ExtendedLoadingState.Loaded(emptyList())
+            flowOf<ExtendedLoadingState<SubnetValidators>> {
+                if (state.isLoading()) ExtendedLoadingState.Loading else ExtendedLoadingState.Loaded(SubnetValidators(emptyList(), null))
             }
         } else if (quickPickOrder != null) {
             combine(validatorRetry, selectedValidatorOverride) { _, explicitAddress -> explicitAddress }.flatMapLatest { explicitAddress ->
                 flowOf {
                     if (explicitAddress == null) {
-                        presetValidatorInteractor.validators(subnet.id)
+                        val validators = presetValidatorInteractor.validators(subnet.id)
+                        SubnetValidators(validators, validators.first().address)
                     } else {
                         val validators = bittensorSubnetStakingInteractor.validators(subnet.id)
                         require(validators.any { it.address == explicitAddress && it.canSelect }) { "Selected validator is unavailable" }
-                        validators
+                        SubnetValidators(validators, null)
                     }
                 }.withSafeLoading()
                     .onEach { if (it is ExtendedLoadingState.Error) logSelectionFailure(it.exception) }
@@ -206,10 +206,14 @@ class BittensorSubnetAmountViewModel(
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf {
-                    if (existingPosition) {
-                        listOf(bittensorSubnetStakingInteractor.existingPositionValidator(subnet.id, requireNotNull(validatorAddress)))
-                    } else {
-                        bittensorSubnetStakingInteractor.validators(subnet.id)
+                    when {
+                        existingPosition -> {
+                            val validator = bittensorSubnetStakingInteractor.existingPositionValidator(subnet.id, requireNotNull(validatorAddress))
+                            SubnetValidators(listOf(validator), validator.address)
+                        }
+                        // An address chosen on subnet details or in the validator list is never replaced by the preset.
+                        validatorAddress != null -> SubnetValidators(bittensorSubnetStakingInteractor.validators(subnet.id), null)
+                        else -> presetValidatorInteractor.preset(subnet.id).let { SubnetValidators(it.directory, it.preset?.address) }
                     }
                 }
             }
@@ -218,13 +222,13 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     private val selectedValidatorAddress = combine(validatorsState, selectedValidatorOverride) { state, selectedAddress ->
-        initialBittensorValidatorAddress(selectedAddress, state.dataOrNull.orEmpty())
+        selectedAddress ?: state.dataOrNull?.presetAddress
     }
         .shareInBackground()
 
     private val selectedValidator = combine(validatorsState, selectedValidatorAddress) { state, address ->
         address?.let { selectedAddress ->
-            val validator = state.dataOrNull?.firstOrNull {
+            val validator = state.dataOrNull?.validators?.firstOrNull {
                 it.address == selectedAddress && (if (existingPosition) it.canAddToExistingPosition else it.canSelect)
             }?.validator
             QuoteValidator(selectedAddress, validator)
@@ -387,7 +391,10 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     val validator = combine(validatorsState, selectedValidatorAddress) { state, address ->
-        state.map { validators -> validators.firstOrNull { it.address == address }?.validator?.name?.takeIf { it.isNotBlank() } ?: address.orEmpty() }
+        state.map { loaded ->
+            if (address == null) return@map resources.getString(R.string.bittensor_select_validator)
+            loaded.validators.firstOrNull { it.address == address }?.validator?.name?.takeIf { it.isNotBlank() } ?: address
+        }
     }
         .shareInBackground()
 
@@ -754,10 +761,7 @@ class BittensorSubnetAmountViewModel(
                 if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION,
                 when {
                     existingPosition -> StakingValidatorSource.EXISTING_HOTKEY
-                    request.validatorAddress != initialBittensorValidatorAddress(
-                        null,
-                        validatorsState.replayCache.lastOrNull()?.dataOrNull.orEmpty()
-                    ) -> StakingValidatorSource.MANUAL
+                    request.validatorAddress != validatorsState.replayCache.lastOrNull()?.dataOrNull?.presetAddress -> StakingValidatorSource.MANUAL
                     else -> StakingValidatorSource.RECOMMENDED
                 },
                 SlippageBucket.from(request.slippage.movePointRight(2)),
@@ -798,6 +802,9 @@ class BittensorSubnetAmountViewModel(
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
     }
+
+    /** [presetAddress] is the automatic choice; null when the user picked the validator or nothing qualifies. */
+    private class SubnetValidators(val validators: List<BittensorSubnetValidator>, val presetAddress: String?)
 
     private data class QuoteValidator(val address: String, val validator: BittensorValidator?)
 
