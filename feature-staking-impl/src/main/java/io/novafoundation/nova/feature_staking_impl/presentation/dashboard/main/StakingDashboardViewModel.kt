@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -69,11 +70,6 @@ private class DashboardFormatters(
     val maskableValueFormatter: MaskableValueFormatter,
     val presentationMapper: StakingDashboardPresentationMapper
 )
-
-private enum class StartStakingSource(val analyticsValue: String) {
-    DASHBOARD("dashboard"),
-    DEEP_LINK("deep_link")
-}
 
 class StakingDashboardViewModel(
     private val interactor: StakingDashboardInteractor,
@@ -157,7 +153,7 @@ class StakingDashboardViewModel(
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        openStartStaking(withoutStakeItem.chain, withoutStakeItem.token.configuration, noStakeItemState, StartStakingSource.DASHBOARD)
+        openStartStaking(withoutStakeItem.chain, withoutStakeItem.token.configuration, noStakeItemState, StakingFlowSource.DASHBOARD)
     }
 
     fun setDeepLinkTarget(target: StakingDeepLinkTarget?) {
@@ -176,19 +172,19 @@ class StakingDashboardViewModel(
                     val option = destination.option
                     when (val state = option.stakingState) {
                         is HasStake -> openChainStaking(option.chain, option.token.configuration, state.stakingType)
-                        is NoStake -> openStartStaking(option.chain, option.token.configuration, state, StartStakingSource.DEEP_LINK)
+                        is NoStake -> openStartStaking(option.chain, option.token.configuration, state, StakingFlowSource.DEEP_LINK)
                     }
                 }
             }
         }
     }
 
-    private suspend fun openStartStaking(chain: Chain, chainAsset: Chain.Asset, state: NoStake, source: StartStakingSource) {
+    private suspend fun openStartStaking(chain: Chain, chainAsset: Chain.Asset, state: NoStake, source: StakingFlowSource) {
         val stakingTypes = state.flowType.allStakingTypes
 
         stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
 
-        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = source.analyticsValue))
+        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = source.value))
 
         val payload = StartStakingLandingPayload(
             availableStakingOptions = AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes)

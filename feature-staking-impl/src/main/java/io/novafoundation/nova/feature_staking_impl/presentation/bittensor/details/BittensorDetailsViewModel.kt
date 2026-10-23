@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import kotlinx.coroutines.flow.onEach
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
@@ -377,12 +378,17 @@ class BittensorDetailsViewModel(
         if (entryConsumed || entry != BittensorPortfolioEntry.DEEP_LINK) return
         entryConsumed = true
         if (resolution is BittensorEntryResolution.Start) {
-            analytics.track(AnalyticsEvent.StakingFlowOpened(resolution.network, "deep_link"))
+            analytics.track(AnalyticsEvent.StakingFlowOpened(resolution.network, StakingFlowSource.DEEP_LINK.value))
             router.replaceBittensorPortfolioWithStart(resolution.payload)
         }
     }
 
-    fun addPosition() = router.openBittensorChooseSubnet()
+    /** Re-entry goes through the same Earn landing as a first stake (iOS `SubtensorPortfolioWireframe.showAddPosition`). */
+    fun addPosition() = launchUnit {
+        val portfolio = portfolio.first()
+        analytics.track(AnalyticsEvent.StakingFlowOpened(portfolio.chain.name, StakingFlowSource.PORTFOLIO_ADD_POSITION.value))
+        router.openBittensorStartStaking(portfolio.startStakingPayload())
+    }
 
     fun positionClicked(position: BittensorPositionUi) {
         when (val action = position.action) {

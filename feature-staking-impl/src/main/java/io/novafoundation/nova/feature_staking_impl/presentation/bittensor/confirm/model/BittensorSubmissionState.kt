@@ -12,6 +12,10 @@ sealed class BittensorSubmissionState(val result: BittensorStakeResultUi?) {
 
     class Unconfirmed(val hash: String?, result: BittensorStakeResultUi.Unconfirmed? = null) : BittensorSubmissionState(result)
 
+    /** The operation was executed or may have been: the screen can only be left, never resubmitted. */
+    val isFinished: Boolean
+        get() = this is Completed || this is Unconfirmed
+
     val canSubmit: Boolean
         get() = this is Ready || this is Failed
 

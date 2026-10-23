@@ -11,9 +11,11 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
     onDismiss: () -> Unit,
     onTryAgain: () -> Unit,
     onViewPosition: () -> Unit,
-    onDiscoverSubnets: () -> Unit = {}
+    onDiscoverSubnets: () -> Unit = {},
+    onUnconfirmedDone: () -> Unit = {}
 ) {
     var resultSheet: BittensorStakeResultBottomSheet? = null
+    var shownState: BittensorStakeResultUi? = null
     lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
         override fun onDestroy(owner: LifecycleOwner) {
             resultSheet = resultSheet.dismissWithoutResultCallback()
@@ -25,7 +27,11 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
         } else {
             val sheet = resultSheet ?: BittensorStakeResultBottomSheet(
                 context = fragment.requireContext(),
-                onClose = { resultSheet?.dismiss() },
+                onClose = {
+                    resultSheet?.dismiss()
+                    // "Done" on an unconfirmed result finishes the flow like a completed one; "Close" on a failure stays for a retry.
+                    if (shownState is BittensorStakeResultUi.Unconfirmed) onUnconfirmedDone()
+                },
                 onTryAgain = {
                     resultSheet?.dismiss()
                     onTryAgain()
@@ -45,6 +51,7 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
                     onDismiss()
                 }
             }
+            shownState = state
             sheet.setState(state)
             if (!sheet.isShowing) sheet.show()
         }

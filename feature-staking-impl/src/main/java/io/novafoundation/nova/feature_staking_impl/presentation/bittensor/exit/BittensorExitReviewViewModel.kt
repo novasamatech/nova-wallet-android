@@ -4,7 +4,7 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -106,7 +106,11 @@ private sealed interface ExitExecution {
     data class Running(val startedAt: Long, val estimatedDuration: Duration) : ExitExecution
     data class Success(val at: Long, val outcome: BittensorOperationOutcome?, val draft: BittensorExitDraft) : ExitExecution
     data class Failure(val model: BittensorStakeResultUi.Failure, val at: Long = System.currentTimeMillis()) : ExitExecution
-    data class Unconfirmed(val model: BittensorStakeResultUi.Unconfirmed, val at: Long = System.currentTimeMillis()) : ExitExecution
+    data class Unconfirmed(
+        val model: BittensorStakeResultUi.Unconfirmed,
+        val draft: BittensorExitDraft,
+        val at: Long = System.currentTimeMillis()
+    ) : ExitExecution
 }
 
 class BittensorExitReviewViewModel(
@@ -137,6 +141,14 @@ class BittensorExitReviewViewModel(
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val isRoot = payload.position.netuid().isRoot()
+
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.UNSTAKE,
+        if (isRoot) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
+        newPosition = false
+    )
 
     val slippage = payload.slippageFraction.toBigDecimal().movePointRight(2).toStripTrailingZerosString() + "%"
 
@@ -606,18 +618,18 @@ class BittensorExitReviewViewModel(
                     val model = result.mapResult(resources)
                     execution.value = when (model) {
                         is BittensorStakeResultUi.Failure -> ExitExecution.Failure(model)
-                        is BittensorStakeResultUi.Unconfirmed -> ExitExecution.Unconfirmed(model)
+                        is BittensorStakeResultUi.Unconfirmed -> ExitExecution.Unconfirmed(model, draft)
                         else -> error("Unexpected failure presentation")
                     }
                 }
-                is BittensorOperationResult.Unknown -> execution.value = ExitExecution.Unconfirmed(result.mapResult(resources))
+                is BittensorOperationResult.Unknown -> execution.value = ExitExecution.Unconfirmed(result.mapResult(resources), draft)
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val result = e.mapBittensorSubmissionError()
             trackOutcome(result, draft)
-            execution.value = ExitExecution.Unconfirmed(result.mapResult(resources))
+            execution.value = ExitExecution.Unconfirmed(result.mapResult(resources), draft)
         }
     }
 
@@ -648,13 +660,30 @@ class BittensorExitReviewViewModel(
 
     fun resultDismissed() {
         sheetDismissed.value = true
+        finishedEmptiesPosition()?.let(resultNavigation::leave)
     }
 
-    fun doneClicked() = launchUnit {
-        router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
+    fun doneClicked() {
+        finishedEmptiesPosition()?.let(resultNavigation::done)
+    }
+
+    fun viewPositionClicked() {
+        val state = execution.value as? ExitExecution.Success ?: return
+        resultNavigation.viewPosition(state.draft.quote.fullExit)
     }
 
     fun back() {
-        if (execution.value !is ExitExecution.Running) router.back()
+        when (execution.value) {
+            is ExitExecution.Running -> Unit
+            is ExitExecution.Success, is ExitExecution.Unconfirmed -> resultNavigation.leave(finishedEmptiesPosition() ?: false)
+            else -> router.back()
+        }
+    }
+
+    /** Whether the finished exit emptied the position (iOS `emptiesPosition`); null while nothing has finished. */
+    private fun finishedEmptiesPosition(): Boolean? = when (val state = execution.value) {
+        is ExitExecution.Success -> state.draft.quote.fullExit
+        is ExitExecution.Unconfirmed -> state.draft.quote.fullExit
+        else -> null
     }
 }

@@ -4,6 +4,9 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
+import io.novafoundation.nova.common.utils.dp
 import android.view.animation.LinearInterpolator
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -13,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.databinding.BottomSheetBitten
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 
 private const val SPINNER_ANIMATION_DURATION = 1_000L
+private const val BUTTON_GAP_DP = 6
 
 class BittensorStakeResultBottomSheet(
     context: Context,
@@ -87,6 +91,10 @@ class BittensorStakeResultBottomSheet(
         state.amount?.let { binder.bittensorStakeResultAmount.showValue(it.token, it.fiat) }
         binder.bittensorStakeResultValidator.showValue(state.validator)
         binder.bittensorStakeResultFee.showValue(state.fee.amount, state.fee.fiatAmount)
+        binder.bittensorStakeResultDiscoverSubnets.isVisible = state.canDiscoverSubnets
+        binder.bittensorStakeResultViewPosition.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = if (state.canDiscoverSubnets) BUTTON_GAP_DP.dp(context) else 0
+        }
     }
 
     private fun showFailure(state: BittensorStakeResultUi.Failure) {

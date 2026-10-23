@@ -86,6 +86,33 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_finish_bittensor_flow_to_portfolio"
+        app:destination="@id/bittensorPortfolioFragment"
+        app:popUpTo="@id/mainFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_bittensor_start_staking"
+        app:destination="@id/start_staking_nav_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_replace_bittensor_portfolio_with_start_staking"
+        app:destination="@id/start_staking_nav_graph"
+        app:popUpTo="@id/bittensorPortfolioFragment"
+        app:popUpToInclusive="true"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_bittensor_root_details"
         app:destination="@id/bittensorRootDetailsFragment"
         app:enterAnim="@anim/fragment_open_enter"

@@ -5,8 +5,6 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingPortfolioSource
-import io.novafoundation.nova.analytics.StakingResultAction
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -14,6 +12,7 @@ import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 
 import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -490,6 +489,14 @@ class BittensorSubnetReviewViewModel(
         }
     }
 
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.STAKE,
+        StakingAnalyticsTarget.SUBNET,
+        newPosition = !existingPosition
+    )
+
     private val analyticsMode get() = if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION
 
     private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
@@ -606,21 +613,14 @@ class BittensorSubnetReviewViewModel(
     }
 
     fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.YOUR_BITTENSOR,
-                    StakingFlow.STAKE,
-                    StakingAnalyticsTarget.SUBNET
-                )
-            )
-            router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
-        } else if (submission.value is BittensorSubmissionState.Unconfirmed) {
-            router.back()
-        }
+        if (submission.value.isFinished) resultNavigation.done()
     }
 
     fun back() {
-        if (submission.value !is BittensorSubmissionState.Submitting) router.back()
+        when {
+            submission.value is BittensorSubmissionState.Submitting -> Unit
+            submission.value.isFinished -> resultNavigation.leave()
+            else -> router.back()
+        }
     }
 }

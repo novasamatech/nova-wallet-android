@@ -23,7 +23,9 @@ sealed interface BittensorStakeResultUi {
         val validator: String,
         val fee: BittensorFeeUi,
         val outcome: BittensorOperationOutcome? = null,
-        val amount: AmountModel? = null
+        val amount: AmountModel? = null,
+        /** "Discover subnets" is offered only after opening a new position (iOS `landingActions`). */
+        val canDiscoverSubnets: Boolean = false
     ) : BittensorStakeResultUi
 
     data class Failure(

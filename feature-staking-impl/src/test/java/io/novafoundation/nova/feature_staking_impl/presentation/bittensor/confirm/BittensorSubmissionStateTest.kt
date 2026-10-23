@@ -67,4 +67,12 @@ class BittensorSubmissionStateTest {
         assertFalse(progress.canSubmit)
         assertSame(progress, progress.dismissResult())
     }
+
+    @Test
+    fun `only completed or unconfirmed operations finish the screen`() {
+        assertTrue(BittensorSubmissionState.Completed().isFinished)
+        assertTrue(BittensorSubmissionState.Unconfirmed(null).isFinished)
+        assertFalse(BittensorSubmissionState.Ready.isFinished)
+        assertFalse(BittensorSubmissionState.Failed().isFinished)
+    }
 }
