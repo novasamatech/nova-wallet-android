@@ -37,9 +37,15 @@ class BittensorPortfolioChartInteractorTest {
 
     private val status = BittensorPortfolioHistoryStatus(BigDecimal.ZERO, true)
 
-    private val account = BittensorAccountHistory(BittensorPortfolioPeriod.ONE_DAY, 0, 2000, listOf(point), status)
+    private val account = BittensorAccountHistory(BittensorPortfolioPeriod.ONE_DAY, 0, 3600, listOf(point), status)
 
     private val history = BittensorPortfolioHistory(account, null)
+
+    /** The grid instant before the point is zero, the point keeps its own timestamp, nothing is appended. */
+    private val historicalPoints = listOf(
+        BittensorPortfolioValuePoint(0, BigDecimal.ZERO, BigDecimal.ZERO),
+        BittensorPortfolioValuePoint(1000, point.tao, point.usd)
+    )
 
     @Test
     fun `no holdings still returns historical points`() {
@@ -51,10 +57,8 @@ class BittensorPortfolioChartInteractorTest {
         val empty = BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap())
         val loading = BittensorPortfolio(1L, chain, asset, empty, BittensorDataStatus.Loading)
         val stale = loading.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException("Read failed")))
-        val expected = listOf(BittensorPortfolioValuePoint(1000, point.tao, point.usd))
-
-        assertEquals(expected, interactor.calculate(loading, history).points)
-        assertEquals(expected, interactor.calculate(stale, history).points)
+        assertEquals(historicalPoints, interactor.calculate(loading, history).points)
+        assertEquals(historicalPoints, interactor.calculate(stale, history).points)
     }
 
     @Test
@@ -82,6 +86,6 @@ class BittensorPortfolioChartInteractorTest {
     private fun assertHistory(positions: BittensorPortfolioPositions?) {
         val portfolio = BittensorPortfolio(1L, chain, asset, positions, BittensorDataStatus.Loading)
         val result = interactor.calculate(portfolio, history)
-        assertEquals(listOf(BittensorPortfolioValuePoint(1000, point.tao, point.usd)), result.points)
+        assertEquals(historicalPoints, result.points)
     }
 }
