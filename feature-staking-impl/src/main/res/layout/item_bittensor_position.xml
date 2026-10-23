@@ -19,7 +19,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- One line each, as iOS: the amount column measures first and keeps its full width, the title takes the rest and ellipsizes. -->
+    <!-- The amount column measures first; the title keeps at least its widest word (BittensorPositionAdapter),
+         so it wraps between words onto a second line, and at large font scales the amount wraps before its symbol. -->
+
     <LinearLayout
         android:id="@+id/positionTexts"
         android:layout_width="0dp"
@@ -36,7 +38,7 @@
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:maxLines="2"
             android:ellipsize="end" />
         <ProgressBar
             android:id="@+id/positionTitleProgress"
@@ -71,7 +73,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/positionAmountProgress"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@id/positionIcon"
+        app:layout_constraintStart_toEndOf="@id/positionTexts"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -80,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:maxLines="1"
+            android:maxLines="2"
             android:ellipsize="end" />
 
         <TextView
