@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import androidx.core.view.isVisible
 import android.os.Bundle
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
@@ -35,7 +36,6 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         onBackPressed { viewModel.back() }
         binder.bittensorStakeConfirmExtrinsicInformation.setOnAccountClickedListener { viewModel.accountClicked() }
         binder.bittensorStakeConfirmButton.setOnClickListener { viewModel.confirmClicked() }
-        binder.stakeAfter.isVisible = viewModel.showsStakeAfter
     }
 
     override fun inject() {
@@ -58,7 +58,10 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         viewModel.fee.observe(binder.bittensorStakeConfirmExtrinsicInformation::setFeeStatus)
         binder.bittensorStakeConfirmStakingType.showValue(viewModel.stakingType)
         viewModel.validator.observe(::showValidator)
-        viewModel.stakeAfter.observe(binder.stakeAfter::showBittensorLoadingValue)
+        viewModel.stakeAfter.observe {
+            binder.stakeAfter.isVisible = it !is ExtendedLoadingState.Loaded || it.data != null
+            binder.stakeAfter.showBittensorLoadingValue(it)
+        }
         viewModel.apy.observe(binder.bittensorStakeConfirmApy::showBittensorLoadingValue)
         viewModel.confirmButtonState.observe(binder.bittensorStakeConfirmButton::setState)
         bindBittensorStakeResults(

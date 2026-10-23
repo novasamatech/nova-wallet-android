@@ -604,18 +604,16 @@ class BittensorSubnetAmountViewModel(
         walletState,
         quoteState,
         amount
-    ) {
-            request, quote, wallet, quoteState, input ->
-        val label = resources.getString(R.string.common_continue)
-        when {
-            wallet.isLoading() -> DescriptiveButtonState.Loading
-            // As on iOS: an empty or zero amount asks for one; the no-TAO case is handled by the funding state.
-            input.toBigDecimalOrNull()?.isPositive != true -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_enter_amount))
-            request == null || wallet.isError() || quoteState.isError() -> DescriptiveButtonState.Disabled(label)
-            wallet.dataOrNull?.let { request.amount > it.asset.transferableInPlanks } == true -> DescriptiveButtonState.Disabled(label)
-            quote == null -> DescriptiveButtonState.Loading
-            else -> DescriptiveButtonState.Enabled(label)
-        }
+    ) { request, quote, wallet, quoteState, input ->
+        bittensorSubnetQuoteButtonState(
+            walletLoading = wallet.isLoading(),
+            input = input,
+            ready = request != null && !wallet.isError() && !quoteState.isError(),
+            exceedsBalance = request != null && wallet.dataOrNull?.let { request.amount > it.asset.transferableInPlanks } == true,
+            quoted = quote != null,
+            continueLabel = resources.getString(R.string.common_continue),
+            enterAmountLabel = resources.getString(R.string.common_enter_amount)
+        )
     }
         .shareInBackground()
 
@@ -765,7 +763,12 @@ class BittensorSubnetAmountViewModel(
 
     fun chooseSubnetClicked() {
         val browseState = selectionState.browseState ?: BittensorSubnetBrowseState.fromQuickPick(quickPickOrder)
-        val payload = BittensorChooseSubnetPayload(replaceAmount = true, browseState = browseState, selectionState = selectionState)
+        val payload = BittensorChooseSubnetPayload(
+            replaceAmount = true,
+            browseState = browseState,
+            selectionState = selectionState,
+            quickPick = isQuickPick
+        )
         router.openBittensorChooseSubnet(payload)
     }
 
@@ -911,3 +914,20 @@ internal fun bittensorStakeValidatorSource(existingPosition: Boolean, selectedAd
 
 /** The quick-pick warning above the placeholder card: "Couldn't load rates" / "Unable to fetch validators" as on iOS. */
 class BittensorSelectionFailureUi(val title: String, val message: String)
+
+/** As on iOS: an empty or zero amount asks for one ("Enter amount…"); the no-TAO case is handled by the funding state. */
+internal fun bittensorSubnetQuoteButtonState(
+    walletLoading: Boolean,
+    input: String,
+    ready: Boolean,
+    exceedsBalance: Boolean,
+    quoted: Boolean,
+    continueLabel: String,
+    enterAmountLabel: String
+): DescriptiveButtonState = when {
+    walletLoading -> DescriptiveButtonState.Loading
+    input.toBigDecimalOrNull()?.isPositive != true -> DescriptiveButtonState.Disabled(enterAmountLabel)
+    !ready || exceedsBalance -> DescriptiveButtonState.Disabled(continueLabel)
+    !quoted -> DescriptiveButtonState.Loading
+    else -> DescriptiveButtonState.Enabled(continueLabel)
+}

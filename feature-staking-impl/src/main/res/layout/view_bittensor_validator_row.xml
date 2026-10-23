@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- "Validator" row with the name over the estimated APY (iOS SubtensorPickValidatorCell). -->
+<!-- "Validator" row with the name over the estimated APY (iOS SubtensorPickValidatorCell).
+     No vertical padding on the root: TableView overwrites it on its first and last rows. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,8 +9,7 @@
     android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:minHeight="44dp"
-    android:orientation="horizontal"
-    android:paddingVertical="8dp">
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/validatorRowTitle"
@@ -24,6 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginVertical="8dp"
         android:layout_weight="1"
         android:gravity="end"
         android:orientation="vertical">
@@ -63,6 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:textColor="@color/text_positive"
