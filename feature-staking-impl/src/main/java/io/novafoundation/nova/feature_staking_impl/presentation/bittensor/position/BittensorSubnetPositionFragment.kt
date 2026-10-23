@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensor
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
@@ -82,7 +83,8 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.subnet.observe { subnet ->
-            val name = subnet?.title(requireContext()) ?: getString(R.string.bittensor_exit_position)
+            val title = subnet?.title(requireContext()) ?: getString(R.string.bittensor_exit_position)
+            val name = subnet?.displayName(requireContext()) ?: title
             toolbar.setTitle(name)
             subnetCaption.text = name
             subnetIcon.setIcon(
@@ -95,7 +97,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
                     )
                 )
             }
-            priceTitle.text = getString(R.string.price_chart_title, name)
+            priceTitle.text = getString(R.string.price_chart_title, title)
         }
         viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
         viewModel.earned.observe { model ->
@@ -112,8 +114,10 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
             chart.setCharts(charts)
         }
-        viewModel.averageChartPrice.observe { value ->
-            chart.setReferencePrice(value?.toFloat(), getString(R.string.bittensor_exit_avg_buy_price))
+        combine(viewModel.averageChartPrice, viewModel.axisFormatter, ::Pair).observe { (value, formatter) ->
+            val price = value?.toFloat()
+            // iOS `ui.avg.buy.chart.format`: the line carries its value in the axis format, e.g. "Avg buy 0.0055 TAO".
+            chart.setReferencePrice(price, price?.let { getString(R.string.bittensor_avg_buy_chart, formatter.format(it)) }.orEmpty())
         }
         viewModel.holding.observe { holding.text = it }
         viewModel.hasStake.observe { activeStatus.isVisible = it }
