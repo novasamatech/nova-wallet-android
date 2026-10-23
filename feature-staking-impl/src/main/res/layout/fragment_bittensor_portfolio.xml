@@ -39,6 +39,7 @@
                 android:visibility="gone" />
 
             <LinearLayout
+                android:id="@+id/totalCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_block_12"
@@ -98,6 +99,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/positionsHeader"
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -107,14 +109,122 @@
                 android:textAllCaps="true"
                 android:textColor="@color/text_secondary" />
 
-            <TextView
+            <!-- iOS SubtensorPortfolioEmptyView: replaces the total card and the positions list while nothing is staked. -->
+            <LinearLayout
                 android:id="@+id/empty"
-                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/bittensor_no_positions"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:background="@drawable/bg_block_12"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="18dp">
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/bittensor_portfolio_empty_caption"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/emptyTotal"
+                        style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:text="—" />
+
+                    <TextView
+                        android:id="@+id/emptyFiat"
+                        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="7dp"
+                        android:gravity="center"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_block_12"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bittensor_portfolio_empty_subnet_title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/bittensor_portfolio_empty_subnet_subtitle"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_block_12"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bittensor_portfolio_empty_root_title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/emptyRootSubtitle"
+                        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_block_12"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bittensor_portfolio_empty_unstake_title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/bittensor_portfolio_empty_unstake_subtitle"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/positions"
