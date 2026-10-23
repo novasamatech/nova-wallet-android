@@ -50,6 +50,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
 import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
@@ -274,7 +275,7 @@ class BittensorExitReviewViewModel(
                     inIcon,
                     exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true).let {
                         val amount = it.token.ltrIsolated()
-                        it.copy(token = if (actualAlpha == null) "≈ $amount" else amount)
+                        it.copy(token = if (actualAlpha == null) "≈ $amount".ltrIsolated() else amount)
                     },
                     iconSizeDp = 48,
                     clipIconToOutline = true
@@ -336,10 +337,13 @@ class BittensorExitReviewViewModel(
         .shareInBackground()
 
     /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
-    val completedEarned = combine(saleCostBasis, execution) { sale, state ->
+    // The settled totals behind "You will earn" at confirm time: after a full sale the live history may settle again or drop the subnet.
+    private var confirmedPurchaseTotals: BittensorEstimatedPurchaseTotals? = null
+
+    val completedEarned = execution.map { state ->
         val success = state as? ExitExecution.Success
-        if (isRoot || success == null) return@combine null
-        saleCostBasisFormatter.completedProfit(sale.dataOrNull, success.draft.quote, success.outcome, success.draft.position.asset.token)
+        if (isRoot || success == null) return@map null
+        saleCostBasisFormatter.completedProfit(confirmedPurchaseTotals, success.draft.quote, success.outcome, success.draft.position.asset.token)
     }
         .shareInBackground()
 
@@ -592,6 +596,7 @@ class BittensorExitReviewViewModel(
                 }
             ) {
                 if (reviewedQuote.value == draft.quote) {
+                    confirmedPurchaseTotals = settledPurchaseTotals(saleCostBasis.replayCache.lastOrNull()?.dataOrNull)
                     execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
                     launchUnit { submit(draft) }
                 }

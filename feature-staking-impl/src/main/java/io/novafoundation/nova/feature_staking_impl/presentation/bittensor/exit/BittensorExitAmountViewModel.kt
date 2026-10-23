@@ -280,8 +280,9 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
+    // Root shows "Staked: X · Unstake all" instead of the Max action.
     val maxAmount = maximumAmount.map { maximum ->
-        maximum?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString().ltrIsolated() }
+        maximum?.takeUnless { isRoot }?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString().ltrIsolated() }
     }
         .shareInBackground()
 

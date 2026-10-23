@@ -292,7 +292,7 @@ class BittensorDetailsViewModel(
         .shareInBackground()
 
     val rates = combine(portfolio, subnetMetadata, rootApy) { portfolio, metadata, apy ->
-        bittensorPortfolioRates(portfolio.positions, metadata, apy.forAccount(portfolio.metaId))
+        bittensorPortfolioRates(portfolio.positions, metadata, apy.forAccount(portfolio.metaId), portfolio.dataStatus is BittensorDataStatus.Loading)
     }
         .distinctUntilChanged()
         .onStart { emit(BittensorPortfolioRates.AVAILABLE) }
@@ -454,9 +454,11 @@ enum class BittensorPortfolioRates(val showBanner: Boolean, val showChart: Boole
 internal fun bittensorPortfolioRates(
     positions: BittensorPortfolioPositions?,
     metadata: ExtendedLoadingState<*>,
-    rootApy: ExtendedLoadingState<BigDecimal?>
+    rootApy: ExtendedLoadingState<BigDecimal?>,
+    isPortfolioLoading: Boolean = false
 ): BittensorPortfolioRates {
-    if (positions == null) return BittensorPortfolioRates.AVAILABLE
+    // Cached positions are still being refreshed: no banner flash on a cold start.
+    if (positions == null || isPortfolioLoading) return BittensorPortfolioRates.AVAILABLE
     val hasSubnets = positions.subnets.any { it.alphaInPlanks.signum() > 0 }
     val subnetsUnavailable = hasSubnets && (metadata is ExtendedLoadingState.Error || positions.totalStake == null)
     val rootUnavailable = positions.rootStake.signum() > 0 &&
