@@ -50,20 +50,18 @@ class StakingDashboardBittensorUpdater(
                 val positions = state.positions
                 if (state.status !is BittensorDataStatus.Fresh || positions == null) return@collect
 
-                if (positions.root.isNotEmpty() || positions.subnets.isNotEmpty()) {
-                    // Rewards are not read while a stake exists; drop a value that would go stale.
-                    lastClaimable = null
-                    snapshots.saveClaimableRootRewards(chain.id, coldKey, null)
-                    savePosition(positions.totalStake, true, coldKey)
-                } else {
-                    val claimable = claimableRootRewards(coldKey)
-                        ?: lastClaimable
-                        ?: snapshots.claimableRootRewards(chain.id, coldKey)
-                        ?: BigInteger.ZERO
-                    lastClaimable = claimable
-                    snapshots.saveClaimableRootRewards(chain.id, coldKey, claimable)
-                    savePosition(positions.totalStake, claimable.isPositive(), coldKey)
-                }
+                // As iOS, rewards are read with every stake state; next to a subnet stake they add Root to the composition.
+                val staked = positions.root.isNotEmpty() || positions.subnets.isNotEmpty()
+                if (staked) savePosition(positions.totalStake, true, coldKey)
+
+                val claimable = claimableRootRewards(coldKey)
+                    ?: lastClaimable
+                    ?: snapshots.claimableRootRewards(chain.id, coldKey)
+                    ?: BigInteger.ZERO
+                lastClaimable = claimable
+                snapshots.saveClaimableRootRewards(chain.id, coldKey, claimable)
+                if (!staked) savePosition(positions.totalStake, claimable.isPositive(), coldKey)
+
                 emit(primarySynced())
             }
         }
@@ -71,7 +69,7 @@ class StakingDashboardBittensorUpdater(
 
     /** Only rewards meeting the claim minimum count, as in iOS hasActiveStaking. Null when unavailable. */
     private suspend fun claimableRootRewards(coldKey: AccountId): BigInteger? = try {
-        rootClaims.claims(chain.id, coldKey).totalClaimable
+        rootClaims.claimPreviews(chain.id, coldKey).totalClaimable
     } catch (e: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
         logRewardsFailure(e)

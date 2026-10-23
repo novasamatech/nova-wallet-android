@@ -19,7 +19,8 @@ data class BittensorDashboardSnapshot(
     val rootStakeInPlanks: BigInteger?,
     val subnetCount: Int,
     val rootAnnualPercentageYield: BigDecimal?,
-    val subnetAnnualPercentageYield: BigDecimal?
+    val subnetAnnualPercentageYield: BigDecimal?,
+    val maximumAnnualPercentageYield: BigDecimal?
 )
 
 /**
@@ -51,7 +52,8 @@ class RealBittensorDashboardSnapshotRepository(
         val root: String?,
         val subnets: Int?,
         val rootRate: String?,
-        val subnetRate: String?
+        val subnetRate: String?,
+        val maxRate: String?
     )
 
     override fun snapshot(chainId: ChainId, coldKey: AccountId): BittensorDashboardSnapshot? {
@@ -63,7 +65,8 @@ class RealBittensorDashboardSnapshotRepository(
                 rootStakeInPlanks = stored.root?.toBigInteger(),
                 subnetCount = requireNotNull(stored.subnets),
                 rootAnnualPercentageYield = stored.rootRate?.toBigDecimal(),
-                subnetAnnualPercentageYield = stored.subnetRate?.toBigDecimal()
+                subnetAnnualPercentageYield = stored.subnetRate?.toBigDecimal(),
+                maximumAnnualPercentageYield = stored.maxRate?.toBigDecimal()
             )
         }.getOrNull()
     }
@@ -74,7 +77,8 @@ class RealBittensorDashboardSnapshotRepository(
             root = snapshot.rootStakeInPlanks?.toString(),
             subnets = snapshot.subnetCount,
             rootRate = snapshot.rootAnnualPercentageYield?.toPlainString(),
-            subnetRate = snapshot.subnetAnnualPercentageYield?.toPlainString()
+            subnetRate = snapshot.subnetAnnualPercentageYield?.toPlainString(),
+            maxRate = snapshot.maximumAnnualPercentageYield?.toPlainString()
         )
         preferences.putString(snapshotKey(chainId, coldKey), gson.toJson(stored))
     }

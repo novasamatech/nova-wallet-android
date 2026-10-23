@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDat
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -64,8 +65,9 @@ class BittensorPortfolioRowMapperTest {
         `when`(resources.getString(R.string.bittensor_root_staking)).thenReturn("Root")
         `when`(resources.getString(R.string.bittensor_subnet_number, 1)).thenReturn("Subnet 1")
         `when`(resources.getString(R.string.bittensor_chart_week)).thenReturn("7D")
-        `when`(resources.getString(R.string.bittensor_weekly_change, "+0%", "7D")).thenReturn("+0% · 7D")
-        `when`(resources.getString(R.string.staking_apy, "0%")).thenReturn("0% APY")
+        `when`(resources.getString(R.string.bittensor_weekly_change, "+0%", "7D")).thenReturn("+0% 7D")
+        `when`(resources.getString(R.string.bittensor_portfolio_root_apy, "0%")).thenReturn("APY 0% · 30 days")
+        `when`(resources.getString(R.string.bittensor_portfolio_root_apy, "—")).thenReturn("APY — · 30 days")
         `when`(resources.getString(R.string.bittensor_portfolio_root_claimable, "0.000000001 NATIVE")).thenReturn("Claimable rewards: 0.000000001 NATIVE")
     }
 
@@ -83,8 +85,15 @@ class BittensorPortfolioRowMapperTest {
         assertEquals("Claimable rewards: 0.000000001 NATIVE", rows[0].subtitle)
         assertFalse(rows[0].isSubtitleLoading)
         assertEquals("2 ALPHA", rows[1].subtitle)
-        assertEquals("+0% · 7D", rows[1].change?.text)
+        assertEquals("+0% 7D", rows[1].change?.text)
         assertFalse(rows[1].isChangeLoading)
+    }
+
+    @Test
+    fun `staked root row shows the 30 day APY with a dash for an unknown rate and nothing when rates failed`() {
+        assertEquals("APY 0% · 30 days", stakedRootSubtitle(ExtendedLoadingState.Loaded(BigDecimal.ZERO)))
+        assertEquals("APY — · 30 days", stakedRootSubtitle(ExtendedLoadingState.Loaded(null)))
+        assertNull(stakedRootSubtitle(ExtendedLoadingState.Error(IllegalStateException("Unavailable"))))
     }
 
     @Test
@@ -121,5 +130,11 @@ class BittensorPortfolioRowMapperTest {
         assertFalse(failed.isChangeLoading)
         assertNull(failed.change)
         assertEquals("2 ALPHA", failed.subtitle)
+    }
+
+    private fun stakedRootSubtitle(apy: ExtendedLoadingState<BigDecimal?>): CharSequence? {
+        val root = BittensorRootPosition(AccountIdKey(ByteArray(32)), BigInteger.ONE)
+        val staked = portfolio.copy(positions = holdings.copy(root = listOf(root)))
+        return mapper.map(staked, ExtendedLoadingState.Loading, null, apy, ExtendedLoadingState.Loading).first().subtitle
     }
 }

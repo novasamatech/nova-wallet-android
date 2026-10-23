@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.dashboard
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
@@ -125,7 +126,8 @@ class StakingDashboardModule {
         dAppMetadataRepository: DAppMetadataRepository,
         walletRepository: WalletRepository,
         totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
-        bittensorDetailsSource: BittensorDashboardDetailsSource
+        bittensorDetailsSource: BittensorDashboardDetailsSource,
+        computationalCache: ComputationalCache
     ): StakingDashboardInteractor = RealStakingDashboardInteractor(
         dashboardRepository = dashboardRepository,
         chainRegistry = chainRegistry,
@@ -134,6 +136,7 @@ class StakingDashboardModule {
         walletRepository = walletRepository,
         dAppMetadataRepository = dAppMetadataRepository,
         totalStakeChainComparatorProvider = totalStakeChainComparatorProvider,
-        bittensorDetailsSource = bittensorDetailsSource
+        bittensorDetailsSource = bittensorDetailsSource,
+        computationalCache = computationalCache
     )
 }

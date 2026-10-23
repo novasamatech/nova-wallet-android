@@ -48,7 +48,8 @@ abstract class SubstrateAssetHistory(
         val sources = realtimeFetcherSources(chain)
         val realtimeOperationFetcher = realtimeOperationFetcherFactory.create(sources)
 
-        return realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)
+        val updates = realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)
+        return filterBittensorTechnicalRealtimeTransfers(updates, chain, chainAsset)
     }
 
     override suspend fun additionalFirstPageSync(

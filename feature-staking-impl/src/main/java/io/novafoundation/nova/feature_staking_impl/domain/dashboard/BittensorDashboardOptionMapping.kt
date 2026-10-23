@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Bittens
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigInteger
 
 internal fun StakingDashboard.withBittensorDetails(details: Map<String, BittensorDashboardDetails>): StakingDashboard {
     return StakingDashboard(hasStake.map { it.withBittensorDetails(details) }, withoutStake.map { it.withBittensorDetails(details) })
@@ -23,13 +22,14 @@ internal fun <S> AggregatedStakingDashboardOption<S>.withBittensorDetails(
     var details = detailsByChain[chain.id] ?: mapBittensorDashboardDetails(null, emptyMap(), emptyMap(), emptyMap())
         .copy(rootYieldLoading = true, subnetYieldLoading = true, maximumYieldLoading = true)
     // The updater's HasStake classification includes claimable root rewards without stake; those get
-    // their own panel. A zero root panel only bridges the moment until the updater reclassifies.
+    // their own panel. An emptied stake stays loading until the updater has read the rewards and
+    // reclassified the card, never an active zero stake.
     if (stakingState is AggregatedStakingDashboardOption.HasStake &&
         details.composition == BittensorDashboardDetails.Composition.NONE &&
         details.pricing != BittensorDashboardDetails.Pricing.LOADING &&
         !details.showsClaimableRewardsPanel
     ) {
-        details = details.copy(rootStakeInPlanks = BigInteger.ZERO)
+        details = details.copy(totalStakeInPlanks = null, pricing = BittensorDashboardDetails.Pricing.LOADING)
     }
     return AggregatedStakingDashboardOption(chain, token, stakingState, syncingStage, details)
 }

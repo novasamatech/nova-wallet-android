@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history
 
 import com.google.gson.Gson
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.model.BittensorServiceFeeRecipients
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse.Query.HistoryElements.Node
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -171,7 +173,36 @@ class BittensorHistoryFilterTest {
         assertEquals(withoutHashes, filter(withoutHashes))
     }
 
+    @Test
+    fun `realtime fee recipient and subnet transfers are not stored`() {
+        val fee = realtimeTransfer(to = beneficiary.toAccountId())
+        val subnetLeg = realtimeTransfer(to = subnetAddress.toAccountId())
+        val ordinary = realtimeTransfer(to = ByteArray(32) { 3 })
+
+        assertEquals(listOf(ordinary), filterRealtime(listOf(fee, subnetLeg, ordinary)))
+    }
+
+    @Test
+    fun `failed realtime fee transfer and other chains keep realtime transfers`() {
+        val failedFee = realtimeTransfer(to = beneficiary.toAccountId(), status = Operation.Status.FAILED)
+        assertEquals(listOf(failedFee), filterRealtime(listOf(failedFee)))
+
+        val fee = realtimeTransfer(to = beneficiary.toAccountId())
+        `when`(chain.id).thenReturn("other-chain")
+        assertEquals(listOf(fee), filterRealtime(listOf(fee)))
+    }
+
     private fun filter(nodes: List<Node>) = filterBittensorTechnicalTransfers(nodes, chain, asset)
+
+    private fun filterRealtime(updates: List<RealtimeHistoryUpdate>) = filterBittensorTechnicalRealtimeTransfers(updates, chain, asset)
+
+    private fun realtimeTransfer(
+        to: ByteArray,
+        status: Operation.Status = Operation.Status.COMPLETED
+    ): RealtimeHistoryUpdate {
+        val transfer = RealtimeHistoryUpdate.Type.Transfer(userAddress.toAccountId(), to, BigInteger.TEN, asset)
+        return RealtimeHistoryUpdate(hash, status, transfer)
+    }
 
     private fun parent(
         module: String = "subtensorModule",

@@ -20,11 +20,14 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
@@ -32,6 +35,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -53,8 +58,12 @@ class BittensorDashboardDetailsSource(
     // Unknown positions never trigger the recommendations request: PENDING waits, UNAVAILABLE settles without it.
     private enum class StakeActivity { ACTIVE, NONE, PENDING, UNAVAILABLE }
 
-    private companion object {
-        const val REFRESH_MILLIS = 60_000L
+    // Only heard while there is known to be no active stake; iOS refreshMaxApy also skips a wallet with active staking.
+    private val maximumYieldRefreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    // As iOS each time the dashboard appears: asks for the start-staking yield again, keeping the shown one until it succeeds.
+    fun refreshMaximumYield() {
+        maximumYieldRefreshes.tryEmit(Unit)
     }
 
     fun observe(account: MetaAccount, chains: Collection<Chain>): Flow<Map<String, BittensorDashboardDetails>> {
@@ -75,10 +84,17 @@ class BittensorDashboardDetailsSource(
         // Like iOS persisted dashboard details: shown until positions are known again (cold start, offline).
         val restored = coldKey?.let { snapshots.snapshot(chain.id, it) }
         var lastSaved = restored
+        // Like iOS MaxApyUpdate: only a successful request replaces the stored maximum yield.
+        var latestMaximumYield = restored?.maximumAnnualPercentageYield
         val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(null)
-        val rootRates = refreshed { validators.yields(BittensorNetuid.Root) }
-        val subnetRates = portfolio
-            .map { it.positions?.subnets.orEmpty().map { position -> position.subnetId }.toSet() }
+        // As iOS: yields are requested once per held set, never polled.
+        val rootRates = portfolio
+            .map { it.positions?.root.orEmpty().map { position -> position.validatorHotkey }.toSet() }
+            .distinctUntilChanged()
+            .flatMapLatest { hotkeys ->
+                if (hotkeys.isEmpty()) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else requested { validators.yields(BittensorNetuid.Root) }
+            }
+        val subnetRates = combine(portfolio, claimable) { state, rewards -> subnetsShowingRate(state.positions, rewards) }
             .distinctUntilChanged()
             .flatMapLatest(::observeSubnetRates)
         val maximumRates = combine(portfolio, claimable) { state, rewards -> stakeActivity(state, rewards, restored) }
@@ -86,30 +102,34 @@ class BittensorDashboardDetailsSource(
             .flatMapLatest { activity ->
                 // As iOS: the start-staking yield is only needed, and requested, once there is known to be no active stake.
                 when (activity) {
-                    StakeActivity.ACTIVE, StakeActivity.UNAVAILABLE -> flowOf(ExtendedLoadingState.Loaded(emptyMap()))
+                    StakeActivity.ACTIVE, StakeActivity.UNAVAILABLE -> flowOf(null)
                     StakeActivity.PENDING -> flowOf(ExtendedLoadingState.Loading)
-                    StakeActivity.NONE -> refreshed { recommendedYields.maximumYields() }
+                    StakeActivity.NONE -> maximumYieldRequests()
                 }
             }
 
         return combine(portfolio, rootRates, subnetRates, maximumRates, claimable) { state, root, subnets, maximum, rewards ->
+            if (maximum is ExtendedLoadingState.Loaded) latestMaximumYield = maximumYield(maximum.data)
+
             val snapshot = restored.takeIf { state.positions == null }
             val details = if (snapshot != null) {
                 snapshot.toDetails(rateLoading = state.status is BittensorDataStatus.Loading)
+                    .copy(claimableRootRewardsInPlanks = rewards)
             } else {
                 mapBittensorDashboardDetails(
                     positions = state.positions,
                     rootYields = root.dataOrNull.orEmpty(),
                     subnetYields = subnets.values,
-                    recommendedYields = emptyMap()
+                    recommendedYields = emptyMap(),
+                    pricingPending = state.positions == null || state.pricesPending,
+                    claimableRootRewards = rewards
                 ).copy(
                     rootYieldLoading = root is ExtendedLoadingState.Loading,
                     subnetYieldLoading = subnets.loading
                 )
             }.copy(
-                maximumAnnualPercentageYield = maximumYield(maximum.dataOrNull.orEmpty()),
-                maximumYieldLoading = maximum is ExtendedLoadingState.Loading,
-                claimableRootRewardsInPlanks = rewards
+                maximumAnnualPercentageYield = latestMaximumYield,
+                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null
             )
 
             if (coldKey != null && state.status is BittensorDataStatus.Fresh && details.pricing != BittensorDashboardDetails.Pricing.LOADING) {
@@ -140,13 +160,19 @@ class BittensorDashboardDetailsSource(
         }
     }
 
+    private fun subnetsShowingRate(positions: BittensorPortfolioPositions?, claimableRewards: BigInteger?): Set<BittensorNetuid.Subnet> {
+        // As iOS: the subnet yield is only shown, and requested, without root stake or claimable root rewards.
+        if (positions == null || positions.root.isNotEmpty() || claimableRewards?.isPositive() == true) return emptySet()
+        return positions.subnets.map { it.subnetId }.toSet()
+    }
+
     private fun BittensorDashboardSnapshot.toDetails(rateLoading: Boolean) = BittensorDashboardDetails(
         totalStakeInPlanks = totalStakeInPlanks,
         rootStakeInPlanks = rootStakeInPlanks,
         subnetCount = subnetCount,
         rootAnnualPercentageYield = rootAnnualPercentageYield,
         subnetAnnualPercentageYield = subnetAnnualPercentageYield,
-        maximumAnnualPercentageYield = null,
+        maximumAnnualPercentageYield = maximumAnnualPercentageYield,
         pricing = if (totalStakeInPlanks != null) BittensorDashboardDetails.Pricing.KNOWN else BittensorDashboardDetails.Pricing.UNKNOWN,
         rootYieldLoading = rateLoading && rootAnnualPercentageYield == null,
         subnetYieldLoading = rateLoading && subnetAnnualPercentageYield == null
@@ -160,14 +186,15 @@ class BittensorDashboardDetailsSource(
         rootAnnualPercentageYield = rootAnnualPercentageYield
             ?: previous?.rootAnnualPercentageYield?.takeIf { rootStakeInPlanks != null && previous.rootStakeInPlanks != null },
         subnetAnnualPercentageYield = subnetAnnualPercentageYield
-            ?: previous?.subnetAnnualPercentageYield?.takeIf { subnetCount > 0 && previous.subnetCount > 0 }
+            ?: previous?.subnetAnnualPercentageYield?.takeIf { subnetCount > 0 && previous.subnetCount > 0 },
+        maximumAnnualPercentageYield = maximumAnnualPercentageYield
     )
 
     private fun observeSubnetRates(
         subnets: Set<BittensorNetuid.Subnet>
     ): Flow<SubnetRates> {
         if (subnets.isEmpty()) return flowOf(SubnetRates(emptyMap(), false))
-        val sources = subnets.map { subnet -> refreshed { validators.yields(subnet) }.map { subnet to it } }
+        val sources = subnets.map { subnet -> requested { validators.yields(subnet) }.map { subnet to it } }
         return combine(sources) { results ->
             SubnetRates(
                 values = results.associate { it.first to it.second.dataOrNull.orEmpty() },
@@ -176,28 +203,36 @@ class BittensorDashboardDetailsSource(
         }
     }
 
-    // Independent refresh/recovery: an unavailable rate never suppresses positions or other rates.
-    private fun <T> refreshed(load: suspend () -> T): Flow<ExtendedLoadingState<T>> = flow {
-        emit(ExtendedLoadingState.Loading)
-        while (true) {
-            try {
-                emit(ExtendedLoadingState.Loaded(load()))
-            } catch (timeout: TimeoutCancellationException) {
-                currentCoroutineContext().ensureActive()
-                logFailure(timeout)
-                emit(ExtendedLoadingState.Error(timeout))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
-            } catch (failure: Exception) {
-                logFailure(failure)
-                emit(ExtendedLoadingState.Error(failure))
+    // As iOS performMaxApyFetch: a refresh while a request is in flight does not start another one.
+    private fun maximumYieldRequests(): Flow<ExtendedLoadingState<Map<BittensorNetuid.Subnet, BigDecimal>>> = channelFlow {
+        var request: Job? = null
+        maximumYieldRefreshes.onSubscription { emit(Unit) }.collect {
+            if (request?.isActive != true) {
+                request = launch { requested { recommendedYields.maximumYields() }.collect { send(it) } }
             }
-            delay(REFRESH_MILLIS)
         }
     }
 
+    // An unavailable rate never suppresses positions or other rates.
+    private fun <T> requested(load: suspend () -> T): Flow<ExtendedLoadingState<T>> = flow {
+        emit(ExtendedLoadingState.Loading)
+        val result = try {
+            ExtendedLoadingState.Loaded(load())
+        } catch (timeout: TimeoutCancellationException) {
+            currentCoroutineContext().ensureActive()
+            logFailure(timeout)
+            ExtendedLoadingState.Error(timeout)
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (failure: Exception) {
+            logFailure(failure)
+            ExtendedLoadingState.Error(failure)
+        }
+        emit(result)
+    }
+
     private fun logFailure(failure: Throwable) {
-        logger.log("[BittensorDashboard] Yield refresh failed")
+        logger.log("[BittensorDashboard] Yield request failed")
         logger.log(failure)
     }
 }

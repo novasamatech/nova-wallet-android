@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.model.BittensorServiceFeeRecipients
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse.Query.HistoryElements.Node
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 /**
  * Mirrors iOS SubtensorHistoryFiltersProvider:
@@ -22,18 +25,45 @@ internal fun filterBittensorTechnicalTransfers(
 ): List<Node> {
     if (!supportsBittensorTransferFiltering(chain, asset)) return nodes
 
-    val feeRecipients = feeRecipientAddresses.mapNotNull { chain.accountIdOrNull(it)?.let(::AccountIdKey) }.toSet()
+    val feeRecipients = chain.feeRecipientIds(feeRecipientAddresses)
 
     return nodes.filter { node ->
         if (!node.isSuccessfulNativeTransfer()) return@filter true
         val transfer = requireNotNull(node.transfer)
 
-        val recipient = chain.accountIdOrNull(transfer.to)?.let(::AccountIdKey)
-        if (recipient in feeRecipients) return@filter false
+        !isTechnicalTransfer(
+            sender = chain.accountIdOrNull(transfer.from),
+            recipient = chain.accountIdOrNull(transfer.to),
+            withinExtrinsic = isExtrinsicHash(node.extrinsicHash),
+            feeRecipients = feeRecipients
+        )
+    }
+}
 
-        if (!node.hasExtrinsicHash()) return@filter true
+/**
+ * The same rules for transfers read from a block, so the batched Nova fee is not stored
+ * as a history row before SubQuery returns the extrinsic.
+ */
+internal fun filterBittensorTechnicalRealtimeTransfers(
+    updates: List<RealtimeHistoryUpdate>,
+    chain: Chain,
+    asset: Chain.Asset,
+    feeRecipientAddresses: List<String> = BittensorServiceFeeRecipients.historyAddresses
+): List<RealtimeHistoryUpdate> {
+    if (!supportsBittensorTransferFiltering(chain, asset)) return updates
 
-        !chain.isSubnetAccount(transfer.from) && !chain.isSubnetAccount(transfer.to)
+    val feeRecipients = chain.feeRecipientIds(feeRecipientAddresses)
+
+    return updates.filter { update ->
+        val transfer = update.type as? RealtimeHistoryUpdate.Type.Transfer ?: return@filter true
+        if (update.status != Operation.Status.COMPLETED) return@filter true
+
+        !isTechnicalTransfer(
+            sender = transfer.senderId,
+            recipient = transfer.recipientId,
+            withinExtrinsic = isExtrinsicHash(update.txHash),
+            feeRecipients = feeRecipients
+        )
     }
 }
 
@@ -41,6 +71,23 @@ private fun supportsBittensorTransferFiltering(chain: Chain, asset: Chain.Asset)
     return chain.id == ChainGeneses.BITTENSOR &&
         asset.type == Chain.Asset.Type.Native &&
         Chain.Asset.StakingType.BITTENSOR_ROOT in asset.staking
+}
+
+private fun Chain.feeRecipientIds(addresses: List<String>): Set<AccountIdKey> {
+    return addresses.mapNotNull { accountIdOrNull(it)?.let(::AccountIdKey) }.toSet()
+}
+
+private fun isTechnicalTransfer(
+    sender: AccountId?,
+    recipient: AccountId?,
+    withinExtrinsic: Boolean,
+    feeRecipients: Set<AccountIdKey>
+): Boolean {
+    if (recipient != null && AccountIdKey(recipient) in feeRecipients) return true
+
+    if (!withinExtrinsic) return false
+
+    return sender.isSubnetAccount() || recipient.isSubnetAccount()
 }
 
 private fun Node.isSuccessfulNativeTransfer(): Boolean {
@@ -51,14 +98,14 @@ private fun Node.isSuccessfulNativeTransfer(): Boolean {
         swap == null
 }
 
-private fun Node.hasExtrinsicHash(): Boolean {
-    val hash = extrinsicHash?.removePrefix("0x") ?: return false
+private fun isExtrinsicHash(value: String?): Boolean {
+    val hash = value?.removePrefix("0x") ?: return false
     return hash.length == 64 && hash.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }
 }
 
-private fun Chain.isSubnetAccount(address: String): Boolean {
-    val accountId = accountIdOrNull(address) ?: return false
-    return accountId.size == 32 && SUBNET_ACCOUNT_PREFIX.indices.all { accountId[it] == SUBNET_ACCOUNT_PREFIX[it] }
+private fun AccountId?.isSubnetAccount(): Boolean {
+    if (this == null) return false
+    return size == 32 && SUBNET_ACCOUNT_PREFIX.indices.all { this[it] == SUBNET_ACCOUNT_PREFIX[it] }
 }
 
 private val SUBNET_ACCOUNT_PREFIX = "modlsubtensr".toByteArray(Charsets.UTF_8)

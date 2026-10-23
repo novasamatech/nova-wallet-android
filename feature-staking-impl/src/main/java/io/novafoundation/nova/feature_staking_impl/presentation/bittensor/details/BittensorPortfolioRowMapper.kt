@@ -53,7 +53,9 @@ class BittensorPortfolioRowMapper(
         val subtitle = if (rewardsOnly) {
             resources.getString(R.string.bittensor_portfolio_root_claimable, formatAmount(rewards, portfolio).token)
         } else {
-            apy.dataOrNull?.let { resources.getString(R.string.staking_apy, it.formatAsPercentage()) }
+            (apy as? ExtendedLoadingState.Loaded)?.let {
+                resources.getString(R.string.bittensor_portfolio_root_apy, it.data?.formatAsPercentage() ?: "—")
+            }
         }
         return BittensorPositionUi(
             id = "root",

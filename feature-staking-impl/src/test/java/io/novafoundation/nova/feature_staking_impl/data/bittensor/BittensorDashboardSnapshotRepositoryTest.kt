@@ -28,7 +28,8 @@ class BittensorDashboardSnapshotRepositoryTest {
         rootStakeInPlanks = BigInteger("19990000"),
         subnetCount = 0,
         rootAnnualPercentageYield = BigDecimal("0.123456789012"),
-        subnetAnnualPercentageYield = null
+        subnetAnnualPercentageYield = null,
+        maximumAnnualPercentageYield = BigDecimal("0.654321")
     )
 
     @Test

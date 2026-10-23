@@ -15,7 +15,7 @@ data class BittensorDashboardDetails(
     val rootYieldLoading: Boolean = false,
     val subnetYieldLoading: Boolean = false,
     val maximumYieldLoading: Boolean = false,
-    /** Root rewards meeting the claim minimum; only tracked while nothing is staked. */
+    /** Root rewards meeting the claim minimum. */
     val claimableRootRewardsInPlanks: BigInteger? = null
 ) {
 

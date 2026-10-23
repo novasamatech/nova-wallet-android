@@ -100,7 +100,7 @@ class StakingDashboardBittensorUpdaterTest {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(metaAccount.id).thenReturn(1L)
         `when`(metaAccount.accountIdIn(chain)).thenReturn(coldKey)
-        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(BittensorRootClaims(emptyList(), BigInteger.ONE))
+        `when`(rootClaims.claimPreviews(chain.id, coldKey)).thenReturn(BittensorRootClaims(emptyList(), BigInteger.ONE))
         `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(
             BittensorStakePositions(listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), BigInteger.TEN)), emptyList())
@@ -141,7 +141,7 @@ class StakingDashboardBittensorUpdaterTest {
     fun `claimable rewards keep zero stake wallet in staking dashboard`() = runBlocking {
         prepare()
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
-        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(claims(redeemable = BigInteger.TEN, minimum = BigInteger.TEN))
+        `when`(rootClaims.claimPreviews(chain.id, coldKey)).thenReturn(claims(redeemable = BigInteger.TEN, minimum = BigInteger.TEN))
 
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 
@@ -155,7 +155,7 @@ class StakingDashboardBittensorUpdaterTest {
         prepare()
         cache.item = stakingItem()
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
-        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(claims(redeemable = BigInteger.ONE, minimum = BigInteger.TEN))
+        `when`(rootClaims.claimPreviews(chain.id, coldKey)).thenReturn(claims(redeemable = BigInteger.ONE, minimum = BigInteger.TEN))
 
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 
@@ -168,7 +168,7 @@ class StakingDashboardBittensorUpdaterTest {
         prepare()
         cache.item = stakingItem()
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
-        `when`(rootClaims.claims(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
+        `when`(rootClaims.claimPreviews(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
 
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 
@@ -176,14 +176,25 @@ class StakingDashboardBittensorUpdaterTest {
     }
 
     @Test
-    fun `stake clears stored claimable rewards so a later exit cannot reuse them`() = runBlocking {
+    fun `rewards read while staked survive a failed read after a full exit`() = runBlocking {
         prepare()
-        snapshots.saveClaimableRootRewards(chain.id, coldKey, BigInteger.TEN)
+        `when`(rootClaims.claimPreviews(chain.id, coldKey))
+            .thenReturn(claims(redeemable = BigInteger.TEN, minimum = BigInteger.TEN))
+            .thenThrow(IllegalStateException("offline"))
+        val updates = updater().listenForUpdates(subscriptionBuilder)
 
-        withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
+        val claimable = mutableListOf<BigInteger?>()
+        withTimeout(3_000L) {
+            updates.onEach {
+                claimable += snapshots.claimableRootRewards(chain.id, coldKey)
+                `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
+                blockNumbers.value += BigInteger.ONE
+            }.take(2).toList()
+        }
 
+        assertEquals(listOf(BigInteger.TEN, BigInteger.TEN), claimable)
         assertTrue(requireNotNull(cache.item).hasStake)
-        assertNull(snapshots.claimableRootRewards(chain.id, coldKey))
+        assertEquals(BigInteger.ZERO, cache.item?.stake)
     }
 
     @Test
@@ -191,7 +202,7 @@ class StakingDashboardBittensorUpdaterTest {
         prepare()
         snapshots.saveClaimableRootRewards(chain.id, coldKey, BigInteger.TEN)
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
-        `when`(rootClaims.claims(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
+        `when`(rootClaims.claimPreviews(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
 
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 

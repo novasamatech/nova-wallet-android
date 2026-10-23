@@ -2972,7 +2972,7 @@
     <string name="bittensor_statistics_unavailable">Rewards and validator APR are not available yet</string>
     <string name="bittensor_unstake_unavailable">Unstaking is not available in this preview yet</string>
     <string name="bittensor_chart_week">7D</string>
-    <string name="bittensor_weekly_change">%1$s · %2$s</string>
+    <string name="bittensor_weekly_change">%1$s %2$s</string>
     <string name="bittensor_chart_month">30D</string>
     <string name="bittensor_chart_quarter">90D</string>
     <string name="bittensor_chart_three_months">3M</string>
@@ -3030,6 +3030,7 @@
     <string name="bittensor_claim_completed_description">The claim was confirmed in a finalized block.</string>
     <string name="bittensor_claim_available">Claimable rewards</string>
     <string name="bittensor_portfolio_root_claimable">Claimable rewards: %s</string>
+    <string name="bittensor_portfolio_root_apy">APY %1$s · 30 days</string>
     <string name="bittensor_portfolio_chart_disclaimer">Partial portfolio history reported by the provider. It may not include every operation.</string>
     <string name="bittensor_subnet_execution_buying">Buying %1$s %2$s with TAO</string>
     <string name="bittensor_subnet_execution_operation">1 of 1 operation</string>
@@ -3107,7 +3108,7 @@
     <string name="bittensor_dashboard_subnets_title">Subnets</string>
     <string name="bittensor_dashboard_mixed">Root + %1$s</string>
     <string name="bittensor_dashboard_title">%1$s · %2$s</string>
-    <string name="bittensor_dashboard_estimated">≈ %1$s</string>
+    <string name="bittensor_dashboard_estimated">%1$s · estimated</string>
     <string name="bittensor_dashboard_max_apy">up to %1$s</string>
     <string name="bittensor_inactive_validator_title">Validator is inactive</string>
     <string name="bittensor_inactive_validator_message">This validator is inactive, so new stake earns nothing until it’s active again.</string>
