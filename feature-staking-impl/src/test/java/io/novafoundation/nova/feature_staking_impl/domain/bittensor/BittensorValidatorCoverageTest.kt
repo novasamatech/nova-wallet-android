@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.bindBittensorDelegatePermits
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 import org.junit.Assert.assertEquals
@@ -51,7 +52,7 @@ class BittensorValidatorCoverageTest {
 
         val failure = runCatching { interactor.coverage(hotkey) }.exceptionOrNull()
 
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertEquals("Validator coverage timed out", failure?.message)
     }
 
