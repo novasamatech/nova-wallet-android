@@ -30,6 +30,23 @@ private const val DRAW_DIVIDERS_DEAULT = false
 private const val PADDING_HORIZONTAL_DP = 16
 private const val PADDING_VERTICAL_DP = 4
 
+internal class TableRowDividerState(val isVisible: Boolean, val allowsDivider: Boolean)
+
+/**
+ * Indices of the rows that get a divider below them: a visible row that allows dividers and is followed by
+ * at least one more visible row. Gone rows never separate anything, so a hidden last row leaves no divider
+ * under the last visible one.
+ */
+internal fun tableRowsWithDividerBelow(rows: List<TableRowDividerState>): List<Int> {
+    val lastVisibleIndex = rows.indexOfLast { it.isVisible }
+
+    return rows.indices.filter { idx ->
+        val row = rows[idx]
+
+        row.isVisible && row.allowsDivider && idx < lastVisibleIndex
+    }
+}
+
 open class TableView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -89,15 +106,12 @@ open class TableView @JvmOverloads constructor(
         setupTableChildrenAppearance()
 
         dividerPath.reset()
-        children.forEachIndexed { idx, child ->
-            val isVisible = child.isVisible
-            val allowsToDrawDividers = shouldDrawDivider(child)
-            val hasNext = idx < childCount - 1
+        val rows = children.map { TableRowDividerState(isVisible = it.isVisible, allowsDivider = shouldDrawDivider(it)) }.toList()
+        tableRowsWithDividerBelow(rows).forEach { idx ->
+            val child = getChildAt(idx)
 
-            if (isVisible && allowsToDrawDividers && hasNext) {
-                dividerPath.moveTo(childHorizontalPadding, child.bottom.toFloat())
-                dividerPath.lineTo(measuredWidth - childHorizontalPadding, child.bottom.toFloat())
-            }
+            dividerPath.moveTo(childHorizontalPadding, child.bottom.toFloat())
+            dividerPath.lineTo(measuredWidth - childHorizontalPadding, child.bottom.toFloat())
         }
     }
 
