@@ -143,6 +143,15 @@
                         app:title="@string/bittensor_exchange_rate"
                         app:titleIcon="@drawable/ic_info" />
 
+                    <!-- Sale done only (iOS "You earned"); hidden unless a screen binds it. -->
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/earned"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:title="@string/bittensor_you_earned"
+                        app:titleIcon="@drawable/ic_info" />
+
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/slippage"
                         android:layout_width="match_parent"

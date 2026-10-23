@@ -50,6 +50,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
@@ -76,6 +77,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
@@ -261,17 +263,18 @@ class BittensorExitReviewViewModel(
             val actualAlpha = outcome?.alpha
             val inIcon = draft.position.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
             val outIcon = assetIconProvider.getAssetIconOrFallback(draft.position.asset.token.configuration)
-            val output = formatBittensorNativeResult(
-                outcome?.actualSellReceive(draft.quote.serviceFee),
-                draft.netReceive,
-                draft.position.chain,
-                tokenFormatter
+            val actualReceive = outcome?.actualSellReceive(draft.quote.serviceFee)
+            val token = draft.position.asset.token
+            // Fiat under both sides, as on the iOS done page: received TAO at the current TAO price.
+            val output = formatBittensorNativeResult(actualReceive, draft.netReceive, draft.position.chain, tokenFormatter).copy(
+                fiat = token.toFiatOrNull(token.amountFromPlanks(actualReceive ?: draft.netReceive))?.let { fiatFormatter.formatFiat(it, token.currency) }
             )
             SwapAssetsView.Model(
                 SwapAssetView.Model(
                     inIcon,
                     exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true).let {
-                        if (actualAlpha == null) it.copy(token = "≈ " + it.token) else it.copy(fiat = null)
+                        val amount = it.token.ltrIsolated()
+                        it.copy(token = if (actualAlpha == null) "≈ $amount" else amount)
                     },
                     iconSizeDp = 48,
                     clipIconToOutline = true
@@ -329,6 +332,14 @@ class BittensorExitReviewViewModel(
             val exit = request.dataOrNull
             saleCostBasisFormatter.profit(state.dataOrNull, exit?.quote, exit?.position?.asset?.token)
         }
+    }
+        .shareInBackground()
+
+    /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
+    val completedEarned = combine(saleCostBasis, execution) { sale, state ->
+        val success = state as? ExitExecution.Success
+        if (isRoot || success == null) return@combine null
+        saleCostBasisFormatter.completedProfit(sale.dataOrNull, success.draft.quote, success.outcome, success.draft.position.asset.token)
     }
         .shareInBackground()
 

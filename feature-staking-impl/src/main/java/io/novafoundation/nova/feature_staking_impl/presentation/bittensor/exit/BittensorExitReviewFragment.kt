@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorExitReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showCompleted
+import kotlinx.coroutines.flow.combine
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showUnconfirmed
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.bindBittensorStakeResults
@@ -82,6 +84,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         saleAccount.setOnClickListener { viewModel.accountClicked() }
         slippage.setOnClickListener { showDescription(R.string.swap_slippage_title, viewModel.slippageDescription) }
         execution.slippage.setOnClickListener { showDescription(R.string.swap_slippage_title, viewModel.slippageDescription) }
+        execution.earned.valueSecondary.setTextColorRes(R.color.text_secondary)
         networkFee.setOnClickListener { showDescription(R.string.network_fee, getString(R.string.swap_network_fee_description)) }
         execution.networkFee.setOnClickListener { showDescription(R.string.network_fee, getString(R.string.swap_network_fee_description)) }
         execution.stepContainer.background = requireContext()
@@ -150,6 +153,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         }
         viewModel.profitDescription.observe { description ->
             earned.setOnClickListener { description?.let { showDescription(R.string.bittensor_you_will_earn, it) } }
+            execution.earned.setOnClickListener { description?.let { showDescription(R.string.bittensor_you_earned, it) } }
         }
         viewModel.validatorIcon.observe {
             validator.image.isVisible = it != null
@@ -180,16 +184,20 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
                 execution.operationLabel.setText(R.string.bittensor_subnet_execution_operation)
             }
         }
-        viewModel.isCompleted.observe { complete ->
-            if (complete) {
-                execution.timer.setState(ExecutionTimerView.State.Success)
-                execution.title.setText(R.string.common_completed)
-            }
-        }
         viewModel.executionSubtitle.observe { execution.subtitle.text = it }
-        viewModel.executionFailure.observe {
-            execution.showFailure(it)
-            retryExecution.isVisible = it?.canRetry == true
+        // One observer, so the failure reset never runs after the done styling.
+        combine(viewModel.isCompleted, viewModel.executionFailure, ::Pair).observe { (complete, failure) ->
+            execution.showFailure(failure)
+            retryExecution.isVisible = failure?.canRetry == true
+            // iOS hides Slippage once the sale is done; the tolerance no longer applies.
+            execution.slippage.isVisible = !complete
+            if (complete) execution.showCompleted(getString(R.string.bittensor_exit_completed_operation))
+        }
+        viewModel.completedEarned.observe { earned ->
+            execution.earned.isVisible = earned != null
+            earned ?: return@observe
+            execution.earned.showValue(earned.amount.token, earned.amount.fiat)
+            execution.earned.valuePrimary.setTextColorRes(earned.colorRes)
         }
         viewModel.canFinish.observe { done.isVisible = it && !viewModel.isRoot }
         viewModel.executionUnconfirmed.observe { state ->
