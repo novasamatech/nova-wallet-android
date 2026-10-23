@@ -2,11 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorWholeMonths
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-// Average Gregorian month, so long ages read like a calendar ("33 months") rather than drifting by whole months
-private val DAYS_PER_MONTH = BigDecimal("30.436875")
 private val HOURS_PER_DAY = BigDecimal(24)
 private val MINUTES_PER_HOUR = BigDecimal(60)
 
@@ -20,7 +19,7 @@ data class BittensorAge(val count: Int, val unit: BittensorAgeUnit)
  */
 fun bittensorSubnetAge(ageInDays: BigDecimal): BittensorAge {
     val days = ageInDays.max(BigDecimal.ZERO)
-    val months = days.divide(DAYS_PER_MONTH, 0, RoundingMode.DOWN).toInt()
+    val months = bittensorWholeMonths(days)
     if (months > 0) return BittensorAge(months, BittensorAgeUnit.MONTHS)
 
     val wholeDays = days.setScale(0, RoundingMode.DOWN).toInt()
