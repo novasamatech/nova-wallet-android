@@ -5,6 +5,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.dustRemainder
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitDustRemainderUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -28,6 +31,15 @@ class BittensorExitFormatter(
         return AmountModel(
             token = tokenFormatter.formatToken(value, symbol),
             fiat = fiat?.let { fiatFormatter.formatFiat(it, token.currency) }
+        )
+    }
+
+    fun dustRemainder(payload: BittensorExitValidationPayload, position: BittensorExitPosition): BittensorExitDustRemainderUi? {
+        val dust = payload.dustRemainder() ?: return null
+        val token = position.asset.token
+        return BittensorExitDustRemainderUi(
+            remainder = tokenFormatter.formatToken(token.amountFromPlanks(dust.remainderTao), token.configuration.symbol).toString(),
+            minimum = tokenFormatter.formatToken(token.amountFromPlanks(dust.minimumTao), token.configuration.symbol).toString()
         )
     }
 

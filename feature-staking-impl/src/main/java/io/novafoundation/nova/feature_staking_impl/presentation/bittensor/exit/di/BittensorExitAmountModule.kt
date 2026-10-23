@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -58,7 +59,8 @@ class BittensorExitAmountModule {
         slippageSettings: BittensorSlippageSettings,
         slippageSettingsCommunicator: SlippageSettingsCommunicator,
         costBasisFormatter: BittensorSaleCostBasisFormatter,
-        precisionValidator: BittensorExitPrecisionValidator
+        precisionValidator: BittensorExitPrecisionValidator,
+        validatorInteractor: BittensorValidatorInteractor
     ): ViewModel {
         return BittensorExitAmountViewModel(
             analytics, payload,
@@ -79,7 +81,8 @@ class BittensorExitAmountModule {
             slippageSettings = slippageSettings,
             slippageSettingsCommunicator = slippageSettingsCommunicator,
             costBasisFormatter = costBasisFormatter,
-            precisionValidator = precisionValidator
+            precisionValidator = precisionValidator,
+            validatorInteractor = validatorInteractor
         )
     }
 

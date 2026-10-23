@@ -13,7 +13,12 @@ import io.novafoundation.nova.analytics.UnstakeMode
 import io.novafoundation.nova.analytics.SlippageBucket
 import io.novafoundation.nova.analytics.AnalyticsService
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import kotlinx.coroutines.flow.distinctUntilChanged
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -94,6 +99,9 @@ private data class ExitPreparationRequest(
 
 private data class ExitAmountRequest(val preparation: ExitPreparationRequest, val exit: BittensorExitRequest, val estimateOnly: Boolean)
 
+/** Warnings the user accepted for the request being validated; any change of the request drops them. */
+private data class ExitConsent(val acceptedImpactQuote: BittensorExitQuote? = null, val remainderSweepAccepted: Boolean = false)
+
 class BittensorExitAmountViewModel(
     private val analytics: AnalyticsService,
     private val payload: BittensorExitPositionPayload,
@@ -114,7 +122,8 @@ class BittensorExitAmountViewModel(
     private val slippageSettings: BittensorSlippageSettings,
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
     private val costBasisFormatter: BittensorSaleCostBasisFormatter,
-    precisionValidator: BittensorExitPrecisionValidator
+    precisionValidator: BittensorExitPrecisionValidator,
+    validatorInteractor: BittensorValidatorInteractor
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val isRoot = payload.netuid().isRoot()
@@ -278,20 +287,21 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
+    private val saleCostBasis = estimatesMixin.observePositionCostBasis(
         position.map {
             it?.takeUnless { it.isRoot }
                 ?.let { BittensorEstimateContext(it.metaId, it.chain) }
-        }
+        }.distinctUntilChanged()
     )
+        .map { resolveSaleCostBasis(it, payload.netuid) }
         .shareInBackground()
 
     val averagePrice = combine(
-        costBasisState,
+        saleCostBasis,
         position
     ) { state, position ->
-        state.map { basis ->
-            costBasisFormatter.averagePrice(basis, position, payload.netuid)
+        state.map { sale ->
+            costBasisFormatter.averagePrice(sale, position?.asset?.token, position?.subnet?.symbol)
         }
     }
         .shareInBackground()
@@ -302,18 +312,25 @@ class BittensorExitAmountViewModel(
         .shareInBackground()
 
     val earned = combine(
-        costBasisState,
-        prepared,
+        saleCostBasis,
         requestState
-    ) { state, prepared, request ->
+    ) { state, request ->
         if (request.dataOrNull?.estimateOnly == true) return@combine ExtendedLoadingState.Loaded(costBasisFormatter.profit(null, null))
-        bittensorLoadingValue(state, prepared) {
-            costBasisFormatter.profit(state.dataOrNull, prepared.dataOrNull, payload.netuid)
+        bittensorLoadingValue(state, request) {
+            val exit = request.dataOrNull?.exit
+            costBasisFormatter.profit(state.dataOrNull, exit?.quote, exit?.position?.asset?.token)
         }
     }
         .shareInBackground()
 
-    val validator = payload.hotkeyAddress
+    // Same directory name as the position, review and result screens; the address only as a fallback.
+    val validator = flowOf {
+        val hotkey = AccountIdKey(validatorInteractor.chain().accountIdOf(payload.hotkeyAddress))
+        validatorInteractor.validatorName(payload.netuid(), hotkey)
+    }
+        .withSafeLoading()
+        .map { it.dataOrNull ?: payload.hotkeyAddress.ellipsizeAddress() }
+        .shareInBackground()
 
     val validatorIcon = position.map { position ->
         position?.let { addressIconGenerator.createAddressIcon(it.hotkey.value, 18, AddressIconGenerator.BACKGROUND_TRANSPARENT) }
@@ -423,9 +440,9 @@ class BittensorExitAmountViewModel(
         input.update { it.selectMax(maximum.amount) }
     }
 
-    fun continueClicked(): Unit = continueWithImpact(null)
+    fun continueClicked(): Unit = continueWith(ExitConsent())
 
-    private fun continueWithImpact(acceptedQuote: BittensorExitQuote?): Unit = launchUnit {
+    private fun continueWith(consent: ExitConsent): Unit = launchUnit {
         if (validating.value || continueButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
         val draft = prepared.first().dataOrNull ?: return@launchUnit
         val quoted = requestState.first().dataOrNull ?: return@launchUnit
@@ -442,7 +459,11 @@ class BittensorExitAmountViewModel(
         validating.value = true
         try {
             val freshPayload = bittensorExitInteractor.validationPayload(draft.position, draft.quote, draft.fee)
-            val validationPayload = freshPayload.copy(priceImpactAccepted = acceptedQuote != null && freshPayload.latestQuote == acceptedQuote)
+            val validationPayload = freshPayload.copy(
+                priceImpactAccepted = consent.acceptedImpactQuote != null && freshPayload.latestQuote == consent.acceptedImpactQuote,
+                remainderSweepAccepted = consent.remainderSweepAccepted
+            )
+            val carriedCostBasis = saleCostBasis.first().dataOrNull?.carriedPayload()
             validationExecutor.requireValid(
                 validationSystem = exitValidationSystem,
                 payload = validationPayload,
@@ -450,6 +471,8 @@ class BittensorExitAmountViewModel(
                     bittensorExitValidationFailureUi(
                         failure.reason,
                         resources,
+                        isRoot = isRoot,
+                        dustRemainder = exitFormatter.dustRemainder(validationPayload, draft.position),
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(
@@ -463,9 +486,10 @@ class BittensorExitAmountViewModel(
                                 )
                             }
                         },
-                        unstakeAll = { withCurrentRequest(quoted) { maxClicked() } },
+                        unstakeAll = { exitAll(current) },
+                        acceptRemainder = { withCurrentRequest(quoted) { continueWith(consent.copy(remainderSweepAccepted = true)) } },
                         refreshQuote = { withCurrentRequest(quoted) { input.value = current.copy(revision = current.revision + 1) } },
-                        acceptImpact = { withCurrentRequest(quoted) { continueWithImpact(validationPayload.latestQuote) } }
+                        acceptImpact = { withCurrentRequest(quoted) { continueWith(consent.copy(acceptedImpactQuote = validationPayload.latestQuote)) } }
                     )
                 }
             ) {
@@ -481,7 +505,12 @@ class BittensorExitAmountViewModel(
                             null
                         )
                     )
-                    router.openBittensorExitReview(draft.quote.toPayload(payload))
+                    router.openBittensorExitReview(
+                        draft.quote.toPayload(payload).copy(
+                            remainderSweepAccepted = validationPayload.remainderSweepAccepted,
+                            costBasis = carriedCostBasis
+                        )
+                    )
                 }
             }
         } catch (e: CancellationException) {
@@ -491,6 +520,15 @@ class BittensorExitAmountViewModel(
         } finally {
             validating.value = false
         }
+    }
+
+    /**
+     * "Unstake all" / "Sell all" from the remainder alert: fill Max so the setup re-quotes the full position.
+     * Only a later manual edit cancels it; a refreshed position or quote does not (iOS `selectMax`).
+     */
+    private fun exitAll(validated: ExitAmountInput) = launchUnit {
+        validating.first { !it }
+        if (validated.hasSameIntent(input.value)) maxClicked()
     }
 
     fun validatorClicked() = launchUnit {
@@ -558,7 +596,7 @@ class BittensorExitAmountViewModel(
             }
         }.first { it != null }
         // A changed position/quote must never inherit a warning's price-impact consent.
-        if (ready == true && refreshed.hasSameIntent(input.value) && slippage == currentSlippage()) continueWithImpact(null)
+        if (ready == true && refreshed.hasSameIntent(input.value) && slippage == currentSlippage()) continueWith(ExitConsent())
     }
 
     private suspend fun prepareRequest(request: ExitPreparationRequest): ExitAmountRequest? {

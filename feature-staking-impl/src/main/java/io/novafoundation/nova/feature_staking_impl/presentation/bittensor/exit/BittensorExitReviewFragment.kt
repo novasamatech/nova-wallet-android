@@ -133,10 +133,13 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             validator.showValue(it)
             execution.validator.showValue(it)
         }
-        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
-        viewModel.earned.observe { state ->
-            earned.showBittensorLoadingAmount(state.map { it.amount })
-            earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+        // A loading TableCellView makes itself visible: bind rows only where the operation shows them.
+        if (!viewModel.isRoot) {
+            viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
+            viewModel.earned.observe { state ->
+                earned.showBittensorLoadingAmount(state.map { it.amount })
+                earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+            }
         }
         viewModel.swapRateDescription.observe { description ->
             rate.setOnClickListener { description?.let { showDescription(R.string.bittensor_exchange_rate, it) } }
@@ -154,10 +157,13 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             execution.validator.image.isVisible = it != null
             execution.validator.image.setImageDrawable(it)
         }
-        viewModel.stakeAfter.observe(stakeAfter::showBittensorLoadingValue)
-        viewModel.rate.observe {
-            rate.showBittensorLoadingValue(it)
-            execution.rate.showBittensorLoadingValue(it)
+        if (viewModel.isRoot) {
+            viewModel.stakeAfter.observe(stakeAfter::showBittensorLoadingValue)
+        } else {
+            viewModel.rate.observe {
+                rate.showBittensorLoadingValue(it)
+                execution.rate.showBittensorLoadingValue(it)
+            }
         }
         viewModel.commissionCaption.observe { commissionCaption.text = it }
         viewModel.feeCaption.observe { feeCaption.text = it }

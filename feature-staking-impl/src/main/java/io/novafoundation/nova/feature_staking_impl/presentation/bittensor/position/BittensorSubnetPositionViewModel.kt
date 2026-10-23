@@ -50,6 +50,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.labelRes
@@ -57,6 +59,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolveSaleCostBasis
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -83,6 +86,10 @@ import kotlinx.coroutines.flow.mapNotNull
 
 enum class BittensorPositionTradeAction { BUY, SELL }
 
+/** iOS `SubtensorPortfolioBuilder.isMemberOrderedBefore`: largest stake first, then hotkey; the first is the primary. */
+internal fun List<BittensorSubnetPosition>.inPrimaryOrder(): List<BittensorSubnetPosition> =
+    sortedWith(compareByDescending<BittensorSubnetPosition> { it.alphaInPlanks }.thenBy { it.validatorHotkey.value.toHexString() })
+
 data class BittensorPositionChoiceRequest(val action: BittensorPositionTradeAction, val positions: List<BittensorExitPositionPayload>)
 
 class BittensorSubnetPositionViewModel(
@@ -103,7 +110,8 @@ class BittensorSubnetPositionViewModel(
     private val withdrawalInteractor: BittensorPositionWithdrawalInteractor,
     private val withdrawalFormatter: BittensorWithdrawalFormatter,
     slippageSettings: BittensorSlippageSettings,
-    private val costBasisFormatter: BittensorSaleCostBasisFormatter
+    private val costBasisFormatter: BittensorSaleCostBasisFormatter,
+    private val validatorInteractor: BittensorValidatorInteractor
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private var isOpenedTracked = false
@@ -141,9 +149,28 @@ class BittensorSubnetPositionViewModel(
     val subnet = metadataState.map { it.dataOrNull }
         .shareInBackground()
 
+    // iOS SubtensorPortfolioBuilder order: largest stake first, then hotkey. The first row is the primary hotkey
+    // that Sell opens with, so the validator shown on the position and on the sale setup is the same.
     private val held = portfolio.map { data ->
-        data?.positions?.subnets.orEmpty().filter { it.subnetId == subnetId && it.alphaInPlanks.isPositive() }
+        data?.positions?.subnets.orEmpty()
+            .filter { it.subnetId == subnetId && it.alphaInPlanks.isPositive() }
+            .inPrimaryOrder()
     }
+        .shareInBackground()
+
+    private val validatorNames = held.map { positions -> positions.map { it.validatorHotkey }.toSet() }
+        .distinctUntilChanged()
+        .flatMapLatest { hotkeys ->
+            flowOf { validatorInteractor.validatorNames(subnetId, hotkeys) }
+                .withSafeLoading()
+                .onEach { state ->
+                    if (state is ExtendedLoadingState.Error) {
+                        logger.log("[BittensorSubnetPosition] Optional validator names unavailable")
+                        logger.log(state.exception)
+                    }
+                }
+        }
+        .map { it.dataOrNull.orEmpty() }
         .shareInBackground()
 
     val canAct = combine(
@@ -157,13 +184,13 @@ class BittensorSubnetPositionViewModel(
         .shareInBackground()
 
     val hasStake = held.map {
-        it.maxByOrNull { it.alphaInPlanks }
+        it.firstOrNull()
             ?.isRegistered == true
     }
         .shareInBackground()
 
     private val withdrawalState = combine(portfolio, held, slippageSettings.observe()) { data, positions, slippage ->
-        val primary = positions.sortedBy { it.validatorHotkey.value.toHexString() }.maxByOrNull { it.alphaInPlanks }
+        val primary = positions.firstOrNull()
         if (data == null || data.dataStatus !is BittensorDataStatus.Fresh || primary == null) {
             null
         } else {
@@ -245,12 +272,12 @@ class BittensorSubnetPositionViewModel(
         .shareInBackground()
 
     val averagePrice = combine(
-        costBasisState,
+        costBasisUpdate,
         chartAssetState,
         subnet
-    ) { state, assetState, subnet ->
-        state.map { basis ->
-            costBasisFormatter.averagePrice(basis, subnetId.value, assetState.dataOrNull?.token, subnet?.symbol)
+    ) { update, assetState, subnet ->
+        resolveSaleCostBasis(update, subnetId.value).map { sale ->
+            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token, subnet?.symbol)
         }
     }
         .shareInBackground()
@@ -311,8 +338,9 @@ class BittensorSubnetPositionViewModel(
     val validators = combine(
         portfolio,
         held,
-        yieldState
-    ) { data, held, yields ->
+        yieldState,
+        validatorNames
+    ) { data, held, yields, names ->
         if (data == null) {
             emptyList()
         } else {
@@ -321,7 +349,7 @@ class BittensorSubnetPositionViewModel(
                 val annualYield = yields.dataOrNull?.get(position.validatorHotkey)
                 BittensorPositionUi(
                     address,
-                    address.take(6) + "…" + address.takeLast(6),
+                    names[position.validatorHotkey] ?: address.take(6) + "…" + address.takeLast(6),
                     resources.getString(R.string.bittensor_validator),
                     AmountModel(
                         annualYield?.formatAsPercentage() ?: "",
@@ -443,10 +471,7 @@ class BittensorSubnetPositionViewModel(
     fun sellClicked() = launchUnit {
         if (!canSell.first()) return@launchUnit
         val data = portfolio.first() ?: return@launchUnit
-        val primary = held.first()
-            .sortedBy { it.validatorHotkey.value.toHexString() }
-            .sortedByDescending { it.alphaInPlanks }
-            .firstOrNull() ?: return@launchUnit
+        val primary = held.first().firstOrNull() ?: return@launchUnit
         val address = data.chain.addressOf(primary.validatorHotkey.value)
         router.openBittensorExitAmount(BittensorExitPositionPayload(data.metaId, subnetId.value, address))
     }
