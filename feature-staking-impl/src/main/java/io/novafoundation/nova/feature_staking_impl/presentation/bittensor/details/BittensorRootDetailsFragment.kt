@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -71,6 +72,8 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
             claim.isEnabled = canClaim
             claim.alpha = if (canClaim) 1f else 0.48f
         }
+        viewModel.claimDetail.observe(claim::setDetail)
+        viewModel.claimMinimum.observe(claimMinimum::setTextOrHide)
         viewModel.redeemableRewards.observe(rewards::showBittensorLoadingAmount)
         viewModel.rootStake.observe {
             stakeAmount.text = it.token
