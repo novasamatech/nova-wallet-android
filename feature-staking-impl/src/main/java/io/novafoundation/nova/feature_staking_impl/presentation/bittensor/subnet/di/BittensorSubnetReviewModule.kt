@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -58,6 +59,7 @@ class BittensorSubnetReviewModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         estimatesMixin: BittensorEstimatesMixin,
         tokenFormatter: TokenFormatter,
+        fiatFormatter: FiatFormatter,
         chainStateRepository: ChainStateRepository
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
@@ -81,6 +83,7 @@ class BittensorSubnetReviewModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             estimatesMixin = estimatesMixin,
             tokenFormatter = tokenFormatter,
+            fiatFormatter = fiatFormatter,
             chainStateRepository = chainStateRepository,
             selectedSlippage = payload.slippage,
             existingPosition = payload.existingPosition,

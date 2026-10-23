@@ -90,6 +90,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
@@ -150,6 +151,7 @@ class BittensorSubnetReviewViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
+    private val fiatFormatter: FiatFormatter,
     private val chainStateRepository: ChainStateRepository,
     private val selectedSlippage: BigDecimal,
     val existingPosition: Boolean = false,
@@ -688,7 +690,7 @@ class BittensorSubnetReviewViewModel(
     }
 
     private fun formatFiat(token: TokenBase, fiat: BigDecimal?): CharSequence? {
-        return fiat?.let { bittensorAmountFormatter.amount(BigDecimal.ZERO, token.configuration.symbol, it, token.currency).fiat }
+        return fiat?.let { fiatFormatter.formatFiat(it, token.currency) }
     }
 
     private fun formatRate(token: TokenBase, prepared: BittensorPreparedSubnetStake?): String {
