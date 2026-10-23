@@ -74,6 +74,7 @@ class BittensorSubnetDetailsModule {
         validatorCommunicator = validatorCommunicator,
         addressIconGenerator = addressIconGenerator,
         replaceAmount = payload.replaceAmount,
+        replaceOrigin = payload.replaceOrigin,
         initialValidatorAddress = payload.validatorAddress,
         initialSelectionState = payload.selectionState,
         analyticsSource = payload.analyticsSource

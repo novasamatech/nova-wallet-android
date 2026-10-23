@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorRootStakePresentation
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorReplaceOrigin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmFragment
@@ -365,10 +366,11 @@ class RelayStakingNavigator(
     }
 
     override fun replaceBittensorSubnetAmountWithRoot(
-        selectionState: BittensorSelectionState
+        selectionState: BittensorSelectionState,
+        presentation: BittensorRootStakePresentation
     ) {
         navigationBuilder().action(R.id.action_replace_bittensor_subnet_amount_with_root)
-            .setArgs(BittensorStakeAmountFragment.getBundle(null, selectionState))
+            .setArgs(BittensorStakeAmountFragment.getBundle(null, selectionState, presentation))
             .navigateInFirstAttachedContext()
     }
 
@@ -396,8 +398,7 @@ class RelayStakingNavigator(
     }
 
     override fun openBittensorSubnetAmount(payload: BittensorSubnetAmountPayload) {
-        val action = if (payload.replaceAmount) R.id.action_replace_bittensor_subnet_amount else R.id.action_open_bittensor_subnet_amount
-        navigationBuilder().action(action)
+        navigationBuilder().action(bittensorSubnetAmountAction(payload))
             .setArgs(BittensorSubnetAmountFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
@@ -455,4 +456,11 @@ class RelayStakingNavigator(
             .setArgs(BittensorStakeConfirmFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
+}
+
+/** A replacing pick swaps out the setup screen the picker was opened from, subnet or root (iOS swaps the mode in place). */
+internal fun bittensorSubnetAmountAction(payload: BittensorSubnetAmountPayload): Int = when {
+    !payload.replaceAmount -> R.id.action_open_bittensor_subnet_amount
+    payload.replaceOrigin == BittensorReplaceOrigin.ROOT_STAKE -> R.id.action_replace_bittensor_root_staking_with_subnet_amount
+    else -> R.id.action_replace_bittensor_subnet_amount
 }

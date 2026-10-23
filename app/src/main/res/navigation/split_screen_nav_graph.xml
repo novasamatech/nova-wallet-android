@@ -179,6 +179,16 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_replace_bittensor_root_staking_with_subnet_amount"
+        app:destination="@id/bittensorSubnetAmount"
+        app:popUpTo="@id/bittensor_root_staking_graph"
+        app:popUpToInclusive="true"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_replace_bittensor_subnet_amount_with_root"
         app:destination="@id/bittensor_root_staking_graph"
         app:popUpTo="@id/bittensorSubnetAmount"
