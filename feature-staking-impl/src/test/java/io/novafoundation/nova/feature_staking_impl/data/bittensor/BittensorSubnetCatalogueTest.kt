@@ -13,6 +13,8 @@ import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import retrofit2.Response
 import org.junit.Assert.assertEquals
@@ -47,8 +49,10 @@ class BittensorSubnetCatalogueTest {
         calls.delayMillis = 5_000L
         val slowNodeRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, backend, urls, chainPatienceMillis = 50L)
 
-        val subnets = slowNodeRepository.subnets()
+        val catalogue = slowNodeRepository.catalogue()
+        val subnets = catalogue.subnets
 
+        assertFalse(catalogue.fromChain)
         assertEquals(listOf("Backend 7"), subnets.map { it.name })
         assertEquals("B7", subnets.single().symbol)
         assertEquals(BigInteger.valueOf(500_000_000), subnets.single().priceInRao)
@@ -68,10 +72,32 @@ class BittensorSubnetCatalogueTest {
     }
 
     @Test
-    fun `stale backend catalogue is still listed`() {
+    fun `stale backend catalogue is still listed but its price is not shown`() {
         val subnets = mapBittensorBackendCatalogue(backendCatalogue(freshness = "STALE"))
 
         assertEquals(listOf(BittensorNetuid.Subnet(7)), subnets.map { it.id })
+        assertNull(subnets.single().priceInRao)
+    }
+
+    @Test
+    fun `fast chain never spends an attested backend request`() = runBlocking<Unit> {
+        val catalogue = repository.catalogue()
+
+        assertTrue(catalogue.fromChain)
+        assertEquals(0, backend.requests)
+    }
+
+    @Test
+    fun `after the patience window the first source to answer wins`() = runBlocking<Unit> {
+        calls.delayMillis = 300L
+        backend.delayMillis = 5_000L
+        val slowBackendRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, backend, urls, chainPatienceMillis = 50L)
+
+        val catalogue = slowBackendRepository.catalogue()
+
+        assertTrue(catalogue.fromChain)
+        assertEquals(listOf("Name"), catalogue.subnets.map { it.name })
+        assertEquals(1, backend.requests)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -136,8 +162,11 @@ class BittensorSubnetCatalogueTest {
 
         var failure: Exception? = null
 
+        var delayMillis = 0L
+
         override suspend fun subnets(url: String): Response<BittensorSubnetCatalogueRemote> {
             requests++
+            delay(delayMillis)
             failure?.let { throw it }
             return Response.success(backendCatalogue())
         }

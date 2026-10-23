@@ -18,9 +18,10 @@ class BittensorSubnetBrowseRepository(
 ) {
 
     suspend fun subnets(): List<BittensorSubnet> = coroutineScope {
-        val runtime = async { subnets.subnets() }
+        val runtime = async { subnets.catalogue() }
         val response = loadCatalogue()
-        val candidates = mapBittensorBrowseSubnets(response, runtime.await())
+        val catalogue = runtime.await()
+        val candidates = mapBittensorBrowseSubnets(response, catalogue.subnets, chainVerified = catalogue.fromChain)
         val enabled = availability.enabledSubnets(candidates.map { it.id })
         candidates.filter { it.id in enabled }
     }
@@ -35,7 +36,16 @@ class BittensorSubnetBrowseRepository(
     }
 }
 
-internal fun mapBittensorBrowseSubnets(remote: BittensorSubnetCatalogueRemote, runtime: List<BittensorSubnet>): List<BittensorSubnet> {
+/**
+ * With a chain catalogue every backend row is cross-checked against the chain (registration, live positive price).
+ * When the backend catalogue stood in for a slow node ([chainVerified] = false) there is no chain view to compare
+ * with: rows are listed on the backend's word, and subtoken availability is still read from chain storage.
+ */
+internal fun mapBittensorBrowseSubnets(
+    remote: BittensorSubnetCatalogueRemote,
+    runtime: List<BittensorSubnet>,
+    chainVerified: Boolean = true
+): List<BittensorSubnet> {
     // STALE metadata or prices are still listed, as on iOS; quotes and valuation read live chain prices.
     requireAvailableBittensorComponent(remote.meta?.components?.subnetMetadata, "Subnet metadata")
     requireAvailableBittensorComponent(remote.meta?.components?.alphaPrices, "Subnet prices")
@@ -48,7 +58,8 @@ internal fun mapBittensorBrowseSubnets(remote: BittensorSubnetCatalogueRemote, r
         val chain = chainSubnets[id] ?: return@mapNotNull null
         val registration = requireNotNull(row.networkRegisteredAt)
         require(registration.isNonNegative)
-        if (registration != chain.registrationBlock || chain.priceInRao?.isPositive() != true || id !in prices) return@mapNotNull null
+        val chainPriced = !chainVerified || chain.priceInRao?.isPositive() == true
+        if (registration != chain.registrationBlock || !chainPriced || id !in prices) return@mapNotNull null
         val reserve = requireNotNull(row.taoReserve).toBigDecimal().movePointRight(9).toBigIntegerExact()
         require(reserve.isNonNegative)
         chain.copy(name = normalizeBittensorSubnetName(requireNotNull(row.name)), symbol = requireNotNull(row.symbol), taoReserveInPlanks = reserve)

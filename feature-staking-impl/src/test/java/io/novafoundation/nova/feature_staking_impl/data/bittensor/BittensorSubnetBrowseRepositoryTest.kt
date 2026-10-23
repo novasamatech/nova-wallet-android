@@ -67,6 +67,17 @@ class BittensorSubnetBrowseRepositoryTest {
     }
 
     @Test
+    fun `backend catalogue standing in for a slow node lists rows without a chain price`() {
+        val fallback = listOf(subnet(1, 10, null))
+        val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend 1", "S1", 10.toBigInteger(), "2000"))
+        val component = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
+        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
+
+        assertEquals(emptyList<BittensorSubnet>(), mapBittensorBrowseSubnets(response, fallback, chainVerified = true))
+        assertEquals(listOf(1), mapBittensorBrowseSubnets(response, fallback, chainVerified = false).map { it.id.value })
+    }
+
+    @Test
     fun `validator count is permit population independent of policy selection`() {
         val permits = List(20) { true } + List(8) { false }
         assertEquals(20, bindBittensorValidatorCount(permits))
@@ -88,7 +99,7 @@ class BittensorSubnetBrowseRepositoryTest {
         val meta = BittensorSubnetCatalogueRemote.Meta(components)
         val response = BittensorSubnetCatalogueRemote(listOf(row), meta)
         `when`(api.subnets("https://infra.test/v1/bittensor/subnets")).thenReturn(Response.success(response))
-        `when`(runtime.subnets()).thenReturn(listOf(subnet(1, 10, 1)))
+        `when`(runtime.catalogue()).thenReturn(BittensorSubnetCatalogue(listOf(subnet(1, 10, 1)), fromChain = true))
 
         assertEquals(emptyList<BittensorSubnet>(), repository.subnets())
     }
