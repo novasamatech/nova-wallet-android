@@ -70,6 +70,17 @@ class BittensorValidatorInfoViewModelTest {
     }
 
     @Test
+    fun `reward reads as APY and the info sheets explain root and subnet stake differently`() {
+        val subnet = createViewModel(payload(inactive = false, annualYield = BigDecimal("5.94")))
+        assertEquals("${R.string.staking_apy}|5.94%", subnet.reward.value)
+        assertEquals("${R.string.bittensor_validator_info_total_staked_subnet}", subnet.totalStakeDescription)
+        assertEquals("${R.string.bittensor_validator_info_take_description}", subnet.takeDescription)
+
+        val root = createViewModel(payload(inactive = false, annualYield = null, subnetId = 0))
+        assertEquals("${R.string.bittensor_validator_info_total_staked_root}", root.totalStakeDescription)
+    }
+
+    @Test
     fun `failed coverage reads as unknown instead of an error`() = runBlocking<Unit> {
         val viewModel = createViewModel(payload(inactive = false, annualYield = null))
 
@@ -92,8 +103,8 @@ class BittensorValidatorInfoViewModelTest {
         assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
     }
 
-    private fun payload(inactive: Boolean, annualYield: BigDecimal?, stake: BigDecimal? = null) = BittensorValidatorInfoPayload(
-        subnetId = 5,
+    private fun payload(inactive: Boolean, annualYield: BigDecimal?, stake: BigDecimal? = null, subnetId: Int = 5) = BittensorValidatorInfoPayload(
+        subnetId = subnetId,
         address = "address",
         name = "Validator",
         stakeInNative = stake,
