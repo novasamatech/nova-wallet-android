@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetAbandonment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
@@ -54,7 +55,8 @@ class BittensorSubnetDetailsModule {
         validatorInteractor: BittensorValidatorInteractor,
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
         validatorCommunicator: BittensorSelectValidatorCommunicator,
-        addressIconGenerator: AddressIconGenerator
+        addressIconGenerator: AddressIconGenerator,
+        abandonment: BittensorChooseSubnetAbandonment
     ): ViewModel = BittensorSubnetDetailsViewModel(
         analytics, subnetId = BittensorNetuid.Subnet(payload.subnetId),
         bittensorSubnetInteractor = bittensorSubnetInteractor,
@@ -73,6 +75,7 @@ class BittensorSubnetDetailsModule {
         presetValidatorInteractor = presetValidatorInteractor,
         validatorCommunicator = validatorCommunicator,
         addressIconGenerator = addressIconGenerator,
+        abandonment = abandonment,
         replaceAmount = payload.replaceAmount,
         initialValidatorAddress = payload.validatorAddress,
         initialSelectionState = payload.selectionState,

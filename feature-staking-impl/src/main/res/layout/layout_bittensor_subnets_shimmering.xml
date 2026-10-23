@@ -17,4 +17,8 @@
 
     <include layout="@layout/item_bittensor_subnet_shimmering" />
 
+    <include layout="@layout/item_bittensor_subnet_shimmering" />
+
+    <include layout="@layout/item_bittensor_subnet_shimmering" />
+
 </LinearLayout>

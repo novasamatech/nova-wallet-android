@@ -23,6 +23,7 @@
         android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/controls"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:gravity="center_vertical"

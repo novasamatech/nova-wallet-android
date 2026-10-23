@@ -98,11 +98,14 @@ class SwapOptionsViewModel(
     val slippageTips = slippageConfig.map { it.slippageTips }
         .mapList { it.formatPercents() }
 
+    private var slippageResponded = false
+
     init {
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
-            if (selectedSlippage != defaultSlippage) {
+            // The sheet always shows the current value: an empty field there is no value, not the default.
+            if (payload != null || selectedSlippage != defaultSlippage) {
                 slippageInput.value = formatInput(selectedSlippage)
             }
         }
@@ -125,6 +128,10 @@ class SwapOptionsViewModel(
             val config = slippageConfig.first()
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
             if (payload != null) {
+                // The first Done closes the sheet; a second click already queued behind it would pop the screen under the sheet.
+                if (slippageResponded) return@launch
+                slippageResponded = true
+
                 val method = slippageChangeMethod(payload.selected.fractions, slippage, config)
                 slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method))
             } else {
@@ -153,7 +160,8 @@ class SwapOptionsViewModel(
         val defaultSlippage = slippageConfig.first().defaultSlippage
 
         return if (isEmpty()) {
-            defaultSlippage
+            // As on iOS, an empty sheet field is no value and Done applies nothing; Swap's own settings fall back to the default.
+            defaultSlippage.takeIf { payload == null }
         } else {
             return toDoubleOrNull()?.takeIf { it.isFinite() }?.percents
         }
@@ -165,11 +173,12 @@ class SwapOptionsViewModel(
         validationResult: FieldValidationResult
     ): DescriptiveButtonState {
         val slippage = insertedSlippage.formatToPercent()
-        // The payload sheet mirrors iOS: a single Done action instead of Reset + Apply.
+        // The payload sheet mirrors iOS: a single Done action, which keeps its title while disabled, instead of Reset + Apply.
         val label = resourceManager.getString(if (payload != null) R.string.common_done else R.string.common_apply)
+        val disabledLabel = if (payload != null) label else resourceManager.getString(R.string.swap_slippage_disabled_button_state)
         return when {
-            slippage == null -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
-            validationResult is FieldValidationResult.Error -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
+            slippage == null -> Disabled(disabledLabel)
+            validationResult is FieldValidationResult.Error -> Disabled(disabledLabel)
             slippage != settings.slippage -> Enabled(label)
             else -> Disabled(label)
         }

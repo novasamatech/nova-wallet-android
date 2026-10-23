@@ -2,6 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import android.os.Bundle
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
@@ -42,6 +46,22 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
 
     private val validatorShimmer = CustomPlaceholderAdapter(R.layout.item_bittensor_subnet_shimmering)
 
+    // Only a return from the background counts, like iOS didBecomeActive, not the catch-up start when the observer is added.
+    private val appForegroundObserver = object : LifecycleEventObserver {
+        private var wentToBackground = false
+
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+            when (event) {
+                Lifecycle.Event.ON_STOP -> wentToBackground = true
+                Lifecycle.Event.ON_START -> if (wentToBackground) {
+                    wentToBackground = false
+                    viewModel.appBecameActive()
+                }
+                else -> Unit
+            }
+        }
+    }
+
     override fun createBinding() = FragmentBittensorSubnetDetailsBinding.inflate(layoutInflater)
 
     override fun inject() {
@@ -64,7 +84,13 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         chart.setPlotHeight(208)
-        chart.onPeriodSelected = viewModel::selectPeriod
+        chart.onPeriodSelected = { index ->
+            viewModel.selectPeriod(index)
+            // Undoes the chip switch when the period is kept (an unlisted subnet).
+            chart.setSelectedPeriod(viewModel.selectedPeriodIndex)
+        }
+        chartFailure.setOnClickListener { viewModel.retryChart() }
+        ProcessLifecycleOwner.get().lifecycle.addObserver(appForegroundObserver)
         chart.selectionListener = PriceChartSelectionListener { selection ->
             viewModel.selectChartPoint(selection)
             chartDate.isVisible = selection != null
@@ -80,6 +106,16 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         }
         website.setOnClickListener { viewModel.websiteClicked() }
         github.setOnClickListener { viewModel.githubClicked() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.becomeActive()
+    }
+
+    override fun onDestroyView() {
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(appForegroundObserver)
+        super.onDestroyView()
     }
 
     override fun subscribe(viewModel: BittensorSubnetDetailsViewModel) = with(binder) {
@@ -127,6 +163,7 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
             chart.setCharts(charts)
         }
+        viewModel.isChartFailed.observe { chartFailure.isVisible = it }
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.age.observe(age::showBittensorLoadingValue)
         viewModel.parameters.observe { bindSubnetParameters(it) }

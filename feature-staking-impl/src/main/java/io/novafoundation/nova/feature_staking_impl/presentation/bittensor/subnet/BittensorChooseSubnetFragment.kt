@@ -98,8 +98,14 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
             sorting.alpha = if (enabled) 1f else DISABLED_CONTROL_ALPHA
             filters.alpha = if (enabled) 1f else DISABLED_CONTROL_ALPHA
         }
+        viewModel.controlsVisible.observe { controls.isVisible = it }
         viewModel.isEmpty.observe { empty.isVisible = it }
         viewModel.emptyMessage.observe { empty.text = it }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.becomeActive()
     }
 
     override fun onDestroyView() {

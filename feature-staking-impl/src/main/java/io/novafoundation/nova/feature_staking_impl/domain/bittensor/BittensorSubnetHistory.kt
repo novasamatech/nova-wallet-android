@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
-import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.time.Duration
 
@@ -35,10 +34,11 @@ internal fun clipBittensorSubnetHistory(points: List<BittensorSubnetPricePoint>,
     return points.filter { it.timestamp >= registrationEpochSeconds }
 }
 
-internal fun bittensorRegistrationEpochSeconds(ageInDays: BigDecimal, nowSeconds: Long): Long =
-    nowSeconds - (ageInDays * SECONDS_PER_DAY.toBigDecimal()).setScale(0, RoundingMode.HALF_UP).toLong()
+/** Rounded up to a whole second, so a point is kept exactly when it is not older than the registration (as on iOS). */
+internal fun bittensorRegistrationEpochSeconds(age: Duration, nowMillis: Long): Long =
+    (nowMillis - age.inWholeMilliseconds + MILLIS_PER_SECOND - 1).floorDiv(MILLIS_PER_SECOND)
 
-private const val SECONDS_PER_DAY = 86_400L
+private const val MILLIS_PER_SECOND = 1_000L
 
 /** A successful short/old response is not a return for the entire selected window. */
 internal fun hasBittensorSubnetHistoryCoverage(

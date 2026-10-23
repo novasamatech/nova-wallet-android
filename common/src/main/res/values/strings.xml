@@ -2833,11 +2833,11 @@
     <string name="bittensor_sort_apy_description">Highest 30-day avg first</string>
     <string name="bittensor_sort_week_description">Biggest 7-day move first</string>
     <string name="bittensor_sort_name_description">A to Z</string>
-    <string name="bittensor_no_price_history">No price history yet</string>
+    <string name="bittensor_no_price_history">no price history yet</string>
     <string name="bittensor_price_history_unavailable">Price history not available for this subnet</string>
     <string name="bittensor_price_history_source">Spot price comes from the chain pool ratio</string>
     <string name="bittensor_price_history_failed">Couldn’t load price history</string>
-    <string name="bittensor_thin_pool_description">Below 2K %1$s · price moves more</string>
+    <string name="bittensor_thin_pool_description">below 2K %1$s · price moves more</string>
     <string name="bittensor_you_stake">You stake</string>
     <string name="bittensor_validator">Validator</string>
     <string name="bittensor_select_validator">Choose a validator</string>
@@ -2935,6 +2935,7 @@
     <string name="bittensor_fee_on_review">On confirmation</string>
     <string name="bittensor_slippage_title">Slippage tolerance</string>
     <string name="bittensor_slippage_explanation">If the price moves more than this while your order fills, the network cancels the order and only the network fee is charged.</string>
+    <string name="bittensor_slippage_custom">Custom, %</string>
     <string name="bittensor_slippage_fixed">Slippage tolerance is %1$s%%. The operation is rejected if the price moves beyond this limit; partial staking is not allowed.</string>
     <string name="bittensor_subnet">Subnet</string>
     <string name="bittensor_you_receive">You will get</string>
@@ -3103,8 +3104,8 @@
     <string name="bittensor_root_hold_title">Root stake locked</string>
     <string name="bittensor_root_hold_time_left">%1$s left</string>
     <string name="bittensor_root_hold_description">Root stake is locked for %1$s after staking or claiming. Unstake becomes available when the hold ends.</string>
-    <string name="bittensor_subnet_filter_empty">No subnets match these filters.</string>
-    <string name="bittensor_subnet_search_empty">No subnets found for “%1$s”.</string>
+    <string name="bittensor_subnet_filter_empty">No subnets found</string>
+    <string name="bittensor_subnet_search_empty">No subnets for ‘%1$s’</string>
     <string name="bittensor_dashboard_subnets">%1$d subnets</string>
     <string name="bittensor_dashboard_root">Root</string>
     <string name="bittensor_dashboard_one_subnet">1 subnet</string>

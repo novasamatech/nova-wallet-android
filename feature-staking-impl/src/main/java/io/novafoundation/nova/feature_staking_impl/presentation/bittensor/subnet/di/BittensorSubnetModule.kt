@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import io.novafoundation.nova.analytics.AnalyticsService
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetAbandonment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 
@@ -69,7 +70,8 @@ class BittensorSubnetModule {
         resources: ResourceManager,
         listChooserMixinFactory: ListChooserMixin.Factory,
         payload: BittensorChooseSubnetPayload,
-        validatorCommunicator: BittensorSelectValidatorCommunicator
+        validatorCommunicator: BittensorSelectValidatorCommunicator,
+        abandonment: BittensorChooseSubnetAbandonment
     ): ViewModel = BittensorChooseSubnetViewModel(
         analytics, bittensorSubnetInteractor,
         router,
@@ -82,7 +84,8 @@ class BittensorSubnetModule {
         resources = resources,
         listChooserMixinFactory = listChooserMixinFactory,
         payload = payload,
-        validatorCommunicator = validatorCommunicator
+        validatorCommunicator = validatorCommunicator,
+        abandonment = abandonment
     )
 
     @Provides

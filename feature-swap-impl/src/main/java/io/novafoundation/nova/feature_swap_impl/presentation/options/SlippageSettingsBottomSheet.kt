@@ -56,7 +56,6 @@ class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SwapOptionsViewModel
 
     override fun subscribe(viewModel: SwapOptionsViewModel) {
         binder.slippageSettingsInput.content.bindTo(viewModel.slippageInput, viewModel.viewModelScope, moveSelectionToEndOnInsertion = true)
-        viewModel.defaultSlippage.observe { binder.slippageSettingsInput.setHint(it) }
         viewModel.slippageTips.observe {
             binder.slippageSettingsInput.clearTips()
             it.forEachIndexed { index, text ->
