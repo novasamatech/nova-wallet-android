@@ -19,7 +19,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- The title keeps a minimum width and may wrap to a second line; a large amount wraps instead of squeezing it away. -->
+    <!-- One line each, as iOS: the amount column measures first and keeps its full width, the title takes the rest and ellipsizes. -->
     <LinearLayout
         android:id="@+id/positionTexts"
         android:layout_width="0dp"
@@ -28,17 +28,15 @@
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/positionValues"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/positionIcon"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_min="96dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/positionTitle"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="2"
+            android:maxLines="1"
             android:ellipsize="end" />
 
         <TextView
@@ -67,7 +65,8 @@
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/positionAmountProgress"
-        app:layout_constraintStart_toEndOf="@id/positionTexts"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/positionIcon"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -76,7 +75,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:maxLines="2" />
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/positionFiat"
