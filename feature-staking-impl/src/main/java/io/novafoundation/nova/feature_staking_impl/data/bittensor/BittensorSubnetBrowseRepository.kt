@@ -1,15 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.utils.isNonNegative
-import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import retrofit2.HttpException
 
 /** Manual buy catalogue only; held positions must never be filtered through this repository. */
@@ -24,10 +21,8 @@ class BittensorSubnetBrowseRepository(
         val runtime = async { subnets.subnets() }
         val response = loadCatalogue()
         val candidates = mapBittensorBrowseSubnets(response, runtime.await())
-        val semaphore = Semaphore(4)
-        candidates.mapAsync { subnet ->
-            semaphore.withPermit { subnet.takeIf { availability.isEnabled(it.id) } }
-        }.filterNotNull()
+        val enabled = availability.enabledSubnets(candidates.map { it.id })
+        candidates.filter { it.id in enabled }
     }
 
     private suspend fun loadCatalogue(): BittensorSubnetCatalogueRemote {
@@ -41,9 +36,10 @@ class BittensorSubnetBrowseRepository(
 }
 
 internal fun mapBittensorBrowseSubnets(remote: BittensorSubnetCatalogueRemote, runtime: List<BittensorSubnet>): List<BittensorSubnet> {
-    val metadata = requireNotNull(remote.meta?.components?.subnetMetadata)
-    require(metadata.availability == "AVAILABLE" && metadata.freshness == "FRESH")
-    val prices = mapBittensorPortfolioPrices(remote)
+    // STALE metadata or prices are still listed, as on iOS; quotes and valuation read live chain prices.
+    requireAvailableBittensorComponent(remote.meta?.components?.subnetMetadata, "Subnet metadata")
+    requireAvailableBittensorComponent(remote.meta?.components?.alphaPrices, "Subnet prices")
+    val prices = mapBittensorSubnetPrices(remote)
     val chainSubnets = runtime.associateBy { it.id }
     val seen = mutableSetOf<BittensorNetuid.Subnet>()
     return requireNotNull(remote.items).mapNotNull { row ->

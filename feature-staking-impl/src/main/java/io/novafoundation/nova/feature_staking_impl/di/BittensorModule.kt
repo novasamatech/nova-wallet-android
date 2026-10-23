@@ -227,8 +227,10 @@ class BittensorModule {
     fun provideBittensorSubnetRepository(
         runtimeCalls: MultiChainRuntimeCallsApi,
         configRepository: BittensorConfigRepository,
-        swapSource: BittensorSwapSource
-    ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource)
+        swapSource: BittensorSwapSource,
+        catalogueApi: BittensorSubnetCatalogueApi,
+        infrastructureUrls: InfrastructureUrls
+    ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueApi, infrastructureUrls)
 
     @Provides
     @FeatureScope
