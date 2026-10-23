@@ -14,6 +14,10 @@ import io.novafoundation.nova.analytics.SlippageBucket
 import io.novafoundation.nova.analytics.AnalyticsService
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitExceedsStakeException
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
@@ -166,7 +170,16 @@ class BittensorExitAmountViewModel(
 
     private val amountValidator = precisionValidator.forPrecision(position.map { it?.amountPrecision })
 
-    val amountError = amountValidator.observe(amount)
+    // The input whose amount exceeded the withdrawable stake; shown as a field error instead of a silent disable.
+    private val exceedingInput = MutableStateFlow<ExitAmountInput?>(null)
+
+    val amountError = combine(amountValidator.observe(amount), exceedingInput, input) { precision, exceeding, current ->
+        if (precision is FieldValidationResult.Error || exceeding != current) {
+            precision
+        } else {
+            FieldValidationResult.Error(BittensorExitValidationFailure.INSUFFICIENT_STAKE.message(resources))
+        }
+    }
         .shareInBackground()
 
     private val requestState = combine(
@@ -610,9 +623,18 @@ class BittensorExitAmountViewModel(
         }
             .getOrNull() ?: return null
         if (amount <= BigInteger.ZERO || amount.bitLength() > 64) return null
-        if (amount > maximum) return null
         val fullExit = position.preflight.canExitAll && amount == position.preflight.totalStake
-        val quote = bittensorExitInteractor.quote(position, amount, fullExit, request.slippageFraction)
+        val quote = if (amount > maximum) {
+            null
+        } else {
+            try {
+                bittensorExitInteractor.quote(position, amount, fullExit, request.slippageFraction)
+            } catch (e: BittensorExitExceedsStakeException) {
+                null
+            }
+        }
+        exceedingInput.value = request.input.takeIf { quote == null && !estimateOnly }
+        quote ?: return null
         return ExitAmountRequest(request, BittensorExitRequest(position, quote), estimateOnly)
     }
 }

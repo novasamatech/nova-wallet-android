@@ -1,8 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.data.network.rpc.QueryStorageAtRequest
-import io.novafoundation.nova.common.data.network.rpc.QueryStorageAtResponse
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -27,9 +26,6 @@ import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
-import io.novasama.substrate_sdk_android.wsrpc.executeAsync
-import io.novasama.substrate_sdk_android.wsrpc.mappers.nonNull
-import io.novasama.substrate_sdk_android.wsrpc.mappers.pojoList
 import java.math.BigInteger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -44,8 +40,10 @@ internal suspend fun StorageQueryContext.loadBittensorExitSnapshot(
     hotkey: AccountId,
     netuid: BittensorNetuid,
     socket: SocketService,
-    blockHash: String
+    blockHash: String,
+    bulkRetriever: BulkRetriever
 ): BittensorExitPreflight = coroutineScope {
+    val fetch: suspend (List<String>) -> Map<String, String?> = { keys -> bulkRetriever.queryKeys(socket, keys, blockHash) }
     val pallet = runtime.metadata.module("SubtensorModule")
     val id = BigInteger.valueOf(netuid.value.toLong())
 
@@ -98,7 +96,7 @@ internal suspend fun StorageQueryContext.loadBittensorExitSnapshot(
     val swapFeeRate = globals.takeUnless { netuid.isRoot() }?.add(runtime.metadata.module("Swap").storage("FeeRate"), id) {
         it?.let(::bindNumber) ?: BittensorWithdrawalBounds.DEFAULT_SWAP_FEE_RATE
     }
-    val globalsLoaded = async { globals.execute(socket, blockHash) }
+    val globalsLoaded = async { globals.execute(fetch) }
 
     val minStake = pallet.numberConstant("InitialMinStake", runtime)
 
@@ -124,7 +122,7 @@ internal suspend fun StorageQueryContext.loadBittensorExitSnapshot(
                 ?.add(pallet.storage("LastColdkeyHotkeyStakeBlock"), coldkey, member.value, binding = ::bindNumberOrZero)
         )
     }
-    memberReads.execute(socket, blockHash)
+    memberReads.execute(fetch)
     globalsLoaded.await()
 
     val unlockInterval = interval.value
@@ -161,8 +159,12 @@ private class BittensorExitMemberItems(
     val lastStakeBlock: BittensorStorageBatch.Item<BigInteger>?
 )
 
-/** Collects storage items (plain or keyed) and reads them at one block in a single `state_queryStorageAt`. */
-private class BittensorStorageBatch(private val runtime: RuntimeSnapshot) {
+/**
+ * Collects storage items, plain or keyed, for one multi-key read. `StorageQueryContext.multi` cannot be used:
+ * it splits every returned key into arguments, which the SDK rejects for plain storage values. The transport is
+ * [BulkRetriever.queryKeys] (chunked `state_queryStorageAt` on the IO dispatcher at the snapshot block).
+ */
+internal class BittensorStorageBatch(private val runtime: RuntimeSnapshot) {
 
     inner class Item<V>(private val entry: StorageEntry, val key: String, private val binding: (Any?) -> V) {
 
@@ -182,14 +184,9 @@ private class BittensorStorageBatch(private val runtime: RuntimeSnapshot) {
         return Item(entry, key, binding)
     }
 
-    suspend fun execute(socket: SocketService, blockHash: String) {
+    /** An absent key binds `null`, never the storage default: callers decide what a missing value means. */
+    suspend fun execute(fetch: suspend (List<String>) -> Map<String, String?>) {
         val distinct = keys.distinct()
-        values = if (distinct.isEmpty()) {
-            emptyMap()
-        } else {
-            socket.executeAsync(QueryStorageAtRequest(distinct, blockHash), mapper = pojoList<QueryStorageAtResponse>().nonNull())
-                .first()
-                .changesAsMap()
-        }
+        values = if (distinct.isEmpty()) emptyMap() else fetch(distinct)
     }
 }

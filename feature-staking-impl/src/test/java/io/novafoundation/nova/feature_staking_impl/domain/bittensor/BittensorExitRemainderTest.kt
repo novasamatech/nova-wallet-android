@@ -92,6 +92,12 @@ class BittensorExitRemainderTest {
         assertTrue(validation.validate(full) is ValidationStatus.Valid)
     }
 
+    @Test(expected = BittensorExitExceedsStakeException::class)
+    fun `amount above the drawable stake is a typed insufficient stake failure`() {
+        val stake = rao(19_990_000)
+        rootPreflight(stake).plan(stake + BigInteger.ONE, hotkey)
+    }
+
     private fun rao(value: Long) = BigInteger.valueOf(value)
 
     private fun rootPreflight(stake: BigInteger) = preflight(stake, BittensorProtocolUnits.RAO_PER_TAO)

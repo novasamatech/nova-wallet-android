@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.bittensorFloorsClose
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -55,23 +57,34 @@ class BittensorExitInteractor(
     private val chainState: ChainStateRepository
 ) {
 
+    private companion object {
+
+        const val SUBNET_METADATA_ATTEMPTS = 5
+    }
+
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
     fun observe(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): Flow<BittensorExitPosition> = flowOfAll {
         val initial = load(metaId, netuid, hotkeyAddress)
         var subnet = initial.subnet
+        val metadataRetry = BittensorBlockBackoff(SUBNET_METADATA_ATTEMPTS)
         val snapshots = flowOfAll { chainState.currentRemoteBlockNumberFlow(initial.chain.id) }
             .conflate()
             .mapNotNull {
                 requireWallet(metaId, initial.coldkey, initial.chain)
-                if (subnet == null && !netuid.isRoot()) subnet = loadSubnetMetadata(netuid)
+                if (subnet == null && !netuid.isRoot() && metadataRetry.shouldAttempt()) subnet = loadSubnetMetadata(netuid)
                 refreshPreflight(initial, netuid)?.let { it to subnet }
             }
             .onStart { emit(initial.preflight to initial.subnet) }
-            // Price drift alone must not restart the quote and fee of an unchanged position every block.
-            .distinctUntilChanged { old, new -> old.first.refreshIdentity() == new.first.refreshIdentity() && old.second == new.second }
+            .map { (preflight, subnet) -> preflight.withWithdrawalFloor(netuid) to subnet }
+            // Price drift alone must not restart the quote and fee of an unchanged position every block;
+            // the Max floor is refreshed once it moves by more than the bucket.
+            .distinctUntilChanged { old, new ->
+                old.second == new.second && old.first.refreshIdentity() == new.first.refreshIdentity() &&
+                    bittensorFloorsClose(old.first.withdrawalFloor, new.first.withdrawalFloor)
+            }
         combine(snapshots, walletRepository.assetFlow(metaId, initial.chain.utilityAsset)) { (preflight, subnet), asset ->
-            initial.copy(preflight = preflight.withWithdrawalFloor(netuid), subnet = subnet, asset = asset)
+            initial.copy(preflight = preflight, subnet = subnet, asset = asset)
         }
             .distinctUntilChanged()
     }
@@ -353,5 +366,23 @@ class BittensorExitInteractor(
         check(
             wallet.id == metaId && wallet.requireAccountIdIn(chain).contentEquals(coldkey.value)
         ) { "The staking wallet has changed" }
+    }
+}
+
+/** Exponential backoff over block ticks: attempts on ticks 1, 3, 7, 15, … and gives up after [maxAttempts]. */
+internal class BittensorBlockBackoff(private val maxAttempts: Int) {
+
+    private var tick = 0L
+
+    private var attempts = 0
+
+    private var nextTick = 1L
+
+    fun shouldAttempt(): Boolean {
+        tick += 1
+        if (attempts >= maxAttempts || tick < nextTick) return false
+        attempts += 1
+        nextTick = tick + (1L shl attempts)
+        return true
     }
 }

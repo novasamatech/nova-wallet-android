@@ -37,4 +37,11 @@ class BittensorExitPreflightRefreshTest {
         assertNotEquals(preflight(stake = 1_000).refreshIdentity(), preflight(stake = 999).refreshIdentity())
         assertNotEquals(preflight(hold = 1).refreshIdentity(), preflight(hold = 0).refreshIdentity())
     }
+
+    @Test
+    fun `withdrawal floor drift inside one percent keeps the previous max`() {
+        assertEquals(true, bittensorFloorsClose(BigInteger.valueOf(1_000), BigInteger.valueOf(1_010)))
+        assertEquals(false, bittensorFloorsClose(BigInteger.valueOf(1_000), BigInteger.valueOf(1_011)))
+        assertEquals(true, bittensorFloorsClose(BigInteger.ZERO, BigInteger.ZERO))
+    }
 }

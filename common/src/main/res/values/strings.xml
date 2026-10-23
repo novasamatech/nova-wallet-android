@@ -3019,7 +3019,7 @@
     <string name="bittensor_submission_unknown_description">The transaction may have been included, but its result could not be verified. Check your positions and transaction history before starting another operation.</string>
     <string name="bittensor_exit_position_changed">The full position amount has changed. Review the withdrawal again.</string>
     <string name="bittensor_exit_below_minimum">Amount is below the minimum withdrawal.</string>
-    <string name="bittensor_exit_remainder_below_minimum">The remaining stake would be below the chain minimum. Choose Max to exit the full position.</string>
+    <string name="bittensor_exit_remainder_below_minimum">The remaining stake would be below the network minimum.</string>
     <string name="bittensor_exit_dust_remainder_title">Position will be closed</string>
     <string name="bittensor_exit_dust_remainder_message">Your remaining stake of %1$s would be below the network minimum of %2$s. The network will return the remainder to your transferable balance and close the position.</string>
     <string name="bittensor_exit_remainder_locked_title">Remaining tokens are locked</string>

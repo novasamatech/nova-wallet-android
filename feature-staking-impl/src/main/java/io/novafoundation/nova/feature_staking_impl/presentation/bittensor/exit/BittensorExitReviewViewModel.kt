@@ -96,6 +96,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitExceedsStakeException
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -526,11 +529,9 @@ class BittensorExitReviewViewModel(
                 draft.fee,
                 draft.feeFromStake
             )
-            // The setup's "Proceed" covers the reviewed amount only; Max or a refreshed quote asks again.
-            val setupAcceptedSweep = payload.remainderSweepAccepted && draft.quote == payload.quote()
             val validationPayload = freshPayload.copy(
                 priceImpactAccepted = acceptedImpactQuote != null && freshPayload.latestQuote == acceptedImpactQuote,
-                remainderSweepAccepted = remainderSweepAccepted || setupAcceptedSweep
+                remainderSweepAccepted = remainderSweepAccepted || payload.carriesRemainderSweepFor(draft.quote)
             )
             validationExecutor.requireValid(
                 validationSystem = exitValidationSystem,
@@ -595,6 +596,8 @@ class BittensorExitReviewViewModel(
             }
         } catch (e: CancellationException) {
             throw e
+        } catch (e: BittensorExitExceedsStakeException) {
+            showError(resources.getString(R.string.common_error_general_title), BittensorExitValidationFailure.INSUFFICIENT_STAKE.message(resources))
         } catch (e: Exception) {
             showError(e)
         } finally {

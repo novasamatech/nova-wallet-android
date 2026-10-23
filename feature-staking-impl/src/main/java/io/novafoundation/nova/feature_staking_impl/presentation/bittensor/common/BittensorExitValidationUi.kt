@@ -39,15 +39,8 @@ fun bittensorExitValidationFailureUi(
     acceptImpact: () -> Unit,
     onOutcome: (StakingValidationOutcome) -> Unit = {}
 ): TransformedFailure {
-    if (dustRemainder != null) {
-        remainderFailureUi(reason, resources, isRoot, dustRemainder, unstakeAll, acceptRemainder, onOutcome)?.let { return it }
-    }
+    remainderFailureUi(reason, resources, isRoot, dustRemainder, unstakeAll, acceptRemainder, onOutcome)?.let { return it }
     val action = when (reason) {
-        BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL ->
-            CustomDialogDisplayer.Payload.DialogAction(resources.getString(exitAllLabel(isRoot))) {
-                onOutcome(StakingValidationOutcome.PROCEEDED)
-                unstakeAll()
-            }
         BittensorExitValidationFailure.QUOTE_CHANGED ->
             CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.bittensor_review_updated_quote)) {
                 onOutcome(StakingValidationOutcome.PROCEEDED)
@@ -90,7 +83,7 @@ private fun remainderFailureUi(
     reason: BittensorExitValidationFailure,
     resources: ResourceManager,
     isRoot: Boolean,
-    dustRemainder: BittensorExitDustRemainderUi,
+    dustRemainder: BittensorExitDustRemainderUi?,
     unstakeAll: () -> Unit,
     acceptRemainder: () -> Unit,
     onOutcome: (StakingValidationOutcome) -> Unit
@@ -98,7 +91,8 @@ private fun remainderFailureUi(
     BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL -> TransformedFailure.Custom(
         CustomDialogDisplayer.Payload(
             title = resources.getString(R.string.bittensor_exit_dust_remainder_title),
-            message = resources.getString(R.string.bittensor_exit_dust_remainder_message, dustRemainder.remainder, dustRemainder.minimum),
+            message = dustRemainder?.let { resources.getString(R.string.bittensor_exit_dust_remainder_message, it.remainder, it.minimum) }
+                ?: reason.message(resources),
             okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_proceed)) {
                 onOutcome(StakingValidationOutcome.PROCEEDED)
                 acceptRemainder()
@@ -107,7 +101,7 @@ private fun remainderFailureUi(
                 onOutcome(StakingValidationOutcome.CANCELLED)
             },
             neutralAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(exitAllLabel(isRoot))) {
-                onOutcome(StakingValidationOutcome.CANCELLED)
+                onOutcome(StakingValidationOutcome.PROCEEDED)
                 unstakeAll()
             }
         )
@@ -117,7 +111,7 @@ private fun remainderFailureUi(
         val message = if (isRoot) R.string.bittensor_exit_remainder_locked_unstake_message else R.string.bittensor_exit_remainder_locked_sale_message
         TransformedFailure.Default(
             resources.getString(R.string.bittensor_exit_remainder_locked_title) to
-                resources.getString(message, dustRemainder.remainder, dustRemainder.minimum)
+                (dustRemainder?.let { resources.getString(message, it.remainder, it.minimum) } ?: reason.message(resources))
         )
     }
     else -> null

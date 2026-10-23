@@ -8,6 +8,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPlanMember
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.planBittensorExit
 
+/** Withdrawal floors within 1 % of each other: the Max shown from the older one is still accurate enough. */
+internal fun bittensorFloorsClose(first: BigInteger, second: BigInteger): Boolean =
+    (first - second).abs() * BigInteger.valueOf(100) <= first.max(second)
+
 data class BittensorExitAvailability(val total: BigInteger, val locked: BigInteger, val available: BigInteger)
 
 data class BittensorExitPreflight(

@@ -63,6 +63,10 @@ data class BittensorExitReviewPayload(
     )
 }
 
+/** The setup's "Proceed" on a swept remainder covers the reviewed terms only; Max or a refreshed quote asks again. */
+fun BittensorExitReviewPayload.carriesRemainderSweepFor(reviewed: BittensorExitQuote): Boolean =
+    remainderSweepAccepted && reviewed == quote()
+
 fun BittensorExitQuote.toPayload(position: BittensorExitPositionPayload) = BittensorExitReviewPayload(
     position,
     amount.toString(),

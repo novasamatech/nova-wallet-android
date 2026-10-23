@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
@@ -22,7 +23,8 @@ interface BittensorExitRuntimeSource {
 class RealBittensorExitRuntimeSource(
     private val storage: StorageDataSource,
     private val rpcCalls: RpcCalls,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val bulkRetriever: BulkRetriever
 ) : BittensorExitRuntimeSource {
 
     override suspend fun preflight(
@@ -45,7 +47,8 @@ class RealBittensorExitRuntimeSource(
                 hotkey,
                 netuid,
                 socket,
-                hash
+                hash,
+                bulkRetriever
             )
         }
     } ?: error("Exit preflight timed out")
