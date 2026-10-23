@@ -81,4 +81,5 @@ dependencies {
     implementation retrofitDep
 
     implementation shimmerDep
+    implementation flexBoxDep
 }
