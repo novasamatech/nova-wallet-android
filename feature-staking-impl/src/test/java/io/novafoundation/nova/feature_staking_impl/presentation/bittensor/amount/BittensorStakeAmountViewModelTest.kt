@@ -242,7 +242,7 @@ class BittensorStakeAmountViewModelTest {
         `when`(resources.getString(R.string.common_continue)).thenReturn("Continue")
         `when`(resources.getString(R.string.common_enter_amount)).thenReturn("Enter amount")
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
+        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(chainAsset.precision).thenReturn(Precision(9))
         `when`(chainAsset.chainId).thenReturn("bittensor")

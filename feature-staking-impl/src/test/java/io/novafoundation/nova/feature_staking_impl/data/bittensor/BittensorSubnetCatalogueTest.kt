@@ -9,7 +9,12 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Str
 import java.math.BigInteger
 import java.io.IOException
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import org.junit.Assert.assertTrue
+import retrofit2.Response
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -31,7 +36,56 @@ class BittensorSubnetCatalogueTest {
 
     private val swaps = mock(BittensorSwapSource::class.java)
 
-    private val repository = RealBittensorSubnetRepository(runtimeCalls, config, swaps)
+    private val backend = CatalogueApi()
+
+    private val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+
+    private val repository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, backend, urls)
+
+    @Test
+    fun `slow chain node falls back to backend names within the patience window`() = runBlocking<Unit> {
+        calls.delayMillis = 5_000L
+        val slowNodeRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, backend, urls, chainPatienceMillis = 50L)
+
+        val subnets = slowNodeRepository.subnets()
+
+        assertEquals(listOf("Backend 7"), subnets.map { it.name })
+        assertEquals("B7", subnets.single().symbol)
+        assertEquals(BigInteger.valueOf(500_000_000), subnets.single().priceInRao)
+        assertEquals(BigInteger.valueOf(2_000_000_000_000), subnets.single().taoReserveInPlanks)
+        assertEquals(BigInteger.valueOf(42), subnets.single().registrationBlock)
+        assertEquals(1, backend.requests)
+    }
+
+    @Test
+    fun `failing chain node uses backend and fast chain stays authoritative`() = runBlocking<Unit> {
+        calls.failure = IOException("Node down")
+        assertEquals(listOf("Backend 7"), repository.subnets().map { it.name })
+
+        calls.failure = null
+        val freshRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, backend, urls)
+        assertEquals(listOf("Name"), freshRepository.subnets().map { it.name })
+    }
+
+    @Test
+    fun `stale backend catalogue is still listed`() {
+        val subnets = mapBittensorBackendCatalogue(backendCatalogue(freshness = "STALE"))
+
+        assertEquals(listOf(BittensorNetuid.Subnet(7)), subnets.map { it.id })
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `unavailable backend catalogue is rejected`() {
+        mapBittensorBackendCatalogue(backendCatalogue(availability = "UNAVAILABLE"))
+    }
+
+    @Test
+    fun `both sources failing surface the chain failure`() = runBlocking<Unit> {
+        calls.failure = IOException("Node down")
+        backend.failure = IOException("Backend down")
+
+        assertEquals("Node down", runCatching { repository.subnets() }.exceptionOrNull()?.message)
+    }
 
     @Test(expected = IllegalArgumentException::class)
     fun `quick pick rejects missing runtime rows`() {
@@ -54,7 +108,7 @@ class BittensorSubnetCatalogueTest {
         }
         val logger = mock(Logger::class.java)
         val remoteConfig = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
-        val catalogueRepository = RealBittensorSubnetRepository(runtimeCalls, remoteConfig, swaps)
+        val catalogueRepository = RealBittensorSubnetRepository(runtimeCalls, remoteConfig, swaps, backend, urls)
 
         val subnets = catalogueRepository.subnets()
 
@@ -76,6 +130,19 @@ class BittensorSubnetCatalogueTest {
         verify(swaps, times(2)).currentAlphaPrice(ChainGeneses.BITTENSOR, subnetId)
     }
 
+    private class CatalogueApi : BittensorSubnetCatalogueApi {
+
+        var requests = 0
+
+        var failure: Exception? = null
+
+        override suspend fun subnets(url: String): Response<BittensorSubnetCatalogueRemote> {
+            requests++
+            failure?.let { throw it }
+            return Response.success(backendCatalogue())
+        }
+    }
+
     private class CatalogueCalls : RuntimeCallsApi {
 
         override val chainId = ChainGeneses.BITTENSOR
@@ -83,6 +150,10 @@ class BittensorSubnetCatalogueTest {
         override val runtime = mock(RuntimeSnapshot::class.java)
 
         var requests = 0
+
+        var delayMillis = 0L
+
+        var failure: Exception? = null
 
         override fun isSupported(section: String, method: String) = true
 
@@ -101,6 +172,8 @@ class BittensorSubnetCatalogueTest {
             returnBinding: (Any?) -> R
         ): R {
             requests++
+            delay(delayMillis)
+            failure?.let { throw it }
             val subnet = Struct.Instance(
                 mapOf(
                     "netuid" to BigInteger.ONE,
@@ -121,4 +194,11 @@ class BittensorSubnetCatalogueTest {
             returnBinding: (Any?) -> R
         ): R = error("Unexpected untyped runtime request")
     }
+}
+
+private fun backendCatalogue(freshness: String = "FRESH", availability: String = "AVAILABLE"): BittensorSubnetCatalogueRemote {
+    val row = BittensorSubnetCatalogueRemote.Subnet(7, "0.5", "Backend 7", "B7", 42.toBigInteger(), "2000", alphaReserve = "4000")
+    val component = BittensorRecommendationsRemote.Component(availability, freshness)
+    val meta = BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component))
+    return BittensorSubnetCatalogueRemote(listOf(row), meta)
 }

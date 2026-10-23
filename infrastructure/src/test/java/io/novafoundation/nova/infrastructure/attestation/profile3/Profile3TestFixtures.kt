@@ -169,7 +169,9 @@ internal class Profile3Fixture(testScope: CoroutineScope) {
 
     val factory = Profile3TokenRecordFactory(clock, random)
 
-    val integrity = IntegrityTokenSource { "synthetic-integrity-proof" }
+    var integrityFailure: Exception? = null
+
+    val integrity = IntegrityTokenSource { integrityFailure?.let { throw it } ?: "synthetic-integrity-proof" }
 
     val registration = Profile3RegistrationService(api, keys, integrity, "io.novafoundation.nova.debug", urls, identities)
 

@@ -120,5 +120,5 @@ class RealBittensorRootClaimSource(
                 )
             }
         }
-    } ?: error("Root claim availability timed out")
+    } ?: throw BittensorTimeoutException("Root claim availability")
 }

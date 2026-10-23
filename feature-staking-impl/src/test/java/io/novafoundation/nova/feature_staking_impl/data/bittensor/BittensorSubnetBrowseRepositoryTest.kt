@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -44,6 +45,28 @@ class BittensorSubnetBrowseRepositoryTest {
     }
 
     @Test
+    fun `stale backend metadata and prices are still listed but unavailable ones are not`() {
+        val runtime = listOf(subnet(1, 10, 1))
+        val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend 1", "S1", 10.toBigInteger(), "2000"))
+        val stale = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
+        val unavailable = BittensorRecommendationsRemote.Component("UNAVAILABLE", "STALE")
+
+        val listed = mapBittensorBrowseSubnets(
+            BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(stale, stale))),
+            runtime
+        )
+        val rejected = runCatching {
+            mapBittensorBrowseSubnets(
+                BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(stale, unavailable))),
+                runtime
+            )
+        }
+
+        assertEquals(listOf(1), listed.map { it.id.value })
+        assertTrue(rejected.exceptionOrNull() is IllegalArgumentException)
+    }
+
+    @Test
     fun `validator count is permit population independent of policy selection`() {
         val permits = List(20) { true } + List(8) { false }
         assertEquals(20, bindBittensorValidatorCount(permits))
@@ -78,7 +101,7 @@ class BittensorSubnetBrowseRepositoryTest {
             at: String?,
             applyStorageDefault: Boolean,
             query: suspend StorageQueryContext.() -> R
-        ): R = false as R
+        ): R = emptyMap<BittensorNetuid.Subnet, Boolean>() as R
     }
 
     private fun subnet(id: Int, registration: Long, price: Long?) = BittensorSubnet(

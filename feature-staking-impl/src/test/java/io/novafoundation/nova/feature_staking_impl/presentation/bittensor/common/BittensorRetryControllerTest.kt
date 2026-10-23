@@ -20,7 +20,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
+import io.novafoundation.nova.infrastructure.attestation.AttestationUnavailableException
+import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
+import java.io.IOException
+import java.net.SocketTimeoutException
+import kotlinx.coroutines.coroutineScope
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -39,7 +46,67 @@ class BittensorRetryControllerTest {
     @Before
     fun prepare() {
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
+        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
+        `when`(resources.getString(R.string.bittensor_load_slow_title)).thenReturn("Slow")
+        `when`(resources.getString(R.string.bittensor_load_slow_message)).thenReturn("Slow message")
+        `when`(resources.getString(R.string.bittensor_load_device_title)).thenReturn("Device")
+        `when`(resources.getString(R.string.bittensor_load_device_message)).thenReturn("Device message")
+    }
+
+    @Test
+    fun `generic failure uses the iOS load failure wording and offers retry`() = runBlocking {
+        val failure = firstFailure { error("RPC unavailable") }
+
+        assertEquals(BittensorReadFailureKind.GENERIC, failure.kind)
+        assertEquals("Error", failure.title)
+        assertEquals("Retry", failure.message)
+        assertTrue(failure.retryable)
+    }
+
+    @Test
+    fun `timeout is explained as a slow network and stays retryable`() = runBlocking {
+        val failure = firstFailure { throw BittensorTimeoutException("Subnet catalogue") }
+
+        assertEquals(BittensorReadFailureKind.SLOW_NETWORK, failure.kind)
+        assertEquals("Slow", failure.title)
+        assertEquals("Slow message", failure.message)
+        assertTrue(failure.retryable)
+    }
+
+    @Test
+    fun `device without attestation gets one non retryable explanation per screen`() = runBlocking {
+        val unsupported = IOException("Profile-3 authentication failed", AttestationUnsupportedException("Play Integrity is unavailable"))
+        val collections = List(2) {
+            launch {
+                controller.observe("source $it", transform = { flow -> flow.catch { } }) { flow<Int> { throw unsupported } }.collect {}
+            }
+        }
+
+        val failure = withTimeout(3_000L) { controller.events.first() }
+
+        assertEquals(BittensorReadFailureKind.DEVICE_UNSUPPORTED, failure.kind)
+        assertEquals("Device", failure.title)
+        assertEquals("Device message", failure.message)
+        assertFalse(failure.retryable)
+        assertNull(withTimeoutOrNull(100L) { controller.events.first() })
+        collections.forEach { it.cancelAndJoin() }
+    }
+
+    @Test
+    fun `failure kind follows the cause chain`() {
+        assertEquals(BittensorReadFailureKind.SLOW_NETWORK, IllegalStateException("wrapped", SocketTimeoutException()).bittensorReadFailureKind())
+        assertEquals(BittensorReadFailureKind.DEVICE_UNSUPPORTED, AttestationUnsupportedException("refused").bittensorReadFailureKind())
+        assertEquals(BittensorReadFailureKind.GENERIC, AttestationUnavailableException("cooling down").bittensorReadFailureKind())
+        assertEquals(BittensorReadFailureKind.GENERIC, IllegalArgumentException("Subnet metadata is unavailable").bittensorReadFailureKind())
+    }
+
+    private suspend fun firstFailure(load: suspend () -> Int): BittensorReadFailure = coroutineScope {
+        val collection = launch {
+            controller.observe("step", transform = { it.catch { } }) { flow { emit(load()) } }.collect {}
+        }
+        val failure = withTimeout(3_000L) { controller.events.first() }
+        collection.cancelAndJoin()
+        failure
     }
 
     @Test

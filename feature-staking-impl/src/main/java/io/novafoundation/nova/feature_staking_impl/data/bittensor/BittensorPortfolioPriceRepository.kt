@@ -72,9 +72,14 @@ class RealBittensorPortfolioPriceRepository(
     }
 }
 
+/** Holdings are valued only at FRESH backend prices (iOS `freshTaoPerAlpha`); STALE ones yield to live runtime prices. */
 internal fun mapBittensorPortfolioPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
-    val component = requireNotNull(response.meta?.components?.alphaPrices)
-    require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Portfolio prices are unavailable or stale" }
+    val fresh = requireAvailableBittensorComponent(response.meta?.components?.alphaPrices, "Portfolio prices")
+    return if (fresh) mapBittensorSubnetPrices(response) else emptyMap()
+}
+
+/** Catalogue prices regardless of freshness - for listing, never for valuing holdings. */
+internal fun mapBittensorSubnetPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
     val subnets = requireNotNull(response.items)
     val seenSubnets = mutableSetOf<BittensorNetuid.Subnet>()
 

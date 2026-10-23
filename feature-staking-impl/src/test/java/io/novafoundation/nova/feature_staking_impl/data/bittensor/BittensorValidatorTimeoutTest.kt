@@ -45,7 +45,7 @@ class BittensorValidatorTimeoutTest {
     @Test
     fun `owned directory timeout is recoverable not cancellation`() = runTest {
         val failure = runCatching { repository.rootValidators(chain) }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertFalse(failure is CancellationException)
     }
 
@@ -53,7 +53,7 @@ class BittensorValidatorTimeoutTest {
     fun `owned eligibility timeout is recoverable not cancellation`() = runTest {
         val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator")
         val failure = runCatching { repository.validateRoot(chain, validator) }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertFalse(failure is CancellationException)
     }
 

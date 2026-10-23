@@ -48,7 +48,15 @@ class AttestationFailedException(message: String) : IOException(message)
  * key failed - so the request was not sent. Unlike [AttestationFailedException] it says nothing about
  * whether this client is accepted, so it is worth retrying later.
  */
-class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
+open class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
+
+/**
+ * This device cannot attest at all - Play Integrity is missing or unusable here, or the backend refused this client -
+ * so retrying will not help. Callers should explain the device limitation instead of offering a retry.
+ */
+class AttestationUnsupportedException(message: String, cause: Throwable? = null) : AttestationUnavailableException(message, cause)
+
+fun Throwable.isAttestationUnsupported(): Boolean = generateSequence(this) { it.cause }.any { it is AttestationUnsupportedException }
 
 /** Produces a Play Integrity token bound to [requestHash]. */
 fun interface IntegrityTokenSource {

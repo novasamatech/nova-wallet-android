@@ -11,7 +11,11 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlin.time.Duration.Companion.seconds
+import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
+import retrofit2.HttpException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -26,15 +30,25 @@ interface BittensorSubnetRepository {
     suspend fun quickPickSubnets(): List<BittensorSubnet>
 }
 
+/**
+ * Subnet names and symbols come from the chain (`get_all_dynamic_info`, a heavy call) or, when the node is slow or
+ * failing, from the backend `/subnets` catalogue - the source iOS names subnets from. The last good catalogue
+ * backs both up, so a slow node never blanks subnet names.
+ */
 class RealBittensorSubnetRepository(
     private val runtimeCalls: MultiChainRuntimeCallsApi,
     private val configRepository: BittensorConfigRepository,
-    private val swapSource: BittensorSwapSource
+    private val swapSource: BittensorSwapSource,
+    private val catalogueApi: BittensorSubnetCatalogueApi,
+    private val infrastructureUrls: InfrastructureUrls,
+    private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS
 ) : BittensorSubnetRepository {
 
     private val mutex = Mutex()
 
     private var cachedCatalogue: List<BittensorSubnet>? = null
+
+    private var lastGoodCatalogue: List<BittensorSubnet>? = null
 
     private var catalogueLoadedAtNanos = 0L
 
@@ -43,8 +57,15 @@ class RealBittensorSubnetRepository(
         if (cachedCatalogue != null && System.nanoTime() - catalogueLoadedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
             return@withLock cachedCatalogue
         }
-        val catalogue = loadCatalogue()
+        val catalogue = try {
+            loadCatalogue()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            lastGoodCatalogue ?: throw e
+        }
         this.cachedCatalogue = catalogue
+        lastGoodCatalogue = catalogue
         catalogueLoadedAtNanos = System.nanoTime()
         catalogue
     }
@@ -55,20 +76,44 @@ class RealBittensorSubnetRepository(
             ?: throw NoSuchElementException("Subnet ${subnetId.value} is unavailable")
         val price = swapSource.currentAlphaPrice(ChainGeneses.BITTENSOR, subnetId)
         subnet.copy(priceInRao = price)
-    } ?: error("Subnet details timed out")
+    } ?: throw BittensorTimeoutException("Subnet details")
 
     override suspend fun quickPickSubnets(): List<BittensorSubnet> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         loadDynamicSubnets(requireComplete = true)
-    } ?: error("Subnet quick-pick catalogue timed out")
+    } ?: throw BittensorTimeoutException("Subnet quick-pick catalogue")
 
     private suspend fun loadCatalogue(): List<BittensorSubnet> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         coroutineScope {
             val subnetLogos = async { configRepository.subnetLogos() }
-            val subnets = loadDynamicSubnets()
+            val chain = async { catching { loadDynamicSubnets() } }
+            val backend = async { catching { loadBackendCatalogue() } }
+            // Prefer the chain while it answers promptly; a slow node must not hold the names hostage.
+            val subnets = withTimeoutOrNull(chainPatienceMillis) { chain.await() }?.getOrNull()
+                ?: backend.await().getOrNull()
+                ?: chain.await().getOrThrow()
+            chain.cancel()
+            backend.cancel()
             val logos = subnetLogos.await()
             subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
         }
-    } ?: error("Subnet catalogue timed out")
+    } ?: throw BittensorTimeoutException("Subnet catalogue")
+
+    private suspend fun loadBackendCatalogue(): List<BittensorSubnet> {
+        val base = infrastructureUrls.baseUrl() ?: throw InfrastructureUrlMissingException()
+        require(base.isHttps) { "Infrastructure requires HTTPS" }
+        val url = requireNotNull(base.resolve("/v1/bittensor/subnets"))
+        val response = catalogueApi.subnets(url.toString())
+        if (!response.isSuccessful) throw HttpException(response)
+        return mapBittensorBackendCatalogue(requireNotNull(response.body()))
+    }
+
+    private suspend fun <T> catching(load: suspend () -> T): Result<T> = try {
+        Result.success(load())
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 
     private suspend fun loadDynamicSubnets(requireComplete: Boolean = false): List<BittensorSubnet> = runtimeCalls.forChain(ChainGeneses.BITTENSOR)
         .call(
@@ -81,8 +126,44 @@ class RealBittensorSubnetRepository(
     private companion object {
 
         val CATALOGUE_VALIDITY = 30.seconds
+
+        const val CHAIN_CATALOGUE_PATIENCE_MILLIS = 4_000L
     }
 }
+
+/** The backend catalogue as [BittensorSubnet]s; STALE metadata or prices are still listed, as on iOS. */
+internal fun mapBittensorBackendCatalogue(remote: BittensorSubnetCatalogueRemote): List<BittensorSubnet> {
+    requireAvailableBittensorComponent(remote.meta?.components?.subnetMetadata, "Subnet metadata")
+    requireAvailableBittensorComponent(remote.meta?.components?.alphaPrices, "Subnet prices")
+    val prices = mapBittensorSubnetPrices(remote)
+    val subnets = requireNotNull(remote.items).mapNotNull { row ->
+        val id = BittensorNetuid.from(requireNotNull(row.netuid)) as? BittensorNetuid.Subnet ?: return@mapNotNull null
+        val registration = requireNotNull(row.networkRegisteredAt)
+        require(registration.signum() >= 0) { "Invalid subnet registration" }
+        BittensorSubnet(
+            id = id,
+            name = requireNotNull(row.name).trim(),
+            symbol = requireNotNull(row.symbol).trim(),
+            logoUrl = null,
+            priceInRao = prices[id],
+            taoReserveInPlanks = row.taoReserve?.let(::bittensorBackendPlanks),
+            registrationBlock = registration,
+            alphaReserveInPlanks = row.alphaReserve?.let(::bittensorBackendPlanks),
+            websiteUrl = BittensorSubnetLinks.website(row.subnetUrl),
+            githubUrl = BittensorSubnetLinks.github(row.githubRepo)
+        )
+    }.distinctBy { it.id }.sortedBy { it.id.value }
+    require(subnets.isNotEmpty()) { "Empty subnet catalogue" }
+    return subnets
+}
+
+private fun bittensorBackendPlanks(value: String): BigInteger {
+    val planks = value.toBigDecimal().movePointRight(BITTENSOR_DECIMALS).toBigIntegerExact()
+    require(planks.signum() >= 0) { "Negative subnet reserve" }
+    return planks
+}
+
+private const val BITTENSOR_DECIMALS = 9
 
 internal fun bindBittensorSubnets(decoded: Any?, requireComplete: Boolean = false): List<BittensorSubnet> {
     if (requireComplete) {

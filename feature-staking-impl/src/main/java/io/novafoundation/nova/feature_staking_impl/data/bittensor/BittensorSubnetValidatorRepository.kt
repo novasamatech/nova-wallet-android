@@ -88,7 +88,7 @@ class RealBittensorSubnetValidatorRepository(
         }
         val validators = mapDirectoryRows(chain, netuid, candidates, snapshot, admittedRanking.getOrNull())
         BittensorValidatorDirectory(validators, mapBittensorDirectoryStatus(response.meta), admittedRanking.exceptionOrNull())
-    } ?: error("Validator directory timed out")
+    } ?: throw BittensorTimeoutException("Validator directory")
 
     override suspend fun unrankedDirectory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory =
         withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
@@ -98,7 +98,7 @@ class RealBittensorSubnetValidatorRepository(
             val snapshot = loadDirectorySnapshot(chain, netuid, listed)
             val rows = mapUnavailablePolicyDirectory(chain, netuid, listed.withRootStakes(rootStakes.await()), snapshot)
             BittensorValidatorDirectory(rows, mapBittensorDirectoryStatus(response.meta), recommendationFailure = null)
-        } ?: error("Validator directory timed out")
+        } ?: throw BittensorTimeoutException("Validator directory")
 
     override suspend fun rankDirectory(
         chain: Chain,
@@ -112,7 +112,7 @@ class RealBittensorSubnetValidatorRepository(
         requireBittensorRegistrationFreshness(netuid, snapshot, ranking)
         val rows = mapDirectoryRows(chain, netuid, candidates, snapshot, ranking)
         directory.copy(validators = rows, recommendationFailure = null)
-    } ?: error("Validator eligibility checks timed out")
+    } ?: throw BittensorTimeoutException("Validator eligibility checks")
 
     private suspend fun loadDirectorySnapshot(
         chain: Chain,
@@ -133,7 +133,7 @@ class RealBittensorSubnetValidatorRepository(
         ranking: BittensorRankedValidatorsRemote?
     ): List<BittensorSubnetValidator> {
         val rankedRows = ranking?.items.orEmpty()
-        val recommendedHotkeys = recommendedHotkeys(rankedRows)
+        val recommendedHotkeys = if (hasFreshBittensorRecommendations(ranking?.meta)) recommendedHotkeys(rankedRows) else emptySet()
         val namedCandidates = applyRankedNames(chain, candidates, rankedRows)
         val rows = ranking?.let {
             val gates = mapBittensorValidatorGates(BittensorRecommendationsRemote(it.meta))
@@ -151,7 +151,7 @@ class RealBittensorSubnetValidatorRepository(
         Result.success(withTimeout(RANKING_TIMEOUT_MILLIS) { backend.rankedValidators(netuid.value) })
     } catch (exception: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
-        Result.failure(IllegalStateException("Validator recommendations timed out", exception))
+        Result.failure(BittensorTimeoutException("Validator recommendations", exception))
     } catch (exception: CancellationException) {
         throw exception
     } catch (exception: Exception) {
@@ -258,7 +258,7 @@ class RealBittensorSubnetValidatorRepository(
         )
             .singleOrNull()
         require(row?.canSelect == true) { "Validator is no longer eligible in this subnet" }
-    } ?: error("Validator eligibility checks timed out")
+    } ?: throw BittensorTimeoutException("Validator eligibility checks")
 
     override suspend fun existingPositionValidator(
         chain: Chain,

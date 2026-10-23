@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
-import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.R
@@ -16,11 +15,15 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** Screen-local recovery for reads. Never retries a submitted transaction. */
 class BittensorRetryController(private val resources: ResourceManager, private val logger: Logger) {
 
-    private val errors = Channel<RetryPayload>(Channel.BUFFERED)
+    private val errors = Channel<BittensorReadFailure>(Channel.BUFFERED)
+
+    // Every attested read fails the same way on a device that cannot attest: explain it once per screen.
+    private val deviceFailureReported = AtomicBoolean(false)
 
     val events = errors.receiveAsFlow()
 
@@ -52,12 +55,13 @@ class BittensorRetryController(private val resources: ResourceManager, private v
     private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
         logger.log("[Bittensor] Failed to load $step")
         logger.log(cause)
-        errors.trySend(
-            RetryPayload(
-                title = resources.getString(R.string.common_error_general_title),
-                message = resources.getString(R.string.common_retry_message),
-                onRetry = onRetry
-            )
-        )
+        val kind = cause.bittensorReadFailureKind()
+        if (kind == BittensorReadFailureKind.DEVICE_UNSUPPORTED && !deviceFailureReported.compareAndSet(false, true)) return
+        val (title, message) = when (kind) {
+            BittensorReadFailureKind.GENERIC -> R.string.common_error_general_title to R.string.bittensor_load_failed_message
+            BittensorReadFailureKind.SLOW_NETWORK -> R.string.bittensor_load_slow_title to R.string.bittensor_load_slow_message
+            BittensorReadFailureKind.DEVICE_UNSUPPORTED -> R.string.bittensor_load_device_title to R.string.bittensor_load_device_message
+        }
+        errors.trySend(BittensorReadFailure(kind, resources.getString(title), resources.getString(message), onRetry))
     }
 }

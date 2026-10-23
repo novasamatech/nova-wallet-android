@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.hasFreshBittensorRecommendations
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.isNonNegative
@@ -30,7 +31,8 @@ class BittensorValidatorInteractor(
             return listOf(BittensorValidatorPreview(validator, canPreselect = true))
         }
         val response = backend.rankedValidators(netuid.value)
-        val recommended = response.items.orEmpty().mapNotNull { row ->
+        val rankedRows = if (hasFreshBittensorRecommendations(response.meta)) response.items.orEmpty() else emptyList()
+        val recommended = rankedRows.mapNotNull { row ->
             mapBittensorValidatorPreview(chain, row)
         }
         if (recommended.isNotEmpty()) return recommended.map { BittensorValidatorPreview(it, canPreselect = true) }
