@@ -18,6 +18,7 @@ class BittensorEstimatesRemoteSource(
     suspend fun history(baseUrl: HttpUrl, address: String): EstimatePages<BittensorReportedOperation> =
         loadPages(HISTORY_PAGE_LIMIT, spacingMillis) { page -> loadHistoryPage(baseUrl, address, page) }
 
+    /** Alpha yields arrive as one unpaginated collection per subnet, so there is nothing to page through. */
     internal suspend fun yields(baseUrl: HttpUrl, chain: Chain, subnet: BittensorNetuid.Subnet): EstimatePages<BittensorValidatorYield> {
         val snapshot = loadYieldSnapshot(baseUrl, chain, subnet)
         return EstimatePages(snapshot.items, snapshot.validUntilNanos, allPagesRead = true)
