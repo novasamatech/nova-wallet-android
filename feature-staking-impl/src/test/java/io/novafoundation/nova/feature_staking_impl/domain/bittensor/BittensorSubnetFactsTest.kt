@@ -27,9 +27,21 @@ class BittensorSubnetFactsTest {
 
     @Test
     fun `age uses actual block time and rounds months down`() {
-        val row = ranking(age = 181.days)
+        val row = ranking(age = 183.days)
         assertEquals(6, mapBittensorSubnetFacts(row, 12.seconds).monthsOld)
         assertEquals(null, mapBittensorSubnetFacts(row, 6.seconds).monthsOld)
+    }
+
+    @Test
+    fun `chip months match the details age row`() {
+        // 660 days: 22 months of 30 days, but 21 calendar months, which the details "Age" row shows.
+        assertEquals(21, mapBittensorSubnetFacts(ranking(age = 660.days), 12.seconds).monthsOld)
+        assertEquals(bittensorWholeMonths(java.math.BigDecimal(660)), mapBittensorSubnetFacts(ranking(age = 660.days), 12.seconds).monthsOld)
+    }
+
+    @Test
+    fun `an age past six 30-day months but short of six calendar months shows no chip`() {
+        assertEquals(null, mapBittensorSubnetFacts(ranking(age = 181.days), 12.seconds).monthsOld)
     }
 
     @Test

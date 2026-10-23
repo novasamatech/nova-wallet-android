@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.days
 data class BittensorSubnetFacts(val monthsOld: Int?, val deepPool: Boolean, val steady: Boolean)
 
 private val FACT_MONTH = 30.days
+private val DAY_MILLIS = 1.days.inWholeMilliseconds.toBigDecimal()
 private const val SAFER_AGE_MONTHS = 6
 private val DEEP_POOL_TAO = BigDecimal(25000)
 private val CALMER_VOLATILITY_SCORE = BigDecimal(50)
@@ -34,10 +35,13 @@ internal fun mapBittensorSubnetFacts(ranking: BittensorSubnetRankingRemote?, blo
     val ageMillis = ranking?.ageBlocks?.takeIf { it.isNonNegative && blockTime.isPositive() }
         ?.toBigDecimal()?.times(blockTime.inWholeMilliseconds.toBigDecimal())
     val monthMillis = FACT_MONTH.inWholeMilliseconds.toBigDecimal()
+    // iOS qualifies the chip after 6 × 30 days; the shown count uses the same calendar months as the details "Age" row,
+    // so a chip never reads "22 months old" next to "21 months". The chip appears from 6 whole months.
     val months = ageMillis?.takeIf { it > monthMillis * SAFER_AGE_MONTHS.toBigDecimal() }
-        ?.divide(monthMillis, 0, RoundingMode.DOWN)
+        ?.divide(DAY_MILLIS, 6, RoundingMode.DOWN)
         ?.takeIf { it <= Int.MAX_VALUE.toBigDecimal() }
-        ?.toInt()
+        ?.let(::bittensorWholeMonths)
+        ?.takeIf { it >= SAFER_AGE_MONTHS }
     val pool = ranking?.taoIn?.toBigDecimalOrNull()
     val volatility = ranking?.breakdown?.volatility
     val rawVolatility = volatility?.raw?.toBigDecimalOrNull()
