@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -25,9 +27,6 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
-import java.math.BigDecimal
-import java.math.RoundingMode
-import kotlin.math.abs
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,6 +70,8 @@ class SwapOptionsViewModel(
 
     val slippageInput = MutableStateFlow("")
 
+    private var selectedMethod: Pair<String, SlippageSettingsCommunicator.Method>? = null
+
     private val slippageFieldValidator = slippageConfig.map { slippageFieldValidatorFactory.create(it) }
         .shareInBackground()
 
@@ -99,11 +100,14 @@ class SwapOptionsViewModel(
         .mapList { it.formatPercents() }
 
     init {
+        slippageInput.onEach { value ->
+            if (selectedMethod?.first != value) selectedMethod = null
+        }.launchIn(this)
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
             if (selectedSlippage != defaultSlippage) {
-                slippageInput.value = formatInput(selectedSlippage)
+                slippageInput.value = selectedSlippage.formatPercents(includeSymbol = false)
             }
         }
     }
@@ -115,7 +119,9 @@ class SwapOptionsViewModel(
     fun tipClicked(index: Int) {
         launch {
             val slippageTips = slippageConfig.first().slippageTips
-            slippageInput.value = formatInput(slippageTips[index])
+            val value = slippageTips[index].formatPercents(includeSymbol = false)
+            selectedMethod = value to SlippageSettingsCommunicator.Method.PRESET
+            slippageInput.value = value
         }
     }
 
@@ -125,7 +131,7 @@ class SwapOptionsViewModel(
             val config = slippageConfig.first()
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
             if (payload != null) {
-                val method = slippageChangeMethod(payload.selected.fractions, slippage, config)
+                val method = selectedMethod?.takeIf { it.first == slippageInput.value }?.second ?: SlippageSettingsCommunicator.Method.CUSTOM
                 slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method))
             } else {
                 swapSettingState.await().setSlippage(slippage)
@@ -135,18 +141,12 @@ class SwapOptionsViewModel(
     }
 
     fun resetClicked() {
+        selectedMethod = "" to SlippageSettingsCommunicator.Method.RESET
         slippageInput.value = ""
     }
 
     fun backClicked() {
         swapRouter.back()
-    }
-
-    // The payload sheet caps input at four decimals; a saved value must fit that cap instead of being rejected by it.
-    private fun formatInput(slippage: Fraction): String = if (payload != null) {
-        slippageInputText(slippage)
-    } else {
-        slippage.formatPercents(includeSymbol = false)
     }
 
     private suspend fun String.formatToPercent(): Fraction? {
@@ -165,13 +165,11 @@ class SwapOptionsViewModel(
         validationResult: FieldValidationResult
     ): DescriptiveButtonState {
         val slippage = insertedSlippage.formatToPercent()
-        // The payload sheet mirrors iOS: a single Done action instead of Reset + Apply.
-        val label = resourceManager.getString(if (payload != null) R.string.common_done else R.string.common_apply)
         return when {
             slippage == null -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
             validationResult is FieldValidationResult.Error -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
-            slippage != settings.slippage -> Enabled(label)
-            else -> Disabled(label)
+            slippage != settings.slippage -> Enabled(resourceManager.getString(R.string.common_apply))
+            else -> Disabled(resourceManager.getString(R.string.common_apply))
         }
     }
 
@@ -179,21 +177,3 @@ class SwapOptionsViewModel(
         return slippageInput.formatToPercent() != slippageConfig.defaultSlippage
     }
 }
-
-/** A plain, locale-independent percent with at most [SLIPPAGE_MAX_FRACTION_DIGITS] decimals, e.g. 0.0125. */
-internal fun slippageInputText(slippage: Fraction): String = BigDecimal(slippage.inPercents)
-    .setScale(SLIPPAGE_MAX_FRACTION_DIGITS, RoundingMode.HALF_UP)
-    .stripTrailingZeros()
-    .toPlainString()
-
-/** As iOS reports a slippage change: back to the default is a reset, a listed tip is a preset, anything else is custom. */
-internal fun slippageChangeMethod(initial: Fraction, selected: Fraction, config: SlippageConfig): SlippageSettingsCommunicator.Method = when {
-    selected.sameAs(config.defaultSlippage) && !initial.sameAs(config.defaultSlippage) -> SlippageSettingsCommunicator.Method.RESET
-    config.slippageTips.any(selected::sameAs) -> SlippageSettingsCommunicator.Method.PRESET
-    else -> SlippageSettingsCommunicator.Method.CUSTOM
-}
-
-// Typed percents and configured fractions take different floating-point paths, e.g. 0.1 / 100 != 0.001.
-private fun Fraction.sameAs(other: Fraction): Boolean = abs(inFraction - other.inFraction) < FRACTION_EPSILON
-
-private const val FRACTION_EPSILON = 1e-12
