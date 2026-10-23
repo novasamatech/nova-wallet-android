@@ -493,10 +493,12 @@ class BittensorSubnetDetailsViewModel(
         )
     }
 
-    /** The same preset the stake setup applies (NW-2356), so the card here and the amount screen agree. */
+    /**
+     * The same preset the stake setup applies (NW-2356), so the card here and the amount screen agree.
+     * Without one (e.g. every validator is inactive) the card offers "Choose a validator", as on iOS.
+     */
     private suspend fun automaticValidatorPreviews(): List<BittensorValidatorPreview> {
-        val preset = presetValidatorInteractor.preset(subnetId).preset
-            ?: return validatorInteractor.previews(subnetId, null).map { it.copy(canPreselect = false) }
+        val preset = presetValidatorInteractor.preset(subnetId).preset ?: return emptyList()
         return listOf(BittensorValidatorPreview(preset.validator, canPreselect = true))
     }
 
