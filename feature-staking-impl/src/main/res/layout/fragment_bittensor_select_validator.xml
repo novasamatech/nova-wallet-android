@@ -51,16 +51,20 @@
     <LinearLayout
         android:id="@+id/listHeader"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="wrap_content"
+        android:minHeight="36dp"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
         android:gravity="center_vertical">
 
+        <!-- The count always shows in full; at large font scales the sort label wraps to a second line instead of colliding with it. -->
         <TextView
             android:id="@+id/count"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxLines="1"
             android:textColor="@color/text_secondary" />
 
         <TextView
@@ -69,10 +73,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="12dp"
             android:gravity="end"
-            android:maxLines="1"
-            android:ellipsize="end"
+            android:textAlignment="viewEnd"
+            android:maxLines="2"
             android:textColor="@color/text_secondary" />
     </LinearLayout>
 

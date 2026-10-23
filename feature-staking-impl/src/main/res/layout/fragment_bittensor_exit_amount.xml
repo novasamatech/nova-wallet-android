@@ -27,7 +27,8 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="24dp">
 
-            <!-- Root only: "You unstake" with "Staked: X · Unstake all" in place of the Max action (iOS). -->
+            <!-- Root only: "You unstake" with "Staked: X · Unstake all" in place of the Max action (iOS).
+                 At large font scales the staked amount wraps to a second line instead of being cut. -->
             <LinearLayout
                 android:id="@+id/rootAmountHeader"
                 android:layout_width="match_parent"
@@ -54,7 +55,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:gravity="end"
-                    android:maxLines="1"
+                    android:maxLines="2"
                     android:textColor="@color/text_secondary" />
 
                 <TextView
