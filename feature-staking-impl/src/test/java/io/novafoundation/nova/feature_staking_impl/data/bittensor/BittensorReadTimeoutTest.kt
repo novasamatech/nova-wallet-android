@@ -57,7 +57,7 @@ class BittensorReadTimeoutTest {
     }
 
     @Test
-    fun `yield page timeout is recoverable and next request succeeds`() = runTest {
+    fun `yield timeout is recoverable and next request succeeds`() = runTest {
         val delegate = BittensorEstimatesRepositoryTest.EstimatesApi()
         val api = EstimatesApi(delegate)
         val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0)
@@ -67,7 +67,7 @@ class BittensorReadTimeoutTest {
 
         val failure = runCatching { source.yields(origin, chain, subnet) }.exceptionOrNull()
         assertTrue(failure is IllegalStateException)
-        assertEquals("Validator yield page timed out", failure?.message)
+        assertEquals("Validator yields timed out", failure?.message)
 
         api.hang = false
         assertTrue(source.yields(origin, chain, subnet).allPagesRead)
@@ -118,9 +118,9 @@ class BittensorReadTimeoutTest {
             return delegate.operations(url, address, page)
         }
 
-        override suspend fun alphaYields(url: String, page: Int, pageSize: Int): Response<BittensorAlphaYieldsRemote> {
+        override suspend fun alphaYields(url: String): Response<BittensorAlphaYieldsRemote> {
             if (hang) awaitCancellation()
-            return delegate.alphaYields(url, page, pageSize)
+            return delegate.alphaYields(url)
         }
     }
 }

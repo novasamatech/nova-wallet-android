@@ -6,12 +6,9 @@ import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface BittensorEstimatesApi {
+    /** One unpaginated collection per subnet; the route rejects `page` / `pageSize` (ADR-0045). */
     @GET
-    suspend fun alphaYields(
-        @Url url: String,
-        @Query("page") page: Int,
-        @Query("pageSize") pageSize: Int
-    ): Response<BittensorAlphaYieldsRemote>
+    suspend fun alphaYields(@Url url: String): Response<BittensorAlphaYieldsRemote>
 
     @GET
     suspend fun operations(

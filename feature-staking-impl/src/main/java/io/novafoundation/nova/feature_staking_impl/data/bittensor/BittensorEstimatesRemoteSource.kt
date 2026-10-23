@@ -18,8 +18,18 @@ class BittensorEstimatesRemoteSource(
     suspend fun history(baseUrl: HttpUrl, address: String): EstimatePages<BittensorReportedOperation> =
         loadPages(HISTORY_PAGE_LIMIT, spacingMillis) { page -> loadHistoryPage(baseUrl, address, page) }
 
-    internal suspend fun yields(baseUrl: HttpUrl, chain: Chain, subnet: BittensorNetuid.Subnet): EstimatePages<BittensorValidatorYield> =
-        loadPages(YIELD_PAGE_LIMIT, spacingMillis = 0) { page -> loadYieldPage(baseUrl, chain, subnet, page) }
+    /** Alpha yields arrive as one unpaginated collection per subnet, so there is nothing to page through. */
+    internal suspend fun yields(baseUrl: HttpUrl, chain: Chain, subnet: BittensorNetuid.Subnet): EstimatePages<BittensorValidatorYield> {
+        val url = endpoint(baseUrl, "subnets/${subnet.value}/yields/alpha")
+        val requestStartedAtNanos = System.nanoTime()
+        val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
+            ?: error("Validator yields timed out")
+        val validUntilNanos = deadline(response, requestStartedAtNanos)
+        val body = requireBody(response)
+        requireFreshComponent(body.meta?.components?.alphaYield)
+        val items = requireNotNull(body.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnet) }
+        return EstimatePages(items, validUntilNanos, allPagesRead = true)
+    }
 
     private suspend fun loadHistoryPage(baseUrl: HttpUrl, address: String, page: Int): EstimatePage<BittensorReportedOperation> {
         val url = endpoint(baseUrl, "operations/search")
@@ -34,24 +44,6 @@ class BittensorEstimatesRemoteSource(
         validateHistoryPage(body.pageInfo, page, remoteItems.size)
         val items = remoteItems
             .map(::mapBittensorReportedOperation)
-        return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
-    }
-
-    private suspend fun loadYieldPage(
-        baseUrl: HttpUrl,
-        chain: Chain,
-        subnetId: BittensorNetuid.Subnet,
-        page: Int
-    ): EstimatePage<BittensorValidatorYield> {
-        val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha")
-        val requestStartedAtNanos = System.nanoTime()
-        val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url, page, PAGE_SIZE) }
-            ?: error("Validator yield page timed out")
-        val validUntilNanos = deadline(response, requestStartedAtNanos)
-        val body = requireBody(response)
-        requireFreshComponent(body.meta?.components?.alphaYield)
-        require(body.pageInfo?.page == page)
-        val items = requireNotNull(body.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnetId) }
         return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
     }
 
@@ -126,7 +118,6 @@ class BittensorEstimatesRemoteSource(
         const val FIRST_PAGE = 1
         const val PAGE_SIZE = 100
         const val HISTORY_PAGE_LIMIT = 10
-        const val YIELD_PAGE_LIMIT = 3
         const val MAX_PROVIDER_PAGE = 100
         const val REQUEST_TIMEOUT_MILLIS = 25_000L
         const val MAX_CACHE_AGE_SECONDS = 60L
