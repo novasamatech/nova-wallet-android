@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setSelectable
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showTitleInfo
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showValidator
@@ -26,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showCompleted
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showUnconfirmed
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
@@ -150,12 +150,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             } else {
                 execution.showFailure(failure)
                 if (complete) {
-                    execution.timer.setState(ExecutionTimerView.State.Success)
-                    execution.title.setText(R.string.common_completed)
-                    // iOS done page: green "Completed" over the date in secondary text.
-                    execution.title.setTextColorRes(R.color.text_positive)
-                    execution.subtitle.setTextColorRes(R.color.text_secondary)
-                    execution.operationLabel.text = (result as BittensorStakeResultUi.Success).description
+                    execution.showCompleted((result as BittensorStakeResultUi.Success).description)
                 }
             }
         }
