@@ -9,9 +9,9 @@ import coil.load
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.list.GroupedListHolder
-import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.isNegative
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
@@ -57,15 +57,11 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetRowUi) = with(binding) {
             val subnet = item.subnet
-            title.text = "\u200e" + subnet.displayName(root.context)
+            title.text = subnet.displayName(root.context).ltrIsolated()
             price.text = item.price
             val summary = item.weeklySummary.dataOrNull
             change.text = summary?.let {
-                root.context.getString(
-                    R.string.bittensor_weekly_change,
-                    it.changePercent.formatAsChange(),
-                    root.context.getString(R.string.bittensor_chart_week)
-                )
+                root.context.getString(R.string.bittensor_picker_weekly_change, bittensorPickerChangePercent(it.changePercent))
             } ?: when (item.weeklySummary) {
                 ExtendedLoadingState.Loading -> null
                 is ExtendedLoadingState.Error -> root.context.getString(R.string.common_not_available)
