@@ -18,3 +18,14 @@ data class BittensorStakeAmountPayload(
         require(metaId != null || validatorAddress == null) { "An existing position requires its wallet" }
     }
 }
+
+/** The three root setup layouts: quick pick (A-05 root), picker (A-11) and add stake (B-07). */
+enum class BittensorRootStakeEntry {
+    QUICK_PICK, PICKER, ADD_STAKE
+}
+
+internal fun bittensorRootStakeEntry(payload: BittensorStakeAmountPayload?) = when {
+    payload?.validatorAddress != null -> BittensorRootStakeEntry.ADD_STAKE
+    payload?.quickPick == true -> BittensorRootStakeEntry.QUICK_PICK
+    else -> BittensorRootStakeEntry.PICKER
+}
