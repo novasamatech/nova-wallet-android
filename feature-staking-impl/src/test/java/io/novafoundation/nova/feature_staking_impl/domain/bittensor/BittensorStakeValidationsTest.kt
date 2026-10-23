@@ -128,7 +128,43 @@ class BittensorStakeValidationsTest {
         val quote = quote().copy(serviceFeeTaoInPlanks = BigInteger.TEN)
         val withPoolFee = quote.copy(simulation = quote.simulation.copy(taoFee = BigInteger.valueOf(20)))
         assertNull(validation.validate(payload.copy(amount = BigDecimal("0.000000130"), quote = withPoolFee)).notValidOrNull())
-        assertFailure(validation, payload.copy(amount = BigDecimal("0.000000129"), quote = withPoolFee), BittensorStakeValidationFailure.BELOW_MINIMUM_STAKE)
+        assertFailure(
+            validation,
+            payload.copy(amount = BigDecimal("0.000000129"), quote = withPoolFee),
+            BittensorStakeValidationFailure.BelowMinimumStake(BigInteger.valueOf(120))
+        )
+    }
+
+    @Test
+    fun `root minimum stake reports the bare network minimum`() = runBlocking {
+        val validation = BittensorMinimumStakeValidation()
+        assertNull(validation.validate(payload.copy(amount = BigDecimal("0.000000100"), quote = null)).notValidOrNull())
+        assertFailure(
+            validation,
+            payload.copy(amount = BigDecimal("0.000000099"), quote = null),
+            BittensorStakeValidationFailure.BelowMinimumStake(BigInteger.valueOf(100))
+        )
+    }
+
+    @Test
+    fun `subnet minimum stake is grossed up by the service fee and the reported amount passes`() = runBlocking {
+        val validation = BittensorMinimumStakeValidation()
+        val rate = BigDecimal("0.0085")
+        val commission = BittensorSubnetCommission(rate)
+        fun quoteFor(total: Long) = quote().let {
+            it.copy(
+                totalTaoInPlanks = BigInteger.valueOf(total),
+                serviceFeeTaoInPlanks = commission.feeFor(BigInteger.valueOf(total)),
+                serviceFeeRate = rate,
+                simulation = it.simulation.copy(taoFee = BigInteger.valueOf(20))
+            )
+        }
+        val failure = validation.validate(payload.copy(amount = BigDecimal("0.000000100"), quote = quoteFor(100))).notValidOrNull()?.reason
+        val required = (failure as BittensorStakeValidationFailure.BelowMinimumStake).requiredAmountInPlanks
+        assertEquals(BigInteger.valueOf(122), required)
+
+        val atRequired = payload.copy(amount = BigDecimal(required, 9), quote = quoteFor(required.toLong()))
+        assertNull(validation.validate(atRequired).notValidOrNull())
     }
 
     @Test

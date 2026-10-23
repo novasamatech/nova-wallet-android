@@ -47,6 +47,7 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
 
     override fun initViews() {
         binder.bittensorStakeAmountContinue.prepareForProgress(viewLifecycleOwner)
+        binder.bittensorStakeAmountToolbar.setTitle(viewModel.titleRes)
         binder.bittensorStakeAmountToolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         binder.bittensorStakeAmountValidator.setOnClickListener { viewModel.validatorClicked() }

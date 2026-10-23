@@ -19,6 +19,8 @@ import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorPreview
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.selectBittensorValidatorPreview
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAction
@@ -99,6 +101,7 @@ class BittensorSubnetDetailsViewModel(
     private val subnetSafetyInteractor: BittensorSubnetSafetyInteractor,
     private val subnetParametersInteractor: BittensorSubnetParametersInteractor,
     private val validatorInteractor: BittensorValidatorInteractor,
+    private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val addressIconGenerator: AddressIconGenerator,
     private val replaceAmount: Boolean,
@@ -339,7 +342,7 @@ class BittensorSubnetDetailsViewModel(
             analytics = validatorsReads,
             transform = { it.withSafeLoading() }
         ) {
-            flowOf { validatorInteractor.previews(subnetId, address) }
+            flowOf { if (address != null) validatorInteractor.previews(subnetId, address) else automaticValidatorPreviews() }
         }
     }
         .shareInBackground()
@@ -456,6 +459,7 @@ class BittensorSubnetDetailsViewModel(
     fun continueClicked() = launchUnit {
         if (!canContinue.first()) return@launchUnit
         val address = currentValidatorAddress()
+        val isPreset = selectedValidatorAddress.value == null && address != null
         analytics.track(
             BittensorAnalyticsEvent.TypeSelected(
                 BittensorAnalyticsEvent.NETWORK,
@@ -465,8 +469,21 @@ class BittensorSubnetDetailsViewModel(
             )
         )
         router.openBittensorSubnetAmount(
-            BittensorSubnetAmountPayload(subnetId.value, address, replaceAmount = replaceAmount, selectionState = selectionState)
+            BittensorSubnetAmountPayload(
+                subnetId.value,
+                address,
+                validatorIsPreset = isPreset,
+                replaceAmount = replaceAmount,
+                selectionState = selectionState
+            )
         )
+    }
+
+    /** The same preset the stake setup applies (NW-2356), so the card here and the amount screen agree. */
+    private suspend fun automaticValidatorPreviews(): List<BittensorValidatorPreview> {
+        val preset = presetValidatorInteractor.preset(subnetId).preset
+            ?: return validatorInteractor.previews(subnetId, null).map { it.copy(canPreselect = false) }
+        return listOf(BittensorValidatorPreview(preset.validator, canPreselect = true))
     }
 
     private suspend fun currentValidatorAddress(): String? {

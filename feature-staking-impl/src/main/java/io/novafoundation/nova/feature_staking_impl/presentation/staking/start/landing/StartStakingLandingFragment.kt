@@ -53,7 +53,7 @@ class StartStakingLandingFragment :
         binder.startStakingLandingButton.prepareForProgress(viewLifecycleOwner)
         binder.startStakingLandingButton.setOnClickListener { viewModel.continueClicked() }
         if (viewModel.isBittensor) {
-            binder.startStakingLandingButton.setText(R.string.bittensor_start_earning)
+            binder.startStakingLandingButton.setText(R.string.staking_start_title)
         }
         binder.startStakingLandingAllOptions.isVisible = viewModel.isBittensor
         binder.startStakingLandingAllOptions.setOnClickListener { viewModel.allOptionsClicked() }

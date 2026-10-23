@@ -2824,6 +2824,7 @@
     <string name="privacy_analytics_enabled_toast">Thanks for helping improve Nova Wallet</string>
 
     <string name="bittensor_stake_to_root">Stake to root</string>
+    <string name="bittensor_add_stake_to_root">Add stake to root</string>
     <string name="bittensor_subnet_count">%1$d of %2$d</string>
     <string name="bittensor_show_subnets">Show %1$d subnets</string>
     <string name="bittensor_sort_pool_description">Largest swap pools first</string>
@@ -2848,7 +2849,6 @@
     <string name="bittensor_quick_pick">Quick pick</string>
     <string name="bittensor_where_to_stake">Where to stake</string>
     <string name="bittensor_quick_choose">Choose</string>
-    <string name="bittensor_start_earning">Start earning</string>
     <string name="bittensor_quick_all_options">See all options</string>
     <string name="bittensor_see_all_subnets">See all subnets</string>
     <string name="bittensor_chip_age_months">%1$d months old</string>
@@ -2911,12 +2911,18 @@
     <string name="bittensor_no_subnets">No subnets found</string>
     <string name="bittensor_earn_title">Earn with Bittensor</string>
     <string name="bittensor_review">Review</string>
-    <string name="bittensor_selected_subnet">SELECTED SUBNET</string>
+    <string name="bittensor_your_pick">YOUR PICK</string>
+    <string name="bittensor_your_subnet">YOUR SUBNET</string>
+    <string name="bittensor_quick_first_pool">FIRST BY POOL SIZE</string>
+    <string name="bittensor_quick_first_age">FIRST BY AGE</string>
+    <string name="bittensor_quick_first_apy">FIRST BY APY</string>
     <string name="bittensor_quick_selection_loading">Choosing a subnet…</string>
     <string name="bittensor_quick_selection_failed">Could not choose a subnet. Try again or choose a subnet manually.</string>
     <string name="bittensor_quick_validator_failed">Could not choose an available validator. Try again or choose a validator manually.</string>
     <string name="bittensor_monthly_tokens">Earn tokens a month</string>
     <string name="bittensor_fee_on_review">On confirmation</string>
+    <string name="bittensor_slippage_title">Slippage tolerance</string>
+    <string name="bittensor_slippage_explanation">If the price moves more than this while your order fills, the network cancels the order and only the network fee is charged.</string>
     <string name="bittensor_slippage_fixed">Slippage tolerance is %1$s%%. The operation is rejected if the price moves beyond this limit; partial staking is not allowed.</string>
     <string name="bittensor_subnet">Subnet</string>
     <string name="bittensor_you_receive">You will get</string>
@@ -2925,7 +2931,7 @@
     <string name="bittensor_subnet_staking_success">Staked to subnet %1$d</string>
     <string name="bittensor_subnet_staking_completed">The staking operation was included successfully.</string>
     <string name="bittensor_validation_fee_reserve">Leave enough balance for the network fee and the staking fee reserve.</string>
-    <string name="bittensor_validation_minimum_stake">The amount left after service and pool fees is below the minimum stake.</string>
+    <string name="bittensor_validation_minimum_stake">You can\'t stake less than the network minimum value (%1$s)</string>
     <string name="bittensor_validation_hotkey">This validator is no longer registered. Choose another validator.</string>
     <string name="bittensor_validation_staking_disabled">Staking is not available for this network.</string>
     <string name="bittensor_validation_root_locked">The root staking unlock interval has not elapsed. Try again later.</string>
@@ -2992,6 +2998,7 @@
     <string name="bittensor_exit_received">You will get</string>
     <string name="bittensor_exit_completed_operation">1 operation</string>
     <string name="bittensor_buy_more">Buy more</string>
+    <string name="bittensor_buy_more_subnet">Buy more %1$s</string>
     <string name="bittensor_you_pay">You pay</string>
     <string name="bittensor_safety_age_days">≈ %1$s days</string>
     <string name="bittensor_safety_observed_days">%1$s days of observed prices</string>

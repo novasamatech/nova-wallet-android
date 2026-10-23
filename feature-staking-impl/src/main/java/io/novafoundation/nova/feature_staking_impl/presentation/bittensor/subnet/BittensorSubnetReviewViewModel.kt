@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorRequiredAmount
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
@@ -446,6 +447,7 @@ class BittensorSubnetReviewViewModel(
         val fee = fee.first()
             .loadedFeeOrNull()
             ?.takeIf { it.request == prepared } ?: return@launchUnit
+        val token = walletContext.first().asset.token
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
@@ -459,6 +461,7 @@ class BittensorSubnetReviewViewModel(
                         failure,
                         actions,
                         resources,
+                        formatAmount = { tokenFormatter.formatBittensorRequiredAmount(it, token) },
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(

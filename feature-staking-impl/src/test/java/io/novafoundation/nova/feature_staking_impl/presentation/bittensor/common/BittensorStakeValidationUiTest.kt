@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.common.validation.validOrWarning
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationFailure
+import io.novafoundation.nova.feature_staking_impl.R
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -53,12 +54,13 @@ class BittensorStakeValidationUiTest {
 
     @Test
     fun `inactive warning cancel stays put and continue repeats validations`() {
-        val failure = validOrWarning(false) { BittensorStakeValidationFailure.INACTIVE_VALIDATOR }
+        val failure = validOrWarning<BittensorStakeValidationFailure>(false) { BittensorStakeValidationFailure.INACTIVE_VALIDATOR }
             .notValidOrNull()!!
         val transformed = bittensorStakeValidationFailureUi(
             failure,
             actions,
-            resources
+            resources,
+            formatAmount = { "$it planks" }
         ) { refreshes += 1 } as TransformedFailure.Custom
 
         transformed.dialogPayload.cancelAction!!.action()
@@ -71,12 +73,13 @@ class BittensorStakeValidationUiTest {
 
     @Test
     fun `accepting price impact repeats validations instead of resuming past them`() {
-        val failure = validOrWarning(false) { BittensorStakeValidationFailure.HIGH_PRICE_IMPACT }
+        val failure = validOrWarning<BittensorStakeValidationFailure>(false) { BittensorStakeValidationFailure.HIGH_PRICE_IMPACT }
             .notValidOrNull()!!
         val transformed = bittensorStakeValidationFailureUi(
             failure,
             actions,
-            resources
+            resources,
+            formatAmount = { "$it planks" }
         ) { refreshes += 1 } as TransformedFailure.Custom
 
         transformed.dialogPayload.okAction!!.action()
@@ -89,11 +92,12 @@ class BittensorStakeValidationUiTest {
     @Test
     fun `validation analytics reports only the chosen dialog outcome`() {
         val outcomes = mutableListOf<StakingValidationOutcome>()
-        val failure = validOrError(false) { BittensorStakeValidationFailure.QUOTE_EXPIRED }.notValidOrNull()!!
+        val failure = validOrError<BittensorStakeValidationFailure>(false) { BittensorStakeValidationFailure.QUOTE_EXPIRED }.notValidOrNull()!!
         val transformed = bittensorStakeValidationFailureUi(
             failure,
             actions,
             resources,
+            formatAmount = { "$it planks" },
             onOutcome = { outcomes += it }
         ) { refreshes += 1 } as TransformedFailure.Custom
         assertEquals(emptyList<StakingValidationOutcome>(), outcomes)
@@ -105,11 +109,12 @@ class BittensorStakeValidationUiTest {
     @Test
     fun `accepting an updated rate reports proceeded without submitting`() {
         val outcomes = mutableListOf<StakingValidationOutcome>()
-        val failure = validOrError(false) { BittensorStakeValidationFailure.QUOTE_EXPIRED }.notValidOrNull()!!
+        val failure = validOrError<BittensorStakeValidationFailure>(false) { BittensorStakeValidationFailure.QUOTE_EXPIRED }.notValidOrNull()!!
         val transformed = bittensorStakeValidationFailureUi(
             failure,
             actions,
             resources,
+            formatAmount = { "$it planks" },
             onOutcome = { outcomes += it }
         ) { refreshes += 1 } as TransformedFailure.Custom
         transformed.dialogPayload.okAction!!.action()
@@ -118,13 +123,40 @@ class BittensorStakeValidationUiTest {
         assertEquals(0, resumptions)
     }
 
+    @Test
+    fun `minimum stake shows the iOS amount too low copy with the required amount`() {
+        `when`(resources.getString(R.string.bittensor_validation_minimum_stake, "122 planks"))
+            .thenReturn("You can't stake less than the network minimum value (122 planks)")
+        val outcomes = mutableListOf<StakingValidationOutcome>()
+        val failure = validOrError<BittensorStakeValidationFailure>(false) { BittensorStakeValidationFailure.BelowMinimumStake(122.toBigInteger()) }.notValidOrNull()!!
+        val transformed = bittensorStakeValidationFailureUi(
+            failure,
+            actions,
+            resources,
+            formatAmount = { "$it planks" },
+            onOutcome = { outcomes += it }
+        ) { refreshes += 1 } as TransformedFailure.Default
+
+        assertEquals(R.string.common_amount_low.toString(), transformed.titleAndMessage.first)
+        assertEquals("You can't stake less than the network minimum value (122 planks)", transformed.titleAndMessage.second)
+        assertEquals(listOf(StakingValidationOutcome.BLOCKED), outcomes)
+    }
+
+    @Test
+    fun `other blocking failures keep the generic error title`() {
+        val failure = BittensorStakeValidationFailure.FEE_RESERVE
+        assertEquals(R.string.common_error_general_title.toString(), failure.title(resources))
+        assertEquals(R.string.bittensor_validation_fee_reserve.toString(), failure.message(resources) { "unused" })
+    }
+
     private fun assertExplicitQuoteReview(reason: BittensorStakeValidationFailure) {
-        val failure = validOrError(false) { reason }
+        val failure = validOrError<BittensorStakeValidationFailure>(false) { reason }
             .notValidOrNull()!!
         val transformed = bittensorStakeValidationFailureUi(
             failure,
             actions,
-            resources
+            resources,
+            formatAmount = { "$it planks" }
         ) { refreshes += 1 } as TransformedFailure.Custom
 
         assertEquals(0, refreshes)

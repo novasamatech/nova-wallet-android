@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
@@ -51,6 +52,7 @@ class BittensorSubnetDetailsModule {
         subnetSafetyInteractor: BittensorSubnetSafetyInteractor,
         subnetParametersInteractor: BittensorSubnetParametersInteractor,
         validatorInteractor: BittensorValidatorInteractor,
+        presetValidatorInteractor: BittensorPresetValidatorInteractor,
         validatorCommunicator: BittensorSelectValidatorCommunicator,
         addressIconGenerator: AddressIconGenerator
     ): ViewModel = BittensorSubnetDetailsViewModel(
@@ -68,6 +70,7 @@ class BittensorSubnetDetailsModule {
         subnetSafetyInteractor = subnetSafetyInteractor,
         subnetParametersInteractor = subnetParametersInteractor,
         validatorInteractor = validatorInteractor,
+        presetValidatorInteractor = presetValidatorInteractor,
         validatorCommunicator = validatorCommunicator,
         addressIconGenerator = addressIconGenerator,
         replaceAmount = payload.replaceAmount,

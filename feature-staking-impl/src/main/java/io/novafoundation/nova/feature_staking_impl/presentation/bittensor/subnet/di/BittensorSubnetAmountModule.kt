@@ -15,9 +15,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
@@ -47,14 +44,6 @@ class BittensorSubnetAmountModule {
     @Provides
     fun subnetFacts(backend: BittensorValidatorBackend, chainStateRepository: ChainStateRepository) =
         BittensorSubnetFactsInteractor(backend, chainStateRepository)
-
-    @Provides
-    fun presetValidators(
-        repository: BittensorSubnetValidatorRepository,
-        yields: BittensorAlphaYieldRepository,
-        chains: ChainRegistry,
-        logger: Logger
-    ) = BittensorPresetValidatorInteractor(repository, yields, chains, logger)
 
     @Provides
     @IntoMap
@@ -90,6 +79,7 @@ class BittensorSubnetAmountModule {
         quickPickInteractor = quickPickInteractor,
         presetValidatorInteractor = presetValidatorInteractor,
         validatorAddress = payload.validatorAddress,
+        validatorIsPreset = payload.validatorIsPreset,
         bittensorSubnetInteractor = bittensorSubnetInteractor,
         router = router,
         resources = resources,

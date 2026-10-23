@@ -382,6 +382,7 @@ class BittensorStakeAmountViewModelTest {
         withTimeout(3_000L) {
             val position = BittensorRootPosition(estimateValidator.hotkey, BigInteger("10000000"))
             assets.emit(details(10).copy(validator = estimateValidator, position = position))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             assertEquals(null, viewModel.addStakeCaption.first())
         }
@@ -391,6 +392,7 @@ class BittensorStakeAmountViewModelTest {
     fun `zero input retains a placeholder fee without enabling continue`() = runBlocking<Unit> {
         withTimeout(3_000L) {
             assets.emit(details(10).copy(validator = estimateValidator))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("0")
             val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
@@ -408,6 +410,7 @@ class BittensorStakeAmountViewModelTest {
     fun `cleared input retains a placeholder fee and a new amount invalidates it`() = runBlocking<Unit> {
         withTimeout(3_000L) {
             assets.emit(details(10).copy(validator = estimateValidator))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("")
             val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
@@ -425,9 +428,31 @@ class BittensorStakeAmountViewModelTest {
     }
 
     @Test
+    fun `setup opens with an empty amount even when the balance is below the old suggestion`() = runBlocking {
+        withTimeout(3_000L) {
+            assets.emit(details(1))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.99")) == 0 }
+
+            assertEquals("", viewModel.amount.first())
+        }
+    }
+
+    @Test
+    fun `add stake opens with an empty amount instead of the full transferable balance`() = runBlocking {
+        createViewModel(BittensorStakeAmountPayload(1L, null))
+        withTimeout(3_000L) {
+            explicitAssets.emit(details(1))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.99")) == 0 }
+
+            assertEquals("", viewModel.amount.first())
+        }
+    }
+
+    @Test
     fun `a balance refresh does not repopulate an amount cleared by the user`() = runBlocking {
         withTimeout(3_000L) {
             assets.emit(details(10))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("")
             viewModel.amount.first { it.isEmpty() }
