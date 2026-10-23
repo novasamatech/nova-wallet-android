@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.abs
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
@@ -101,7 +103,7 @@ class SwapOptionsViewModel(
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
             if (selectedSlippage != defaultSlippage) {
-                slippageInput.value = selectedSlippage.formatPercents(includeSymbol = false)
+                slippageInput.value = formatInput(selectedSlippage)
             }
         }
     }
@@ -113,7 +115,7 @@ class SwapOptionsViewModel(
     fun tipClicked(index: Int) {
         launch {
             val slippageTips = slippageConfig.first().slippageTips
-            slippageInput.value = slippageTips[index].formatPercents(includeSymbol = false)
+            slippageInput.value = formatInput(slippageTips[index])
         }
     }
 
@@ -138,6 +140,13 @@ class SwapOptionsViewModel(
 
     fun backClicked() {
         swapRouter.back()
+    }
+
+    // The payload sheet caps input at four decimals; a saved value must fit that cap instead of being rejected by it.
+    private fun formatInput(slippage: Fraction): String = if (payload != null) {
+        slippageInputText(slippage)
+    } else {
+        slippage.formatPercents(includeSymbol = false)
     }
 
     private suspend fun String.formatToPercent(): Fraction? {
@@ -170,6 +179,12 @@ class SwapOptionsViewModel(
         return slippageInput.formatToPercent() != slippageConfig.defaultSlippage
     }
 }
+
+/** A plain, locale-independent percent with at most [SLIPPAGE_MAX_FRACTION_DIGITS] decimals, e.g. 0.0125. */
+internal fun slippageInputText(slippage: Fraction): String = BigDecimal(slippage.inPercents)
+    .setScale(SLIPPAGE_MAX_FRACTION_DIGITS, RoundingMode.HALF_UP)
+    .stripTrailingZeros()
+    .toPlainString()
 
 /** As iOS reports a slippage change: back to the default is a reset, a listed tip is a preset, anything else is custom. */
 internal fun slippageChangeMethod(initial: Fraction, selected: Fraction, config: SlippageConfig): SlippageSettingsCommunicator.Method = when {

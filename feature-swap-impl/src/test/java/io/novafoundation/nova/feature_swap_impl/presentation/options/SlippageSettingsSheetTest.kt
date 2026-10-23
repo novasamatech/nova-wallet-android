@@ -48,4 +48,12 @@ class SlippageSettingsSheetTest {
     fun `other values are custom`() {
         assertEquals(Method.CUSTOM, slippageChangeMethod(0.005.fractions, 0.0125.percents, config))
     }
+
+    @Test
+    fun `saved slippage is shown within the four decimal cap`() {
+        assertEquals("0.0125", slippageInputText(0.0125.percents))
+        assertEquals("0.1", slippageInputText(0.001.fractions))
+        assertEquals("0.0123", slippageInputText(0.012345.percents))
+        assertTrue(slippageInputWithinPrecision(slippageInputText(0.012345.percents), SLIPPAGE_MAX_FRACTION_DIGITS))
+    }
 }

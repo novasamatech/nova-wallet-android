@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
@@ -33,6 +34,8 @@ class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SwapOptionsViewModel
     override fun createBinding() = FragmentSlippageSettingsSheetBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        // The sheet holds a text field: resize so the Done button stays above the keyboard.
+        requireDialog().window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         with(getBehaviour()) {
             skipCollapsed = true
             state = BottomSheetBehavior.STATE_EXPANDED
