@@ -93,8 +93,6 @@ enum class BittensorPositionTradeAction { BUY, SELL }
 internal fun List<BittensorSubnetPosition>.inPrimaryOrder(): List<BittensorSubnetPosition> =
     sortedWith(compareByDescending<BittensorSubnetPosition> { it.alphaInPlanks }.thenBy { it.validatorHotkey.value.toHexString() })
 
-data class BittensorPositionChoiceRequest(val action: BittensorPositionTradeAction, val positions: List<BittensorExitPositionPayload>)
-
 class BittensorSubnetPositionViewModel(
     private val analytics: AnalyticsService,
     private val subnetId: BittensorNetuid.Subnet,
@@ -493,11 +491,19 @@ class BittensorSubnetPositionViewModel(
     private fun choose(action: BittensorPositionTradeAction) = launchUnit {
         if (!canAct.first()) return@launchUnit
         val data = portfolio.first() ?: return@launchUnit
-        val options = held.first().map { BittensorExitPositionPayload(data.metaId, subnetId.value, data.chain.addressOf(it.validatorHotkey.value)) }
+        val symbol = TokenSymbol(subnet.first()?.symbol.orEmpty().ifBlank { "—" })
+        val options = bittensorPositionChoices(
+            held = held.first(),
+            metaId = data.metaId,
+            names = validatorNames.first(),
+            addressOf = { data.chain.addressOf(it) },
+            formatStaked = { tokenFormatter.formatToken(BigDecimal(it, BittensorProtocolUnits.ALPHA_PRECISION), symbol) }
+        )
         if (options.size == 1) {
-            selectPosition(action, options.single())
+            selectPosition(action, options.single().position)
         } else {
-            choices.value = BittensorPositionChoiceRequest(action, options).event()
+            val rows = options.map { BittensorPositionChoiceUi(it, addressIconGenerator.createAddressIcon(it.hotkey.value, 32)) }
+            choices.value = BittensorPositionChoiceRequest(action, rows).event()
         }
     }
 

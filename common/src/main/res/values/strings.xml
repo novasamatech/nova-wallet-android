@@ -3016,6 +3016,7 @@
     <string name="bittensor_exit_position">Staking position</string>
     <string name="bittensor_exit_worth_now">Worth now</string>
     <string name="bittensor_exit_select_position">Choose a staking position</string>
+    <string name="bittensor_position_choice_staked">Staked: %s</string>
     <string name="bittensor_exit_received">You will get</string>
     <string name="bittensor_exit_completed_operation">1 operation</string>
     <string name="bittensor_buy_more">Buy more</string>
