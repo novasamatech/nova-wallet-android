@@ -28,10 +28,10 @@ class BittensorEstimatesRemoteSource(
         val url = endpoint(baseUrl, "operations/search")
         val requestStartedAtNanos = System.nanoTime()
         val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.operations(url, address, page) }
-            ?: error("Operation history page timed out")
+            ?: throw BittensorTimeoutException("Operation history page")
         val validUntilNanos = deadline(response, requestStartedAtNanos)
         val body = requireBody(response)
-        requireFreshComponent(body.meta?.components?.operationHistory)
+        requireAvailableBittensorComponent(body.meta?.components?.operationHistory, "Operation history")
         require(body.historyScope == "TAO_APP_PARTIAL")
         val remoteItems = requireNotNull(body.items)
         validateHistoryPage(body.pageInfo, page, remoteItems.size)
@@ -48,13 +48,10 @@ class BittensorEstimatesRemoteSource(
         val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha")
         val requestStartedAtNanos = System.nanoTime()
         val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
-            ?: error("Validator yield snapshot timed out")
+            ?: throw BittensorTimeoutException("Validator yield snapshot")
         val validUntilNanos = deadline(response, requestStartedAtNanos)
         val body = requireBody(response)
-        val component = body.meta?.components?.alphaYield
-        require(component?.availability == "AVAILABLE" && component.freshness in setOf("FRESH", "STALE")) {
-            "Yield source is unavailable"
-        }
+        requireAvailableBittensorComponent(body.meta?.components?.alphaYield, "Yield source")
         val items = requireNotNull(body.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnetId) }
         return EstimatePage(items, null, validUntilNanos)
     }
@@ -93,10 +90,6 @@ class BittensorEstimatesRemoteSource(
                 .coerceIn(0, MAX_CACHE_AGE_SECONDS)
         }
         return requestStartedAtNanos + seconds * NANOS_PER_SECOND
-    }
-
-    private fun requireFreshComponent(component: BittensorRecommendationsRemote.Component?) {
-        require(component?.availability == "AVAILABLE" && component.freshness == "FRESH") { "Estimate source is unavailable or stale" }
     }
 
     private fun nextPage(info: BittensorHistoryPageInfo?, current: Int): Int? {

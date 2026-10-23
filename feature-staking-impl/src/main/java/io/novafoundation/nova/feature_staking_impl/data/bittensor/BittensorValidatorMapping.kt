@@ -83,10 +83,13 @@ private fun mapDirectoryComponent(remote: BittensorRecommendationsRemote.Compone
     return Component(availability, freshness, timestamp, remote?.availabilityReason)
 }
 
+/**
+ * A STALE policy still applies: its take/permit/activity limits are configuration, and iOS keeps serving stale
+ * components. Only automatic recommendations need a FRESH generation - see [hasFreshBittensorRecommendations].
+ */
 internal fun requireUsableBittensorRecommendations(response: BittensorRecommendationsRemote) {
     val meta = requireNotNull(response.meta) { "Missing validator policy" }
-    val component = requireNotNull(meta.components?.recommendations)
-    require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Validator policy is unavailable or stale" }
+    requireAvailableBittensorComponent(meta.components?.recommendations, "Validator policy")
     val gates = requireNotNull(meta.clientGates)
     val maxCommissionRate = requireNotNull(gates.maxTake).toBigDecimal()
     require(maxCommissionRate.isNonNegative && maxCommissionRate <= BigDecimal.ONE) { "Invalid validator take limit" }

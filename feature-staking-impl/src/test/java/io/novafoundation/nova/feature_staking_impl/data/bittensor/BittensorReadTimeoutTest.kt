@@ -21,7 +21,7 @@ class BittensorReadTimeoutTest {
         val repository = BittensorSubnetMarketRepository(api)
 
         val failure = runCatching { repository.weeklyMarkets() }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertEquals("Subnet markets timed out", failure?.message)
 
         api.hang = false
@@ -49,7 +49,7 @@ class BittensorReadTimeoutTest {
         val origin = "https://infra.test/".toHttpUrl()
 
         val failure = runCatching { source.history(origin, "account") }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertEquals("Operation history page timed out", failure?.message)
 
         api.hang = false
@@ -66,7 +66,7 @@ class BittensorReadTimeoutTest {
         val subnet = BittensorNetuid.Subnet(1)
 
         val failure = runCatching { source.yields(origin, chain, subnet) }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertEquals("Validator yield snapshot timed out", failure?.message)
 
         api.hang = false
