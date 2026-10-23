@@ -102,6 +102,18 @@ class BittensorAmountFormatterTest {
 
         val rate = formatter.exchangeRate(quote, subnet, token)
 
-        assertEquals("\u2066\u20661 NATIVE\u2069 ≈ \u206615.000000000 ش\u2069\u2069", rate)
+        assertEquals("\u2066\u20661 NATIVE\u2069 ≈ \u206615.00 ش\u2069\u2069", rate)
+    }
+
+    @Test
+    fun `rates from ten up show two decimals rounded down as on iOS`() {
+        assertEquals(BigDecimal("28.83"), bittensorRateDisplayValue(BigDecimal("28.837961234")))
+        assertEquals(BigDecimal("10.00"), bittensorRateDisplayValue(BigDecimal("10")))
+    }
+
+    @Test
+    fun `rates below ten keep the regular precision`() {
+        assertEquals(BigDecimal("9.876543210"), bittensorRateDisplayValue(BigDecimal("9.876543210")))
+        assertEquals(BigDecimal("0.034675"), bittensorRateDisplayValue(BigDecimal("0.034675")))
     }
 }

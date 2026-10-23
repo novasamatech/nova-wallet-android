@@ -89,7 +89,15 @@ class BittensorAmountFormatter(
         val input = token.amountFromPlanks(quote.totalTaoInPlanks)
         val rate = output.divide(input, BITTENSOR_ALPHA_DECIMALS, RoundingMode.DOWN)
         val nativeAmount = tokenFormatter.formatToken(BigDecimal.ONE, token.configuration.symbol)
-        val alphaAmount = tokenFormatter.formatToken(rate, TokenSymbol(subnet.symbol.ifBlank { "—" }))
+        val alphaAmount = tokenFormatter.formatToken(bittensorRateDisplayValue(rate), TokenSymbol(subnet.symbol.ifBlank { "—" }))
         return ltrIsolatedRate(nativeAmount, alphaAmount)
     }
+}
+
+/**
+ * iOS token formatter (`AssetBalanceFormatterFactory.createCompoundFormatter`) shows values from 10 up with 2 decimals,
+ * rounded down; smaller rates keep the regular precision. "1 TAO ≈ 28.83 ש", "1 ש ≈ 0.03467 TAO".
+ */
+internal fun bittensorRateDisplayValue(rate: BigDecimal): BigDecimal {
+    return if (rate >= BigDecimal.TEN) rate.setScale(2, RoundingMode.DOWN) else rate
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorRateDisplayValue
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.ltrIsolatedRate
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
@@ -52,7 +53,7 @@ class BittensorExitFormatter(
     fun exchangeRate(position: BittensorExitPosition, quote: BittensorExitQuote): String {
         val ratio = quote.estimatedTaoOut.toBigDecimal()
             .divide(quote.amount.toBigDecimal(), BittensorProtocolUnits.ALPHA_PRECISION, RoundingMode.DOWN)
-        val nativeAmount = tokenFormatter.formatToken(ratio, position.asset.token.configuration.symbol)
+        val nativeAmount = tokenFormatter.formatToken(bittensorRateDisplayValue(ratio), position.asset.token.configuration.symbol)
         val alphaSymbol = position.subnet?.symbol?.ifBlank { "—" } ?: "—"
         return ltrIsolatedRate("1 $alphaSymbol", nativeAmount)
     }
