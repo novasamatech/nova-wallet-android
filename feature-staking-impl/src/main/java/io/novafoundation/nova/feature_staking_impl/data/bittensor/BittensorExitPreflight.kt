@@ -51,6 +51,18 @@ data class BittensorExitPreflight(
             groupMembers.values.sumOf { it.drawable(withdrawalFloor) }.min(availability.available)
         }
 
+    /**
+     * Equality key for background refreshes: ignores per-block price drift and hold countdowns (only whether a
+     * hotkey is held matters before the fresh validation read), so unchanged chain state does not re-quote.
+     */
+    fun refreshIdentity(): BittensorExitPreflight = copy(
+        rootHoldRemaining = rootHoldRemaining.signum().toBigInteger(),
+        groupRootHoldRemaining = groupRootHoldRemaining.signum().toBigInteger(),
+        groupMembers = groupMembers.mapValues { (_, member) -> member.copy(holdRemaining = member.holdRemaining.signum().toBigInteger()) },
+        withdrawalFloor = BigInteger.ZERO,
+        withdrawalPrice = null
+    )
+
     fun plan(amount: BigInteger, primary: AccountIdKey): BittensorExitPlan {
         val hotkeys = orderedHotkeys.ifEmpty { listOf(primary) }
         val members = hotkeys.map { hotkey ->

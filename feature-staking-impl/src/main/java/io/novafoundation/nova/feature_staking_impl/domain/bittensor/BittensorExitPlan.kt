@@ -25,6 +25,15 @@ internal fun bittensorWithdrawalFloor(minimumTao: BigInteger, price: BigInteger,
     return floor + margin
 }
 
+/**
+ * Subtensor `get_nominator_min_required_stake`: `NominatorMinRequiredStake` is a per-million factor of
+ * `DefaultMinStake` (= `InitialMinStake`), not an absolute rao amount. A non-owner remainder below it is
+ * swept to the coldkey's free balance by `clear_small_nomination_if_required`.
+ */
+internal fun bittensorNominatorMinStake(minStake: BigInteger, perMillionFactor: BigInteger): BigInteger {
+    return minStake * perMillionFactor / BittensorProtocolUnits.NOMINATOR_FACTOR_DENOMINATOR
+}
+
 data class BittensorExitSlice(val hotkey: AccountIdKey, val amount: BigInteger, val fullExit: Boolean) {
 
     init {

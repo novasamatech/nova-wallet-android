@@ -31,8 +31,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class BittensorExitInteractor(
     private val chainRegistry: ChainRegistry,
@@ -57,26 +59,31 @@ class BittensorExitInteractor(
 
     fun observe(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): Flow<BittensorExitPosition> = flowOfAll {
         val initial = load(metaId, netuid, hotkeyAddress)
+        var subnet = initial.subnet
         val snapshots = flowOfAll { chainState.currentRemoteBlockNumberFlow(initial.chain.id) }
             .conflate()
-            .map {
+            .mapNotNull {
                 requireWallet(metaId, initial.coldkey, initial.chain)
-                exitRuntimeSource.preflight(initial.chain.id, initial.coldkey.value, initial.hotkey.value, netuid)
-                    .withWithdrawalFloor(netuid)
+                if (subnet == null && !netuid.isRoot()) subnet = loadSubnetMetadata(netuid)
+                refreshPreflight(initial, netuid)?.let { it to subnet }
             }
-            .onStart { emit(initial.preflight) }
-        combine(snapshots, walletRepository.assetFlow(metaId, initial.chain.utilityAsset)) { preflight, asset ->
-            initial.copy(preflight = preflight, asset = asset)
+            .onStart { emit(initial.preflight to initial.subnet) }
+            // Price drift alone must not restart the quote and fee of an unchanged position every block.
+            .distinctUntilChanged { old, new -> old.first.refreshIdentity() == new.first.refreshIdentity() && old.second == new.second }
+        combine(snapshots, walletRepository.assetFlow(metaId, initial.chain.utilityAsset)) { (preflight, subnet), asset ->
+            initial.copy(preflight = preflight.withWithdrawalFloor(netuid), subnet = subnet, asset = asset)
         }
             .distinctUntilChanged()
     }
 
-    suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition {
+    suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition = coroutineScope {
         val wallet = accountRepository.getMetaAccount(metaId)
         immediateExecution.requireSupported(wallet)
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val coldkey = AccountIdKey(wallet.requireAccountIdIn(chain))
         val hotkey = AccountIdKey(chain.accountIdOf(hotkeyAddress))
+        // Optional display metadata loads alongside the chain snapshot instead of after it.
+        val subnet = async { loadSubnetMetadata(netuid) }
         val preflight = exitRuntimeSource.preflight(
             chain.id,
             coldkey.value,
@@ -85,10 +92,9 @@ class BittensorExitInteractor(
         )
         val asset = walletRepository.assetFlow(metaId, chain.utilityAsset)
             .first()
-        val subnet = loadSubnetMetadata(netuid)
         val directSigner = wallet.type != LightMetaAccount.Type.PROXIED && wallet.type != LightMetaAccount.Type.MULTISIG
         requireWallet(metaId, coldkey, chain)
-        return BittensorExitPosition(
+        BittensorExitPosition(
             metaId = metaId,
             chain = chain,
             coldkey = coldkey,
@@ -96,7 +102,7 @@ class BittensorExitInteractor(
             validatorAddress = hotkeyAddress,
             netuid = netuid,
             asset = asset,
-            subnet = subnet,
+            subnet = subnet.await(),
             preflight = preflight.withWithdrawalFloor(netuid),
             supportsFeeFromStake = directSigner && !preflight.rootHoldEnabled,
             existentialDeposit = walletConstants.existentialDeposit(chain.id)
@@ -252,6 +258,19 @@ class BittensorExitInteractor(
                 logger.log(e)
                 null
             }
+        }
+    }
+
+    /** Background refresh: a failed read keeps the last snapshot; validation always re-reads the chain. */
+    private suspend fun refreshPreflight(initial: BittensorExitPosition, netuid: BittensorNetuid): BittensorExitPreflight? {
+        return try {
+            exitRuntimeSource.preflight(initial.chain.id, initial.coldkey.value, initial.hotkey.value, netuid)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logger.log("[BittensorExit] Background preflight refresh failed")
+            logger.log(e)
+            null
         }
     }
 
