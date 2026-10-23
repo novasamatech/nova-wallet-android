@@ -219,10 +219,11 @@ class BittensorChooseSubnetViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val subnetCount = combine(filteredCatalogue, catalogue, query, catalogueState) { filtered, all, query, state ->
-        // Wait until the derived lists caught up with the loaded catalogue, so no transient "0 of 0" is shown.
-        if (state is ExtendedLoadingState.Loaded && state.data == all) {
-            resources.getString(R.string.bittensor_subnet_count, filtered.count { it.matchesQuery(query) }, all.size)
+    val subnetCount = combine(orderedCatalogue, hideThinPools, favorites, query, catalogueState) { ordered, hideThin, favorites, query, state ->
+        // Count only once the sorted list is the loaded catalogue, so neither "0 of 0" nor "0 of N" flashes while it settles.
+        if (state is ExtendedLoadingState.Loaded && ordered.size == state.data.size && ordered.toSet() == state.data.toSet()) {
+            val shown = ordered.count { it.matchesQuery(query) && (!hideThin || passesBittensorThinPoolFilter(it, favorites)) }
+            resources.getString(R.string.bittensor_subnet_count, shown, state.data.size)
         } else {
             resources.getString(R.string.bittensor_subnet_count_loading)
         }

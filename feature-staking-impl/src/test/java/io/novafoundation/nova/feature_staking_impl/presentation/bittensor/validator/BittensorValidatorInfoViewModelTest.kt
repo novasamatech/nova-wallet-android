@@ -85,11 +85,18 @@ class BittensorValidatorInfoViewModelTest {
         assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
     }
 
-    private fun payload(inactive: Boolean, annualYield: BigDecimal?) = BittensorValidatorInfoPayload(
+    @Test
+    fun `stake that cannot be formatted resolves to no amount instead of loading forever`() = runBlocking<Unit> {
+        val viewModel = createViewModel(payload(inactive = false, annualYield = null, stake = BigDecimal.TEN))
+
+        assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
+    }
+
+    private fun payload(inactive: Boolean, annualYield: BigDecimal?, stake: BigDecimal? = null) = BittensorValidatorInfoPayload(
         subnetId = 5,
         address = "address",
         name = "Validator",
-        stakeInNative = null,
+        stakeInNative = stake,
         commissionRate = BigDecimal("0.18"),
         inactive = inactive,
         annualYield = annualYield

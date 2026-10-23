@@ -7,10 +7,15 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-class BittensorDelegateSource(private val runtimeCalls: MultiChainRuntimeCallsApi) {
+interface BittensorDelegateSource {
 
     /** Subnets where [hotkey] holds a validator permit; null when the hotkey is not a registered delegate. */
-    suspend fun validatorPermits(chainId: ChainId, hotkey: AccountIdKey): Set<BittensorNetuid.Subnet>? = runtimeCalls.forChain(chainId)
+    suspend fun validatorPermits(chainId: ChainId, hotkey: AccountIdKey): Set<BittensorNetuid.Subnet>?
+}
+
+class RealBittensorDelegateSource(private val runtimeCalls: MultiChainRuntimeCallsApi) : BittensorDelegateSource {
+
+    override suspend fun validatorPermits(chainId: ChainId, hotkey: AccountIdKey): Set<BittensorNetuid.Subnet>? = runtimeCalls.forChain(chainId)
         .call(
             section = "DelegateInfoRuntimeApi",
             method = "get_delegate",

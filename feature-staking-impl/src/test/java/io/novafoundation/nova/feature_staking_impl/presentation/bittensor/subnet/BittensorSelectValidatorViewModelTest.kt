@@ -215,6 +215,21 @@ class BittensorSelectValidatorViewModelTest {
         assertEquals(0, payload.subnetId)
     }
 
+    @Test
+    fun `inactive preselected validator cannot be confirmed`() = runBlocking<Unit> {
+        val inactive = validator(1, "Inactive").copy(inactive = true)
+        val directory = directory(listOf(inactive, validator(2, "Active")))
+        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
+        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, "address-1", BittensorSelectionState()))
+        viewModel.applyFilters(BittensorValidatorFilters(BittensorValidatorSorting.NAME, hideUnusualApy = false))
+        withTimeout(5_000) { viewModel.rows.first { it.size == 2 } }
+
+        assertEquals(ButtonState.DISABLED, viewModel.buttonState.first())
+        viewModel.confirmClicked()
+        assertNull(communicator.responses.tryReceive().getOrNull())
+    }
+
     private fun createViewModel(request: BittensorSelectValidatorCommunicator.Request): BittensorSelectValidatorViewModel {
         return BittensorSelectValidatorViewModel(
             analytics, request, communicator, interactor, icons, router, externalActions, resources, logger,

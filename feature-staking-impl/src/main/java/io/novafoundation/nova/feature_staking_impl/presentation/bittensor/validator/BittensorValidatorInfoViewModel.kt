@@ -29,9 +29,10 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.RoundingMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.flow
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -67,19 +68,28 @@ class BittensorValidatorInfoViewModel(
             emit(null)
             return@flow
         }
-        val symbol = validatorInteractor.chain().utilityAsset.symbol
-        emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
+        var emitted = false
+        val amounts = flow {
+            val symbol = validatorInteractor.chain().utilityAsset.symbol
+            emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
+            emitAll(
+                subnetInteractor.observeAsset().map { asset ->
+                    amountFormatter.amount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
+                }
+            )
+        }
         emitAll(
-            subnetInteractor.observeAsset().map { asset ->
-                amountFormatter.amount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
-            }
+            amounts
+                .onEach { emitted = true }
+                .catch { cause ->
+                    if (cause is CancellationException) throw cause
+                    logger.log("[BittensorValidatorInfo] Validator stake price unavailable")
+                    logger.log(cause)
+                    // Keep the amount already shown; otherwise resolve the cell instead of leaving it loading.
+                    if (!emitted) emit(null)
+                }
         )
     }
-        .catch { cause ->
-            if (cause is CancellationException) throw cause
-            logger.log("[BittensorValidatorInfo] Validator stake price unavailable")
-            logger.log(cause)
-        }
         .shareInBackground()
 
     val take: String = resources.getString(

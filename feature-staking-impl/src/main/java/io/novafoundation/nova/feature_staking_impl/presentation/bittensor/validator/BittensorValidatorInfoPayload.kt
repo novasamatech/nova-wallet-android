@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.valid
 
 import android.os.Parcelable
 import java.math.BigDecimal
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /**
  * The validator as the list shows it: the info screen presents the same snapshot instead of re-deriving it.

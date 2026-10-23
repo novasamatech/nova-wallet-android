@@ -501,7 +501,8 @@ class BittensorSubnetDetailsViewModel(
 
     /** Null when the subnet has no market listing, so no price history exists for any period. */
     private suspend fun loadChartHistory(request: BittensorSubnetChartRequest): List<BittensorSubnetPricePoint>? {
-        val priceId = request.nativePriceId ?: return emptyList()
+        // A missing native price id is a failed read (retryable), not a subnet without price history.
+        val priceId = requireNotNull(request.nativePriceId) { "Native token price id is unavailable" }
         return bittensorSubnetDetailsInteractor.listedHistory(
             subnetId,
             priceId,
