@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorRootStakePresentation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmFragment
@@ -349,10 +350,11 @@ class RelayStakingNavigator(
 
     override fun openBittensorRootStaking(
         payload: BittensorStakeAmountPayload?,
-        selectionState: BittensorSelectionState
+        selectionState: BittensorSelectionState,
+        presentation: BittensorRootStakePresentation
     ) {
         navigationBuilder().action(R.id.action_open_bittensor_root_staking)
-            .setArgs(BittensorStakeAmountFragment.getBundle(payload, selectionState))
+            .setArgs(BittensorStakeAmountFragment.getBundle(payload, selectionState, presentation))
             .navigateInFirstAttachedContext()
     }
 
