@@ -43,7 +43,7 @@ interface BittensorDashboardSnapshotRepository {
 
 class RealBittensorDashboardSnapshotRepository(
     private val preferences: Preferences,
-    private val gson: Gson = Gson()
+    private val gson: Gson
 ) : BittensorDashboardSnapshotRepository {
 
     private class StoredSnapshot(

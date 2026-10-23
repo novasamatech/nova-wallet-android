@@ -5,7 +5,8 @@ import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepositoryTest
+import com.google.gson.Gson
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.InMemoryPreferences
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
@@ -61,7 +62,7 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val cache = RecordingCache()
 
-    private val snapshots = RealBittensorDashboardSnapshotRepository(BittensorDashboardSnapshotRepositoryTest.InMemoryPreferences())
+    private val snapshots = RealBittensorDashboardSnapshotRepository(InMemoryPreferences(), Gson())
 
     private val coldKey: AccountId = ByteArray(32)
 

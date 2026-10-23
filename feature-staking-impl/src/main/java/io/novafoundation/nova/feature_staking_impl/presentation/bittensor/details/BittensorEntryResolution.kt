@@ -20,7 +20,7 @@ internal fun resolveBittensorEntry(portfolio: BittensorPortfolio?, claims: Bitte
     val positions = portfolio.positions ?: return null
     if (positions.root.isNotEmpty() || positions.subnets.isNotEmpty()) return BittensorEntryResolution.Portfolio
     if (claims?.dataStatus !is BittensorDataStatus.Fresh || claims.metaId != portfolio.metaId) return null
-    if (!isPortfolioEmpty(positions, claims.claims.totalRedeemable)) return BittensorEntryResolution.Portfolio
+    if (!isPortfolioEmpty(positions, claims.claims.totalClaimable)) return BittensorEntryResolution.Portfolio
 
     val options = AvailableStakingOptionsPayload(portfolio.chain.id, portfolio.asset.token.configuration.id, listOf(Chain.Asset.StakingType.BITTENSOR_ROOT))
     return BittensorEntryResolution.Start(StartStakingLandingPayload(options), portfolio.chain.name)

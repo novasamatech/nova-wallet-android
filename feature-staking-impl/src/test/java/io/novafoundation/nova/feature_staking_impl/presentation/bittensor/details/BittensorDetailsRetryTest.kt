@@ -423,6 +423,15 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
+    fun `root rewards below the claim minimum without stake resolve to start staking`() {
+        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList(), subnets = emptyList()))
+        val preview = BittensorRootClaimPreview(hotkey, BigInteger.ONE, BigInteger.ONE, BigInteger.ZERO)
+        val claims = BittensorRootClaims(listOf(preview), BigInteger.TEN)
+
+        assertTrue(resolveBittensorEntry(emptyPortfolio, rootClaims.value.copy(claims = claims)) is BittensorEntryResolution.Start)
+    }
+
+    @Test
     fun `redeemable root rewards without stake keep portfolio accessible`() {
         val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
         val preview = BittensorRootClaimPreview(hotkey, BigInteger.TEN, BigInteger.TEN, BigInteger.ZERO)

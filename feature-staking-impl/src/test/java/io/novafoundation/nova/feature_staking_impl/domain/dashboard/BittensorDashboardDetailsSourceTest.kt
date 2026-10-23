@@ -3,7 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.dashboard
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepositoryTest
+import com.google.gson.Gson
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.InMemoryPreferences
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioState
@@ -71,7 +72,7 @@ class BittensorDashboardDetailsSourceTest {
 
     private val portfolioState = MutableStateFlow(BittensorPortfolioState(portfolio, BittensorDataStatus.Fresh))
 
-    private val snapshots = RealBittensorDashboardSnapshotRepository(BittensorDashboardSnapshotRepositoryTest.InMemoryPreferences())
+    private val snapshots = RealBittensorDashboardSnapshotRepository(InMemoryPreferences(), Gson())
 
     private val source = BittensorDashboardDetailsSource(positions, validators, recommendations, snapshots, logger)
 
@@ -186,6 +187,28 @@ class BittensorDashboardDetailsSourceTest {
         assertEquals(BigInteger.TEN, details.panelStakeInPlanks)
         assertEquals(0, BigDecimal.TEN.compareTo(details.panelAnnualPercentageYield))
         assertFalse(details.panelYieldLoading)
+    }
+
+    @Test
+    fun `recommendations wait for unknown positions and load once they resolve to no stake`() = runTest {
+        prepare()
+        portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Loading)
+        val emitted = mutableListOf<BittensorDashboardDetails>()
+        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        runCurrent()
+        assertTrue(emitted.last().maximumYieldLoading)
+        verifyNoInteractions(recommendations)
+
+        portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Stale(IllegalStateException("offline")))
+        runCurrent()
+        assertFalse(emitted.last().maximumYieldLoading)
+        verifyNoInteractions(recommendations)
+
+        portfolioState.value = BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh)
+        runCurrent()
+        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        verify(recommendations, times(1)).maximumYields()
+        job.cancel()
     }
 
     @Test

@@ -50,6 +50,9 @@ class BittensorDashboardDetailsSource(
         val loading: Boolean
     )
 
+    // Unknown positions never trigger the recommendations request: PENDING waits, UNAVAILABLE settles without it.
+    private enum class StakeActivity { ACTIVE, NONE, PENDING, UNAVAILABLE }
+
     private companion object {
         const val REFRESH_MILLIS = 60_000L
     }
@@ -78,11 +81,15 @@ class BittensorDashboardDetailsSource(
             .map { it.positions?.subnets.orEmpty().map { position -> position.subnetId }.toSet() }
             .distinctUntilChanged()
             .flatMapLatest(::observeSubnetRates)
-        val maximumRates = combine(portfolio, claimable) { state, rewards -> hasActiveStake(state.positions, rewards, restored) }
+        val maximumRates = combine(portfolio, claimable) { state, rewards -> stakeActivity(state, rewards, restored) }
             .distinctUntilChanged()
-            .flatMapLatest { active ->
-                // As iOS: the start-staking yield is only needed, and requested, without an active stake.
-                if (active) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else refreshed { recommendedYields.maximumYields() }
+            .flatMapLatest { activity ->
+                // As iOS: the start-staking yield is only needed, and requested, once there is known to be no active stake.
+                when (activity) {
+                    StakeActivity.ACTIVE, StakeActivity.UNAVAILABLE -> flowOf(ExtendedLoadingState.Loaded(emptyMap()))
+                    StakeActivity.PENDING -> flowOf(ExtendedLoadingState.Loading)
+                    StakeActivity.NONE -> refreshed { recommendedYields.maximumYields() }
+                }
             }
 
         return combine(portfolio, rootRates, subnetRates, maximumRates, claimable) { state, root, subnets, maximum, rewards ->
@@ -117,14 +124,20 @@ class BittensorDashboardDetailsSource(
         }
     }
 
-    private fun hasActiveStake(
-        positions: BittensorPortfolioPositions?,
+    private fun stakeActivity(
+        state: BittensorPortfolioState,
         claimableRewards: BigInteger?,
         restored: BittensorDashboardSnapshot?
-    ): Boolean {
-        if (claimableRewards?.isPositive() == true) return true
-        if (positions != null) return positions.root.isNotEmpty() || positions.subnets.isNotEmpty()
-        return restored != null && (restored.rootStakeInPlanks != null || restored.subnetCount > 0)
+    ): StakeActivity {
+        if (claimableRewards?.isPositive() == true) return StakeActivity.ACTIVE
+        val positions = state.positions
+        return when {
+            positions != null && (positions.root.isNotEmpty() || positions.subnets.isNotEmpty()) -> StakeActivity.ACTIVE
+            positions != null -> StakeActivity.NONE
+            restored != null && (restored.rootStakeInPlanks != null || restored.subnetCount > 0) -> StakeActivity.ACTIVE
+            state.status is BittensorDataStatus.Loading -> StakeActivity.PENDING
+            else -> StakeActivity.UNAVAILABLE
+        }
     }
 
     private fun BittensorDashboardSnapshot.toDetails(rateLoading: Boolean) = BittensorDashboardDetails(

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import com.google.gson.Gson
 import android.os.SystemClock
 import dagger.Module
 import dagger.Provides
@@ -234,8 +235,8 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorDashboardSnapshots(preferences: Preferences): BittensorDashboardSnapshotRepository =
-        RealBittensorDashboardSnapshotRepository(preferences)
+    fun provideBittensorDashboardSnapshots(preferences: Preferences, gson: Gson): BittensorDashboardSnapshotRepository =
+        RealBittensorDashboardSnapshotRepository(preferences, gson)
 
     @Provides
     @FeatureScope
