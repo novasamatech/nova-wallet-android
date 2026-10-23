@@ -29,7 +29,7 @@ class RemoteBittensorConfigRepository(
 
     override suspend fun config(): BittensorConfig {
         try {
-            return withTimeoutOrNull(15_000L) { cachedConfig() }
+            return withTimeoutOrNull(CONFIG_TIMEOUT_MILLIS) { cachedConfig() }
                 ?: throw BittensorTimeoutException("Bittensor config request")
         } catch (e: CancellationException) {
             throw e
@@ -51,6 +51,9 @@ class RemoteBittensorConfigRepository(
         }
     }
 }
+
+// iOS gives the config request 30 seconds.
+private const val CONFIG_TIMEOUT_MILLIS = 30_000L
 
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())
 

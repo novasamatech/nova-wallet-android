@@ -67,14 +67,17 @@ class BittensorSubnetBrowseRepositoryTest {
     }
 
     @Test
-    fun `backend catalogue standing in for a slow node lists rows without a chain price`() {
+    fun `backend catalogue standing in for a slow node lists rows at the stale backend price`() {
         val fallback = listOf(subnet(1, 10, null))
         val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend 1", "S1", 10.toBigInteger(), "2000"))
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
         val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
 
+        val listed = mapBittensorBrowseSubnets(response, fallback, chainVerified = false)
+
         assertEquals(emptyList<BittensorSubnet>(), mapBittensorBrowseSubnets(response, fallback, chainVerified = true))
-        assertEquals(listOf(1), mapBittensorBrowseSubnets(response, fallback, chainVerified = false).map { it.id.value })
+        assertEquals(listOf(1), listed.map { it.id.value })
+        assertEquals(1_000_000_000.toBigInteger(), listed.single().priceInRao)
     }
 
     @Test

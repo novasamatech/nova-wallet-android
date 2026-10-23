@@ -8,24 +8,28 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import java.util.concurrent.atomic.AtomicBoolean
 
 /** Screen-local recovery for reads. Never retries a submitted transaction. */
 class BittensorRetryController(private val resources: ResourceManager, private val logger: Logger) {
 
-    private val errors = Channel<BittensorReadFailure>(Channel.BUFFERED)
+    // The failure awaiting the user is state, not a one-shot event: a dialog lost to a configuration change shows again,
+    // and failures raised while the screen is hidden wait as one dialog instead of a stack of them.
+    private val pending = MutableStateFlow<BittensorReadFailure?>(null)
 
-    // Every attested read fails the same way on a device that cannot attest: explain it once per screen.
-    private val deviceFailureReported = AtomicBoolean(false)
+    // Sources that failed while the pending dialog was up; its Retry restarts them all.
+    private val pendingRetries = mutableListOf<() -> Unit>()
 
-    val events = errors.receiveAsFlow()
+    // A failure no retry can fix reads the same for every source, e.g. each attested read on a device that cannot
+    // attest: explain it once per screen.
+    private var finalFailureReported = false
+
+    val events: Flow<BittensorReadFailure> = pending.filterNotNull()
 
     fun <T, R> observe(
         step: String,
@@ -56,12 +60,39 @@ class BittensorRetryController(private val resources: ResourceManager, private v
         logger.log("[Bittensor] Failed to load $step")
         logger.log(cause)
         val kind = cause.bittensorReadFailureKind()
-        if (kind == BittensorReadFailureKind.DEVICE_UNSUPPORTED && !deviceFailureReported.compareAndSet(false, true)) return
+        synchronized(pendingRetries) {
+            val shown = pending.value
+            if (shown != null) {
+                // iOS presents one alert at a time, so a later failure adds no dialog of its own.
+                if (shown.retryable && kind.retryable) pendingRetries += onRetry
+                return
+            }
+            if (kind.retryable) {
+                pendingRetries += onRetry
+            } else {
+                if (finalFailureReported) return
+                finalFailureReported = true
+            }
+            pending.value = createFailure(kind)
+        }
+    }
+
+    private fun createFailure(kind: BittensorReadFailureKind): BittensorReadFailure {
         val (title, message) = when (kind) {
             BittensorReadFailureKind.GENERIC -> R.string.common_error_general_title to R.string.bittensor_load_failed_message
             BittensorReadFailureKind.SLOW_NETWORK -> R.string.bittensor_load_slow_title to R.string.bittensor_load_slow_message
             BittensorReadFailureKind.DEVICE_UNSUPPORTED -> R.string.bittensor_load_device_title to R.string.bittensor_load_device_message
+            BittensorReadFailureKind.REJECTED -> R.string.common_error_general_title to R.string.bittensor_load_rejected_message
         }
-        errors.trySend(BittensorReadFailure(kind, resources.getString(title), resources.getString(message), onRetry))
+        return BittensorReadFailure(kind, resources.getString(title), resources.getString(message), ::resolve)
+    }
+
+    private fun resolve(failure: BittensorReadFailure, retry: Boolean) {
+        val retries = synchronized(pendingRetries) {
+            if (pending.value !== failure) return
+            pending.value = null
+            pendingRetries.toList().also { pendingRetries.clear() }
+        }
+        if (retry) retries.forEach { it() }
     }
 }

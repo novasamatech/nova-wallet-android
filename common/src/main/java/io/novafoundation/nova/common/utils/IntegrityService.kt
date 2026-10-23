@@ -4,14 +4,9 @@ import com.google.android.play.core.integrity.StandardIntegrityException
 import com.google.android.play.core.integrity.StandardIntegrityManager
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenProvider
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
-import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.API_NOT_AVAILABLE
-import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.APP_NOT_INSTALLED
-import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.APP_UID_MISMATCH
 import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.INTEGRITY_TOKEN_PROVIDER_INVALID
 import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.PLAY_SERVICES_NOT_FOUND
-import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.PLAY_SERVICES_VERSION_OUTDATED
 import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.PLAY_STORE_NOT_FOUND
-import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.PLAY_STORE_VERSION_OUTDATED
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -25,15 +20,11 @@ import kotlin.coroutines.resumeWithException
 private const val RECEIVING_PROVIDER_MAX_RETRY = 3
 private const val INTEGRITY_TIMEOUT_MILLIS = 100_000L
 
-// Codes that describe the device itself (no or outdated Play Store / Play services), not a transient outage.
+// Codes that say this device has no Play Store or Play services. Outdated Play, a Play Console setup problem or a
+// transient fault can be fixed, so those stay ordinary failures.
 private val DEVICE_UNSUPPORTED_CODES = setOf(
-    API_NOT_AVAILABLE,
     PLAY_STORE_NOT_FOUND,
-    APP_NOT_INSTALLED,
-    PLAY_SERVICES_NOT_FOUND,
-    APP_UID_MISMATCH,
-    PLAY_STORE_VERSION_OUTDATED,
-    PLAY_SERVICES_VERSION_OUTDATED
+    PLAY_SERVICES_NOT_FOUND
 )
 
 /** Whether Play Integrity failed because this device cannot provide it, so a retry cannot succeed. */

@@ -18,17 +18,19 @@ class BittensorReadAnalytics(
     private val failureReported = AtomicBoolean(false)
 
     fun failed(cause: Throwable) {
-        // As on iOS, a device that cannot attest is not a data failure.
-        if (cause.bittensorReadFailureKind() == BittensorReadFailureKind.DEVICE_UNSUPPORTED) return
+        val kind = cause.bittensorReadFailureKind()
+        // As on iOS, a device the backend cannot serve is not a data failure.
+        if (kind == BittensorReadFailureKind.DEVICE_UNSUPPORTED) return
         val reason = when {
-            cause is HttpException && cause.code() == 429 -> BittensorDataFailureReason.RATE_LIMITED
-            cause is HttpException && cause.code() in 400..499 -> BittensorDataFailureReason.REJECTED
+            kind == BittensorReadFailureKind.REJECTED -> BittensorDataFailureReason.REJECTED
+            // iOS reports any other error status, a rate limit included, as a server error.
+            cause is HttpException -> BittensorDataFailureReason.SERVER_ERROR
             cause is IOException || cause is TimeoutCancellationException -> BittensorDataFailureReason.TRANSPORT
             cause is IllegalArgumentException -> BittensorDataFailureReason.CONTRACT_VIOLATION
             else -> BittensorDataFailureReason.SERVER_ERROR
         }
         if (failureReported.compareAndSet(false, true)) {
-            analytics.track(BittensorAnalyticsEvent.DataFailed(endpoint, reason, screen, retryable = true))
+            analytics.track(BittensorAnalyticsEvent.DataFailed(endpoint, reason, screen, retryable = kind.retryable))
         }
     }
 

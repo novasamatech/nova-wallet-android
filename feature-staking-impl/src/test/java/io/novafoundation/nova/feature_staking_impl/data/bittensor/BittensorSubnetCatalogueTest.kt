@@ -8,6 +8,7 @@ import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 import java.io.IOException
+import kotlin.time.Duration.Companion.seconds
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.delay
@@ -72,7 +73,7 @@ class BittensorSubnetCatalogueTest {
     }
 
     @Test
-    fun `stale backend catalogue is still listed but its price is not shown`() {
+    fun `stale backend catalogue is still listed but its price values nothing`() {
         val subnets = mapBittensorBackendCatalogue(backendCatalogue(freshness = "STALE"))
 
         assertEquals(listOf(BittensorNetuid.Subnet(7)), subnets.map { it.id })
@@ -111,6 +112,27 @@ class BittensorSubnetCatalogueTest {
         backend.failure = IOException("Backend down")
 
         assertEquals("Node down", runCatching { repository.subnets() }.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `last good catalogue keeps names without prices and never counts as a fresh load`() = runBlocking<Unit> {
+        var now = 0L
+        val clockedRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, backend, urls, nanoTime = { now })
+        clockedRepository.catalogue()
+        calls.failure = IOException("Node down")
+        backend.failure = IOException("Backend down")
+
+        now = 31.seconds.inWholeNanoseconds
+        val lastGood = clockedRepository.catalogue()
+        now = 32.seconds.inWholeNanoseconds
+        clockedRepository.catalogue()
+
+        assertFalse(lastGood.fromChain)
+        assertEquals(listOf("Name"), lastGood.subnets.map { it.name })
+        assertNull(lastGood.subnets.single().priceInRao)
+        assertNull(lastGood.subnets.single().taoReserveInPlanks)
+        assertNull(lastGood.subnets.single().alphaReserveInPlanks)
+        assertEquals(3, calls.requests)
     }
 
     @Test(expected = IllegalArgumentException::class)

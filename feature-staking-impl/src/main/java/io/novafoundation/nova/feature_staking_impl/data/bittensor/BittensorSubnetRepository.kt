@@ -23,7 +23,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 
-/** [fromChain] is false when the backend catalogue stood in for a slow or failing node, so it cannot cross-check the backend. */
+/**
+ * [fromChain] is false when the backend catalogue or the last good names stood in for a slow or failing node, so it
+ * cannot cross-check the backend.
+ */
 class BittensorSubnetCatalogue(val subnets: List<BittensorSubnet>, val fromChain: Boolean)
 
 interface BittensorSubnetRepository {
@@ -39,8 +42,9 @@ interface BittensorSubnetRepository {
 
 /**
  * Subnet names and symbols come from the chain (`get_all_dynamic_info`, a heavy call) or, when the node is slow or
- * failing, from the backend `/subnets` catalogue - the source iOS names subnets from. The last good catalogue
- * backs both up, so a slow node never blanks subnet names.
+ * failing, from the backend `/subnets` catalogue - the source iOS names subnets from. When both fail, the last good
+ * catalogue stands in with its metadata only, so a failing node never blanks subnet names; prices and reserves always
+ * come from a current read, and the next read asks both sources again.
  */
 class RealBittensorSubnetRepository(
     private val runtimeCalls: MultiChainRuntimeCallsApi,
@@ -48,7 +52,8 @@ class RealBittensorSubnetRepository(
     private val swapSource: BittensorSwapSource,
     private val catalogueApi: BittensorSubnetCatalogueApi,
     private val infrastructureUrls: InfrastructureUrls,
-    private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS
+    private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS,
+    private val nanoTime: () -> Long = System::nanoTime
 ) : BittensorSubnetRepository {
 
     private val mutex = Mutex()
@@ -63,7 +68,7 @@ class RealBittensorSubnetRepository(
 
     override suspend fun catalogue(): BittensorSubnetCatalogue = mutex.withLock {
         val cachedCatalogue = cachedCatalogue
-        if (cachedCatalogue != null && System.nanoTime() - catalogueLoadedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
+        if (cachedCatalogue != null && nanoTime() - catalogueLoadedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
             return@withLock cachedCatalogue
         }
         val catalogue = try {
@@ -71,13 +76,19 @@ class RealBittensorSubnetRepository(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            lastGoodCatalogue ?: throw e
+            return@withLock lastGoodCatalogue ?: throw e
         }
         this.cachedCatalogue = catalogue
-        lastGoodCatalogue = catalogue
-        catalogueLoadedAtNanos = System.nanoTime()
+        lastGoodCatalogue = catalogue.namesOnly()
+        catalogueLoadedAtNanos = nanoTime()
         catalogue
     }
+
+    // Prices and reserves move every block: what outlives a failed load names subnets but never values anything.
+    private fun BittensorSubnetCatalogue.namesOnly() = BittensorSubnetCatalogue(
+        subnets.map { it.copy(priceInRao = null, taoReserveInPlanks = null, alphaReserveInPlanks = null) },
+        fromChain = false
+    )
 
     override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         val catalogue = subnets()
@@ -91,24 +102,33 @@ class RealBittensorSubnetRepository(
         loadDynamicSubnets(requireComplete = true)
     } ?: throw BittensorTimeoutException("Subnet quick-pick catalogue")
 
-    private suspend fun loadCatalogue(): BittensorSubnetCatalogue = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
-        coroutineScope {
-            val subnetLogos = async { configRepository.subnetLogos() }
-            val chain = async { catching { loadDynamicSubnets() } }
-            // Prefer the chain while it answers promptly. Only a slow or failing node costs an attested backend request,
-            // so a healthy node never spends the Profile-3 rate budget.
-            val promptChain = withTimeoutOrNull(chainPatienceMillis) { chain.await() }?.getOrNull()
-            val catalogue = if (promptChain != null) {
-                BittensorSubnetCatalogue(promptChain, fromChain = true)
-            } else {
-                val backend = async { catching { loadBackendCatalogue() } }
-                firstSuccess(chain, backend).also { backend.cancel() }
-            }
-            chain.cancel()
-            val logos = subnetLogos.await()
-            BittensorSubnetCatalogue(catalogue.subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }, catalogue.fromChain)
+    private suspend fun loadCatalogue(): BittensorSubnetCatalogue = coroutineScope {
+        val subnetLogos = async { configRepository.subnetLogos() }
+        var catalogue: BittensorSubnetCatalogue? = null
+        // Logos only decorate the catalogue: a config read slower than the catalogue budget costs the logos, not the catalogue.
+        val logos = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
+            catalogue = resolveCatalogue()
+            subnetLogos.await()
         }
-    } ?: throw BittensorTimeoutException("Subnet catalogue")
+        subnetLogos.cancel()
+        val resolved = catalogue ?: throw BittensorTimeoutException("Subnet catalogue")
+        BittensorSubnetCatalogue(resolved.subnets.map { it.copy(logoUrl = logos?.get(it.id) ?: it.logoUrl) }, resolved.fromChain)
+    }
+
+    private suspend fun resolveCatalogue(): BittensorSubnetCatalogue = coroutineScope {
+        val chain = async { catching { loadDynamicSubnets() } }
+        // Prefer the chain while it answers promptly. Only a slow or failing node costs an attested backend request,
+        // so a healthy node never spends the Profile-3 rate budget.
+        val promptChain = withTimeoutOrNull(chainPatienceMillis) { chain.await() }?.getOrNull()
+        val catalogue = if (promptChain != null) {
+            BittensorSubnetCatalogue(promptChain, fromChain = true)
+        } else {
+            val backend = async { catching { loadBackendCatalogue() } }
+            firstSuccess(chain, backend).also { backend.cancel() }
+        }
+        chain.cancel()
+        catalogue
+    }
 
     /** Whichever source answers first with a catalogue; the chain's failure is reported when both fail. */
     private suspend fun firstSuccess(
@@ -158,8 +178,9 @@ class RealBittensorSubnetRepository(
 }
 
 /**
- * The backend catalogue as [BittensorSubnet]s; STALE metadata is still listed, as on iOS. A STALE price is not shown:
- * [BittensorSubnet.priceInRao] stays null (displayed as "—") until a FRESH or live chain price is available.
+ * The backend catalogue as [BittensorSubnet]s; STALE metadata is still listed, as on iOS. A STALE price never values
+ * anything: [BittensorSubnet.priceInRao] stays null (iOS `freshTaoPerAlpha`) until a FRESH or live chain price is
+ * available. The subnet picker still lists it from the backend rows, as iOS lists `taoPerAlpha` whatever its freshness.
  */
 internal fun mapBittensorBackendCatalogue(remote: BittensorSubnetCatalogueRemote): List<BittensorSubnet> {
     requireAvailableBittensorComponent(remote.meta?.components?.subnetMetadata, "Subnet metadata")

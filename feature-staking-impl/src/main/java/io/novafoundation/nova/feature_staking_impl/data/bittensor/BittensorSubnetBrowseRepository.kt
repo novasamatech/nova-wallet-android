@@ -38,8 +38,8 @@ class BittensorSubnetBrowseRepository(
 
 /**
  * With a chain catalogue every backend row is cross-checked against the chain (registration, live positive price).
- * When the backend catalogue stood in for a slow node ([chainVerified] = false) there is no chain view to compare
- * with: rows are listed on the backend's word, and subtoken availability is still read from chain storage.
+ * When the chain could not supply one ([chainVerified] = false) there is no chain view to compare with: rows are
+ * listed on the backend's word with the backend price, and subtoken availability is still read from chain storage.
  */
 internal fun mapBittensorBrowseSubnets(
     remote: BittensorSubnetCatalogueRemote,
@@ -62,6 +62,11 @@ internal fun mapBittensorBrowseSubnets(
         if (registration != chain.registrationBlock || !chainPriced || id !in prices) return@mapNotNull null
         val reserve = requireNotNull(row.taoReserve).toBigDecimal().movePointRight(9).toBigIntegerExact()
         require(reserve.isNonNegative)
-        chain.copy(name = normalizeBittensorSubnetName(requireNotNull(row.name)), symbol = requireNotNull(row.symbol), taoReserveInPlanks = reserve)
+        chain.copy(
+            name = normalizeBittensorSubnetName(requireNotNull(row.name)),
+            symbol = requireNotNull(row.symbol),
+            priceInRao = if (chainVerified) chain.priceInRao else prices[id],
+            taoReserveInPlanks = reserve
+        )
     }
 }

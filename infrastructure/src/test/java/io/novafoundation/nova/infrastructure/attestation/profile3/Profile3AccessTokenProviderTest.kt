@@ -1,5 +1,6 @@
 package io.novafoundation.nova.infrastructure.attestation.profile3
 
+import io.novafoundation.nova.infrastructure.attestation.AttestationRefusedException
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnavailableException
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
 import io.novafoundation.nova.infrastructure.attestation.isAttestationUnsupported
@@ -179,16 +180,18 @@ class Profile3AccessTokenProviderTest {
     }
 
     @Test
-    fun `backend refusal stays a retryable unavailability rather than an unsupported device`() = runTest {
+    fun `backend refusal keeps its status and code on every later request`() = runTest {
         val fixture = Profile3Fixture(backgroundScope)
         fixture.api.failure = httpFailure(401, "attestation_failed")
         val provider = fixture.provider()
         val first = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
-        assertTrue(first is AttestationUnavailableException)
-        assertFalse(first!!.isAttestationUnsupported())
         val refused = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
-        assertTrue(refused is AttestationUnavailableException)
-        assertFalse(refused!!.isAttestationUnsupported())
+        listOf(first, refused).forEach { failure ->
+            assertTrue(failure is AttestationRefusedException)
+            assertEquals(401, (failure as AttestationRefusedException).status)
+            assertEquals("attestation_failed", failure.code)
+            assertFalse(failure.isAttestationUnsupported())
+        }
     }
 
     @Test

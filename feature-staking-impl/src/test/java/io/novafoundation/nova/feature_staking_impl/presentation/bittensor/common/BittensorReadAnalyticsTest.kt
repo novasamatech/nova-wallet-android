@@ -3,9 +3,12 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import java.io.IOException
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
 
 class BittensorReadAnalyticsTest {
 
@@ -34,6 +37,22 @@ class BittensorReadAnalyticsTest {
         reopened.failed(error)
 
         assertEquals(2, service.events.size)
+    }
+
+    @Test
+    fun `backend rejection is reported as not retryable`() {
+        reads.failed(HttpException(Response.error<Unit>(422, "".toResponseBody())))
+
+        assertEquals("rejected", service.events.single().properties["reason"])
+        assertEquals(false, service.events.single().properties["retryable"])
+    }
+
+    @Test
+    fun `rate limit is reported as a retryable server error`() {
+        reads.failed(HttpException(Response.error<Unit>(429, "".toResponseBody())))
+
+        assertEquals("server_error", service.events.single().properties["reason"])
+        assertEquals(true, service.events.single().properties["retryable"])
     }
 
     @Test

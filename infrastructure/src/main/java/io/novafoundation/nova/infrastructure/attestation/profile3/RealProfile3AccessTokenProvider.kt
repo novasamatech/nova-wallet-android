@@ -2,11 +2,12 @@ package io.novafoundation.nova.infrastructure.attestation.profile3
 
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.attestation.AttestationKeyPairStore
+import io.novafoundation.nova.infrastructure.attestation.AttestationRefusedException
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnavailableException
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
 import io.novafoundation.nova.infrastructure.attestation.isAttestationUnsupported
-import io.novafoundation.nova.infrastructure.attestation.errorCodeOf
+import io.novafoundation.nova.infrastructure.attestation.peekErrorCode
 import io.novafoundation.nova.infrastructure.attestation.signedContext
 import java.io.IOException
 import kotlinx.coroutines.CancellationException
@@ -50,11 +51,14 @@ class RealProfile3AccessTokenProvider(
 
         var failures = 0
 
-        var rejected = false
+        // The backend refused this client's bootstrap; it is not asked again in this process.
+        var refusal: Refusal? = null
 
         // The last bootstrap failed because this device cannot attest; later refusals keep saying so.
         var unsupported = false
     }
+
+    private class Refusal(val status: Int, val code: String?)
 
     private class TokenDecision(val usable: Profile3TokenRecord?, val issuance: Deferred<Profile3TokenRecord>?)
 
@@ -70,11 +74,11 @@ class RealProfile3AccessTokenProvider(
             val now = clock.elapsedRealtimeMillis()
             val current = (state.token ?: tokens.read(identity.scope))?.takeIf { it.isUsable(now, clock.bootCount()) }
             state.token = current
-            if (current != null && (!current.shouldRefresh(now) || state.rejected || now < state.cooldownUntil)) {
+            if (current != null && (!current.shouldRefresh(now) || state.refusal != null || now < state.cooldownUntil)) {
                 return@withLock TokenDecision(current, null)
             }
-            // A backend refusal is not a device limitation (iOS keeps authorizationDenied apart from unsupported).
-            if (state.rejected) throw AttestationUnavailableException("Profile-3 registration was refused")
+            // Repeats the backend's answer, so callers still tell a refused device from a rejected request.
+            state.refusal?.let { throw AttestationRefusedException(it.status, it.code, "Profile-3 registration was refused") }
             if (now < state.cooldownUntil) {
                 if (state.unsupported) throw AttestationUnsupportedException("Profile-3 attestation is unsupported on this device")
                 throw AttestationUnavailableException("Profile-3 bootstrap is cooling down")
@@ -143,12 +147,13 @@ class RealProfile3AccessTokenProvider(
         } catch (cancelled: CancellationException) {
             throw cancelled
         } catch (failure: Exception) {
-            val unsupported = mutex.withLock {
+            val (unsupported, refusal) = mutex.withLock {
                 state.unsupported = failure.isAttestationUnsupported()
                 if (failure is HttpException) {
-                    val code = failure.backendCode()
-                    state.rejected = failure.code() in listOf(400, 403, 409) ||
+                    val code = failure.peekErrorCode()
+                    val refused = failure.code() in listOf(400, 403, 409) ||
                         failure.code() == 401 && code in listOf("invalid_proof", "attestation_failed")
+                    state.refusal = if (refused) Refusal(failure.code(), code) else null
                     state.cooldownUntil = if (failure.code() == 429) {
                         retryDeadline(failure.response()?.headers()?.get("Retry-After"))
                     } else {
@@ -159,9 +164,10 @@ class RealProfile3AccessTokenProvider(
                 } else {
                     state.cooldownUntil = backoffDeadline(state)
                 }
-                state.unsupported
+                state.unsupported to state.refusal
             }
             if (unsupported) throw AttestationUnsupportedException("Profile-3 bootstrap failed", failure)
+            if (refusal != null) throw AttestationRefusedException(refusal.status, refusal.code, "Profile-3 bootstrap was refused", failure)
             throw AttestationUnavailableException("Profile-3 bootstrap failed", failure)
         } finally {
             val job = currentCoroutineContext()[Job]
@@ -189,7 +195,7 @@ class RealProfile3AccessTokenProvider(
         return try {
             issue(identity, origin)
         } catch (failure: HttpException) {
-            when (failure.backendCode()) {
+            when (failure.peekErrorCode()) {
                 "unknown_client" -> {
                     if (failure.code() != 401) throw failure
                     register(identity, origin)
@@ -243,13 +249,5 @@ class RealProfile3AccessTokenProvider(
         val seconds = minOf(30L, 1L shl state.failures.coerceAtMost(5))
         state.failures += 1
         return clock.elapsedRealtimeMillis() + seconds * 1_000 + (random.nextDouble() * 1_000).toLong()
-    }
-
-    private fun HttpException.backendCode(): String? = try {
-        val source = response()?.errorBody()?.source()
-        source?.request(4_096)
-        source?.buffer?.clone()?.let { errorCodeOf(it.readUtf8(minOf(it.size, 4_096L))) }
-    } catch (failure: Exception) {
-        null
     }
 }
