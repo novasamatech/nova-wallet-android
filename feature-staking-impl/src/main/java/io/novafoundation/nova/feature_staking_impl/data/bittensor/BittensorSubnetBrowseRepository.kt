@@ -55,6 +55,6 @@ internal fun mapBittensorBrowseSubnets(remote: BittensorSubnetCatalogueRemote, r
         if (registration != chain.registrationBlock || chain.priceInRao?.isPositive() != true || id !in prices) return@mapNotNull null
         val reserve = requireNotNull(row.taoReserve).toBigDecimal().movePointRight(9).toBigIntegerExact()
         require(reserve.isNonNegative)
-        chain.copy(name = requireNotNull(row.name), symbol = requireNotNull(row.symbol), taoReserveInPlanks = reserve)
+        chain.copy(name = normalizeBittensorSubnetName(requireNotNull(row.name)), symbol = requireNotNull(row.symbol), taoReserveInPlanks = reserve)
     }
 }

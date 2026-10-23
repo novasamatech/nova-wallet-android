@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.dialog.dialog
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -66,6 +67,13 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             progress.isVisible = it
         }
         viewModel.isEmpty.observe { emptyState.isVisible = it }
+        viewModel.inactiveValidatorEvents.observe {
+            dialog(requireContext()) {
+                setTitle(R.string.bittensor_inactive_validator_title)
+                setMessage(R.string.bittensor_inactive_validator_message)
+                setPositiveButton(R.string.common_close, null)
+            }
+        }
         viewModel.emptyMessage.observe { empty.text = it }
         viewModel.canRemoveFilters.observe {
             removeFilters.isVisible = it

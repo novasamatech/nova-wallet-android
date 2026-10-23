@@ -37,6 +37,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
@@ -375,6 +377,12 @@ class RelayStakingNavigator(
     override fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload) {
         navigationBuilder().action(R.id.action_open_bittensor_subnet_details)
             .setArgs(BittensorSubnetDetailsFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorValidatorInfo(payload: BittensorValidatorInfoPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_validator_info)
+            .setArgs(BittensorValidatorInfoFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 

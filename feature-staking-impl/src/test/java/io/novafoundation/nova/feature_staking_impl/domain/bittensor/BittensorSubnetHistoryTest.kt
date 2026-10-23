@@ -40,6 +40,27 @@ class BittensorSubnetHistoryTest {
         assertTrue(convertBittensorSubnetHistory(alpha, native, BittensorSubnetChartPeriod.DAY, nowSeconds = 199_999).isEmpty())
     }
 
+    @Test
+    fun `prices before the current registration are dropped so a window starting earlier has no change`() {
+        val day = 86_400L
+        val now = 400 * day
+        val registeredAt = now - 71 * day
+        // A recycled netuid: the market quotes a full year, but the current subnet exists for 71 days only.
+        val points = (0..365).map { BittensorSubnetPricePoint(now - (365 - it) * day, BigDecimal.ONE, BigDecimal.ONE) }
+
+        assertTrue(hasBittensorSubnetHistoryCoverage(points, BittensorSubnetChartPeriod.YEAR, now))
+        val clipped = clipBittensorSubnetHistory(points, registeredAt)
+        assertTrue(clipped.all { it.timestamp >= registeredAt })
+        assertFalse(hasBittensorSubnetHistoryCoverage(clipped, BittensorSubnetChartPeriod.YEAR, now))
+        assertTrue(hasBittensorSubnetHistoryCoverage(clipped, BittensorSubnetChartPeriod.ALL, now))
+        assertEquals(points, clipBittensorSubnetHistory(points, null))
+    }
+
+    @Test
+    fun `registration time is derived from the age in days`() {
+        assertEquals(1_000_000L - 129_600L, bittensorRegistrationEpochSeconds(BigDecimal("1.5"), 1_000_000L))
+    }
+
     private fun point(timestamp: Long, price: String) = HistoricalCoinRate(timestamp, price.toBigDecimal())
 
     @Test

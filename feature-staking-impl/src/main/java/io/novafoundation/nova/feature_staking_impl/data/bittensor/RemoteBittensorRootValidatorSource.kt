@@ -100,3 +100,16 @@ internal fun mapRootValidatorDetails(
         put(hotkey, BittensorRootValidatorDetails(BittensorValidator(hotkey, row.name.orEmpty()), rate))
     }
 }
+
+/** Root stake per hotkey in TAO; only a fresh root-validators component may supply a displayed amount. */
+internal fun mapBittensorRootStakes(chain: Chain, response: BittensorRootValidatorRemote): Map<AccountIdKey, BigDecimal> {
+    if (response.meta?.components?.rootValidators?.freshness != "FRESH") return emptyMap()
+    return buildMap {
+        for (row in response.items.orEmpty()) {
+            val stake = row.rootStakeTao?.toBigDecimalOrNull()?.takeIf { it.isPositive } ?: continue
+            val address = row.hotkey ?: continue
+            val hotkey = runCatching { AccountIdKey(chain.accountIdOf(address)) }.getOrNull() ?: continue
+            put(hotkey, stake)
+        }
+    }
+}

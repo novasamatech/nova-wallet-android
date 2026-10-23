@@ -2826,6 +2826,7 @@
     <string name="bittensor_stake_to_root">Stake to root</string>
     <string name="bittensor_add_stake_to_root">Add stake to root</string>
     <string name="bittensor_subnet_count">%1$d of %2$d</string>
+    <string name="bittensor_subnet_count_loading">— of —</string>
     <string name="bittensor_show_subnets">Show %1$d subnets</string>
     <string name="bittensor_sort_pool_description">Largest swap pools first</string>
     <string name="bittensor_sort_age_description">Longest-running first</string>
@@ -2833,6 +2834,9 @@
     <string name="bittensor_sort_week_description">Biggest 7-day move first</string>
     <string name="bittensor_sort_name_description">A to Z</string>
     <string name="bittensor_no_price_history">No price history yet</string>
+    <string name="bittensor_price_history_unavailable">Price history not available for this subnet</string>
+    <string name="bittensor_price_history_source">Spot price comes from the chain pool ratio</string>
+    <string name="bittensor_price_history_failed">Couldn’t load price history</string>
     <string name="bittensor_thin_pool_description">Below 2K %1$s · price moves more</string>
     <string name="bittensor_you_stake">You stake</string>
     <string name="bittensor_validator">Validator</string>
@@ -3035,6 +3039,7 @@
     <string name="bittensor_hide_unusual_apy">Hide unusual APY</string>
     <string name="bittensor_validator_search_hint">Search by name or address</string>
     <string name="bittensor_validator_list_count">Validators: %1$d of %2$d</string>
+    <string name="bittensor_validator_list_count_loading">Validators: — of —</string>
     <string name="bittensor_validator_list_sort">Rewards (APY) · By %1$s</string>
     <string name="bittensor_validator_list_subtitle">%1$s staked · take %2$s%%</string>
     <string name="bittensor_validator_apy_value">APY: %1$s%%</string>
@@ -3093,6 +3098,11 @@
     <string name="bittensor_dashboard_max_apy">up to %1$s</string>
     <string name="bittensor_inactive_validator_title">Validator is inactive</string>
     <string name="bittensor_inactive_validator_message">This validator is inactive, so new stake earns nothing until it’s active again.</string>
+    <string name="bittensor_validator_info_take">Validator take</string>
+    <string name="bittensor_validator_info_take_value">%1$s%%</string>
+    <string name="bittensor_validator_info_coverage">Subnets validated</string>
+    <string name="bittensor_validator_info_coverage_value">%1$d of %2$d</string>
+    <string name="bittensor_validator_info_reward_average">30-day average</string>
     <string name="bittensor_remove_validator_filters">Remove all filters</string>
     <string name="bittensor_validators_filtered_empty">No quick-pick validators for this subnet yet. Remove filters to see all validators.</string>
     <string name="bittensor_validators_search_empty">No validators for ‘%s’</string>

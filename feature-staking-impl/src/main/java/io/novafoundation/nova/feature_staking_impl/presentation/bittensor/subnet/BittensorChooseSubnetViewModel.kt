@@ -204,17 +204,29 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val listState = combine(rootIcon, subnets, isLoading) { icon, subnets, loading ->
+    val listState = combine(rootIcon, subnets, isLoading, query) { icon, subnets, loading, query ->
+        val visible = if (loading) emptyList() else subnets
         BittensorSubnetListState(
-            items = bittensorSubnetList(icon, if (loading) emptyList() else subnets),
+            items = bittensorSubnetList(icon, visible, searchHasNoMatches = !loading && query.isNotBlank() && visible.isEmpty()),
             loading = loading
         )
     }
         .distinctUntilChanged()
         .shareInBackground()
 
-    val subnetCount = combine(filteredCatalogue, catalogue, query) { filtered, all, query ->
-        resources.getString(R.string.bittensor_subnet_count, filtered.count { it.matchesQuery(query) }, all.size)
+    // Sorting and filtering act on the catalogue, so they stay disabled until it is loaded (as on iOS).
+    val controlsEnabled = catalogueState.map { it is ExtendedLoadingState.Loaded }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val subnetCount = combine(orderedCatalogue, hideThinPools, favorites, query, catalogueState) { ordered, hideThin, favorites, query, state ->
+        // Count only once the sorted list is the loaded catalogue, so neither "0 of 0" nor "0 of N" flashes while it settles.
+        if (state is ExtendedLoadingState.Loaded && ordered.size == state.data.size && ordered.toSet() == state.data.toSet()) {
+            val shown = ordered.count { it.matchesQuery(query) && (!hideThin || passesBittensorThinPoolFilter(it, favorites)) }
+            resources.getString(R.string.bittensor_subnet_count, shown, state.data.size)
+        } else {
+            resources.getString(R.string.bittensor_subnet_count_loading)
+        }
     }
         .shareInBackground()
 

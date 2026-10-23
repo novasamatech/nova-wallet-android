@@ -52,6 +52,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubne
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketsApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
@@ -343,6 +345,10 @@ class BittensorModule {
     @Provides
     @FeatureScope
     fun provideBittensorRuntimePriceSource(runtimeCalls: MultiChainRuntimeCallsApi) = BittensorRuntimePriceSource(runtimeCalls)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorDelegateSource(runtimeCalls: MultiChainRuntimeCallsApi): BittensorDelegateSource = RealBittensorDelegateSource(runtimeCalls)
 
     @Provides
     @FeatureScope

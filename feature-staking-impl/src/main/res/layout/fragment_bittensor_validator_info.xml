@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/staking_validator_info_title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <io.novafoundation.nova.feature_account_api.view.AccountView
+                android:id="@+id/account"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:actionIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                app:title="@string/staking_title">
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/common_status" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/totalStake"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/staking_total_staked" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/take"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/bittensor_validator_info_take" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/coverage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/bittensor_validator_info_coverage" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/reward"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/staking_validator_estimated_reward" />
+
+            </io.novafoundation.nova.common.view.TableView>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

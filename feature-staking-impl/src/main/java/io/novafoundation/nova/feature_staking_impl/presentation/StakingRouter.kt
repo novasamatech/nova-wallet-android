@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.B
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
@@ -159,6 +160,8 @@ interface StakingRouter {
     fun openBittensorWhereToStake()
 
     fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload)
+
+    fun openBittensorValidatorInfo(payload: BittensorValidatorInfoPayload)
 
     fun openBittensorSubnetPosition(payload: BittensorSubnetPositionPayload)
 

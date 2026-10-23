@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
+import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.time.Duration
 
@@ -24,6 +25,20 @@ internal fun convertBittensorSubnetHistory(
     val cutoff = if (period == BittensorSubnetChartPeriod.ALL) Long.MIN_VALUE else nowSeconds - period.duration.inWholeSeconds
     return points.filter { it.timestamp in cutoff..nowSeconds }
 }
+
+/**
+ * Netuids are recycled: market prices quoted before the current registration belong to a previous subnet.
+ * Clipping them also makes a window that starts before the registration fail [hasBittensorSubnetHistoryCoverage] (as on iOS).
+ */
+internal fun clipBittensorSubnetHistory(points: List<BittensorSubnetPricePoint>, registrationEpochSeconds: Long?): List<BittensorSubnetPricePoint> {
+    if (registrationEpochSeconds == null) return points
+    return points.filter { it.timestamp >= registrationEpochSeconds }
+}
+
+internal fun bittensorRegistrationEpochSeconds(ageInDays: BigDecimal, nowSeconds: Long): Long =
+    nowSeconds - (ageInDays * SECONDS_PER_DAY.toBigDecimal()).setScale(0, RoundingMode.HALF_UP).toLong()
+
+private const val SECONDS_PER_DAY = 86_400L
 
 /** A successful short/old response is not a return for the entire selected window. */
 internal fun hasBittensorSubnetHistoryCoverage(

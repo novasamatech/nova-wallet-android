@@ -115,7 +115,7 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
         ?.takeIf { it.startsWith("https://") }
     return BittensorSubnet(
         id = netuid,
-        name = bindBittensorText(requireNotNull(value.get<Any?>("subnetName")) { "Subnet name field is missing" }),
+        name = normalizeBittensorSubnetName(bindBittensorText(requireNotNull(value.get<Any?>("subnetName")) { "Subnet name field is missing" })),
         symbol = bindBittensorText(requireNotNull(value.get<Any?>("tokenSymbol")) { "Subnet symbol field is missing" }),
         logoUrl = logoUrl,
         priceInRao = bindBittensorSubnetPrice(value.get<Any?>("taoIn"), value.get<Any?>("alphaIn")),
@@ -132,6 +132,15 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
             ?.let(::bindBittensorText)
             ?.let(BittensorSubnetLinks::github)
     )
+}
+
+// Subtensor reports "Unknown" for subnets without a name; such subnets are shown as "Subnet <netuid>" (as on iOS).
+private const val UNNAMED_SUBNET_PLACEHOLDER = "Unknown"
+
+/** Blank means unnamed: every display site then falls back to "Subnet <netuid>". */
+internal fun normalizeBittensorSubnetName(name: String): String {
+    val trimmed = name.trim()
+    return if (trimmed.equals(UNNAMED_SUBNET_PLACEHOLDER, ignoreCase = true)) "" else trimmed
 }
 
 /** SCALE text decodes as bytes or a Vec<u8>, not a Kotlin String. */

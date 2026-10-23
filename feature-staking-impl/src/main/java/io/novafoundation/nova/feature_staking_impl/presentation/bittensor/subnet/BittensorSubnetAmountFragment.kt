@@ -156,8 +156,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         viewModel.subnet.observe {
             selectedSubnetCard.isVisible = it != null || !viewModel.isQuickPick
             subnetName.text = it?.let {
-                val name = it.name.ifBlank { getString(R.string.bittensor_subnet_number, it.id.value) }
-                "\u200e" + it.displayName(name)
+                "\u200e" + it.displayName(requireContext())
             } ?: "—"
             subnetIcon.load(
                 it?.logoUrl,

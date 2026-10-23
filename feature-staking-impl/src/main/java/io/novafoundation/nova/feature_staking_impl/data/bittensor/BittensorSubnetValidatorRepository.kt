@@ -24,6 +24,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.async
+import java.math.BigDecimal
 
 interface BittensorSubnetValidatorRepository {
 
@@ -75,9 +77,11 @@ class RealBittensorSubnetValidatorRepository(
 
     override suspend fun directory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
         val response = backend.validators(netuid.value)
-        val candidates = mapCandidates(chain, response)
+        val rootStakes = async { loadRootStakes(chain, netuid) }
         val ranking = loadRanking(netuid)
-        val snapshot = loadDirectorySnapshot(chain, netuid, candidates)
+        val listed = mapCandidates(chain, response)
+        val snapshot = loadDirectorySnapshot(chain, netuid, listed)
+        val candidates = listed.withRootStakes(rootStakes.await())
         val admittedRanking = ranking.mapCatching { ranked ->
             requireBittensorRegistrationFreshness(netuid, snapshot, ranked)
             ranked
@@ -89,9 +93,10 @@ class RealBittensorSubnetValidatorRepository(
     override suspend fun unrankedDirectory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory =
         withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
             val response = backend.validators(netuid.value)
-            val candidates = mapCandidates(chain, response)
-            val snapshot = loadDirectorySnapshot(chain, netuid, candidates)
-            val rows = mapUnavailablePolicyDirectory(chain, netuid, candidates, snapshot)
+            val rootStakes = async { loadRootStakes(chain, netuid) }
+            val listed = mapCandidates(chain, response)
+            val snapshot = loadDirectorySnapshot(chain, netuid, listed)
+            val rows = mapUnavailablePolicyDirectory(chain, netuid, listed.withRootStakes(rootStakes.await()), snapshot)
             BittensorValidatorDirectory(rows, mapBittensorDirectoryStatus(response.meta), recommendationFailure = null)
         } ?: error("Validator directory timed out")
 
@@ -159,6 +164,8 @@ class RealBittensorSubnetValidatorRepository(
         candidates: List<BittensorValidator>,
         snapshot: BittensorValidatorSnapshot
     ): List<BittensorSubnetValidator> = candidates.mapNotNull { validator ->
+        // Same membership as the ranked rows: root lists only hotkeys registered on the root network.
+        if (netuid.isRoot() && snapshot.uids[validator.hotkey] == null) return@mapNotNull null
         val take = snapshot.commissionsInU16[validator.hotkey] ?: return@mapNotNull null
         BittensorSubnetValidator(
             validator,
@@ -188,6 +195,29 @@ class RealBittensorSubnetValidatorRepository(
                 ?.takeIf(String::isNotBlank)
             validator.copy(name = name ?: validator.name)
         }
+    }
+
+    private fun List<BittensorValidator>.withRootStakes(stakes: Map<AccountIdKey, BigDecimal>?): List<BittensorValidator> {
+        if (stakes == null) return this
+        return map { it.copy(reportedStake = stakes[it.hotkey]) }
+    }
+
+    /**
+     * The subnet-0 directory carries no stake measurement; root stake comes from the root validators resource.
+     * Null for subnets (keep the directory's own stake); empty when the root stake is unavailable.
+     */
+    private suspend fun loadRootStakes(chain: Chain, netuid: BittensorNetuid): Map<AccountIdKey, BigDecimal>? {
+        if (!netuid.isRoot()) return null
+        return withTimeoutOrNull(RANKING_TIMEOUT_MILLIS) {
+            try {
+                mapBittensorRootStakes(chain, backend.rootValidators())
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                // Stake is display and sort data only; its absence must not fail the directory.
+                emptyMap()
+            }
+        } ?: emptyMap()
     }
 
     private fun mapCandidates(chain: Chain, response: BittensorValidatorsRemote): List<BittensorValidator> {

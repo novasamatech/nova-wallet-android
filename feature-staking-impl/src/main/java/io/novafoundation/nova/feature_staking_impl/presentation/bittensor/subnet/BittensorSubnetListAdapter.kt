@@ -57,8 +57,7 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetRowUi) = with(binding) {
             val subnet = item.subnet
-            val name = subnet.name.ifBlank { root.context.getString(R.string.bittensor_subnet_number, subnet.id.value) }
-            title.text = "\u200e" + subnet.displayName(name)
+            title.text = "\u200e" + subnet.displayName(root.context)
             price.text = item.price
             val summary = item.weeklySummary.dataOrNull
             change.text = summary?.let {

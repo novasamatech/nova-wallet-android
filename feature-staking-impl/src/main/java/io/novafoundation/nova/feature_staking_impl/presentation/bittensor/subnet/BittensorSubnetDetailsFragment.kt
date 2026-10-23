@@ -96,7 +96,7 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
         viewModel.nativeTokenSymbol.observe { tao.text = it }
         viewModel.subnet.observe { subnet ->
-            val name = subnet.displayName(getString(R.string.bittensor_subnet_number, subnet.id.value))
+            val name = subnet.displayName(requireContext())
             toolbar.setTitle("\u200e$name")
             priceTitle.text = getString(R.string.price_chart_title, name)
             subnetNumber.showValue(subnet.id.value.toString())
