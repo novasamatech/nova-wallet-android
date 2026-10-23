@@ -6,7 +6,8 @@ import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
-import io.novafoundation.nova.common.utils.formatting.formatAsChange
+import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asUrlIcon
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 class BittensorPortfolioRowMapper(
     private val resources: ResourceManager,
@@ -53,7 +55,7 @@ class BittensorPortfolioRowMapper(
         val subtitle = if (rewardsOnly) {
             resources.getString(R.string.bittensor_portfolio_root_claimable, formatAmount(rewards, portfolio).token)
         } else {
-            apy.dataOrNull?.let { resources.getString(R.string.staking_apy, it.formatAsPercentage()) }
+            apy.dataOrNull?.let { resources.getString(R.string.bittensor_portfolio_root_apy, it.formatAsPercentage()) }
         }
         return BittensorPositionUi(
             id = "root",
@@ -83,14 +85,18 @@ class BittensorPortfolioRowMapper(
                 TokenSymbol(subnet?.symbol?.takeIf { it.isNotBlank() } ?: "—"),
                 null,
                 portfolio.asset.token.currency
-            ).token
+            ).token.ltrIsolated()
         }
         val change = if (subnet == null) {
             null
         } else {
             weeklyChanges.dataOrNull?.get(subnetId)?.let {
                 BittensorPositionChange(
-                    resources.getString(R.string.bittensor_weekly_change, it.formatAsChange(), resources.getString(R.string.bittensor_chart_week)),
+                    resources.getString(
+                        R.string.bittensor_portfolio_weekly_change,
+                        it.formatAsSingleDecimalChange(),
+                        resources.getString(R.string.bittensor_chart_week)
+                    ),
                     it.isNonNegative
                 )
             }
@@ -99,13 +105,20 @@ class BittensorPortfolioRowMapper(
             id = "subnet-${subnetId.value}",
             title = subnetPositionTitle(subnet, fallback),
             subtitle = subtitle,
-            amount = formatAmount(portfolio.positions?.subnetStake(subnetId), portfolio).copy(fiat = null),
+            amount = subnetAmount(portfolio.positions?.subnetStake(subnetId), portfolio),
             icon = subnet?.logoUrl?.asUrlIcon() ?: Icon.FromDrawableRes(R.drawable.ic_fallback_network_icon),
             action = BittensorPositionAction.SubnetDetails(subnetId),
             isSubtitleLoading = metadata.isLoading(),
             change = change,
             isChangeLoading = subnet != null && weeklyChanges.isLoading()
         )
+    }
+
+    /** A subnet stake is valued at the current pool price, so it is an estimate: "≈ 0.01993 TAO" without fiat (iOS). */
+    private fun subnetAmount(amount: BigInteger?, portfolio: BittensorPortfolio): AmountModel {
+        val formatted = formatAmount(amount, portfolio)
+        val token = if (amount == null) formatted.token else "≈ ${formatted.token}"
+        return AmountModel(token, null)
     }
 
     private fun formatAmount(amount: BigInteger?, portfolio: BittensorPortfolio): AmountModel {
@@ -119,6 +132,14 @@ class BittensorPortfolioRowMapper(
 /** [rewards] are claimable root rewards: amounts below the claim minimum do not keep the row, as on iOS. */
 internal fun hasRootPortfolioRow(positions: BittensorPortfolioPositions, rewards: BigInteger?): Boolean =
     positions.rootStake.isPositiveAmount() || rewards.isPositiveAmount()
+
+private val singleDecimalFormatter = FixedPrecisionFormatter(1)
+
+/** Signed change with one decimal, as iOS `signedPercentSingle`: "+16.4%". */
+internal fun BigDecimal.formatAsSingleDecimalChange(): String {
+    val prefix = if (isNonNegative) "+" else ""
+    return prefix + singleDecimalFormatter.format(this, RoundingMode.HALF_EVEN) + "%"
+}
 
 private fun BigInteger?.isPositiveAmount(): Boolean = this != null && signum() > 0
 
