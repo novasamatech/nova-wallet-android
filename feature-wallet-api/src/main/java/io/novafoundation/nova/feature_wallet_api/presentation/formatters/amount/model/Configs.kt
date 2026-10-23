@@ -8,6 +8,7 @@ import java.math.RoundingMode
 private const val INCLUDE_ZERO_FIAT = true
 private const val INCLUDE_ASSET_TICKER: Boolean = true
 private const val USE_TOKEN_ABBREVIATION: Boolean = true
+private const val USE_COMPACT_ABBREVIATION: Boolean = false
 private const val ESTIMATED_FIAT: Boolean = false
 private val FIAT_ABBREVIATION: AbbreviationStyle = AbbreviationStyle.DEFAULT_ABBREVIATION
 private val TOKEN_AMOUNT_SIGN: AmountSign = AmountSign.NONE
@@ -30,7 +31,9 @@ class TokenConfig(
     val useAbbreviation: Boolean = USE_TOKEN_ABBREVIATION,
     val tokenAmountSign: AmountSign = TOKEN_AMOUNT_SIGN,
     val roundingMode: RoundingMode = ROUNDING_MODE,
-    val fractionPartStyling: FractionPartStyling = TOKEN_FRACTION_STYLING_SIZE
+    val fractionPartStyling: FractionPartStyling = TOKEN_FRACTION_STYLING_SIZE,
+    // "8.4K", "1.02M" for big totals, see formatCompact. Only applies together with useAbbreviation
+    val useCompactAbbreviation: Boolean = USE_COMPACT_ABBREVIATION
 )
 
 class AmountConfig(

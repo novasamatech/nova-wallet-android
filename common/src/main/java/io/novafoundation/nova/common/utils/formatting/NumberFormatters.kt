@@ -93,7 +93,22 @@ private val trillionAbbreviation = NumberAbbreviation(
     formatter = defaultAbbreviationFormatter
 )
 
+private val compactTenAbbreviation = NumberAbbreviation(
+    threshold = BigDecimal.TEN,
+    divisor = BigDecimal.ONE,
+    suffix = "",
+    formatter = defaultAbbreviationFormatter
+)
+
+private val compactThousandAbbreviation = NumberAbbreviation(
+    threshold = BigDecimal("1E+3"),
+    divisor = BigDecimal("1E+3"),
+    suffix = "K",
+    formatter = FixedPrecisionFormatter(precision = 1)
+)
+
 private val defaultNumberFormatter = defaultNumberFormatter()
+private val compactNumberFormatter = compactNumberFormatter()
 private val fullAmountAbbreviationFormatter = fullAmountAbbreviationFormatter()
 
 fun BigDecimal.toStripTrailingZerosString(): String {
@@ -107,6 +122,19 @@ fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
 @Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatWithFullAmount(): String {
     return fullAmountAbbreviationFormatter.format(this)
+}
+
+/**
+ * Compact form for big totals (pool size, total staked): "8.4K", "54.2K", "1.02M", "210K".
+ * Below 10 the value is formatted as [format] does, from 10 up to 2 decimals, thousands with a "K" and 1 decimal,
+ * millions and above as [format] does. Trailing zeros are dropped, rounding goes towards zero for both signs.
+ */
+fun BigDecimal.formatCompact(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
+    return if (signum() < 0) {
+        "-" + compactNumberFormatter.format(negate(), roundingMode)
+    } else {
+        compactNumberFormatter.format(this, roundingMode)
+    }
 }
 
 fun Int.format(): String {
@@ -237,6 +265,18 @@ fun defaultNumberFormatter() = CompoundNumberFormatter(
         zeroAbbreviation,
         oneAbbreviation,
         thousandAbbreviation,
+        millionAbbreviation,
+        billionAbbreviation,
+        trillionAbbreviation
+    )
+)
+
+fun compactNumberFormatter() = CompoundNumberFormatter(
+    abbreviations = listOf(
+        zeroAbbreviation,
+        oneAbbreviation,
+        compactTenAbbreviation,
+        compactThousandAbbreviation,
         millionAbbreviation,
         billionAbbreviation,
         trillionAbbreviation

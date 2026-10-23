@@ -4,6 +4,7 @@ import androidx.core.text.buildSpannedString
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.formatCompact
 import io.novafoundation.nova.common.utils.formatting.formatWithFullAmount
 import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -42,7 +43,11 @@ class RealTokenFormatter(
         token: TokenSymbol,
         config: TokenConfig
     ): CharSequence {
-        val unsignedTokenAmount = if (config.useAbbreviation) {
+        val unsignedTokenAmount = if (config.useAbbreviation && config.useCompactAbbreviation) {
+            val compactAmount = amount.formatCompact(config.roundingMode)
+
+            if (config.includeAssetTicker) compactAmount.withTokenSymbol(token) else compactAmount
+        } else if (config.useAbbreviation) {
             if (config.includeAssetTicker) {
                 amount.formatTokenAmount(token, config.roundingMode)
             } else {
