@@ -38,6 +38,8 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.common.utils.ltrIsolated
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawal
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -225,7 +227,8 @@ class BittensorSubnetPositionViewModel(
     }.map { it.isLoading() }.shareInBackground()
 
     val withdrawalHint = combine(withdrawalState, subnet) { state, subnet ->
-        val withdrawal = state.dataOrNull ?: return@combine null
+        // iOS shows no withdrawal caption while the whole stake is free to sell.
+        val withdrawal = state.dataOrNull?.takeIf { it.hasWithdrawalRestriction() } ?: return@combine null
         val symbol = subnet?.symbol?.takeIf { it.isNotBlank() } ?: return@combine null
         withdrawalFormatter.format(withdrawal, BittensorProtocolUnits.ALPHA_PRECISION, TokenSymbol(symbol))
     }.shareInBackground()
@@ -317,7 +320,7 @@ class BittensorSubnetPositionViewModel(
         tokenFormatter.formatToken(
             BigDecimal(amount, BittensorProtocolUnits.ALPHA_PRECISION),
             TokenSymbol(subnet.alphaSymbol(subnetId.value))
-        ).toString()
+        ).toString().ltrIsolated()
     }
         .shareInBackground()
 
@@ -538,3 +541,5 @@ class BittensorSubnetPositionViewModel(
 
     fun back() = router.back()
 }
+
+internal fun BittensorPositionWithdrawal.hasWithdrawalRestriction(): Boolean = locked.signum() > 0 || holdDurationMillis.signum() > 0
