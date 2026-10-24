@@ -52,7 +52,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelection
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
@@ -121,8 +124,8 @@ class BittensorDetailsViewModel(
             if (source == null || positions == null || data.dataStatus is BittensorDataStatus.Loading) return@combine
             if (!unreportedOpenSource.compareAndSet(source, null)) return@combine
 
-            val hasRoot = positions.rootStake.signum() > 0
-            val count = positions.subnets.filter { it.alphaInPlanks.signum() > 0 }.distinctBy { it.subnetId }.size +
+            val hasRoot = positions.rootStake.isPositive()
+            val count = positions.subnets.filter { it.alphaInPlanks.isPositive() }.distinctBy { it.subnetId }.size +
                 if (hasRoot) 1 else 0
             analytics.track(BittensorAnalyticsEvent.PortfolioOpened(source, count, hasRoot, null))
         }
@@ -384,7 +387,9 @@ class BittensorDetailsViewModel(
         val portfolio = portfolio.first()
         walletGate.checkingSupport(portfolio.metaId, StakingFlow.STAKE, target = null) {
             analytics.track(AnalyticsEvent.StakingFlowOpened(portfolio.chain.name, StakingFlowSource.PORTFOLIO_ADD_POSITION.value))
-            router.openBittensorStartStaking(portfolio.startStakingPayload())
+            val stakingTypes = listOf(Chain.Asset.StakingType.BITTENSOR_ROOT)
+            val payload = StartStakingLandingPayload(AvailableStakingOptionsPayload(portfolio.chain.id, portfolio.asset.token.configuration.id, stakingTypes))
+            router.openBittensorStartStaking(payload)
         }
     }
 

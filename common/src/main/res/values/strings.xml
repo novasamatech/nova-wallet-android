@@ -2910,12 +2910,6 @@
     <string name="bittensor_load_slow_message">The Bittensor network is taking too long to respond. Would you like to retry?</string>
     <string name="bittensor_load_device_title">Unavailable on this device</string>
     <string name="bittensor_load_device_message">This device can’t load Bittensor staking data right now. Your stake is not affected.</string>
-    <string name="bittensor_subnets_fetch_failed">Unable to fetch subnets</string>
-    <string name="bittensor_subnets_fetch_failed_message">The subnet list did not load. Your stake is not affected.</string>
-    <string name="bittensor_subnets_fetch_device_message">This device can’t load the subnet list right now. Your stake is not affected.</string>
-    <string name="bittensor_validators_fetch_failed">Unable to fetch validators</string>
-    <string name="bittensor_validators_fetch_failed_message">The validator list did not load. Your stake is not affected.</string>
-    <string name="bittensor_validators_fetch_device_message">This device can’t load the validator list right now. Your stake is not affected.</string>
     <string name="bittensor_valuation_unavailable">Some subnet prices are unavailable. Total stake cannot be calculated.</string>
     <string name="bittensor_apy_unavailable">APY unavailable</string>
     <string name="bittensor_subnet_number">Subnet %1$d</string>
@@ -2936,6 +2930,7 @@
     <string name="bittensor_quick_first_apy">FIRST BY APY</string>
     <string name="bittensor_quick_selection_loading">Choosing a subnet…</string>
     <string name="bittensor_quick_selection_failed">Could not choose a subnet. Try again or choose a subnet manually.</string>
+    <string name="bittensor_quick_validator_failed">Could not choose an available validator. Try again or choose a validator manually.</string>
     <string name="bittensor_monthly_tokens">Earn tokens a month</string>
     <string name="bittensor_fee_on_review">On confirmation</string>
     <string name="bittensor_slippage_title">Slippage tolerance</string>

@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetRequoteMixin
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -73,7 +74,7 @@ class BittensorSubnetAmountModule {
         quickPickInteractor: BittensorQuickPickInteractor,
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
         subnetFactsInteractor: BittensorSubnetFactsInteractor,
-        chainStateRepository: ChainStateRepository
+        requoteMixin: BittensorSubnetRequoteMixin
     ): ViewModel = BittensorSubnetAmountViewModel(
         analytics, initialSubnetId = payload.subnetId?.let { BittensorNetuid.Subnet(it) },
         quickPickOrder = payload.quickPickOrder,
@@ -103,7 +104,7 @@ class BittensorSubnetAmountModule {
         validatorCommunicator = validatorCommunicator,
         getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
         subnetFactsInteractor = subnetFactsInteractor,
-        chainStateRepository = chainStateRepository,
+        requoteMixin = requoteMixin,
         initialSelectionState = payload.selectionState
     )
 

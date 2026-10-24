@@ -14,7 +14,6 @@
         android:hint="@string/bittensor_validator_search_hint" />
 
     <LinearLayout
-        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:orientation="horizontal"
@@ -69,15 +68,6 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center" />
-
-        <io.novafoundation.nova.common.view.AlertView
-            android:id="@+id/failure"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="14dp"
-            android:visibility="gone"
-            app:alertMode="warning" />
 
         <LinearLayout
             android:id="@+id/emptyState"

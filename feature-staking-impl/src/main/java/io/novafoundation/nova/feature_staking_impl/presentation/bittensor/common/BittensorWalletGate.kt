@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.AnalyticsWalletType
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingBlockedReason
 import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
@@ -26,7 +29,7 @@ import javax.inject.Inject
 class BittensorWalletGate @Inject constructor(
     private val immediateExecution: BittensorImmediateExecution,
     private val accountRepository: AccountRepository,
-    private val resources: ResourceManager,
+    private val resourceManager: ResourceManager,
     private val analytics: AnalyticsService,
     actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
 ) : ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create() {
@@ -52,35 +55,37 @@ class BittensorWalletGate @Inject constructor(
 
         analytics.track(BittensorAnalyticsEvent.Blocked(flow, refusal, wallet.type.analyticsWalletType(), target))
         onRefusal()
-        showRefusal(refusal)
+
+        when (refusal) {
+            StakingBlockedReason.LEDGER -> showWarning(R.drawable.ic_ledger, resourceManager.bittensorLedgerNotSupported())
+            StakingBlockedReason.PROXY -> showWarning(R.drawable.ic_proxy, resourceManager.bittensorWalletNotSupported(R.string.account_proxied))
+            else -> showWarning(R.drawable.ic_multisig, resourceManager.bittensorWalletNotSupported(R.string.account_multisig))
+        }
     }
 
-    // As iOS presentOperationCompletion: Ledger gets the signer-not-supported sheet, proxied and delayed multisig wallets the
-    // unsupported-wallet sheet, each with "Okay, back" only.
-    private fun showRefusal(reason: StakingBlockedReason) {
-        val (imageRes, title, subtitle) = when (reason) {
-            StakingBlockedReason.LEDGER -> Triple(
-                R.drawable.ic_ledger,
-                resources.getString(R.string.account_parity_signer_not_supported_title),
-                resources.getString(R.string.ledger_sign_raw_not_supported)
-            )
-            StakingBlockedReason.PROXY -> Triple(R.drawable.ic_proxy, unsupportedTitle(R.string.account_proxied), unsupportedMessage())
-            else -> Triple(R.drawable.ic_multisig, unsupportedTitle(R.string.account_multisig), unsupportedMessage())
-        }
-
+    // As iOS presentOperationCompletion: the sheet offers "Okay, back" only.
+    private fun showWarning(@DrawableRes imageRes: Int, warning: TitleAndMessage) {
+        val (title, message) = warning
         launchBottomSheet(
             imageRes = imageRes,
             title = title,
-            subtitle = subtitle,
-            actionButtonPreferences = ButtonPreferences.primary(resources.getString(R.string.common_ok_back)),
+            subtitle = message ?: "",
+            actionButtonPreferences = ButtonPreferences.primary(resourceManager.getString(R.string.common_ok_back)),
             neutralButtonPreferences = null
         )
     }
+}
 
-    private fun unsupportedTitle(walletType: Int) =
-        resources.getString(R.string.bittensor_staking_wallet_unsupported_title, resources.getString(walletType))
+// As iOS: Ledger gets the signer-not-supported copy, proxied and delayed multisig wallets the unsupported-wallet copy.
+fun ResourceManager.bittensorLedgerNotSupported(): TitleAndMessage =
+    getString(R.string.account_parity_signer_not_supported_title) to getString(R.string.ledger_sign_raw_not_supported)
 
-    private fun unsupportedMessage() = resources.getString(R.string.bittensor_staking_wallet_unsupported_message)
+fun ResourceManager.bittensorWalletNotSupported(@StringRes walletType: Int): TitleAndMessage =
+    getString(R.string.bittensor_staking_wallet_unsupported_title, getString(walletType)) to getString(R.string.bittensor_staking_wallet_unsupported_message)
+
+/** As iOS, a watch-only wallet is reported blocked once its stake confirmation opens. */
+fun AnalyticsService.reportWatchOnlyStake(target: StakingAnalyticsTarget) {
+    track(BittensorAnalyticsEvent.Blocked(StakingFlow.STAKE, StakingBlockedReason.WATCH_ONLY, AnalyticsWalletType.WATCH_ONLY, target))
 }
 
 /** iOS `MetaAccountModelType.analyticsWalletType`. */

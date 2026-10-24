@@ -6,14 +6,13 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.reportWatchOnlyStake
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
 import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.AnalyticsService
-import io.novafoundation.nova.analytics.AnalyticsWalletType
-import io.novafoundation.nova.analytics.StakingBlockedReason
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 
@@ -37,7 +36,6 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.asUrlIcon
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
@@ -68,7 +66,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPreparedSubnetStake
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
@@ -108,22 +105,16 @@ import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 class BittensorSubnetReviewViewModel(
@@ -133,7 +124,6 @@ class BittensorSubnetReviewViewModel(
     private val totalInPlanks: BigInteger,
     private val metaId: Long,
     private val validatorAddress: String,
-    private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
     chainRegistry: ChainRegistry,
     walletUiUseCase: WalletUiUseCase,
@@ -151,6 +141,7 @@ class BittensorSubnetReviewViewModel(
     private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
     private val chainStateRepository: ChainStateRepository,
+    private val requoteMixin: BittensorSubnetRequoteMixin,
     private val selectedSlippage: BigDecimal,
     val existingPosition: Boolean = false,
     private val inactiveValidatorAccepted: Boolean = false
@@ -196,12 +187,11 @@ class BittensorSubnetReviewViewModel(
     private val retryRequotes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     // As on iOS: every new block re-quotes until the stake is handed to submission, and a retry re-quotes at once.
-    private val requotes = merge(
-        chainStateRepository.bittensorNewBlocks().filter { submission.value is BittensorSubmissionState.Ready },
-        retryRequotes
+    private val requotes = requoteMixin.requotes(
+        scope = this,
+        active = { submission.value is BittensorSubmissionState.Ready },
+        immediate = retryRequotes
     )
-        .inBackground()
-        .shareIn(this, SharingStarted.Eagerly)
 
     private val preparedStake = retryController.observe(
         step = "stake preparation",
@@ -472,14 +462,7 @@ class BittensorSubnetReviewViewModel(
             // As iOS: a watch-only wallet is reported blocked once the review opens, and leaving it is not an abandonment.
             if (accountRepository.getMetaAccount(metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
                 flowContinued = true
-                analytics.track(
-                    BittensorAnalyticsEvent.Blocked(
-                        StakingFlow.STAKE,
-                        StakingBlockedReason.WATCH_ONLY,
-                        AnalyticsWalletType.WATCH_ONLY,
-                        StakingAnalyticsTarget.SUBNET
-                    )
-                )
+                analytics.reportWatchOnlyStake(StakingAnalyticsTarget.SUBNET)
             }
         }
     }
@@ -675,19 +658,10 @@ class BittensorSubnetReviewViewModel(
     }
 
     /** iOS shows the acknowledged quote while the latest is missing: a failed re-quote falls back to the prepared stake. */
-    private fun requotedEachBlock(prepared: BittensorPreparedSubnetStake): Flow<ExtendedLoadingState<BittensorPreparedSubnetStake>> = requotes
-        .mapLatest {
-            try {
-                val quote = bittensorSubnetInteractor.quote(subnetId, totalInPlanks, BittensorSlippage(selectedSlippage))
-                prepared.copy(draft = prepared.draft.requoted(quote))
-            } catch (cause: Exception) {
-                if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
-                chainRpcReads.failed(cause)
-                prepared
-            }
-        }
-        .map<BittensorPreparedSubnetStake, ExtendedLoadingState<BittensorPreparedSubnetStake>> { ExtendedLoadingState.Loaded(it) }
-        .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
+    private fun requotedEachBlock(prepared: BittensorPreparedSubnetStake): Flow<ExtendedLoadingState<BittensorPreparedSubnetStake>> =
+        requoteMixin.requoted(prepared.draft, BittensorSlippage(selectedSlippage), requotes, chainRpcReads)
+            .map { requote -> ExtendedLoadingState.Loaded(prepared.copy(draft = requote.getOrDefault(prepared.draft))) }
+            .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
 
     fun retryClicked() {
         val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return

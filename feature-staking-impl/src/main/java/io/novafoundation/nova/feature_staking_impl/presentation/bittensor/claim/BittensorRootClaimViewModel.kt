@@ -31,6 +31,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlin.time.Duration.Companion.milliseconds
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
@@ -46,21 +47,21 @@ import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
 import kotlinx.coroutines.TimeoutCancellationException
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
-import java.math.BigInteger
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filterNotNull
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorClaimValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorPreSubmissionError
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorSubmissionError
@@ -124,8 +125,6 @@ class BittensorRootClaimViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val durationFormatter: DurationFormatter,
     private val amountFormatter: BittensorAmountFormatter,
-    private val rootValidatorSource: BittensorRootValidatorSource,
-    private val positionRepository: BittensorPositionRepository,
     private val debugSettings: DebugSettings
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
@@ -250,7 +249,7 @@ class BittensorRootClaimViewModel(
     private val validatorDetails = claimState.mapNotNull { it?.chain }
         .distinctUntilChanged()
         .flatMapLatest { chain ->
-            flowOf { rootValidatorSource.validatorDetails(chain) }.withSafeLoading()
+            flowOf { bittensorRootClaimInteractor.validatorDetails(chain) }.withSafeLoading()
         }
         .shareInBackground()
 
@@ -262,10 +261,9 @@ class BittensorRootClaimViewModel(
         .shareInBackground()
 
     // Root validators of the account: the claim result names the validator when it is the only one, as on iOS.
-    private val rootHotkeys = claimState.mapNotNull { it?.let { claim -> claim.chain.id to claim.coldkey } }
-        .distinctUntilChanged()
-        .flatMapLatest { (chainId, coldkey) -> positionRepository.observePositions(chainId, coldkey.value) }
-        .map { positions -> positions.positions?.root?.mapTo(mutableSetOf()) { it.validatorHotkey } }
+    private val rootHotkeys = claimState.filterNotNull()
+        .distinctUntilChangedBy { it.coldkey }
+        .flatMapLatest(bittensorRootClaimInteractor::observeRootHotkeys)
         .shareInBackground()
 
     val stakeAfterClaim = state.mapLoading { claim ->
@@ -274,8 +272,9 @@ class BittensorRootClaimViewModel(
         if (stake == null || preview == null) {
             null
         } else {
-            val before = tokenFormatter.formatToken(claim.asset.token.amountFromPlanks(stake), claim.asset.token.configuration.symbol)
-            val after = tokenFormatter.formatToken(claim.asset.token.amountFromPlanks(stake + preview.redeemable), claim.asset.token.configuration.symbol)
+            val token = claim.asset.token
+            val before = tokenFormatter.formatToken(token.amountFromPlanks(stake), token.configuration.symbol)
+            val after = tokenFormatter.formatToken(token.amountFromPlanks(claim.stakeAfterClaim(preview.redeemable)), token.configuration.symbol)
             "$before → ≈ $after"
         }
     }.shareInBackground()
@@ -546,7 +545,7 @@ class BittensorRootClaimViewModel(
         val claim = draft.state
         val fee = outcome.formatNetworkFee(draft.fee, claim.chain, resources, tokenFormatter)
         val claimed = outcome?.tao
-        if (claimed != null && claimed.signum() == 0) {
+        if (claimed != null && claimed.isZero) {
             return BittensorStakeResultUi.Failure(
                 title = resources.getString(R.string.bittensor_claim_nothing_claimed),
                 description = resources.getString(R.string.bittensor_claim_fee_charged),
@@ -556,13 +555,13 @@ class BittensorRootClaimViewModel(
             )
         }
 
-        val amount = claimed ?: draft.preview.redeemable
-        val token = claim.asset.token
-        val format = { planks: BigInteger ->
-            val formatted = tokenFormatter.formatToken(token.amountFromPlanks(planks), token.configuration.symbol)
-            if (claimed == null) "≈ $formatted" else formatted.toString()
-        }
-        val stakeAfter = format((claim.claims.rootStake ?: BigInteger.ZERO) + amount)
+        val amount = formatBittensorNativeResult(claimed, draft.preview.redeemable, claim.chain, tokenFormatter).token
+        val stakeAfter = formatBittensorNativeResult(
+            claimed?.let(claim::stakeAfterClaim),
+            claim.stakeAfterClaim(draft.preview.redeemable),
+            claim.chain,
+            tokenFormatter
+        ).token.toString()
         val groupHotkeys = rootHotkeys.replayCache.lastOrNull().orEmpty() + draft.preview.hotkey
         val description = if (groupHotkeys.size == 1) {
             val name = validatorName(claim, draft.preview.hotkey, validatorDetails.first().dataOrNull)
@@ -572,7 +571,7 @@ class BittensorRootClaimViewModel(
         }
 
         return BittensorStakeResultUi.Success(
-            title = resources.getString(R.string.bittensor_claim_success_title, format(amount)),
+            title = resources.getString(R.string.bittensor_claim_success_title, amount),
             description = description,
             validator = null,
             fee = fee,

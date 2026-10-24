@@ -16,7 +16,9 @@ data class BittensorSelectionState(
     val subnetFilters: BittensorValidatorFilters = BittensorValidatorFilters(),
     val browseState: BittensorSubnetBrowseState? = null,
     /** The flow started from a Where to stake quick pick, as iOS keeps its `quickPickVisit` when the target changes. */
-    val quickPick: Boolean = false
+    val quickPick: Boolean = false,
+    /** The flow moved on to amount entry (iOS `abandonTracker.markProceeded`), so leaving the subnet picker is no abandonment. */
+    val flowContinued: Boolean = false
 ) : Parcelable {
 
     fun filtersFor(netuid: BittensorNetuid): BittensorValidatorFilters = if (netuid.isRoot()) rootFilters else subnetFilters

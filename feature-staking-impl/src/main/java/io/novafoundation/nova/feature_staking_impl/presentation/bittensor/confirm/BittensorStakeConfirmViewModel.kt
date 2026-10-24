@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.reportWatchOnlyStake
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
@@ -12,8 +13,6 @@ import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.AnalyticsService
-import io.novafoundation.nova.analytics.AnalyticsWalletType
-import io.novafoundation.nova.analytics.StakingBlockedReason
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -226,14 +225,7 @@ class BittensorStakeConfirmViewModel(
             // As iOS: a watch-only wallet is reported blocked once the confirmation opens, and leaving it is not an abandonment.
             if (accountRepository.getMetaAccount(payload.metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
                 flowContinued = true
-                analytics.track(
-                    BittensorAnalyticsEvent.Blocked(
-                        StakingFlow.STAKE,
-                        StakingBlockedReason.WATCH_ONLY,
-                        AnalyticsWalletType.WATCH_ONLY,
-                        StakingAnalyticsTarget.ROOT
-                    )
-                )
+                analytics.reportWatchOnlyStake(StakingAnalyticsTarget.ROOT)
             }
         }
     }

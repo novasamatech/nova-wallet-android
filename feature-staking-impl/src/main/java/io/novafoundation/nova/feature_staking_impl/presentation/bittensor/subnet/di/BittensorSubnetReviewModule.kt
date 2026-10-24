@@ -20,12 +20,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetRequoteMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -43,7 +43,6 @@ class BittensorSubnetReviewModule {
         analytics: AnalyticsService,
         operationAnalytics: BittensorOperationAnalytics,
         payload: BittensorSubnetReviewPayload,
-        bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
@@ -60,14 +59,14 @@ class BittensorSubnetReviewModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         estimatesMixin: BittensorEstimatesMixin,
         tokenFormatter: TokenFormatter,
-        chainStateRepository: ChainStateRepository
+        chainStateRepository: ChainStateRepository,
+        requoteMixin: BittensorSubnetRequoteMixin
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             analytics, operationAnalytics, BittensorNetuid.Subnet(payload.subnetId),
             payload.amountInPlanks,
             payload.metaId,
             payload.validatorAddress,
-            bittensorSubnetInteractor,
             router,
             chainRegistry,
             walletUiUseCase,
@@ -85,6 +84,7 @@ class BittensorSubnetReviewModule {
             estimatesMixin = estimatesMixin,
             tokenFormatter = tokenFormatter,
             chainStateRepository = chainStateRepository,
+            requoteMixin = requoteMixin,
             selectedSlippage = payload.slippage,
             existingPosition = payload.existingPosition,
             inactiveValidatorAccepted = payload.inactiveValidatorAccepted

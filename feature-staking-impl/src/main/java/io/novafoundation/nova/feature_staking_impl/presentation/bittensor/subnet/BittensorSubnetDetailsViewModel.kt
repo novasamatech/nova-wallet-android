@@ -34,12 +34,15 @@ import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.R
@@ -83,20 +86,18 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retryWhen
 
 class BittensorSubnetDetailsViewModel(
     private val analytics: AnalyticsService,
@@ -117,7 +118,7 @@ class BittensorSubnetDetailsViewModel(
     private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val addressIconGenerator: AddressIconGenerator,
-    private val abandonment: BittensorChooseSubnetAbandonment,
+    private val automaticInteractionGate: AutomaticInteractionGate,
     private val replaceAmount: Boolean,
     initialValidatorAddress: String?,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
@@ -131,6 +132,11 @@ class BittensorSubnetDetailsViewModel(
     // Only details opened from the start picker share its abandonment, as iOS hands them the picker's tracker.
     private val tracksAbandonment = analyticsSource == SubnetDetailsSource.PICKER && !replaceAmount
 
+    // A validator list opened from here reports the abandonment itself while it is open.
+    private var validatorListOpen = false
+
+    private var returned = false
+
     private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
 
     val chartDateFormatter = RealDateChartTextInjector(resources)
@@ -138,12 +144,7 @@ class BittensorSubnetDetailsViewModel(
     private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SUBNET_DETAILS)
     private val priceServerReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PRICE_SERVER, BittensorScreen.SUBNET_DETAILS)
 
-    // Only the subnet and the wallet asset block the screen and offer a retry dialog; the other reads fail inline, as on iOS.
     val retryEvents = retryController.events
-
-    private val appActivations = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-
-    private val chartRetries = MutableStateFlow(0)
 
     // As on iOS, a subnet without a market listing stays unlisted for this screen: no period or currency change loads it again.
     private val isUnlisted = AtomicBoolean(false)
@@ -300,7 +301,6 @@ class BittensorSubnetDetailsViewModel(
         BittensorSubnetChartRequest(asset.token.configuration.priceId, asset.token.currency, period)
     }
         .distinctUntilChanged()
-        .combine(chartRetries) { request, _ -> request }
         .flatMapLatest { request ->
             chartHistory(request).map { SubnetChartData(request.period, it) }
         }
@@ -328,12 +328,6 @@ class BittensorSubnetDetailsViewModel(
     val charts = combine(visibleChart, isFiatMode, ::mapCharts)
         .shareInBackground()
 
-    val isChartFailed = combine(visibleChart, period) { chart, selected ->
-        chart.period == selected && chart.points is ExtendedLoadingState.Error
-    }
-        .distinctUntilChanged()
-        .shareInBackground()
-
     val priceChangeFormatter = combine(visibleChart, period) { chart, selected ->
         val points = chart.points.dataOrNull.orEmpty()
         val covered = chart.period == selected && hasBittensorSubnetHistoryCoverage(points, selected)
@@ -358,7 +352,7 @@ class BittensorSubnetDetailsViewModel(
 
     private val validatorCandidates = selectedValidatorAddress.flatMapLatest { address ->
         if (address != null) {
-            flowOf { selectedValidatorPreviews(address) }.withSafeLoading()
+            selectedValidatorPreviews(address).withSafeLoading()
         } else {
             quietRead("subnet validator preset") { automaticValidatorPreviews() }
         }
@@ -366,9 +360,9 @@ class BittensorSubnetDetailsViewModel(
         .shareInBackground()
 
     // As on iOS, the rate is resolved once: a failure shows "—" and is not requested again.
-    private val validatorYields = quietRead("subnet validator preview APY", requestAgainOnForeground = false) {
-        validatorInteractor.yields(subnetId)
-    }
+    private val validatorYields = flowOf { validatorInteractor.yields(subnetId) }
+        .withSafeLoading()
+        .onError { logFailure("subnet validator preview APY", it) }
         .shareInBackground()
 
     private val validatorState = combine(validatorCandidates, validatorYields) { candidates, yields ->
@@ -414,6 +408,7 @@ class BittensorSubnetDetailsViewModel(
         analytics.track(BittensorAnalyticsEvent.SubnetDetailsOpened(subnetId.value, analyticsSource, AnalyticsPricePeriod.WEEK))
         validatorCommunicator.responseFlow
             .onEach { response ->
+                validatorListOpen = false
                 if (!selectionState.accepts(response)) return@onEach
                 selectionState = selectionState.withResponse(response)
                 val completes = completesOnValidatorSelection
@@ -435,8 +430,15 @@ class BittensorSubnetDetailsViewModel(
 
     private fun openValidatorSelection(address: String?, completesOnSelection: Boolean) {
         completesOnValidatorSelection = completesOnSelection
+        validatorListOpen = true
         validatorCommunicator.openRequest(
-            BittensorSelectValidatorCommunicator.Request(subnetId.value, address, selectionState, recommendedAddress = presetAddress)
+            BittensorSelectValidatorCommunicator.Request(
+                subnetId.value,
+                address,
+                selectionState,
+                recommendedAddress = presetAddress,
+                tracksAbandonment = tracksAbandonment
+            )
         )
     }
 
@@ -475,22 +477,6 @@ class BittensorSubnetDetailsViewModel(
         chartSelection.value = selection
     }
 
-    fun retryChart() {
-        // As on iOS, only a failed history offers Try again.
-        if (visibleChart.replayCache.lastOrNull()?.points !is ExtendedLoadingState.Error) return
-        priceServerReads.retry()
-        chartRetries.value += 1
-    }
-
-    /** Like iOS didBecomeActive: reads that failed quietly are requested again when the app returns to the foreground. */
-    fun appBecameActive() {
-        appActivations.tryEmit(Unit)
-    }
-
-    fun becomeActive() {
-        if (tracksAbandonment) abandonment.becomeActive(selectionState.flowId, BittensorScreen.SUBNET_DETAILS, StakingAnalyticsTarget.SUBNET)
-    }
-
     /** The period the chart shows; the view switches a chip on tap, before [selectPeriod] may ignore the switch. */
     val selectedPeriodIndex: Int
         get() = chartPeriods.indexOf(period.value)
@@ -526,7 +512,7 @@ class BittensorSubnetDetailsViewModel(
     }
 
     private fun openAmount(address: String, isPreset: Boolean) {
-        if (tracksAbandonment) abandonment.markProceeded(selectionState.flowId)
+        selectionState = selectionState.copy(flowContinued = true)
         analytics.track(
             BittensorAnalyticsEvent.TypeSelected(
                 BittensorAnalyticsEvent.NETWORK,
@@ -558,11 +544,14 @@ class BittensorSubnetDetailsViewModel(
     }
 
     /** A chosen validator stays on the card when its name cannot be loaded, as iOS shows the validator it was handed. */
-    private suspend fun selectedValidatorPreviews(address: String): List<BittensorValidatorPreview> {
-        attempt("subnet validator name") { validatorInteractor.previews(subnetId, address) }.dataOrNull?.let { return it }
-        val hotkey = AccountIdKey(validatorInteractor.chain().accountIdOf(address))
-        return listOf(BittensorValidatorPreview(BittensorValidator(hotkey, address), canPreselect = true))
+    private fun selectedValidatorPreviews(address: String): Flow<List<BittensorValidatorPreview>> = flowOf {
+        validatorInteractor.previews(subnetId, address)
     }
+        .catch { cause ->
+            logFailure("subnet validator name", cause)
+            val hotkey = AccountIdKey(validatorInteractor.chain().accountIdOf(address))
+            emit(listOf(BittensorValidatorPreview(BittensorValidator(hotkey, address), canPreselect = true)))
+        }
 
     private suspend fun currentValidatorAddress(): String? {
         selectedValidatorAddress.value?.let { return it }
@@ -579,8 +568,16 @@ class BittensorSubnetDetailsViewModel(
     }
 
     fun back() {
+        returned = true
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
+    }
+
+    override fun onCleared() {
+        if (tracksAbandonment && !returned && !validatorListOpen && !selectionState.flowContinued) {
+            analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SUBNET_DETAILS, StakingAnalyticsTarget.SUBNET))
+        }
+        super.onCleared()
     }
 
     /** Null when the subnet has no market listing, so no price history exists for any period. */
@@ -593,21 +590,19 @@ class BittensorSubnetDetailsViewModel(
             request.currency,
             request.period
         )
+            .also { if (it == null) isUnlisted.set(true) }
     }
 
-    private fun chartHistory(request: BittensorSubnetChartRequest): Flow<ExtendedLoadingState<List<BittensorSubnetPricePoint>?>> = flow {
-        if (isUnlisted.get()) {
-            emit(ExtendedLoadingState.Loaded(null))
-            return@flow
+    private fun chartHistory(request: BittensorSubnetChartRequest): Flow<ExtendedLoadingState<List<BittensorSubnetPricePoint>?>> {
+        if (isUnlisted.get()) return flowOf { ExtendedLoadingState.Loaded(null) }
+
+        return retryController.observe(
+            step = "subnet chart",
+            analytics = priceServerReads,
+            transform = { it.withSafeLoading() }
+        ) {
+            flowOf { loadChartHistory(request) }
         }
-        emit(ExtendedLoadingState.Loading)
-        val state = attempt("subnet chart") { loadChartHistory(request) }
-        when (state) {
-            is ExtendedLoadingState.Error -> priceServerReads.failed(state.exception)
-            is ExtendedLoadingState.Loaded -> if (state.data == null) isUnlisted.set(true)
-            ExtendedLoadingState.Loading -> Unit
-        }
-        emit(state)
     }
 
     private fun mapCharts(data: SubnetChartData, isFiatMode: Boolean): List<PriceChartModel> = chartPeriods.map { period ->
@@ -620,8 +615,7 @@ class BittensorSubnetDetailsViewModel(
 
         return when (val state = data.points) {
             is ExtendedLoadingState.Loading -> PriceChartModel.Loading(label)
-            // The screen draws the failure with its Try again action over the empty plot.
-            is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, "")
+            is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, resources.getString(R.string.bittensor_price_history_failed))
             is ExtendedLoadingState.Loaded -> {
                 // Unlisted subnets and windows with fewer than two points show the iOS empty state; the spot price still comes from the pool.
                 if (state.data.size < 2) return PriceChartModel.Empty(label, unavailableChartMessage())
@@ -641,41 +635,35 @@ class BittensorSubnetDetailsViewModel(
         resources.getString(R.string.bittensor_price_history_source)
 
     /**
-     * A read that does not block the screen: as on iOS its failure raises no dialog and, when [requestAgainOnForeground],
-     * the read is requested again once the app returns to the foreground.
+     * A read that does not block the screen: as on iOS its failure raises no dialog, and the read is requested again once the app
+     * returns to the foreground.
      */
-    private fun <T> quietRead(
-        step: String,
-        requestAgainOnForeground: Boolean = true,
-        load: suspend () -> T
-    ): Flow<ExtendedLoadingState<T>> = flow {
-        emit(ExtendedLoadingState.Loading)
-        var state = attempt(step, load)
-        emit(state)
-        while (requestAgainOnForeground && state is ExtendedLoadingState.Error) {
-            appActivations.first()
-            state = attempt(step, load)
-            emit(state)
+    private fun <T> quietRead(step: String, load: suspend () -> T): Flow<ExtendedLoadingState<T>> = flowOf { load() }
+        .map<T, ExtendedLoadingState<T>> { ExtendedLoadingState.Loaded(it) }
+        .retryWhen { cause, _ ->
+            logFailure(step, cause)
+            emit(ExtendedLoadingState.Error(cause))
+            awaitReturnToForeground()
+            true
         }
+        .onStart { emit(ExtendedLoadingState.Loading) }
+
+    // Like iOS didBecomeActive, only a return from the background counts.
+    private suspend fun awaitReturnToForeground() {
+        automaticInteractionGate.isInteractionAllowedFlow.first { allowed -> !allowed }
+        automaticInteractionGate.awaitInteractionAllowed()
     }
 
-    private suspend fun <T> attempt(step: String, load: suspend () -> T): ExtendedLoadingState<T> = try {
-        ExtendedLoadingState.Loaded(load())
-    } catch (cause: Exception) {
-        // A child request timing out is a failed read, not cancellation of this screen.
-        currentCoroutineContext().ensureActive()
-        if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+    private fun logFailure(step: String, cause: Throwable) {
         logger.log("[BittensorSubnetDetails] Failed to load $step")
         logger.log(cause)
-        ExtendedLoadingState.Error(cause)
     }
 
     private fun reportFailure(
         step: String,
         cause: Throwable
     ) {
-        logger.log("[BittensorSubnetDetails] Failed to load $step")
-        logger.log(cause)
+        logFailure(step, cause)
         showError(resources.getString(R.string.common_retry_message))
     }
 }

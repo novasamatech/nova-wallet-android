@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -173,32 +172,6 @@ class BittensorSelectValidatorViewModelTest {
     }
 
     @Test
-    fun `failed directory shows the iOS failure in place and Try again loads it`() = runBlocking<Unit> {
-        val directory = directory(listOf(validator(1, "Alpha")))
-        var attempts = 0
-        `when`(interactor.directory(BittensorNetuid.Root)).thenAnswer {
-            attempts++
-            check(attempts > 1) { "Directory unavailable" }
-            directory
-        }
-        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
-        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
-
-        val failure = withTimeout(5_000) { viewModel.failure.first { it != null } }
-        val expected = BittensorInlineFailure(
-            label(arrayOf(R.string.bittensor_validators_fetch_failed)),
-            label(arrayOf(R.string.bittensor_validators_fetch_failed_message)),
-            retryable = true
-        )
-        assertEquals(expected, failure)
-
-        viewModel.retry()
-
-        withTimeout(5_000) { viewModel.rows.first { it.size == 1 } }
-        withTimeout(5_000) { viewModel.failure.first { it == null } }
-    }
-
-    @Test
     fun `failed yields still reload when the unusual APY filter changes`() = runBlocking<Unit> {
         val row = validator(1, "Alpha")
         val directory = directory(listOf(row))
@@ -339,7 +312,7 @@ class BittensorSelectValidatorViewModelTest {
     private fun createViewModel(request: BittensorSelectValidatorCommunicator.Request): BittensorSelectValidatorViewModel {
         return BittensorSelectValidatorViewModel(
             analytics, request, communicator, interactor, icons, router, externalActions, resources, logger,
-            retryController, tokenFormatter, subnetInteractor, BittensorChooseSubnetAbandonment()
+            retryController, tokenFormatter, subnetInteractor
         ).also { models += it }
     }
 

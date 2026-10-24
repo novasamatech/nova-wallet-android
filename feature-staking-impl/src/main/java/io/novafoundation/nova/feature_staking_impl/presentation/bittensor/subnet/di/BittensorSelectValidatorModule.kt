@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetAbandonment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorViewModel
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -41,8 +40,7 @@ class BittensorSelectValidatorModule {
         logger: Logger,
         retryController: BittensorRetryController,
         tokenFormatter: TokenFormatter,
-        subnetInteractor: BittensorSubnetInteractor,
-        abandonment: BittensorChooseSubnetAbandonment
+        subnetInteractor: BittensorSubnetInteractor
     ): ViewModel = BittensorSelectValidatorViewModel(
         analytics, request,
         communicator,
@@ -54,8 +52,7 @@ class BittensorSelectValidatorModule {
         logger,
         retryController = retryController,
         tokenFormatter = tokenFormatter,
-        subnetInteractor = subnetInteractor,
-        abandonment = abandonment
+        subnetInteractor = subnetInteractor
     )
 
     @Provides

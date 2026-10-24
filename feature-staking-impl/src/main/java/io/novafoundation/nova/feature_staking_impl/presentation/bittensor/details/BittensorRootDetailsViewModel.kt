@@ -168,7 +168,7 @@ class BittensorRootDetailsViewModel(
             val rewards = when {
                 claim == null -> StakingRewardsState.UNAVAILABLE
                 claim.availableClaims.isNotEmpty() -> StakingRewardsState.CLAIMABLE
-                claim.claims.totalRedeemable.signum() > 0 -> StakingRewardsState.BELOW_MINIMUM
+                claim.claims.totalRedeemable.isPositive() -> StakingRewardsState.BELOW_MINIMUM
                 else -> StakingRewardsState.NONE
             }
             isOpenedTracked = true
@@ -176,8 +176,8 @@ class BittensorRootDetailsViewModel(
                 BittensorAnalyticsEvent.PositionOpened(
                     StakingAnalyticsTarget.ROOT,
                     0,
-                    withdrawal.holdDurationMillis.signum() > 0,
-                    withdrawal.locked.signum() > 0,
+                    withdrawal.holdDurationMillis.isPositive(),
+                    withdrawal.locked.isPositive(),
                     rewards
                 )
             )

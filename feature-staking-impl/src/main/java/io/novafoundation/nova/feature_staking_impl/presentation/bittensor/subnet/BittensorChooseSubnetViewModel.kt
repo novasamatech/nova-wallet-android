@@ -42,9 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWee
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.passesBittensorThinPoolFilter
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorSubnets
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetsFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
@@ -76,14 +74,16 @@ class BittensorChooseSubnetViewModel(
     private val resources: ResourceManager,
     listChooserMixinFactory: ListChooserMixin.Factory,
     private val payload: BittensorChooseSubnetPayload,
-    private val validatorCommunicator: BittensorSelectValidatorCommunicator,
-    private val abandonment: BittensorChooseSubnetAbandonment
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator
 ) : BaseViewModel() {
 
     private var isSearchTracked = false
 
     // As on iOS, only the picker opened from the staking start (see all options) reports abandonment, not the one from the amount screen.
     private val tracksAbandonment = !payload.replaceAmount
+
+    // Subnet details opened from here report the abandonment themselves or finish the flow, so the picker reports nothing while they are open.
+    private var detailsOpen = false
 
     private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SUBNET_SELECT)
     private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SUBNET_SELECT)
@@ -110,12 +110,9 @@ class BittensorChooseSubnetViewModel(
 
     val hideThinPools = MutableStateFlow(payload.browseState.hideThinPools)
 
-    private val catalogueRetry = BittensorInlineRetry()
-
     private val catalogueState = retryController.observe(
         step = "subnet catalogue",
         analytics = subnetsReads,
-        inlineRetry = catalogueRetry,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { browseRepository.subnets() }
@@ -124,13 +121,6 @@ class BittensorChooseSubnetViewModel(
 
     private val catalogue = catalogueState.filterLoaded()
         .onStart { emit(emptyList()) }
-        .shareInBackground()
-
-    // As on iOS, a failed catalogue keeps the root row and explains itself below it, with Try again unless no retry can help.
-    val catalogueFailure = catalogueState.map { state ->
-        (state as? ExtendedLoadingState.Error)?.exception?.bittensorSubnetsFailure(resources)
-    }
-        .distinctUntilChanged()
         .shareInBackground()
 
     private val query = MutableStateFlow("")
@@ -270,7 +260,6 @@ class BittensorChooseSubnetViewModel(
         .shareInBackground()
 
     init {
-        if (tracksAbandonment) abandonment.start(selectionState.flowId)
         analytics.track(
             BittensorAnalyticsEvent.SubnetListOpened(
                 if (payload.replaceAmount) SubnetListSource.SEE_ALL_SUBNETS else SubnetListSource.SEE_ALL_OPTIONS,
@@ -285,12 +274,11 @@ class BittensorChooseSubnetViewModel(
             analytics.track(BittensorAnalyticsEvent.SubnetFilter(it))
         }.launchIn(this)
         validatorCommunicator.responseFlow
-            .onEach { selectionState = selectionState.withResponse(it) }
+            .onEach {
+                detailsOpen = false
+                selectionState = selectionState.withResponse(it)
+            }
             .launchIn(this)
-    }
-
-    fun becomeActive() {
-        if (tracksAbandonment) abandonment.becomeActive(selectionState.flowId, BittensorScreen.SUBNET_SELECT, null)
     }
 
     fun search(query: String) {
@@ -301,12 +289,9 @@ class BittensorChooseSubnetViewModel(
         this.query.value = query.trim()
     }
 
-    fun retryCatalogue() {
-        catalogueRetry.retry()
-    }
-
     fun select(row: BittensorSubnetRowUi) = launchUnit {
         rememberBrowseState()
+        detailsOpen = true
         router.openBittensorSubnetDetails(
             BittensorSubnetDetailsPayload(row.subnet.id.value, payload.replaceAmount, selectionState = selectionState)
         )
@@ -339,7 +324,7 @@ class BittensorChooseSubnetViewModel(
                 0
             )
         )
-        if (tracksAbandonment) abandonment.markProceeded(selectionState.flowId)
+        selectionState = selectionState.copy(flowContinued = true)
         rememberBrowseState()
         if (payload.replaceAmount) {
             router.replaceBittensorSubnetAmountWithRoot(selectionState)
@@ -355,7 +340,9 @@ class BittensorChooseSubnetViewModel(
     }
 
     override fun onCleared() {
-        if (tracksAbandonment) abandonment.finish(selectionState.flowId)?.let(analytics::track)
+        if (tracksAbandonment && !detailsOpen && !selectionState.flowContinued) {
+            analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SUBNET_SELECT, null))
+        }
         super.onCleared()
     }
 

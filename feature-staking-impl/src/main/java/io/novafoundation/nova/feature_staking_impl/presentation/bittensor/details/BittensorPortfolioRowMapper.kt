@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -122,7 +123,7 @@ class BittensorPortfolioRowMapper(
 internal fun hasRootPortfolioRow(positions: BittensorPortfolioPositions, rewards: BigInteger?): Boolean =
     positions.rootStake.isPositiveAmount() || rewards.isPositiveAmount()
 
-private fun BigInteger?.isPositiveAmount(): Boolean = this != null && signum() > 0
+private fun BigInteger?.isPositiveAmount(): Boolean = this != null && isPositive()
 
 internal fun isPortfolioEmpty(positions: BittensorPortfolioPositions?, rewards: BigInteger?): Boolean =
     positions != null && rewards != null && !hasRootPortfolioRow(positions, rewards) && positions.subnets.isEmpty()

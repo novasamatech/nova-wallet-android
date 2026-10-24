@@ -47,17 +47,9 @@ fun BittensorStakePreflightFailure.titleAndMessage(resources: ResourceManager, f
             R.string.bittensor_validation_minimum_stake,
             format.requiredAmount(failure.requiredAmountInPlanks)
         )
-        // As on iOS: Ledger gets the signer-not-supported copy, proxied and delayed multisig wallets the unsupported-wallet copy.
-        BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED ->
-            resources.getString(R.string.account_parity_signer_not_supported_title) to resources.getString(R.string.ledger_sign_raw_not_supported)
-        BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED -> resources.getString(
-            R.string.bittensor_staking_wallet_unsupported_title,
-            resources.getString(R.string.account_proxied)
-        ) to resources.getString(R.string.bittensor_staking_wallet_unsupported_message)
-        BittensorStakeValidationFailure.DELAYED_EXECUTION -> resources.getString(
-            R.string.bittensor_staking_wallet_unsupported_title,
-            resources.getString(R.string.account_multisig)
-        ) to resources.getString(R.string.bittensor_staking_wallet_unsupported_message)
+        BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED -> resources.bittensorLedgerNotSupported()
+        BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED -> resources.bittensorWalletNotSupported(R.string.account_proxied)
+        BittensorStakeValidationFailure.DELAYED_EXECUTION -> resources.bittensorWalletNotSupported(R.string.account_multisig)
         BittensorStakeValidationFailure.NON_POSITIVE_AMOUNT -> error(R.string.common_enter_amount)
         BittensorStakeValidationFailure.INSUFFICIENT_BALANCE -> error(R.string.common_error_not_enough_tokens)
         BittensorStakeValidationFailure.FEE_RESERVE -> {

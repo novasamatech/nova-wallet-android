@@ -10,9 +10,11 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorClaimClock
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingClaims
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimPreview
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -79,7 +81,13 @@ class BittensorRootClaimExecutionTest {
         }
     }
 
-    private val interactor = BittensorRootClaimInteractor(chains, accounts, wallets, source, extrinsics, executor, constants, immediate, pending)
+    private val positions = mock(BittensorPositionRepository::class.java)
+
+    private val validators = mock(BittensorRootValidatorSource::class.java)
+
+    private val interactor = BittensorRootClaimInteractor(
+        chains, accounts, wallets, source, extrinsics, executor, constants, immediate, pending, positions, validators
+    )
 
     private val wallet = mock(MetaAccount::class.java)
 
@@ -223,7 +231,7 @@ class BittensorRootClaimExecutionTest {
         val positionUpdates = BittensorPositionUpdates()
         val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, positionUpdates)
         val cancellingInteractor = BittensorRootClaimInteractor(
-            chains, accounts, wallets, source, cancellingExtrinsics, realExecutor, constants, immediate, pending
+            chains, accounts, wallets, source, cancellingExtrinsics, realExecutor, constants, immediate, pending, positions, validators
         )
         val lease = requireNotNull(cancellingInteractor.tryAcquire(draft))
 

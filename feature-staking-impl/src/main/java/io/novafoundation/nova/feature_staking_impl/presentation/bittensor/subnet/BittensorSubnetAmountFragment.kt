@@ -31,7 +31,6 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetIcon
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setBittensorFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.bindGetAsset
@@ -108,7 +107,6 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.selectionLoading.observe { selectionLoading.isVisible = it }
         viewModel.selectionError.observe(selectionError::setMessageOrHide)
-        viewModel.validatorFailure.observe { validatorFailure.setBittensorFailure(it, viewModel::retryValidators) }
         viewModel.subnetChips.observe { chips ->
             subnetChips.removeAllViews()
             subnetChips.isVisible = chips.isNotEmpty()

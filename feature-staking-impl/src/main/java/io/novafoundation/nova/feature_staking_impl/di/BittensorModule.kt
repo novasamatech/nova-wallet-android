@@ -519,7 +519,9 @@ class BittensorModule {
         submission: BittensorSubmissionExecutor,
         constants: WalletConstants,
         immediateExecution: BittensorImmediateExecution,
-        pendingClaims: BittensorPendingClaims
+        pendingClaims: BittensorPendingClaims,
+        positionRepository: BittensorPositionRepository,
+        rootValidatorSource: BittensorRootValidatorSource
     ) =
         BittensorRootClaimInteractor(
             chains,
@@ -530,7 +532,9 @@ class BittensorModule {
             submission,
             constants,
             immediateExecution,
-            pendingClaims
+            pendingClaims,
+            positionRepository,
+            rootValidatorSource
         )
 
     @Provides

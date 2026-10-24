@@ -147,58 +147,6 @@ class BittensorRetryControllerTest {
     }
 
     @Test
-    fun `read failing in place raises no dialog and restarts from its Try again`() = runBlocking {
-        val inlineRetry = BittensorInlineRetry()
-        var attempts = 0
-        val states = mutableListOf<ExtendedLoadingState<Int>>()
-        val collection = launch {
-            controller.observe("subnet catalogue", inlineRetry = inlineRetry, transform = { it.withSafeLoading() }) {
-                flow {
-                    attempts++
-                    check(attempts > 1) { "Unavailable" }
-                    emit(42)
-                }
-            }
-                .take(4)
-                .toList(states)
-        }
-
-        withTimeout(3_000L) { while (states.none { it is ExtendedLoadingState.Error }) yield() }
-        assertNull(withTimeoutOrNull(100L) { controller.events.first() })
-        inlineRetry.retry()
-        withTimeout(3_000L) { collection.join() }
-
-        assertEquals(ExtendedLoadingState.Loaded(42), states.last())
-        assertEquals(2, attempts)
-    }
-
-    @Test
-    fun `slow read failing in place still raises the dialog and either retry restarts it once`() = runBlocking {
-        val inlineRetry = BittensorInlineRetry()
-        val attempts = AtomicInteger()
-        val values = mutableListOf<Int>()
-        val collection = launch {
-            controller.observe("subnet catalogue", inlineRetry = inlineRetry, transform = { it.catch { } }) {
-                flow {
-                    if (attempts.incrementAndGet() == 1) throw BittensorTimeoutException("Subnet catalogue")
-                    emit(42)
-                }
-            }.toList(values)
-        }
-
-        val failure = withTimeout(3_000L) { controller.events.first() }
-        assertEquals(BittensorReadFailureKind.SLOW_NETWORK, failure.kind)
-        failure.onRetry()
-        withTimeout(3_000L) { while (values.isEmpty()) yield() }
-        inlineRetry.retry()
-        withTimeoutOrNull(100L) { while (attempts.get() < 3) yield() }
-
-        assertEquals(listOf(42), values)
-        assertEquals(2, attempts.get())
-        collection.cancelAndJoin()
-    }
-
-    @Test
     fun `failure kind follows the cause chain`() {
         assertEquals(BittensorReadFailureKind.SLOW_NETWORK, IllegalStateException("wrapped", SocketTimeoutException()).bittensorReadFailureKind())
         assertEquals(BittensorReadFailureKind.DEVICE_UNSUPPORTED, AttestationUnsupportedException("refused").bittensorReadFailureKind())

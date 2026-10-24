@@ -11,10 +11,10 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetAbandonment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
@@ -56,7 +56,7 @@ class BittensorSubnetDetailsModule {
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
         validatorCommunicator: BittensorSelectValidatorCommunicator,
         addressIconGenerator: AddressIconGenerator,
-        abandonment: BittensorChooseSubnetAbandonment
+        automaticInteractionGate: AutomaticInteractionGate
     ): ViewModel = BittensorSubnetDetailsViewModel(
         analytics, subnetId = BittensorNetuid.Subnet(payload.subnetId),
         bittensorSubnetInteractor = bittensorSubnetInteractor,
@@ -75,7 +75,7 @@ class BittensorSubnetDetailsModule {
         presetValidatorInteractor = presetValidatorInteractor,
         validatorCommunicator = validatorCommunicator,
         addressIconGenerator = addressIconGenerator,
-        abandonment = abandonment,
+        automaticInteractionGate = automaticInteractionGate,
         replaceAmount = payload.replaceAmount,
         initialValidatorAddress = payload.validatorAddress,
         initialSelectionState = payload.selectionState,
