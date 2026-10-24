@@ -11,13 +11,10 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlin.time.Duration.Companion.seconds
-import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.selects.select
-import retrofit2.HttpException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -43,15 +40,14 @@ interface BittensorSubnetRepository {
 /**
  * Subnet names and symbols come from the chain (`get_all_dynamic_info`, a heavy call) or, when the node is slow or
  * failing, from the backend `/subnets` catalogue - the source iOS names subnets from. When both fail, the last good
- * catalogue stands in with its metadata only, so a failing node never blanks subnet names; prices and reserves always
- * come from a current read, and the next read asks both sources again.
+ * catalogue stands in with its metadata only, so a failing node never blanks subnet names; prices and reserves are never
+ * served from that last good catalogue, and the next read asks both sources again.
  */
 class RealBittensorSubnetRepository(
     private val runtimeCalls: MultiChainRuntimeCallsApi,
     private val configRepository: BittensorConfigRepository,
     private val swapSource: BittensorSwapSource,
-    private val catalogueApi: BittensorSubnetCatalogueApi,
-    private val infrastructureUrls: InfrastructureUrls,
+    private val catalogueSource: BittensorSubnetCatalogueRemoteSource,
     private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS,
     private val nanoTime: () -> Long = System::nanoTime
 ) : BittensorSubnetRepository {
@@ -144,14 +140,7 @@ class RealBittensorSubnetRepository(
         return BittensorSubnetCatalogue(chain.await().getOrThrow(), fromChain = true)
     }
 
-    private suspend fun loadBackendCatalogue(): List<BittensorSubnet> {
-        val base = infrastructureUrls.baseUrl() ?: throw InfrastructureUrlMissingException()
-        require(base.isHttps) { "Infrastructure requires HTTPS" }
-        val url = requireNotNull(base.resolve("/v1/bittensor/subnets"))
-        val response = catalogueApi.subnets(url.toString())
-        if (!response.isSuccessful) throw HttpException(response)
-        return mapBittensorBackendCatalogue(requireNotNull(response.body()))
-    }
+    private suspend fun loadBackendCatalogue(): List<BittensorSubnet> = mapBittensorBackendCatalogue(catalogueSource.catalogue())
 
     private suspend fun <T> catching(load: suspend () -> T): Result<T> = try {
         Result.success(load())

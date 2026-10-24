@@ -189,7 +189,9 @@ class BittensorDetailsRetryTest {
 
     private val router = mock(StakingRouter::class.java)
 
-    private val portfolioReopenings = MutableSharedFlow<StakingPortfolioSource>(extraBufferCapacity = 1)
+    private val portfolioReopenCommunicator = mock(BittensorPortfolioReopenCommunicator::class.java)
+
+    private val portfolioReopenings = MutableSharedFlow<BittensorPortfolioReopenCommunicator.Response>(extraBufferCapacity = 1)
 
     private val assetIconProvider = mock(AssetIconProvider::class.java)
 
@@ -263,7 +265,7 @@ class BittensorDetailsRetryTest {
         `when`(rootClaimInteractor.observe(1L)).thenReturn(rootClaims)
         `when`(rootClaimInteractor.observe(2L)).thenReturn(otherClaims)
         `when`(rowInteractor.weeklyChanges("native", emptySet())).thenReturn(emptyMap())
-        `when`(router.bittensorPortfolioReopenings).thenReturn(portfolioReopenings)
+        `when`(portfolioReopenCommunicator.responseFlow).thenReturn(portfolioReopenings)
     }
 
     @After
@@ -333,7 +335,7 @@ class BittensorDetailsRetryTest {
         createViewModel()
         withTimeout(3_000L) { while (portfolioOpenedSources().isEmpty()) delay(10L) }
 
-        portfolioReopenings.emit(StakingPortfolioSource.RESULT)
+        portfolioReopenings.emit(BittensorPortfolioReopenCommunicator.Response(StakingPortfolioSource.RESULT))
 
         withTimeout(3_000L) { while (portfolioOpenedSources().size < 2) delay(10L) }
         assertEquals(listOf("dashboard", "result"), portfolioOpenedSources())
@@ -408,6 +410,7 @@ class BittensorDetailsRetryTest {
         viewModel = BittensorDetailsViewModel(
             analytics, bittensorPortfolioInteractor = portfolioInteractor,
             router = router,
+            portfolioReopenCommunicator = portfolioReopenCommunicator,
             resources = resources,
             amountFormatter = amountFormatter,
             rowMapper = rowMapper,
@@ -434,7 +437,6 @@ class BittensorDetailsRetryTest {
         val options = captor.value.availableStakingOptions
         assertEquals("chain", options.chainId)
         assertEquals(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT), options.stakingTypes)
-        verify(router).bittensorPortfolioReopenings
         verifyNoMoreInteractions(router)
         val flowOpened = analyticsService.events.single { it.name == "staking_flow_opened" }
         assertEquals("portfolio_add_position", flowOpened.properties["source"])
@@ -457,7 +459,6 @@ class BittensorDetailsRetryTest {
         assertEquals("proxied", blocked.properties["wallet_type"])
         assertFalse(blocked.properties.containsKey("target"))
         assertTrue(analyticsService.events.none { it.name == "staking_flow_opened" })
-        verify(router).bittensorPortfolioReopenings
         verifyNoMoreInteractions(router)
     }
 

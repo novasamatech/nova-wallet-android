@@ -4,13 +4,18 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootYields
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
+import java.math.BigInteger
 import javax.inject.Inject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
@@ -31,6 +36,7 @@ class BittensorValidatorPreset(
 class BittensorPresetValidatorInteractor @Inject constructor(
     private val repository: BittensorSubnetValidatorRepository,
     private val yields: BittensorAlphaYieldRepository,
+    private val backend: BittensorValidatorBackend,
     private val chains: ChainRegistry,
     private val portfolioRepository: BittensorPortfolioRepository,
     private val logger: Logger
@@ -45,14 +51,49 @@ class BittensorPresetValidatorInteractor @Inject constructor(
         // The directory and yields are independent of the positions; load them alongside instead of after them.
         val directory = async { optionalDirectory(chain, subnet) }
         val rates = async { optionalYields(chain, subnet) }
-        val existing = repository.existingPresetValidator(chain, subnet, existingPrimaryHotkey(subnet), logger)
-        val preset = selectBittensorPreset(existing, { directory.await().getOrThrow() }, { rates.await() }, logger) {
-            repository.validate(chain, subnet, it)
-        }
+        val existing = activeExistingValidator(chain, subnet, existingPrimaryHotkey(subnet))
+        val preset = existing ?: recommendedPreset(chain, subnet, directory.await().getOrThrow(), rates)
         rates.cancel()
         // A manual pick on the stake setup is looked up in this directory; the held validator is kept even without one.
         val rows = directory.await().getOrNull()?.validators.orEmpty()
         BittensorValidatorPreset(rows.withPreset(preset), preset)
+    }
+
+    /**
+     * The subnet preset applied to netuid 0, as on iOS: the held root validator first, otherwise the recommended root validators
+     * ranked by their 30-day root APY. The directory is read only when no held validator qualifies.
+     */
+    suspend fun rootPreset(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator? = coroutineScope {
+        val rates = async { optionalYields(chain, BittensorNetuid.Root) }
+        val existing = activeExistingValidator(chain, BittensorNetuid.Root, bittensorRootPrimaryHotkey(positions))
+        val preset = existing ?: recommendedPreset(chain, BittensorNetuid.Root, repository.directory(chain, BittensorNetuid.Root), rates)
+        rates.cancel()
+        preset?.validator
+    }
+
+    /**
+     * The first of the two best [bittensorPresetCandidates] that passes the chain check, shared by subnets and root as iOS shares
+     * SubtensorValidatorPresetOperationFactory. A failed recommendations read fails the preset.
+     */
+    private suspend fun recommendedPreset(
+        chain: Chain,
+        netuid: BittensorNetuid,
+        directory: BittensorValidatorDirectory,
+        rates: Deferred<Map<AccountIdKey, BigDecimal>>
+    ): BittensorSubnetValidator? {
+        directory.recommendationFailure?.let { throw it }
+        for (candidate in bittensorPresetCandidates(directory.validators, rates.await()).take(MAX_PRESET_ATTEMPTS)) {
+            try {
+                repository.validate(chain, netuid, candidate.validator)
+                return candidate
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (failure: Exception) {
+                logger.log("[BittensorPreset] Automatic candidate unavailable")
+                logger.log(failure)
+            }
+        }
+        return null
     }
 
     private suspend fun optionalDirectory(chain: Chain, subnet: BittensorNetuid.Subnet): Result<BittensorValidatorDirectory> = try {
@@ -63,14 +104,31 @@ class BittensorPresetValidatorInteractor @Inject constructor(
         Result.failure(failure)
     }
 
-    private suspend fun optionalYields(chain: Chain, subnet: BittensorNetuid.Subnet): Map<AccountIdKey, BigDecimal> = try {
-        yields.alphaYields(chain, subnet)
+    private suspend fun optionalYields(chain: Chain, netuid: BittensorNetuid): Map<AccountIdKey, BigDecimal> = try {
+        when (netuid) {
+            BittensorNetuid.Root -> mapBittensorRootYields(chain, backend.rootValidators())
+            is BittensorNetuid.Subnet -> yields.alphaYields(chain, netuid)
+        }
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (failure: Exception) {
         logger.log("[BittensorPreset] Optional yields unavailable")
         logger.log(failure)
         emptyMap()
+    }
+
+    /** [hotkey] of an existing position as the chain reports it (iOS createItemWrapper), or null when unreadable or inactive. */
+    private suspend fun activeExistingValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey?): BittensorSubnetValidator? {
+        if (hotkey == null) return null
+        return try {
+            repository.chainValidator(chain, netuid, hotkey).takeUnless { it.inactive }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (failure: Exception) {
+            logger.log("[BittensorPreset] Existing validator unavailable")
+            logger.log(failure)
+            null
+        }
     }
 
     /** Waits for positions to load or fail, as iOS requests the preset only then, so a held validator is never replaced. */
@@ -98,35 +156,6 @@ class BittensorPresetValidatorInteractor @Inject constructor(
 private const val MAX_PRESET_ATTEMPTS = 2
 
 /**
- * The automatic preset, shared by subnets and root as iOS shares SubtensorValidatorPresetOperationFactory: the [existing] position's
- * primary validator unless the chain reports it inactive, otherwise the first of the two best [bittensorPresetCandidates] that passes
- * [validate]. [directory] and [rates] are read only when no existing validator qualifies; a failed recommendations read fails the preset.
- */
-internal suspend fun selectBittensorPreset(
-    existing: BittensorSubnetValidator?,
-    directory: suspend () -> BittensorValidatorDirectory,
-    rates: suspend () -> Map<AccountIdKey, BigDecimal>,
-    logger: Logger,
-    validate: suspend (BittensorValidator) -> Unit
-): BittensorSubnetValidator? {
-    existing?.takeUnless { it.inactive }?.let { return it }
-    val loaded = directory()
-    loaded.recommendationFailure?.let { throw it }
-    for (candidate in bittensorPresetCandidates(loaded.validators, rates()).take(MAX_PRESET_ATTEMPTS)) {
-        try {
-            validate(candidate.validator)
-            return candidate
-        } catch (cancelled: CancellationException) {
-            throw cancelled
-        } catch (failure: Exception) {
-            logger.log("[BittensorPreset] Automatic candidate unavailable")
-            logger.log(failure)
-        }
-    }
-    return null
-}
-
-/**
  * Recommended, active and gate-passing rows, highest reliable APY first. Equal APYs and rows without a reliable APY follow the
  * ranking, as iOS highestYield takes the first ranked recommendation with the highest rate.
  */
@@ -139,45 +168,24 @@ internal fun bittensorPresetCandidates(
             .thenBy(nullsLast<Int>()) { it.recommendationRank }
     )
 
-/** [hotkey] of an existing position as the chain reports it, or null when unavailable, as iOS createItemWrapper. */
-internal suspend fun BittensorSubnetValidatorRepository.existingPresetValidator(
-    chain: Chain,
-    netuid: BittensorNetuid,
-    hotkey: AccountIdKey?,
-    logger: Logger
-): BittensorSubnetValidator? {
-    if (hotkey == null) return null
-    return try {
-        chainValidator(chain, netuid, hotkey)
-    } catch (cancelled: CancellationException) {
-        throw cancelled
-    } catch (failure: Exception) {
-        logger.log("[BittensorPreset] Existing validator unavailable")
-        logger.log(failure)
-        null
-    }
-}
-
 /**
  * The validator holding the largest stake of the account on [subnet], as iOS picks a position's primary hotkey;
  * equal stakes resolve to the lexicographically smaller hotkey bytes.
  */
 internal fun bittensorPrimaryHotkey(positions: List<BittensorSubnetPosition>, subnet: BittensorNetuid.Subnet): AccountIdKey? = positions
-    .filter { it.subnetId == subnet && it.alphaInPlanks.signum() > 0 }
-    .minWithOrNull(
-        compareByDescending<BittensorSubnetPosition> { it.alphaInPlanks }
-            .thenComparator { left, right -> compareUnsignedBytes(left.validatorHotkey.value, right.validatorHotkey.value) }
-    )
-    ?.validatorHotkey
+    .filter { it.subnetId == subnet }
+    .primaryHotkey(BittensorSubnetPosition::validatorHotkey, BittensorSubnetPosition::alphaInPlanks)
 
 /** The root validator holding the largest root stake of the account, with the same tie-break as [bittensorPrimaryHotkey]. */
-internal fun bittensorRootPrimaryHotkey(positions: List<BittensorRootPosition>): AccountIdKey? = positions
-    .filter { it.stakeInPlanks.signum() > 0 }
+internal fun bittensorRootPrimaryHotkey(positions: List<BittensorRootPosition>): AccountIdKey? =
+    positions.primaryHotkey(BittensorRootPosition::validatorHotkey, BittensorRootPosition::stakeInPlanks)
+
+private fun <T> List<T>.primaryHotkey(hotkey: (T) -> AccountIdKey, stake: (T) -> BigInteger): AccountIdKey? = filter { stake(it).isPositive() }
     .minWithOrNull(
-        compareByDescending<BittensorRootPosition> { it.stakeInPlanks }
-            .thenComparator { left, right -> compareUnsignedBytes(left.validatorHotkey.value, right.validatorHotkey.value) }
+        compareByDescending(stake)
+            .thenComparator { left, right -> compareUnsignedBytes(hotkey(left).value, hotkey(right).value) }
     )
-    ?.validatorHotkey
+    ?.let(hotkey)
 
 private fun compareUnsignedBytes(left: ByteArray, right: ByteArray): Int {
     for (index in 0 until minOf(left.size, right.size)) {

@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
-import kotlinx.coroutines.flow.Flow
 
 interface StakingRouter {
 
@@ -141,9 +140,6 @@ interface StakingRouter {
 
     /** Leaves a finished Bittensor operation, dropping its flow screens from the back stack. */
     fun finishBittensorFlow(exit: BittensorFlowExit)
-
-    /** Emits when [finishBittensorFlow] returns to a portfolio that is already open, as iOS `SubtensorPortfolioPresenter.reopen(from:)`. */
-    val bittensorPortfolioReopenings: Flow<StakingPortfolioSource>
 
     fun openBittensorRootDetails()
 

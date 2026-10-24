@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
@@ -41,8 +42,6 @@ interface BittensorRootValidatorSource {
 
     suspend fun validatorDetails(chain: Chain): Map<AccountIdKey, BittensorRootValidatorDetails>
 
-    suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator?
-
     suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal?
 }
 
@@ -52,6 +51,7 @@ class RealBittensorStakingRepository(
     private val accountRepository: AccountRepository,
     private val positionRepository: BittensorPositionRepository,
     private val validatorSource: BittensorRootValidatorSource,
+    private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val logger: Logger
 ) : BittensorStakingRepository {
 
@@ -129,7 +129,7 @@ class RealBittensorStakingRepository(
         val primaryHotkey = bittensorRootPrimaryHotkey(positions)
         if (cachedSelection != null && cachedSelection.positionHotkey == primaryHotkey) return cachedSelection
 
-        val validator = validatorSource.preferredValidator(chain, positions)
+        val validator = presetValidatorInteractor.rootPreset(chain, positions)
         return DefaultValidatorSelection(primaryHotkey, validator)
     }
 

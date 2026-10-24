@@ -55,6 +55,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -101,7 +103,9 @@ class StakingDashboardViewModel(
     val walletUi = accountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    private val stakingDashboardFlow = interactor.stakingDashboardFlow()
+    private val maximumYieldRefreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    private val stakingDashboardFlow = interactor.stakingDashboardFlow(maximumYieldRefreshes)
         .shareInBackground()
 
     private val pendingDeepLinkTarget = MutableStateFlow<StakingDeepLinkTarget?>(null)
@@ -164,7 +168,7 @@ class StakingDashboardViewModel(
     }
 
     fun onResume() {
-        interactor.refreshMaximumYields()
+        maximumYieldRefreshes.tryEmit(Unit)
     }
 
     /**

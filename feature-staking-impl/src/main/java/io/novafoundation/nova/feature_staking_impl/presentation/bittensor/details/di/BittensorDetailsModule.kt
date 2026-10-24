@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioRowMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
@@ -89,6 +90,7 @@ class BittensorDetailsModule {
         analytics: AnalyticsService,
         bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
+        portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
         resources: ResourceManager,
         amountFormatter: BittensorAmountFormatter,
         rowMapper: BittensorPortfolioRowMapper,
@@ -102,6 +104,7 @@ class BittensorDetailsModule {
     ): ViewModel = BittensorDetailsViewModel(
         analytics, bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
+        portfolioReopenCommunicator = portfolioReopenCommunicator,
         resources = resources,
         amountFormatter = amountFormatter,
         rowMapper = rowMapper,

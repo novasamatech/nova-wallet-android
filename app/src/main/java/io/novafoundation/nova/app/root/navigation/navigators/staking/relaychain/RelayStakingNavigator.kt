@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.la
 
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment
@@ -72,19 +73,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 
 class RelayStakingNavigator(
     private val navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
     private val stakingDashboardRouter: StakingDashboardRouter,
-    private val dAppRouter: DAppRouter
+    private val dAppRouter: DAppRouter,
+    private val portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator
 ) : BaseNavigator(navigationHoldersRegistry), StakingRouter {
-
-    private val portfolioReopenings = MutableSharedFlow<StakingPortfolioSource>(extraBufferCapacity = 1)
-
-    override val bittensorPortfolioReopenings: Flow<StakingPortfolioSource> = portfolioReopenings
 
     override fun returnToStakingMain() {
         navigationBuilder().action(R.id.back_to_staking_main)
@@ -436,7 +432,7 @@ class RelayStakingNavigator(
 
             BittensorFlowExitPlan.ReturnToPortfolio -> {
                 navController.popBackStack(R.id.bittensorPortfolioFragment, false)
-                portfolioReopenings.tryEmit(StakingPortfolioSource.RESULT)
+                portfolioReopenCommunicator.respond(BittensorPortfolioReopenCommunicator.Response(StakingPortfolioSource.RESULT))
             }
 
             BittensorFlowExitPlan.OpenPortfolioOverDashboard -> navigationBuilder().action(R.id.action_finish_bittensor_flow_to_portfolio)

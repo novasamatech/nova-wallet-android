@@ -3,23 +3,15 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.common.utils.isPositive
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorRootPrimaryHotkey
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.existingPresetValidator
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.selectBittensorPreset
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 
 class RemoteBittensorRootValidatorSource(
     private val backend: BittensorValidatorBackend,
-    private val validators: BittensorSubnetValidatorRepository,
     private val logger: io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 ) : BittensorRootValidatorSource {
 
@@ -37,20 +29,6 @@ class RemoteBittensorRootValidatorSource(
         }
     }
 
-    /**
-     * The subnet preset applied to netuid 0, as on iOS: the held root validator first, otherwise the recommended root validators
-     * ranked by their 30-day root APY.
-     */
-    override suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator? = coroutineScope {
-        val rates = async { optionalYields(chain) }
-        val existing = validators.existingPresetValidator(chain, BittensorNetuid.Root, bittensorRootPrimaryHotkey(positions), logger)
-        val preset = selectBittensorPreset(existing, { validators.directory(chain, BittensorNetuid.Root) }, { rates.await() }, logger) {
-            validators.validateRoot(chain, it)
-        }
-        rates.cancel()
-        preset?.validator
-    }
-
     override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal? {
         return try {
             mapBittensorRootYields(chain, backend.rootValidators())[validator.hotkey]
@@ -61,16 +39,6 @@ class RemoteBittensorRootValidatorSource(
             logger.log(e)
             null
         }
-    }
-
-    private suspend fun optionalYields(chain: Chain): Map<AccountIdKey, BigDecimal> = try {
-        mapBittensorRootYields(chain, backend.rootValidators())
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        logger.log("[BittensorPreset] Optional yields unavailable")
-        logger.log(e)
-        emptyMap()
     }
 }
 
@@ -92,20 +60,22 @@ internal fun mapRootValidatorDetails(
  * row's reported stake, named by its non-blank name or else its address. Entries without root stake cannot earn root yield.
  */
 internal fun mapBittensorRootValidators(chain: Chain, response: BittensorRootValidatorRemote): List<BittensorValidator> =
-    mapRootListing(chain, response).map { it.first }
+    mapRootListing(chain, response).map { it.validator }
 
 /** Names of the root list entries; entries without a non-blank name are absent, callers fall back to the address. */
 internal fun mapBittensorRootValidatorNames(chain: Chain, response: BittensorRootValidatorRemote): Map<AccountIdKey, String> =
-    mapRootListing(chain, response).mapNotNull { (validator, name) -> name?.let { validator.hotkey to it } }.toMap()
+    mapRootListing(chain, response).mapNotNull { entry -> entry.name?.let { entry.validator.hotkey to it } }.toMap()
 
-private fun mapRootListing(chain: Chain, response: BittensorRootValidatorRemote): List<Pair<BittensorValidator, String?>> =
+private class RootListingEntry(val validator: BittensorValidator, val name: String?)
+
+private fun mapRootListing(chain: Chain, response: BittensorRootValidatorRemote): List<RootListingEntry> =
     response.items.orEmpty().mapNotNull { row ->
         val stake = row.rootStakeTao?.toBigDecimalOrNull()?.takeIf { it.isPositive } ?: return@mapNotNull null
         val address = row.hotkey ?: return@mapNotNull null
         val hotkey = runCatching { AccountIdKey(chain.accountIdOf(address)) }.getOrNull() ?: return@mapNotNull null
         val name = row.name?.trim()?.takeIf(String::isNotBlank)
-        BittensorValidator(hotkey, name ?: address, stake) to name
-    }.distinctBy { it.first.hotkey }
+        RootListingEntry(BittensorValidator(hotkey, name ?: address, stake), name)
+    }.distinctBy { it.validator.hotkey }
 
 /** Root yields need the optional stakeYieldWindows component, as iOS makeRootYields does. */
 internal fun requireBittensorRootYieldWindows(response: BittensorRootValidatorRemote) {

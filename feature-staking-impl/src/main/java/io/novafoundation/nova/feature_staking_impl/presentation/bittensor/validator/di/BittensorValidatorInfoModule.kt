@@ -13,9 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSubnetCatalogue
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverageInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -30,13 +28,9 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 class BittensorValidatorInfoModule {
 
     @Provides
-    fun provideSubnetCatalogue(api: BittensorSubnetCatalogueApi, urls: InfrastructureUrls): BittensorValidatorSubnetCatalogue =
-        BittensorValidatorSubnetCatalogue(api, urls)
-
-    @Provides
     fun provideCoverageInteractor(
         delegates: BittensorDelegateSource,
-        catalogue: BittensorValidatorSubnetCatalogue
+        catalogue: BittensorSubnetCatalogueRemoteSource
     ): BittensorValidatorCoverageInteractor = BittensorValidatorCoverageInteractor(delegates, catalogue)
 
     @Provides
@@ -48,7 +42,6 @@ class BittensorValidatorInfoModule {
         validatorInteractor: BittensorValidatorInteractor,
         coverageInteractor: BittensorValidatorCoverageInteractor,
         subnetInteractor: BittensorSubnetInteractor,
-        subnetCatalogue: BittensorValidatorSubnetCatalogue,
         addressIconGenerator: AddressIconGenerator,
         amountFormatter: BittensorAmountFormatter,
         tokenFormatter: TokenFormatter,
@@ -62,7 +55,6 @@ class BittensorValidatorInfoModule {
         validatorInteractor = validatorInteractor,
         coverageInteractor = coverageInteractor,
         subnetInteractor = subnetInteractor,
-        subnetCatalogue = subnetCatalogue,
         addressIconGenerator = addressIconGenerator,
         amountFormatter = amountFormatter,
         tokenFormatter = tokenFormatter,

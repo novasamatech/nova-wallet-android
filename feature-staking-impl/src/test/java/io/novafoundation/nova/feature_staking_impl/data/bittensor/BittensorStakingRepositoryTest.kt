@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
@@ -32,6 +33,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
@@ -82,14 +85,10 @@ class BittensorStakingRepositoryTest {
     private val validatorSource = object : BittensorRootValidatorSource {
         override suspend fun validatorDetails(chain: Chain) = emptyMap<AccountIdKey, BittensorRootValidatorDetails>()
 
-        override suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator {
-            validatorRequests++
-            check(!failValidatorSelection) { "Validators unavailable" }
-            return validator
-        }
-
         override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal? = null
     }
+
+    private val presetValidatorInteractor = mock(BittensorPresetValidatorInteractor::class.java)
 
     private val commonModule = CommonModule()
 
@@ -116,6 +115,7 @@ class BittensorStakingRepositoryTest {
         accountRepository,
         positionRepository,
         validatorSource,
+        presetValidatorInteractor,
         logger
     )
 
@@ -224,5 +224,10 @@ class BittensorStakingRepositoryTest {
         `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(walletRepository.assetFlow(1L, chainAsset)).thenReturn(flowOf(asset))
         `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
+        `when`(presetValidatorInteractor.rootPreset(eq(chain) ?: chain, anyList())).thenAnswer {
+            validatorRequests++
+            check(!failValidatorSelection) { "Validators unavailable" }
+            validator
+        }
     }
 }

@@ -215,20 +215,20 @@ class BittensorValidatorBackend(
 
     private fun <T> readCacheEntry(response: Response<T>, startedAt: Long): Cached<T> {
         if (!response.isSuccessful) throw HttpException(response)
-        val lifetimeNanos = cacheLifetimeNanos(response)
+        val lifetimeNanos = bittensorCacheLifetimeNanos(response)
         return Cached(
             requireNotNull(response.body()) { "Empty Bittensor response" },
             startedAt + lifetimeNanos
         )
     }
+}
 
-    private fun cacheLifetimeNanos(response: Response<*>): Long {
-        val control = CacheControl.parse(response.headers())
-        val maxAge = if (control.noStore || control.noCache) 0 else control.maxAgeSeconds.coerceIn(0, 300)
-        val age = response.headers()["Age"]
-            ?.toIntOrNull()
-            ?.coerceAtLeast(0) ?: 0
-        return (maxAge - age)
-            .coerceAtLeast(0) * 1_000_000_000L
-    }
+internal fun bittensorCacheLifetimeNanos(response: Response<*>): Long {
+    val control = CacheControl.parse(response.headers())
+    val maxAge = if (control.noStore || control.noCache) 0 else control.maxAgeSeconds.coerceIn(0, 300)
+    val age = response.headers()["Age"]
+        ?.toIntOrNull()
+        ?.coerceAtLeast(0) ?: 0
+    return (maxAge - age)
+        .coerceAtLeast(0) * 1_000_000_000L
 }

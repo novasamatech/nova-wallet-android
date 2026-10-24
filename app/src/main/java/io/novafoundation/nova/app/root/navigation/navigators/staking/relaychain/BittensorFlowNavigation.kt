@@ -17,153 +17,79 @@ private val BITTENSOR_FLOW_HOSTS = setOf(
 )
 
 /**
- * Nested graphs that are a flow as a whole: iOS presents them modally over the tab bar, or keeps them in their own tab
- * where Android's single back stack would tear them down.
+ * Browse screens a staking deep link may pop, nested graphs included: iOS pushes them inside a tab and pops the staking
+ * tab to its root. Anything else on the split screen back stack (a setup or confirmation, Send, Swap, signing...)
+ * is a flow in progress the link must not interrupt.
  */
-private val STAKING_DEEP_LINK_FLOW_GRAPHS = setOf(
-    R.id.onboarding_nav_graph,
-    R.id.import_nav_graph,
-    R.id.import_wallet_options_nav_graph,
-    R.id.create_wallet_nav_graph,
-    R.id.mnemonic_nav_graph,
-    R.id.add_ledger_chain_account_graph,
-    R.id.add_evm_account_generic_ledger_graph,
-    R.id.start_staking_nav_graph,
-    R.id.start_multi_staking_nav_graph,
-    R.id.setup_staking_validators_graph,
-    R.id.staking_parachain_start_graph,
-    R.id.staking_parachain_unbond,
-    R.id.staking_parachain_yield_boost,
-    R.id.staking_mythos_start_graph,
-    R.id.staking_mythos_unbond_graph,
-    R.id.nomination_pools_bond_more_graph,
-    R.id.nomination_pools_unbond_graph,
-    R.id.bittensor_root_staking_graph,
-    R.id.start_swap_nav_graph,
-    R.id.select_swap_token_nav_graph,
-    R.id.manage_tokens_graph,
-    R.id.gifts_nav_graph,
-    R.id.referendum_unlock_graph,
-    R.id.referenda_search_graph,
-    R.id.dapp_browser_graph,
-    R.id.dapp_search_graph,
-    R.id.external_sign_graph,
-    R.id.sign_ledger_nav_graph,
-    R.id.sign_parity_signer_graph,
-    R.id.multisig_operation_details_graph
-)
-
-/** Flow screens in graphs that also hold browse screens (chain staking, referendum details, delegations, settings). */
-private val STAKING_DEEP_LINK_FLOW_SCREENS = setOf(
-    // Everything chain staking opens; iOS presents all of it modally over staking main
-    R.id.validatorDetailsFragment,
-    R.id.stakingPeriods,
-    R.id.startChangeValidatorsFragment,
-    R.id.recommendedValidatorsFragment,
-    R.id.confirmStakingFragment,
-    R.id.confirmNominationsFragment,
-    R.id.currentValidatorsFragment,
-    R.id.currentCollatorsFragment,
-    R.id.mythosCurrentCollatorsFragment,
-    R.id.payoutsListFragment,
-    R.id.payoutDetailsFragment,
-    R.id.confirmPayoutFragment,
-    R.id.setControllerAccountFragment,
-    R.id.confirmSetControllerAccount,
-    R.id.selectBondMoreFragment,
-    R.id.confirmBondMoreFragment,
-    R.id.selectUnbondFragment,
-    R.id.confirmUnbondFragment,
-    R.id.redeemFragment,
-    R.id.confirmRebondFragment,
-    R.id.customRebondFragment,
-    R.id.selectRewardDestinationFragment,
-    R.id.confirmRewardDestinationFragment,
-    R.id.rebagFragment,
-    R.id.parachainStakingRedeemFragment,
-    R.id.parachainStakingRebondFragment,
-    R.id.nominationPoolsRedeemFragment,
-    R.id.nominationPoolsClaimRewardsFragment,
-    R.id.mythosRedeemFragment,
-    R.id.mythosClaimRewardsFragment,
-    R.id.stakingProxyListFragment,
-    R.id.addStakingProxyFragment,
-    R.id.confirmAddStakingProxyFragment,
-    R.id.confirmRemoveStakingProxyFragment,
-    // Bittensor operations
-    R.id.bittensorWhereToStake,
-    R.id.bittensorChooseSubnet,
-    R.id.bittensorSubnetDetails,
-    R.id.bittensorSelectValidator,
-    R.id.bittensorSubnetAmount,
-    R.id.bittensorSubnetReview,
-    R.id.bittensorSelectUnstakePosition,
-    R.id.bittensorExitAmount,
-    R.id.bittensorExitReview,
-    R.id.bittensorRootClaim,
-    // Send, receive, buy, sell, gifts and transaction details
-    R.id.assetSearchFragment,
-    R.id.sendFlowFragment,
-    R.id.sendFlowNetworkFragment,
-    R.id.selectSendFragment,
-    R.id.confirmTransferFragment,
-    R.id.receiveFlowFragment,
-    R.id.receiveFlowNetworkFragment,
-    R.id.receiveFragment,
-    R.id.buyFlowFragment,
-    R.id.buyFlowNetworkFragment,
-    R.id.sellFlowFragment,
-    R.id.sellFlowNetworkFragment,
-    R.id.tradeProvidersFragment,
-    R.id.tradeWebFragment,
-    R.id.topUpAddressFragment,
-    R.id.claimGiftFragment,
-    R.id.transactionHistoryFilterFragment,
-    R.id.transferDetailFragment,
-    R.id.extrinsicDetailFragment,
-    R.id.rewardDetailFragment,
-    R.id.poolRewardDetailFragment,
-    R.id.swapDetailFragment,
-    // Governance
-    R.id.referendaFiltersFragment,
-    R.id.referendumFullDetailsFragment,
-    R.id.referendumDescription,
-    R.id.referendumVoters,
-    R.id.setupVoteReferendumFragment,
-    R.id.confirmReferendumVote,
-    R.id.selectDelegationTracks,
-    R.id.removeVoteFragment,
-    R.id.newDelegationChooseAmountFragment,
-    R.id.newDelegationConfirmFragment,
-    R.id.revokeDelegationChooseTracksFragment,
-    R.id.revokeDelegationConfirmFragment,
-    R.id.referendumInfoFragment,
-    R.id.setupTinderGovVoteFragment,
-    R.id.setupTinderGovBasketFragment,
-    R.id.confirmTinderGovVoteFragment,
-    R.id.crowdloanContributeFragment,
-    R.id.customContributeFragment,
-    R.id.moonbeamCrowdloanTermsFragment,
-    R.id.confirmContributeFragment,
-    R.id.claimContributionFragment,
-    // Wallets, security, backups and networks
-    R.id.pincodeFragment,
-    R.id.advancedEncryptionFragment,
-    R.id.scanSeedFragment,
-    R.id.changeWatchAccountFragment,
-    R.id.exportJsonPasswordFragment,
-    R.id.syncWalletsBackupPassword,
-    R.id.restoreCloudBackupPasswordFragment,
-    R.id.checkCloudBackupPasswordFragment,
-    R.id.changeBackupPasswordFragment,
-    R.id.addNetworkFragment,
-    R.id.customNode,
-    R.id.addNodeFragment,
-    // dApps, WalletConnect and notifications
-    R.id.dappFavorites,
-    R.id.walletConnectScanFragment,
-    R.id.walletConnectApproveSessionFragment,
-    R.id.pushNotificationsWelcomeFragment
+private val STAKING_DEEP_LINK_BROWSE_SCREENS = setOf(
+    R.id.split_screen_nav_graph,
+    R.id.mainFragment,
+    // Assets, staking and Your Bittensor
+    R.id.balanceDetailFragment,
+    R.id.staking_main_graph,
+    R.id.stakingFragment,
+    R.id.bittensorPortfolioFragment,
+    R.id.bittensorRootDetailsFragment,
+    R.id.bittensorSubnetPosition,
+    R.id.bittensorValidatorInfo,
+    R.id.nfts_nav_graph,
+    R.id.nftListFragment,
+    R.id.nftDetailsFragment,
+    R.id.nova_card_graph,
+    R.id.novaCardFragment,
+    // Governance and crowdloans
+    R.id.referendum_details_graph,
+    R.id.referendumDetailsFragment,
+    R.id.delegation_nav_graph,
+    R.id.delegateListFragment,
+    R.id.delegateSearchFragment,
+    R.id.delegation_details_nav_graph,
+    R.id.delegateDetailsFragment,
+    R.id.votedReferendaFragment,
+    R.id.delegateFullDescription,
+    R.id.delegateDelegatorsFragment,
+    R.id.your_delegations_nav_graph,
+    R.id.yourDelegationsFragment,
+    R.id.selectGovernanceTracks,
+    R.id.tinder_gov_graph,
+    R.id.tinderGovCards,
+    R.id.crowdloan_contributions_graph,
+    R.id.userContributionsFragment,
+    // Wallets, settings, backups and networks
+    R.id.accountsFragment,
+    R.id.walletDetailsFragment,
+    R.id.selectMultipleWalletsFragment,
+    R.id.selectSingleWalletFragment,
+    R.id.exportSeedFragment,
+    R.id.multisig_pending_operations_graph,
+    R.id.multisigPendingOperationsFragment,
+    R.id.selectCurrencyFragment,
+    R.id.languagesFragment,
+    R.id.appearanceFragment,
+    R.id.privacyFragment,
+    R.id.authorizedDAppsFragment,
+    R.id.wallet_connect_nav_graph,
+    R.id.walletConnectSessionsFragment,
+    R.id.walletConnectSessionDetailsFragment,
+    R.id.push_settings_graph,
+    R.id.pushSettingsFragment,
+    R.id.pushMultisigFragment,
+    R.id.pushGovernanceFragment,
+    R.id.pushStakingSettings,
+    R.id.cloud_backup_settings_graph,
+    R.id.cloudBackupSettingsFragment,
+    R.id.manual_backup_graph,
+    R.id.manualBackupSelectWallet,
+    R.id.manualBackupSelectAccount,
+    R.id.manualBackupWarning,
+    R.id.manualBackupSecrets,
+    R.id.manualBackupAdvancedSecrets,
+    R.id.network_management_graph,
+    R.id.networkManagement,
+    R.id.preConfiguredNetworks,
+    R.id.networkManagementDetails,
+    R.id.nodesFragment,
+    R.id.nodeDetailsFragment
 )
 
 internal sealed interface BittensorFlowExitPlan {
@@ -200,9 +126,8 @@ internal fun planBittensorFlowExit(exit: BittensorFlowExit, backStack: List<Int>
 
 /**
  * Whether a staking deep link may reset the split screen to the dashboard, as iOS `canPresentScreenWithoutBreakingFlow`:
- * not while a root screen covers the split screen (dApp browser, external signing, WalletConnect approval...) or a flow
- * is open in it. Browse screens iOS pushes inside a tab (asset details, chain staking, Your Bittensor, referendum details,
- * settings...) are no flow: the link pops them, as iOS pops the staking tab to its root.
+ * not while a root screen covers the split screen (dApp browser, external signing, WalletConnect approval...) or anything
+ * but browse screens is open in it. New screens count as a flow until they join the browse screens.
  * [rootScreen] is the root graph's current destination. [splitScreenBackStack] holds the split screen's destination ids
  * bottom to top, nested graphs included, or is null while the split screen's view is not attached yet.
  */
@@ -210,7 +135,7 @@ internal fun canPresentStakingDeepLink(rootScreen: Int?, splitScreenBackStack: L
     if (rootScreen != R.id.splitScreenFragment) return false
     val backStack = splitScreenBackStack ?: return true
 
-    return backStack.none { it in STAKING_DEEP_LINK_FLOW_GRAPHS || it in STAKING_DEEP_LINK_FLOW_SCREENS }
+    return backStack.all { it in STAKING_DEEP_LINK_BROWSE_SCREENS }
 }
 
 /** Screen ids on the back stack, bottom to top; nested graph entries are skipped. */

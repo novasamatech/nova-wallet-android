@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Bittens
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -24,7 +25,7 @@ internal fun mapBittensorDashboardDetails(
     val rootStake = when {
         positions == null -> null
         positions.root.isNotEmpty() -> positions.rootStake
-        positions.subnets.isNotEmpty() && claimableRootRewards?.signum() == 1 -> BigInteger.ZERO
+        positions.subnets.isNotEmpty() && claimableRootRewards?.isPositive() == true -> BigInteger.ZERO
         else -> null
     }
     val rootRate = positions?.root?.let { roots ->

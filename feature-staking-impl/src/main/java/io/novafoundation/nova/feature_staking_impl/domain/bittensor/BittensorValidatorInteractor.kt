@@ -2,13 +2,16 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorPortfolioPrices
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootValidatorNames
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootYields
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import java.math.BigDecimal
 import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -16,7 +19,8 @@ class BittensorValidatorInteractor(
     private val validatorRepository: BittensorSubnetValidatorRepository,
     private val chainRegistry: ChainRegistry,
     private val alphaYields: BittensorAlphaYieldRepository,
-    private val backend: BittensorValidatorBackend
+    private val backend: BittensorValidatorBackend,
+    private val subnetCatalogue: BittensorSubnetCatalogueRemoteSource
 ) {
 
     suspend fun chain(): Chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
@@ -67,6 +71,14 @@ class BittensorValidatorInteractor(
         val chain = chain()
         if (netuid is BittensorNetuid.Subnet) return alphaYields.alphaYields(chain, netuid, includeUnreliable)
         return mapBittensorRootYields(chain, backend.rootValidators())
+    }
+
+    /** Root stake is native already; subnet stake is valued at the FRESH backend price, as iOS values it on validator info. */
+    suspend fun stakeInNative(netuid: BittensorNetuid, reportedStake: BigDecimal): BigDecimal? = when (netuid) {
+        BittensorNetuid.Root -> reportedStake
+        is BittensorNetuid.Subnet -> mapBittensorPortfolioPrices(subnetCatalogue.catalogue())[netuid]?.let { price ->
+            reportedStake * price.toBigDecimal(chain().utilityAsset.precision.value)
+        }
     }
 
     suspend fun validators(netuid: BittensorNetuid): List<BittensorSubnetValidator> {

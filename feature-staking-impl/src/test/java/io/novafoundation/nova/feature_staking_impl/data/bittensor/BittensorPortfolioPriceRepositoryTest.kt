@@ -42,7 +42,7 @@ class BittensorPortfolioPriceRepositoryTest {
         }
     }
 
-    private val repository = RealBittensorPortfolioPriceRepository(api, urls, runtime, logger)
+    private val repository = RealBittensorPortfolioPriceRepository(BittensorSubnetCatalogueRemoteSource(api, urls), runtime, logger)
 
     private val subnet = BittensorNetuid.Subnet(1)
 

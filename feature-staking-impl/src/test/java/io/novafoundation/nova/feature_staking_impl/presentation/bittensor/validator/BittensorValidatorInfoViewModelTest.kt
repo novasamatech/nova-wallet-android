@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSubnetCatalogue
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
@@ -22,7 +21,6 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
-import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -50,7 +48,6 @@ class BittensorValidatorInfoViewModelTest {
         if (invocation.method.name == "getString") invocation.arguments.joinToString("|") else Mockito.RETURNS_DEFAULTS.answer(invocation)
     }
     private val validatorInteractor = mock(BittensorValidatorInteractor::class.java)
-    private val subnetCatalogue = mock(BittensorValidatorSubnetCatalogue::class.java)
     private val logger = mock(Logger::class.java)
     private val models = mutableListOf<BittensorValidatorInfoViewModel>()
 
@@ -152,7 +149,7 @@ class BittensorValidatorInfoViewModelTest {
 
     @Test
     fun `subnet stake without a fresh price shows no amount`() = runBlocking<Unit> {
-        `when`(subnetCatalogue.freshPrice(BittensorNetuid.Subnet(5))).thenReturn(null)
+        `when`(validatorInteractor.stakeInNative(BittensorNetuid.Subnet(5), BigDecimal.TEN)).thenReturn(null)
         val viewModel = createViewModel(payload(inactive = false, stake = BigDecimal.TEN))
 
         assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
@@ -160,7 +157,7 @@ class BittensorValidatorInfoViewModelTest {
 
     @Test
     fun `stake that cannot be formatted resolves to no amount instead of loading forever`() = runBlocking<Unit> {
-        `when`(subnetCatalogue.freshPrice(BittensorNetuid.Subnet(5))).thenReturn(BigInteger.TEN)
+        `when`(validatorInteractor.stakeInNative(BittensorNetuid.Subnet(5), BigDecimal.TEN)).thenReturn(BigDecimal.TEN)
         val viewModel = createViewModel(payload(inactive = false, stake = BigDecimal.TEN))
 
         assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
@@ -183,7 +180,6 @@ class BittensorValidatorInfoViewModelTest {
         validatorInteractor = validatorInteractor,
         coverageInteractor = mock(BittensorValidatorCoverageInteractor::class.java),
         subnetInteractor = mock(BittensorSubnetInteractor::class.java),
-        subnetCatalogue = subnetCatalogue,
         addressIconGenerator = mock(AddressIconGenerator::class.java),
         amountFormatter = mock(BittensorAmountFormatter::class.java),
         tokenFormatter = mock(TokenFormatter::class.java),

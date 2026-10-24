@@ -2955,14 +2955,12 @@
     <string name="bittensor_validation_safe_mode">The network is in safe mode, staking is temporarily disabled chain-wide. Try again later.</string>
     <string name="bittensor_validation_safe_mode_title">Network in safe mode</string>
     <string name="bittensor_validation_quote_expired">The quote is no longer current. Review the updated amounts before confirming again.</string>
-    <string name="bittensor_validation_slippage">The current price exceeds your accepted price limit. Review a new quote or reduce the amount before confirming again.</string>
     <string name="bittensor_self_impact_title">Order too large for your tolerance</string>
     <string name="bittensor_self_impact_message">Your order alone moves the price beyond your slippage tolerance. Reduce the amount or raise the tolerance.</string>
     <string name="bittensor_rate_updated_message">Old rate: %1$s.\nNew rate: %2$s</string>
     <string name="bittensor_review_updated_quote">Review updated quote</string>
     <string name="bittensor_price_impact_title">High price impact</string>
     <string name="bittensor_price_impact_message">This order moves the pool price by %s. You will receive noticeably less than the current spot value suggests. Proceed anyway?</string>
-    <string name="bittensor_validation_price_impact">This order changes the pool price by more than 1%. Do you want to continue?</string>
     <string name="bittensor_exchange_rate">Swap rate</string>
     <string name="bittensor_you_will_earn">You will earn</string>
     <string name="bittensor_avg_buy_price_per">per %1$s</string>
@@ -3060,7 +3058,6 @@
     <string name="bittensor_position_details">Position details</string>
     <string name="bittensor_submission_unknown_title">Transaction status unknown</string>
     <string name="bittensor_submission_unknown_description">The transaction may have been included, but its result could not be verified. Check your positions and transaction history before starting another operation.</string>
-    <string name="bittensor_exit_position_changed">The full position amount has changed. Review the withdrawal again.</string>
     <string name="bittensor_exit_position_changed_title">Staking data may be out of date</string>
     <string name="bittensor_exit_below_minimum">You can\'t unstake less than the network minimum value (%s) unless you unstake everything.</string>
     <string name="bittensor_exit_exceeds_available">You can unstake at most %s from this validator.</string>

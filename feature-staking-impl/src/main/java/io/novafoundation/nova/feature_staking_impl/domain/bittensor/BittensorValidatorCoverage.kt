@@ -4,7 +4,8 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSubnetCatalogue
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorListedSubnets
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -20,7 +21,7 @@ internal fun bittensorValidatorCoverage(
 
 class BittensorValidatorCoverageInteractor(
     private val delegates: BittensorDelegateSource,
-    private val catalogue: BittensorValidatorSubnetCatalogue,
+    private val catalogue: BittensorSubnetCatalogueRemoteSource,
     private val timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT
 ) {
 
@@ -29,7 +30,7 @@ class BittensorValidatorCoverageInteractor(
         val result = withTimeoutOrNull(timeoutMillis) {
             coroutineScope {
                 val permits = async { delegates.validatorPermits(ChainGeneses.BITTENSOR, hotkey) }
-                val listed = async { catalogue.subnets() }
+                val listed = async { mapBittensorListedSubnets(catalogue.catalogue()) }
                 CoverageResult(bittensorValidatorCoverage(permits.await(), listed.await()))
             }
         } ?: throw BittensorTimeoutException("Validator coverage")

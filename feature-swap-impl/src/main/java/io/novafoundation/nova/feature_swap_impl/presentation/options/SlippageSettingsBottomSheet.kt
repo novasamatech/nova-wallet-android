@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
  * Slippage for flows that pass their own [SlippageSettingsPayload] (Bittensor staking): a content-sized sheet with a single
  * Done action, as on iOS. The full-screen swap settings stay on [SwapOptionsFragment].
  */
-class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SwapOptionsViewModel, FragmentSlippageSettingsSheetBinding>() {
+class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SlippageSettingsViewModel, FragmentSlippageSettingsSheetBinding>() {
 
     companion object {
 
@@ -57,12 +57,12 @@ class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SwapOptionsViewModel
             requireContext(),
             SwapFeatureApi::class.java
         )
-            .swapOptions()
-            .create(this, argument<SlippageSettingsPayload>(KEY_PAYLOAD))
+            .slippageSettings()
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
-    override fun subscribe(viewModel: SwapOptionsViewModel) {
+    override fun subscribe(viewModel: SlippageSettingsViewModel) {
         binder.slippageSettingsInput.content.bindTo(viewModel.slippageInput, viewModel.viewModelScope, moveSelectionToEndOnInsertion = true)
         viewModel.slippagePresets.observe(::showPresets)
         viewModel.buttonState.observe(binder.slippageSettingsDone::setState)
@@ -93,7 +93,7 @@ class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SwapOptionsViewModel
         setOnClickListener {
             binder.slippageSettingsInput.content.clearFocus()
             binder.slippageSettingsInput.content.hideSoftKeyboard()
-            viewModel.tipClicked(index)
+            viewModel.presetClicked(index)
         }
     }
 }

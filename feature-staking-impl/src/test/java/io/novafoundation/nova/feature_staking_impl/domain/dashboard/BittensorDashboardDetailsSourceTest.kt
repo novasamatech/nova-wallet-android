@@ -21,6 +21,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
@@ -80,6 +81,8 @@ class BittensorDashboardDetailsSourceTest {
 
     private val source = BittensorDashboardDetailsSource(positions, validators, recommendations, snapshots, logger)
 
+    private val maximumYieldRefreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
     @Test
     fun `timed out root rate settles without a rate until root holdings change`() = runTest {
         prepare()
@@ -91,7 +94,7 @@ class BittensorDashboardDetailsSourceTest {
         `when`(validators.yields(BittensorNetuid.Root)).thenThrow(timeout).thenReturn(mapOf(hotkey to BigDecimal.TEN, otherHotkey to BigDecimal.ONE))
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch {
-            source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) }
+            source.observe(account, listOf(chain), maximumYieldRefreshes).collect { it["chain"]?.let(emitted::add) }
         }
         runCurrent()
         assertEquals(BigInteger.TEN, emitted.last().totalStakeInPlanks)
@@ -116,7 +119,7 @@ class BittensorDashboardDetailsSourceTest {
         prepare()
         val mixed = portfolio.copy(subnets = listOf(BittensorSubnetPosition(subnet, hotkey, BigInteger.TEN)))
         portfolioState.value = BittensorPortfolioState(mixed, BittensorDataStatus.Fresh)
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect() }
         runCurrent()
         portfolioState.value = BittensorPortfolioState(mixed.copy(root = listOf(BittensorRootPosition(hotkey, BigInteger.ONE))), BittensorDataStatus.Fresh)
         advanceTimeBy(120_000)
@@ -130,7 +133,7 @@ class BittensorDashboardDetailsSourceTest {
     fun `actual cancellation is not converted to a missing rate`() = runTest {
         prepare()
         `when`(validators.yields(BittensorNetuid.Root)).thenThrow(CancellationException("cancel"))
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect() }
         runCurrent()
         advanceTimeBy(120_000)
         runCurrent()
@@ -143,7 +146,9 @@ class BittensorDashboardDetailsSourceTest {
     fun `wallet without account still receives maximum yield without position reads`() = runTest {
         prepare()
         `when`(account.accountIdIn(chain)).thenReturn(null)
-        val details = source.observe(account, listOf(chain)).first { it["chain"]?.maximumAnnualPercentageYield != null }.getValue("chain")
+        val details = source.observe(account, listOf(chain), maximumYieldRefreshes)
+            .first { it["chain"]?.maximumAnnualPercentageYield != null }
+            .getValue("chain")
         assertEquals(BigInteger.ZERO, details.totalStakeInPlanks)
         assertEquals(BigDecimal.ONE, details.maximumAnnualPercentageYield)
         verifyNoInteractions(positions)
@@ -152,10 +157,10 @@ class BittensorDashboardDetailsSourceTest {
     @Test
     fun `active stake does not request start staking recommendations`() = runTest {
         prepare()
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect() }
         runCurrent()
         advanceTimeBy(120_000)
-        source.refreshMaximumYield()
+        maximumYieldRefreshes.tryEmit(Unit)
         runCurrent()
         verifyNoInteractions(recommendations)
         job.cancel()
@@ -167,7 +172,7 @@ class BittensorDashboardDetailsSourceTest {
         portfolioState.value = BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh)
         `when`(recommendations.maximumYields()).thenThrow(IllegalStateException("offline")).thenReturn(mapOf(subnet to BigDecimal.ONE))
         val emitted = mutableListOf<BittensorDashboardDetails>()
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
         advanceTimeBy(120_000)
         runCurrent()
@@ -175,7 +180,7 @@ class BittensorDashboardDetailsSourceTest {
         assertFalse(emitted.last().maximumYieldLoading)
         verify(recommendations, times(1)).maximumYields()
 
-        source.refreshMaximumYield()
+        maximumYieldRefreshes.tryEmit(Unit)
         runCurrent()
         assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
         verify(recommendations, times(2)).maximumYields()
@@ -187,7 +192,7 @@ class BittensorDashboardDetailsSourceTest {
         prepare()
         portfolioState.value = BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh)
         val emitted = mutableListOf<BittensorDashboardDetails>()
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
         assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
         verify(recommendations, times(1)).maximumYields()
@@ -206,7 +211,7 @@ class BittensorDashboardDetailsSourceTest {
     @Test
     fun `fresh figures are persisted and shown while positions are unavailable on the next start`() = runTest {
         prepare()
-        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        val first = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect() }
         runCurrent()
         first.cancel()
         val stored = requireNotNull(snapshots.snapshot("chain", coldKey))
@@ -216,7 +221,7 @@ class BittensorDashboardDetailsSourceTest {
         // Cold start offline: positions never load, rates fail.
         portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Stale(IllegalStateException("offline")))
         `when`(validators.yields(BittensorNetuid.Root)).thenThrow(IllegalStateException("offline"))
-        val details = source.observe(account, listOf(chain)).first().getValue("chain")
+        val details = source.observe(account, listOf(chain), maximumYieldRefreshes).first().getValue("chain")
 
         assertEquals(BittensorDashboardDetails.Pricing.KNOWN, details.pricing)
         assertEquals(BigInteger.TEN, details.totalStakeInPlanks)
@@ -228,14 +233,14 @@ class BittensorDashboardDetailsSourceTest {
     @Test
     fun `unpriced held subnets keep the stored total until their price request completes`() = runTest {
         prepare()
-        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        val first = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect() }
         runCurrent()
         first.cancel()
 
         val withSubnet = portfolio.copy(subnets = listOf(BittensorSubnetPosition(subnet, hotkey, BigInteger.TEN)))
         portfolioState.value = BittensorPortfolioState(withSubnet, BittensorDataStatus.Fresh, pricesPending = true)
         val emitted = mutableListOf<BittensorDashboardDetails>()
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
         assertEquals(BittensorDashboardDetails.Pricing.LOADING, emitted.last().pricing)
         assertEquals(BigInteger.TEN, snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
@@ -252,13 +257,13 @@ class BittensorDashboardDetailsSourceTest {
         prepare()
         val noStake = BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh)
         portfolioState.value = noStake
-        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        val first = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect() }
         runCurrent()
         first.cancel()
 
         portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Loading)
         val emitted = mutableListOf<BittensorDashboardDetails>()
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
         assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
         assertFalse(emitted.last().maximumYieldLoading)
@@ -277,7 +282,7 @@ class BittensorDashboardDetailsSourceTest {
         prepare()
         portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Loading)
         val emitted = mutableListOf<BittensorDashboardDetails>()
-        val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
+        val job = backgroundScope.launch { source.observe(account, listOf(chain), maximumYieldRefreshes).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
         assertTrue(emitted.last().maximumYieldLoading)
         verifyNoInteractions(recommendations)
@@ -298,7 +303,7 @@ class BittensorDashboardDetailsSourceTest {
     fun `without a stored snapshot unknown positions stay loading`() = runTest {
         prepare()
         portfolioState.value = BittensorPortfolioState(null, BittensorDataStatus.Loading)
-        val details = source.observe(account, listOf(chain)).first().getValue("chain")
+        val details = source.observe(account, listOf(chain), maximumYieldRefreshes).first().getValue("chain")
         assertEquals(BittensorDashboardDetails.Pricing.LOADING, details.pricing)
     }
 

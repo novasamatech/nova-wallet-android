@@ -3,36 +3,24 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import retrofit2.HttpException
 
 /** Manual buy catalogue only; held positions must never be filtered through this repository. */
 class BittensorSubnetBrowseRepository(
-    private val api: BittensorSubnetCatalogueApi,
-    private val urls: InfrastructureUrls,
+    private val catalogueSource: BittensorSubnetCatalogueRemoteSource,
     private val subnets: BittensorSubnetRepository,
     private val availability: BittensorSubnetTradingAvailabilityRepository
 ) {
 
     suspend fun subnets(): List<BittensorSubnet> = coroutineScope {
         val runtime = async { subnets.catalogue() }
-        val response = loadCatalogue()
+        val response = catalogueSource.catalogue()
         val catalogue = runtime.await()
         val candidates = mapBittensorBrowseSubnets(response, catalogue.subnets, chainVerified = catalogue.fromChain)
         val enabled = availability.enabledSubnets(candidates.map { it.id })
         candidates.filter { it.id in enabled }
-    }
-
-    private suspend fun loadCatalogue(): BittensorSubnetCatalogueRemote {
-        val base = requireNotNull(urls.baseUrl())
-        require(base.isHttps)
-        val url = requireNotNull(base.resolve("/v1/bittensor/subnets"))
-        val response = api.subnets(url.toString())
-        if (!response.isSuccessful) throw HttpException(response)
-        return requireNotNull(response.body())
     }
 }
 

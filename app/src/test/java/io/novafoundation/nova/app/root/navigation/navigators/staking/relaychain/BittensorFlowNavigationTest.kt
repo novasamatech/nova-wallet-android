@@ -137,6 +137,7 @@ class BittensorFlowNavigationTest {
     fun `staking deep link is ignored over screens iOS presents modally`() {
         assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.balanceDetailFragment, R.id.transferDetailFragment)))
         assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.manage_tokens_graph, R.id.manageTokensFragment)))
+        assertFalse(canPresentOverSplitScreen(listOf(R.id.split_screen_nav_graph, R.id.mainFragment, R.id.switchWalletFragment)))
         assertFalse(
             canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.referendum_details_graph, R.id.referendumDetailsFragment, R.id.referendumVoters))
         )

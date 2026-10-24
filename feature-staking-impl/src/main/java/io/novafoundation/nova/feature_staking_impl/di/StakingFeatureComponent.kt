@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.di.BittensorRootClaimComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di.BittensorStakeConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di.BittensorDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.di.BittensorSelectUnstakePositionComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di.BittensorExitAmountComponent
@@ -318,6 +319,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
         fun create(
             @BindsInstance unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
+            @BindsInstance portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
             @BindsInstance bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
             @BindsInstance slippageSettingsCommunicator: SlippageSettingsCommunicator,
             @BindsInstance router: StakingRouter,

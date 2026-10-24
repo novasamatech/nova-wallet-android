@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortf
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRuntimePriceSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
@@ -77,6 +78,7 @@ import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorExitV
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
@@ -112,13 +114,9 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import java.util.concurrent.TimeUnit
 import javax.inject.Named
-import okhttp3.OkHttpClient
 
 private const val SERVICE_FEE_BENEFICIARY = "BittensorServiceFeeBeneficiary"
-
-private const val CONFIG_REQUEST_TIMEOUT_SECONDS = 30L
 
 @Module(includes = [BittensorStakeValidationsModule::class, BittensorExitValidationsModule::class, BittensorClaimValidationsModule::class])
 class BittensorModule {
@@ -187,8 +185,9 @@ class BittensorModule {
         repository: BittensorSubnetValidatorRepository,
         chainRegistry: ChainRegistry,
         alphaYields: BittensorAlphaYieldRepository,
-        backend: BittensorValidatorBackend
-    ) = BittensorValidatorInteractor(repository, chainRegistry, alphaYields, backend)
+        backend: BittensorValidatorBackend,
+        subnetCatalogue: BittensorSubnetCatalogueRemoteSource
+    ) = BittensorValidatorInteractor(repository, chainRegistry, alphaYields, backend, subnetCatalogue)
 
     @Provides
     fun provideBittensorAmountFormatter(tokenFormatter: TokenFormatter, fiatFormatter: FiatFormatter, resources: ResourceManager) =
@@ -210,21 +209,12 @@ class BittensorModule {
     @FeatureScope
     fun provideBittensorValidatorSource(
         backend: BittensorValidatorBackend,
-        validators: BittensorSubnetValidatorRepository,
         logger: Logger
     ): BittensorRootValidatorSource =
-        RemoteBittensorRootValidatorSource(backend, validators, logger)
+        RemoteBittensorRootValidatorSource(backend, logger)
 
-    // iOS gives the config request a 30 second timeout; the shared client times out after 20 seconds.
     @Provides
-    fun provideBittensorConfigApi(okHttpClient: OkHttpClient): BittensorConfigApi {
-        val client = okHttpClient.newBuilder()
-            .connectTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .readTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .writeTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .build()
-        return NetworkApiCreator(client, "https://placeholder.com").create(BittensorConfigApi::class.java)
-    }
+    fun provideBittensorConfigApi(apiCreator: NetworkApiCreator): BittensorConfigApi = apiCreator.create(BittensorConfigApi::class.java)
 
     @Provides
     @FeatureScope
@@ -242,9 +232,8 @@ class BittensorModule {
         runtimeCalls: MultiChainRuntimeCallsApi,
         configRepository: BittensorConfigRepository,
         swapSource: BittensorSwapSource,
-        catalogueApi: BittensorSubnetCatalogueApi,
-        infrastructureUrls: InfrastructureUrls
-    ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueApi, infrastructureUrls)
+        catalogueSource: BittensorSubnetCatalogueRemoteSource
+    ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueSource)
 
     @Provides
     @FeatureScope
@@ -355,6 +344,11 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
+    fun provideBittensorSubnetCatalogueRemoteSource(api: BittensorSubnetCatalogueApi, infrastructureUrls: InfrastructureUrls) =
+        BittensorSubnetCatalogueRemoteSource(api, infrastructureUrls)
+
+    @Provides
+    @FeatureScope
     fun provideBittensorRuntimePriceSource(runtimeCalls: MultiChainRuntimeCallsApi) = BittensorRuntimePriceSource(runtimeCalls)
 
     @Provides
@@ -364,11 +358,10 @@ class BittensorModule {
     @Provides
     @FeatureScope
     fun provideBittensorPortfolioPriceRepository(
-        api: BittensorSubnetCatalogueApi,
-        infrastructureUrls: InfrastructureUrls,
+        catalogueSource: BittensorSubnetCatalogueRemoteSource,
         runtimePrices: BittensorRuntimePriceSource,
         logger: Logger
-    ): BittensorPortfolioPriceRepository = RealBittensorPortfolioPriceRepository(api, infrastructureUrls, runtimePrices, logger)
+    ): BittensorPortfolioPriceRepository = RealBittensorPortfolioPriceRepository(catalogueSource, runtimePrices, logger)
 
     @Provides
     @FeatureScope
@@ -417,6 +410,7 @@ class BittensorModule {
         accountRepository: AccountRepository,
         positionRepository: BittensorPositionRepository,
         validatorSource: BittensorRootValidatorSource,
+        presetValidatorInteractor: BittensorPresetValidatorInteractor,
         logger: Logger
     ): BittensorStakingRepository = RealBittensorStakingRepository(
         chainRegistry = chainRegistry,
@@ -424,6 +418,7 @@ class BittensorModule {
         accountRepository = accountRepository,
         positionRepository = positionRepository,
         validatorSource = validatorSource,
+        presetValidatorInteractor = presetValidatorInteractor,
         logger = logger
     )
 

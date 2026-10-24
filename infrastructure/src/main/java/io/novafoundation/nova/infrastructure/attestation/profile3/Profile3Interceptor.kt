@@ -161,7 +161,7 @@ class Profile3NetworkAdmission(private val provider: Profile3AccessTokenProvider
  * Whether the backend denied the bearer token of this failed call. For a replayable request [Profile3Interceptor] returns
  * that answer only after sending it again with a fresh token, so the backend keeps denying this client's tokens.
  */
-fun HttpException.isProfile3BearerDenial(): Boolean {
+internal fun HttpException.isProfile3BearerDenial(): Boolean {
     val response = response() ?: return false
     if (code() != 401 || !response.headers().values("WWW-Authenticate").isBearerDenial()) return false
     return response.raw().request.method == "HEAD" || response.errorBody()?.contentType()?.subtype == "json" && peekErrorCode() == "invalid_token"

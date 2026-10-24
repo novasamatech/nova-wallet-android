@@ -73,6 +73,7 @@ class BittensorDetailsViewModel(
     private val analytics: AnalyticsService,
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
     private val router: StakingRouter,
+    private val portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
     private val resources: ResourceManager,
     private val amountFormatter: BittensorAmountFormatter,
     private val rowMapper: BittensorPortfolioRowMapper,
@@ -115,8 +116,8 @@ class BittensorDetailsViewModel(
 
     init {
         // A finished flow that returns here reports the opening again, as iOS `reopen(from: .result)`.
-        router.bittensorPortfolioReopenings
-            .onEach { unreportedOpenSource.value = it }
+        portfolioReopenCommunicator.responseFlow
+            .onEach { unreportedOpenSource.value = it.source }
             .launchIn(this)
 
         combine(portfolio, unreportedOpenSource) { data, source ->

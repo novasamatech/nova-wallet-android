@@ -46,6 +46,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockingDetails
 import org.mockito.Mockito.verify
@@ -96,7 +97,7 @@ class StakingDashboardDeepLinkTest {
         val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCED)
         val dashboard = StakingDashboard(emptyList(), listOf(option))
         dashboardState.value = ExtendedLoadingState.Loaded(dashboard)
-        `when`(interactor.stakingDashboardFlow()).thenReturn(dashboardState)
+        `when`(interactor.stakingDashboardFlow(any() ?: emptyFlow())).thenReturn(dashboardState)
 
         viewModel = StakingDashboardViewModel(
             interactor = interactor,

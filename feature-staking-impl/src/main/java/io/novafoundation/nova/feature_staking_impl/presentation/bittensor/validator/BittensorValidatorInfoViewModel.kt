@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSubnetCatalogue
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverage
@@ -52,7 +51,6 @@ class BittensorValidatorInfoViewModel(
     private val validatorInteractor: BittensorValidatorInteractor,
     private val coverageInteractor: BittensorValidatorCoverageInteractor,
     private val subnetInteractor: BittensorSubnetInteractor,
-    private val subnetCatalogue: BittensorValidatorSubnetCatalogue,
     private val addressIconGenerator: AddressIconGenerator,
     private val amountFormatter: BittensorAmountFormatter,
     private val tokenFormatter: TokenFormatter,
@@ -156,7 +154,7 @@ class BittensorValidatorInfoViewModel(
     private fun stakeAmounts(reportedStake: BigDecimal?): Flow<AmountModel?> = flow {
         var emitted = false
         val amounts = flow<AmountModel?> {
-            val stake = reportedStake?.let { nativeStake(it) }
+            val stake = reportedStake?.let { validatorInteractor.stakeInNative(netuid, it) }
             if (stake == null) {
                 emit(null)
                 return@flow
@@ -180,14 +178,6 @@ class BittensorValidatorInfoViewModel(
                     if (!emitted) emit(null)
                 }
         )
-    }
-
-    /** Root stake is TAO; subnet stake is valued at the FRESH backend price, as iOS values it on this screen. */
-    private suspend fun nativeStake(reportedStake: BigDecimal): BigDecimal? = when (val netuid = netuid) {
-        BittensorNetuid.Root -> reportedStake
-        is BittensorNetuid.Subnet -> subnetCatalogue.freshPrice(netuid)?.let { price ->
-            reportedStake * price.toBigDecimal(validatorInteractor.chain().utilityAsset.precision.value)
-        }
     }
 
     private fun formatReward(rate: BigDecimal?) = BittensorValidatorRewardUi(

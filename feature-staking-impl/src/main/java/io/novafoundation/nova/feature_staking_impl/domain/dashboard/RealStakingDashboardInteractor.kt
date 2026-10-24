@@ -51,16 +51,25 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 
 private const val BITTENSOR_DETAILS_CACHE = "StakingDashboard.BittensorDetails"
@@ -85,7 +94,7 @@ class RealStakingDashboardInteractor(
         }
     }
 
-    override fun stakingDashboardFlow(): Flow<ExtendedLoadingState<StakingDashboard>> {
+    override fun stakingDashboardFlow(maximumYieldRefreshes: Flow<Unit>): Flow<ExtendedLoadingState<StakingDashboard>> {
         return flow {
             val stakingChains = chainRegistry.stakingChainsById()
             val knownStakingAssets = stakingChains.knownStakingAssets()
@@ -103,7 +112,7 @@ class RealStakingDashboardInteractor(
                 val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
 
                 val pricedDashboard = combine(noPriceDashboardFlow, assetsFlow, ::addPricesToDashboard)
-                combine(pricedDashboard, bittensorDetailsFlow(metaAccount, stakingChains)) { dashboard, details ->
+                combine(pricedDashboard, bittensorDetailsFlow(metaAccount, stakingChains, maximumYieldRefreshes)) { dashboard, details ->
                     dashboard.map { it.withBittensorDetails(details) }
                 }
             }
@@ -128,7 +137,7 @@ class RealStakingDashboardInteractor(
                 }
                 val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
                 val dashboardFlow = combine(noPriceDashboardFlow, assetsFlow, dApps, ::combineNoMoreOptionsInfo)
-                combine(dashboardFlow, bittensorDetailsFlow(metaAccount, stakingChains)) { options, details ->
+                combine(dashboardFlow, bittensorDetailsFlow(metaAccount, stakingChains, maximumYieldRefreshes = emptyFlow())) { options, details ->
                     MoreStakingOptions(options.inAppStaking.map { it.withBittensorDetails(details) }, options.browserStaking)
                 }
             }
@@ -136,21 +145,29 @@ class RealStakingDashboardInteractor(
         }
     }
 
-    override fun refreshMaximumYields() {
-        bittensorDetailsSource.refreshMaximumYield()
+    // The dashboard and its More options show the same Bittensor figures: one observation serves both,
+    // so its requests are not doubled, and refreshes reach it from each screen observing it.
+    private fun bittensorDetailsFlow(
+        metaAccount: MetaAccount,
+        stakingChains: ChainsById,
+        maximumYieldRefreshes: Flow<Unit>
+    ): Flow<Map<String, BittensorDashboardDetails>> = flow {
+        coroutineScope {
+            val observation = computationalCache.useCache(BITTENSOR_DETAILS_CACHE, this) { observeBittensorDetails(stakingChains) }
+            maximumYieldRefreshes.onEach(observation.maximumYieldRefreshes::emit).launchIn(this)
+            emitAll(observation.details.filter { (metaId, _) -> metaId == metaAccount.id }.map { (_, details) -> details })
+        }
     }
 
-    // The dashboard and its More options show the same Bittensor figures: one observation serves both,
-    // so its requests are not doubled.
-    private fun bittensorDetailsFlow(metaAccount: MetaAccount, stakingChains: ChainsById): Flow<Map<String, BittensorDashboardDetails>> = flow {
-        coroutineScope {
-            val shared = computationalCache.useSharedFlow(BITTENSOR_DETAILS_CACHE, this) {
-                accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
-                    bittensorDetailsSource.observe(account, stakingChains.values).map { details -> account.id to details }
-                }
+    private fun CoroutineScope.observeBittensorDetails(stakingChains: ChainsById): BittensorDetailsObservation {
+        val maximumYieldRefreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        val details = accountRepository.selectedMetaAccountFlow()
+            .flatMapLatest { account ->
+                bittensorDetailsSource.observe(account, stakingChains.values, maximumYieldRefreshes).map { details -> account.id to details }
             }
-            emitAll(shared.filter { (metaId, _) -> metaId == metaAccount.id }.map { (_, details) -> details })
-        }
+            .shareIn(this, SharingStarted.Eagerly, replay = 1)
+
+        return BittensorDetailsObservation(maximumYieldRefreshes, details)
     }
 
     private fun WalletRepository.supportedAssetsByIdFlow(metaId: Long, chainAssets: List<Chain.Asset>): Flow<Map<FullChainAssetId, Asset>> {
@@ -509,5 +526,10 @@ class RealStakingDashboardInteractor(
     private class NoPriceMoreStakingOptions(
         val noStake: List<NoPriceStakingDashboardOption<NoBalanceNoStake>>,
         val notYetResolved: List<NoPriceStakingDashboardOption<NotYetResolved>>
+    )
+
+    private class BittensorDetailsObservation(
+        val maximumYieldRefreshes: MutableSharedFlow<Unit>,
+        val details: SharedFlow<Pair<Long, Map<String, BittensorDashboardDetails>>>
     )
 }

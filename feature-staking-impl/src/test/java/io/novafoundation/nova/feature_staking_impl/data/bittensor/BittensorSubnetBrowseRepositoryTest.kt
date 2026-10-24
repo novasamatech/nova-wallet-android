@@ -95,7 +95,7 @@ class BittensorSubnetBrowseRepositoryTest {
         val storage = DisabledStorage(storageDelegate)
         val availability = BittensorSubnetTradingAvailabilityRepository(storage)
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
-        val repository = BittensorSubnetBrowseRepository(api, urls, runtime, availability)
+        val repository = BittensorSubnetBrowseRepository(BittensorSubnetCatalogueRemoteSource(api, urls), runtime, availability)
         val row = BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend", "S", 10.toBigInteger(), "2000")
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
         val components = BittensorSubnetCatalogueRemote.Components(component, component)

@@ -262,7 +262,6 @@ class BittensorValidatorBackendTest {
         )
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        val validators = org.mockito.Mockito.mock(BittensorSubnetValidatorRepository::class.java)
         val logger = org.mockito.Mockito.mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
         val chain = org.mockito.Mockito.mock(io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain::class.java)
         org.mockito.Mockito.`when`(chain.addressPrefix).thenReturn(42)
@@ -272,7 +271,7 @@ class BittensorValidatorBackendTest {
             listOf(BittensorRootValidatorRemote.Validator(chain.addressOf(hotkey.value), "Synthetic", api.root!!.items!!.single().stakeYield, "100")),
             rootMeta()
         )
-        val source = RemoteBittensorRootValidatorSource(backend, validators, logger)
+        val source = RemoteBittensorRootValidatorSource(backend, logger)
         assertEquals(BigDecimal("7.25"), source.annualPercentageYield(chain, validator))
     }
 
@@ -427,13 +426,12 @@ class BittensorValidatorBackendTest {
         val api = Api("no-store")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        val validators = org.mockito.Mockito.mock(BittensorSubnetValidatorRepository::class.java)
         val logger = org.mockito.Mockito.mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
         val chain = org.mockito.Mockito.mock(io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain::class.java)
         org.mockito.Mockito.`when`(chain.addressPrefix).thenReturn(42)
         val hotkey = io.novafoundation.nova.common.address.AccountIdKey(ByteArray(32) { 1 })
         val validator = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator(hotkey, "Validator")
-        val source = RemoteBittensorRootValidatorSource(backend, validators, logger)
+        val source = RemoteBittensorRootValidatorSource(backend, logger)
         val address = chain.addressOf(hotkey.value)
         val yield = gson.fromJson("""{"h24":{"apy":"99"},"d30":{"apy":"7.25"}}""", BittensorRootValidatorRemote.Yield::class.java)
         for (stake in listOf(null, "0", "-1", "100")) {

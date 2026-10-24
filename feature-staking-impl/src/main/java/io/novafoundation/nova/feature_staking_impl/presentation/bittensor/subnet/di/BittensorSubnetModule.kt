@@ -9,11 +9,10 @@ import androidx.fragment.app.Fragment
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioRowInteractor
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import androidx.lifecycle.ViewModel
@@ -39,11 +38,10 @@ class BittensorSubnetModule {
 
     @Provides
     fun browseRepository(
-        api: BittensorSubnetCatalogueApi,
-        urls: InfrastructureUrls,
+        catalogueSource: BittensorSubnetCatalogueRemoteSource,
         repository: BittensorSubnetRepository,
         availability: BittensorSubnetTradingAvailabilityRepository
-    ) = BittensorSubnetBrowseRepository(api, urls, repository, availability)
+    ) = BittensorSubnetBrowseRepository(catalogueSource, repository, availability)
 
     @Provides
     fun browseRowInteractor(
