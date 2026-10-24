@@ -41,8 +41,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.launchUnit
-import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
-import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.R
@@ -79,7 +77,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.f
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -96,8 +93,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.transformWhile
 
 class BittensorSubnetDetailsViewModel(
     private val analytics: AnalyticsService,
@@ -118,7 +116,6 @@ class BittensorSubnetDetailsViewModel(
     private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val addressIconGenerator: AddressIconGenerator,
-    private val automaticInteractionGate: AutomaticInteractionGate,
     private val replaceAmount: Boolean,
     initialValidatorAddress: String?,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
@@ -129,7 +126,7 @@ class BittensorSubnetDetailsViewModel(
 
     private var completesOnValidatorSelection = false
 
-    // Only details opened from the start picker share its abandonment, as iOS hands them the picker's tracker.
+    // Only details opened from the start picker share its abandonment.
     private val tracksAbandonment = analyticsSource == SubnetDetailsSource.PICKER && !replaceAmount
 
     // A validator list opened from here reports the abandonment itself while it is open.
@@ -145,9 +142,6 @@ class BittensorSubnetDetailsViewModel(
     private val priceServerReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PRICE_SERVER, BittensorScreen.SUBNET_DETAILS)
 
     val retryEvents = retryController.events
-
-    // As on iOS, a subnet without a market listing stays unlisted for this screen: no period or currency change loads it again.
-    private val isUnlisted = AtomicBoolean(false)
 
     private val subnetState = retryController.observe(
         step = "subnet",
@@ -186,7 +180,7 @@ class BittensorSubnetDetailsViewModel(
     val favorite = combine(subnet, bittensorSubnetInteractor.observeFavorites()) { subnet, favorites -> subnet in favorites }
         .shareInBackground()
 
-    val validatorCount = quietRead("subnet validator count") {
+    val validatorCount = quietlyLoaded("subnet validator count") {
         bittensorSubnetStakingInteractor.validatorCount(subnetId).toString()
     }
         .shareInBackground()
@@ -198,7 +192,7 @@ class BittensorSubnetDetailsViewModel(
             flowOf<ExtendedLoadingState<BittensorSubnetEmission?>> { state.map { null } }
         } else {
             val reference = BittensorSubnetReference(subnet.id, registration)
-            quietRead<BittensorSubnetEmission?>("subnet emission") { subnetParametersInteractor.emission(reference) }
+            quietlyLoaded<BittensorSubnetEmission?>("subnet emission") { subnetParametersInteractor.emission(reference) }
         }
     }
         .shareInBackground()
@@ -294,6 +288,10 @@ class BittensorSubnetDetailsViewModel(
 
     private val chartPeriods = BittensorSubnetChartPeriod.entries
 
+    /** The period the chart shows; the view switches a chip on tap, before [selectPeriod] may ignore the switch. */
+    val selectedPeriodIndex: Int
+        get() = chartPeriods.indexOf(period.value)
+
     private val chartData = combine(
         asset,
         period
@@ -304,6 +302,11 @@ class BittensorSubnetDetailsViewModel(
         .flatMapLatest { request ->
             chartHistory(request).map { SubnetChartData(request.period, it) }
         }
+        // A subnet without a market listing stays unlisted for this screen: no period or currency change loads it again.
+        .transformWhile { data ->
+            emit(data)
+            !data.isUnlisted
+        }
         .shareInBackground()
 
     private val ageState = subnetState.flatMapLatest { state ->
@@ -311,7 +314,7 @@ class BittensorSubnetDetailsViewModel(
         if (subnet == null) {
             flowOf { state.map { null } }
         } else {
-            quietRead("subnet age") { subnetSafetyInteractor.age(subnet) }
+            quietlyLoaded("subnet age") { subnetSafetyInteractor.age(subnet) }
         }
     }
         .shareInBackground()
@@ -347,19 +350,27 @@ class BittensorSubnetDetailsViewModel(
 
     private val selectedValidatorAddress = MutableStateFlow(initialValidatorAddress)
 
-    /** The automatic preset once loaded, kept after the user picks another validator (iOS `recommendedHotkey`). */
-    private var presetAddress: String? = null
+    /**
+     * The same preset the stake setup applies (NW-2356), loaded while no validator is chosen. Once loaded it is kept after the user
+     * picks another validator.
+     */
+    private val presetState = selectedValidatorAddress.flatMapLatest { address ->
+        if (address == null) quietlyLoaded("subnet validator preset") { presetValidatorInteractor.preset(subnetId).preset } else emptyFlow()
+    }
+        .shareInBackground()
 
     private val validatorCandidates = selectedValidatorAddress.flatMapLatest { address ->
         if (address != null) {
             selectedValidatorPreviews(address).withSafeLoading()
         } else {
-            quietRead("subnet validator preset") { automaticValidatorPreviews() }
+            presetState.map { state ->
+                state.map { preset -> listOfNotNull(preset?.let { BittensorValidatorPreview(it.validator, canPreselect = true) }) }
+            }
         }
     }
         .shareInBackground()
 
-    // As on iOS, the rate is resolved once: a failure shows "—" and is not requested again.
+    // The rate is resolved once: a failure shows "—" and is not requested again.
     private val validatorYields = flowOf { validatorInteractor.yields(subnetId) }
         .withSafeLoading()
         .onError { logFailure("subnet validator preview APY", it) }
@@ -372,7 +383,7 @@ class BittensorSubnetDetailsViewModel(
 
     val isValidatorLoading = validatorState.map { it.isLoading() }.shareInBackground()
 
-    // As on iOS, "Use this subnet" waits for the automatic preset; a validator the user chose is usable at once.
+    // "Use this subnet" waits for the automatic preset; a validator the user chose is usable at once.
     val canContinue = combine(subnetState, selectedValidatorAddress, validatorState) { subnet, address, validator ->
         subnet.isLoaded() && (address != null || !validator.isLoading())
     }
@@ -428,7 +439,7 @@ class BittensorSubnetDetailsViewModel(
         openValidatorSelection(address, completesOnSelection = false)
     }
 
-    private fun openValidatorSelection(address: String?, completesOnSelection: Boolean) {
+    private suspend fun openValidatorSelection(address: String?, completesOnSelection: Boolean) {
         completesOnValidatorSelection = completesOnSelection
         validatorListOpen = true
         validatorCommunicator.openRequest(
@@ -436,7 +447,7 @@ class BittensorSubnetDetailsViewModel(
                 subnetId.value,
                 address,
                 selectionState,
-                recommendedAddress = presetAddress,
+                recommendedAddress = presetAddress(),
                 tracksAbandonment = tracksAbandonment
             )
         )
@@ -477,12 +488,8 @@ class BittensorSubnetDetailsViewModel(
         chartSelection.value = selection
     }
 
-    /** The period the chart shows; the view switches a chip on tap, before [selectPeriod] may ignore the switch. */
-    val selectedPeriodIndex: Int
-        get() = chartPeriods.indexOf(period.value)
-
     fun selectPeriod(index: Int) {
-        if (isUnlisted.get()) return
+        if (chartData.replayCache.lastOrNull()?.isUnlisted == true) return
         chartSelection.value = null
         chartPeriods.getOrNull(index)
             ?.let { period.value = it }
@@ -504,14 +511,14 @@ class BittensorSubnetDetailsViewModel(
         if (!canContinue.first()) return@launchUnit
         val address = currentValidatorAddress()
         if (address == null) {
-            // As on iOS, without a validator the list opens first and the stake continues once one is chosen there.
+            // Without a validator the list opens first and the stake continues once one is chosen there.
             openValidatorSelection(null, completesOnSelection = true)
             return@launchUnit
         }
         openAmount(address, isPreset = selectedValidatorAddress.value == null)
     }
 
-    private fun openAmount(address: String, isPreset: Boolean) {
+    private suspend fun openAmount(address: String, isPreset: Boolean) {
         selectionState = selectionState.copy(flowContinued = true)
         analytics.track(
             BittensorAnalyticsEvent.TypeSelected(
@@ -526,24 +533,18 @@ class BittensorSubnetDetailsViewModel(
                 subnetId.value,
                 address,
                 validatorIsPreset = isPreset,
-                recommendedAddress = presetAddress,
+                recommendedAddress = presetAddress(),
                 replaceAmount = replaceAmount,
                 selectionState = selectionState
             )
         )
     }
 
-    /**
-     * The same preset the stake setup applies (NW-2356), so the card here and the amount screen agree.
-     * Without one the card asks to choose a validator, as on iOS.
-     */
-    private suspend fun automaticValidatorPreviews(): List<BittensorValidatorPreview> {
-        val preset = presetValidatorInteractor.preset(subnetId).preset ?: return emptyList()
-        presetAddress = validatorInteractor.chain().addressOf(preset.validator.hotkey.value)
-        return listOf(BittensorValidatorPreview(preset.validator, canPreselect = true))
+    private suspend fun presetAddress(): String? {
+        val preset = presetState.replayCache.lastOrNull()?.dataOrNull ?: return null
+        return validatorInteractor.chain().addressOf(preset.validator.hotkey.value)
     }
 
-    /** A chosen validator stays on the card when its name cannot be loaded, as iOS shows the validator it was handed. */
     private fun selectedValidatorPreviews(address: String): Flow<List<BittensorValidatorPreview>> = flowOf {
         validatorInteractor.previews(subnetId, address)
     }
@@ -590,12 +591,9 @@ class BittensorSubnetDetailsViewModel(
             request.currency,
             request.period
         )
-            .also { if (it == null) isUnlisted.set(true) }
     }
 
     private fun chartHistory(request: BittensorSubnetChartRequest): Flow<ExtendedLoadingState<List<BittensorSubnetPricePoint>?>> {
-        if (isUnlisted.get()) return flowOf { ExtendedLoadingState.Loaded(null) }
-
         return retryController.observe(
             step = "subnet chart",
             analytics = priceServerReads,
@@ -617,7 +615,7 @@ class BittensorSubnetDetailsViewModel(
             is ExtendedLoadingState.Loading -> PriceChartModel.Loading(label)
             is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, resources.getString(R.string.bittensor_price_history_failed))
             is ExtendedLoadingState.Loaded -> {
-                // Unlisted subnets and windows with fewer than two points show the iOS empty state; the spot price still comes from the pool.
+                // Unlisted subnets and windows with fewer than two points show the empty state; the spot price still comes from the pool.
                 if (state.data.size < 2) return PriceChartModel.Empty(label, unavailableChartMessage())
 
                 val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, if (isFiatMode) it.fiat else it.tao) }
@@ -634,25 +632,12 @@ class BittensorSubnetDetailsViewModel(
     private fun unavailableChartMessage(): String = resources.getString(R.string.bittensor_price_history_unavailable) + "\n" +
         resources.getString(R.string.bittensor_price_history_source)
 
-    /**
-     * A read that does not block the screen: as on iOS its failure raises no dialog, and the read is requested again once the app
-     * returns to the foreground.
-     */
-    private fun <T> quietRead(step: String, load: suspend () -> T): Flow<ExtendedLoadingState<T>> = flowOf { load() }
-        .map<T, ExtendedLoadingState<T>> { ExtendedLoadingState.Loaded(it) }
-        .retryWhen { cause, _ ->
-            logFailure(step, cause)
-            emit(ExtendedLoadingState.Error(cause))
-            awaitReturnToForeground()
-            true
+    /** A read that does not block the screen: a failure stays shown until a later attempt succeeds. */
+    private fun <T> quietlyLoaded(step: String, load: suspend () -> T): Flow<ExtendedLoadingState<T>> = retryController.observeQuietly(step, load)
+        .map<Result<T>, ExtendedLoadingState<T>> { attempt ->
+            attempt.fold(onSuccess = { ExtendedLoadingState.Loaded(it) }, onFailure = { ExtendedLoadingState.Error(it) })
         }
         .onStart { emit(ExtendedLoadingState.Loading) }
-
-    // Like iOS didBecomeActive, only a return from the background counts.
-    private suspend fun awaitReturnToForeground() {
-        automaticInteractionGate.isInteractionAllowedFlow.first { allowed -> !allowed }
-        automaticInteractionGate.awaitInteractionAllowed()
-    }
 
     private fun logFailure(step: String, cause: Throwable) {
         logger.log("[BittensorSubnetDetails] Failed to load $step")
@@ -676,6 +661,9 @@ private class SubnetChartData(
 ) {
 
     val points: ExtendedLoadingState<List<BittensorSubnetPricePoint>> = history.map { clipBittensorSubnetHistory(it.orEmpty(), registrationEpochSeconds) }
+
+    val isUnlisted: Boolean
+        get() = history is ExtendedLoadingState.Loaded && history.data == null
 
     fun clipped(registrationEpochSeconds: Long?) = SubnetChartData(period, history, registrationEpochSeconds)
 }

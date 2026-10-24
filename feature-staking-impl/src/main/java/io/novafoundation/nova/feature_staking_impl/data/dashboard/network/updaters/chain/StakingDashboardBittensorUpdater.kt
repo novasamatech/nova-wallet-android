@@ -50,7 +50,7 @@ class StakingDashboardBittensorUpdater(
                 val positions = state.positions
                 if (state.status !is BittensorDataStatus.Fresh || positions == null) return@collect
 
-                // As iOS, rewards are read with every stake state; next to a subnet stake they add Root to the composition.
+                // Rewards are read with every stake state; next to a subnet stake they add Root to the composition.
                 val staked = positions.root.isNotEmpty() || positions.subnets.isNotEmpty()
                 if (staked) savePosition(positions.totalStake, true, coldKey)
 

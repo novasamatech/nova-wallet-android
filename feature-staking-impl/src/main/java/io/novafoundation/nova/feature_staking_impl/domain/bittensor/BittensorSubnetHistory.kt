@@ -34,7 +34,7 @@ internal fun clipBittensorSubnetHistory(points: List<BittensorSubnetPricePoint>,
     return points.filter { it.timestamp >= registrationEpochSeconds }
 }
 
-/** Rounded up to a whole second, so a point is kept exactly when it is not older than the registration (as on iOS). */
+/** Rounded up to a whole second, so a point is kept exactly when it is not older than the registration. */
 internal fun bittensorRegistrationEpochSeconds(age: Duration, nowMillis: Long): Long =
     (nowMillis - age.inWholeMilliseconds + MILLIS_PER_SECOND - 1).floorDiv(MILLIS_PER_SECOND)
 

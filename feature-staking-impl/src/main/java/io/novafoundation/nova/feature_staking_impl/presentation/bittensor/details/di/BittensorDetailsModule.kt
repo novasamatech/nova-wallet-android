@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
-import io.novafoundation.nova.analytics.StakingPortfolioSource
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
 import io.novafoundation.nova.analytics.AnalyticsService
 
 import androidx.fragment.app.Fragment
@@ -35,6 +33,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioRowMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
@@ -86,7 +85,6 @@ class BittensorDetailsModule {
     @IntoMap
     @ViewModelKey(BittensorDetailsViewModel::class)
     fun provideViewModel(
-        fragment: Fragment,
         analytics: AnalyticsService,
         bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
@@ -100,7 +98,8 @@ class BittensorDetailsModule {
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
         rowInteractor: BittensorPortfolioRowInteractor,
         rootClaimInteractor: BittensorRootClaimInteractor,
-        walletGate: BittensorWalletGate
+        walletGate: BittensorWalletGate,
+        portfolioPayload: BittensorPortfolioPayload?
     ): ViewModel = BittensorDetailsViewModel(
         analytics, bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
@@ -115,9 +114,7 @@ class BittensorDetailsModule {
         rowInteractor = rowInteractor,
         rootClaimInteractor = rootClaimInteractor,
         walletGate = walletGate,
-        analyticsSource = StakingPortfolioSource.entries.firstOrNull {
-            it.name == fragment.arguments?.getString(BittensorPortfolioFragment.ANALYTICS_SOURCE)
-        } ?: StakingPortfolioSource.DASHBOARD
+        analyticsSource = requireNotNull(portfolioPayload).source
     )
 
     @Provides

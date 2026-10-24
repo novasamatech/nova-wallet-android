@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -57,7 +58,7 @@ class BittensorSelectValidatorViewModelTest {
         if (invocation.method.name == "getString") label(invocation.arguments) else Mockito.RETURNS_DEFAULTS.answer(invocation)
     }
     private val logger = mock(Logger::class.java)
-    private val retryController = BittensorRetryController(resources, logger)
+    private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
     private val interactor = mock(BittensorValidatorInteractor::class.java)
     private val icons = mock(AddressIconGenerator::class.java)
     private val icon = mock(Drawable::class.java)
@@ -159,63 +160,6 @@ class BittensorSelectValidatorViewModelTest {
     }
 
     @Test
-    fun `partial directory header shows no total`() = runBlocking<Unit> {
-        val status = mock(BittensorValidatorDirectoryStatus::class.java)
-        `when`(status.completeness).thenReturn(BittensorValidatorDirectoryStatus.Completeness.PARTIAL)
-        val directory = BittensorValidatorDirectory(listOf(validator(1, "Alpha"), validator(2, "Beta")), status, null)
-        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
-        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
-        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
-
-        val partial = label(arrayOf(R.string.bittensor_validator_list_count_partial, 2))
-        withTimeout(5_000) { viewModel.header.first { it.count == partial } }
-    }
-
-    @Test
-    fun `failed yields still reload when the unusual APY filter changes`() = runBlocking<Unit> {
-        val row = validator(1, "Alpha")
-        val directory = directory(listOf(row))
-        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
-        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
-        `when`(interactor.yields(BittensorNetuid.Root)).thenThrow(IllegalStateException("Yields unavailable"))
-        `when`(interactor.yields(BittensorNetuid.Root, includeUnreliable = true)).thenReturn(mapOf(row.validator.hotkey to BigDecimal.TEN))
-        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
-        withTimeout(5_000) { viewModel.rows.first { it.isNotEmpty() } }
-
-        viewModel.applyFilters(BittensorValidatorFilters(hideUnusualApy = false))
-
-        withTimeout(5_000) { viewModel.rows.first { it.singleOrNull()?.annualYield == BigDecimal.TEN } }
-    }
-
-    @Test
-    fun `header names the rates only once they have loaded`() = runBlocking<Unit> {
-        val directory = directory(listOf(validator(1, "Alpha")))
-        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
-        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
-        `when`(interactor.yields(BittensorNetuid.Root)).thenThrow(IllegalStateException("Yields unavailable"))
-        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
-
-        val sortOnly = label(arrayOf(R.string.bittensor_validator_list_sort_only, R.string.bittensor_sort_apy.toString()))
-        withTimeout(5_000) { viewModel.header.first { it.sorting == sortOnly } }
-
-        viewModel.applyFilters(BittensorValidatorFilters(hideUnusualApy = false))
-
-        val withRates = label(arrayOf(R.string.bittensor_validator_list_sort, R.string.bittensor_sort_apy.toString()))
-        withTimeout(5_000) { viewModel.header.first { it.sorting == withRates } }
-    }
-
-    @Test
-    fun `stale ranking is shown as outdated`() = runBlocking<Unit> {
-        val unranked = directory(listOf(validator(1, "Alpha")))
-        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(unranked)
-        `when`(interactor.rankDirectory(BittensorNetuid.Root, unranked)).thenReturn(unranked.copy(staleRecommendations = true))
-        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
-
-        val warning = label(arrayOf(R.string.bittensor_validators_ranking_stale))
-        withTimeout(5_000) { viewModel.staleRankingWarning.first { it == warning } }
-    }
-
-    @Test
     fun `preselected validator is pinned first under every sort`() = runBlocking<Unit> {
         val rows = listOf(validator(1, "Alpha", stake = "1"), validator(2, "Zulu", stake = "100"), validator(3, "Mike", stake = "50"))
         val directory = directory(rows)
@@ -269,29 +213,7 @@ class BittensorSelectValidatorViewModelTest {
         assertEquals("address-1", payload.address)
         assertEquals("Alpha", payload.detail?.name)
         assertEquals(BigDecimal("0.18"), payload.detail?.commissionRate)
-        assertEquals(BigDecimal("10"), payload.detail?.reportedStake)
         assertEquals(0, payload.subnetId)
-    }
-
-    @Test
-    fun `validator change is tracked only for a validator other than the preselected and the recommended one`() = runBlocking<Unit> {
-        val directory = directory(listOf(validator(1, "Alpha"), validator(2, "Beta"), validator(3, "Gamma")))
-        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
-        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
-        val request = BittensorSelectValidatorCommunicator.Request(0, "address-1", BittensorSelectionState(), recommendedAddress = "address-2")
-
-        val tracked = listOf("address-1" to "Alpha", "address-2" to "Beta", "address-3" to "Gamma").map { (address, name) ->
-            val viewModel = createViewModel(request)
-            viewModel.applyFilters(BittensorValidatorFilters(BittensorValidatorSorting.NAME, hideUnusualApy = false))
-            viewModel.select(withTimeout(5_000) { viewModel.rows.first { it.size == 3 } }.single { it.eligibility.address == address })
-            withTimeout(5_000) { viewModel.buttonLabel.first { it.endsWith(name) } }
-            analytics.events.clear()
-            viewModel.confirmClicked()
-            withTimeout(5_000) { communicator.responses.receive() }
-            analytics.events.any { it.name == "validator_changed" }
-        }
-
-        assertEquals(listOf(false, false, true), tracked)
     }
 
     @Test

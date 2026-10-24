@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novafoundation.nova.infrastructure.attestation.BackendRefusal
 import io.novafoundation.nova.infrastructure.attestation.backendRefusal
+import io.novafoundation.nova.infrastructure.attestation.causeChain
 import java.net.SocketTimeoutException
 import kotlinx.coroutines.TimeoutCancellationException
 
@@ -43,8 +44,6 @@ fun Throwable.bittensorReadFailureKind(): BittensorReadFailureKind = when (backe
     null -> if (isTimeout()) BittensorReadFailureKind.SLOW_NETWORK else BittensorReadFailureKind.GENERIC
 }
 
-private fun Throwable.isTimeout() = generateSequence(this) { it.cause }
-    .take(MAX_CAUSE_DEPTH)
-    .any { it is BittensorTimeoutException || it is TimeoutCancellationException || it is SocketTimeoutException }
-
-private const val MAX_CAUSE_DEPTH = 16
+private fun Throwable.isTimeout() = causeChain().any {
+    it is BittensorTimeoutException || it is TimeoutCancellationException || it is SocketTimeoutException
+}

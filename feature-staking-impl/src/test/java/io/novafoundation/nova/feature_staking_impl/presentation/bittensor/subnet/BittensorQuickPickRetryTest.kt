@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
@@ -43,7 +44,7 @@ class BittensorQuickPickRetryTest {
 
     private val logger = mock(Logger::class.java)
 
-    private val retryController = BittensorRetryController(resources, logger)
+    private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
 
     private val validatorCommunicator = mock(BittensorSelectValidatorCommunicator::class.java)
 

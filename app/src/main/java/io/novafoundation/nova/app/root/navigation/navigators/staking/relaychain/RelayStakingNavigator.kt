@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.la
 
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 
@@ -409,9 +410,9 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorPortfolio(source: StakingPortfolioSource) {
+    override fun openBittensorPortfolio(payload: BittensorPortfolioPayload) {
         navigationBuilder().action(R.id.action_open_bittensor_portfolio)
-            .setArgs(BittensorPortfolioFragment.sourceBundle(source))
+            .setArgs(BittensorPortfolioFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
@@ -436,7 +437,7 @@ class RelayStakingNavigator(
             }
 
             BittensorFlowExitPlan.OpenPortfolioOverDashboard -> navigationBuilder().action(R.id.action_finish_bittensor_flow_to_portfolio)
-                .setArgs(BittensorPortfolioFragment.sourceBundle(StakingPortfolioSource.RESULT))
+                .setArgs(BittensorPortfolioFragment.getBundle(BittensorPortfolioPayload(StakingPortfolioSource.RESULT)))
                 .navigateInFirstAttachedContext()
         }
     }

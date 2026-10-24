@@ -63,8 +63,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolveSaleCostBasis
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.bittensorAlphaSymbol
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolvedValidatorNames
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.resolvedValidatorNames
 import kotlinx.coroutines.flow.drop
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -165,7 +165,7 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
-    // As iOS on a positions update, the next portfolio update asks again after a failed lookup.
+    // The next portfolio update asks again after a failed lookup.
     private val validatorNames = held.map { positions -> positions.map { it.validatorHotkey }.toSet() }
         .resolvedValidatorNames(
             retries = portfolio.drop(1).map { },
@@ -176,7 +176,7 @@ class BittensorSubnetPositionViewModel(
         ) { hotkeys -> validatorInteractor.validatorNames(subnetId, hotkeys) }
         .shareInBackground()
 
-    // As on iOS, the actions are never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
+    // The actions are never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
     val canAct = combine(
         portfolio,
         held,
@@ -280,7 +280,7 @@ class BittensorSubnetPositionViewModel(
         subnet
     ) { update, assetState, subnet ->
         resolveSaleCostBasis(update, subnetId.value).map { sale ->
-            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token, bittensorAlphaSymbol(subnetId.value, subnet?.symbol))
+            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token, subnet.alphaSymbol(subnetId.value))
         }
     }
         .shareInBackground()
@@ -316,7 +316,7 @@ class BittensorSubnetPositionViewModel(
         val amount = positions.fold(BigInteger.ZERO) { sum, position -> sum + position.alphaInPlanks }
         tokenFormatter.formatToken(
             BigDecimal(amount, BittensorProtocolUnits.ALPHA_PRECISION),
-            TokenSymbol(bittensorAlphaSymbol(subnetId.value, subnet?.symbol))
+            TokenSymbol(subnet.alphaSymbol(subnetId.value))
         ).toString()
     }
         .shareInBackground()
@@ -360,7 +360,7 @@ class BittensorSubnetPositionViewModel(
                     BittensorPositionAction.ValidatorDetails(address),
                     32,
                     isAmountLoading = yields is ExtendedLoadingState.Loading,
-                    // As iOS, the row has no name until the lookup succeeds.
+                    // The row has no name until the lookup succeeds.
                     isTitleLoading = names == null,
                     amountColorRes = bittensorYieldColor(annualYield)
                 )

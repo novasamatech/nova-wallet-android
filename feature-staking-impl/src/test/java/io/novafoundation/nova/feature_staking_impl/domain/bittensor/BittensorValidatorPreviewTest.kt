@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRankedValidatorsRemote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorsRemote
@@ -33,7 +33,7 @@ class BittensorValidatorPreviewTest {
 
     private val backend = mock(BittensorValidatorBackend::class.java)
 
-    private val subnetCatalogue = mock(BittensorSubnetCatalogueRemoteSource::class.java)
+    private val subnetCatalogue = mock(BittensorSubnetCatalogueRepository::class.java)
 
     private val chain = mock(Chain::class.java)
 

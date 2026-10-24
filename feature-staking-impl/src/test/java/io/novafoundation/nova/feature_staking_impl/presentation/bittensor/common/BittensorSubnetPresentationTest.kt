@@ -24,6 +24,11 @@ class BittensorSubnetPresentationTest {
     }
 
     @Test
+    fun `subnet without metadata reads Subnet netuid`() {
+        assertEquals("Subnet 42", null.displayName(42, resources))
+    }
+
+    @Test
     fun `named subnet keeps its name`() {
         val subnet = BittensorSubnet(BittensorNetuid.Subnet(42), "Chutes", "ش", null)
 

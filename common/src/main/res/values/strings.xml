@@ -3019,7 +3019,7 @@
     <string name="bittensor_exit_full_exit">Full exit</string>
     <string name="bittensor_exit_legs_cap">One transaction covers up to %1$d validators. Repeat for the rest.</string>
     <string name="bittensor_exit_locked_title">Stake is locked</string>
-    <string name="bittensor_exit_locked_message">Recently staked TAO is locked by the network. You will be able to unstake in approximately %s.</string>
+    <string name="bittensor_exit_locked_message">Recently staked %1$s is locked by the network. You will be able to unstake in approximately %2$s.</string>
     <string name="bittensor_exit_nothing_available">Your whole position with this validator is locked by the network. Locks release gradually — try again later.</string>
     <string name="bittensor_exit_nothing_available_title">Nothing available to unstake</string>
     <string name="bittensor_exit_received">You will get</string>
@@ -3035,7 +3035,7 @@
     <string name="bittensor_exit_full_position">You withdraw the full position, including rewards accrued before execution.</string>
     <string name="bittensor_multisig_unavailable">Bittensor transactions are not yet available for multisig wallets.</string>
     <string name="bittensor_staking_wallet_unsupported_title">Bittensor staking is not supported for %1$s wallets</string>
-    <string name="bittensor_staking_wallet_unsupported_message">To stake TAO, please switch to a different type of wallet.</string>
+    <string name="bittensor_staking_wallet_unsupported_message">To stake %1$s, please switch to a different type of wallet.</string>
     <string name="bittensor_claim_action">Claim root rewards</string>
     <string name="bittensor_claim_redeemable">You will get</string>
     <string name="bittensor_claim_forfeited">Estimated forfeiture</string>

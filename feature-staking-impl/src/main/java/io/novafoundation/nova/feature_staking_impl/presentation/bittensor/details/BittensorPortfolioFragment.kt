@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
-import android.os.Bundle
-import io.novafoundation.nova.analytics.StakingPortfolioSource
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -17,11 +16,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
 
     companion object {
-        const val ANALYTICS_SOURCE = "bittensor_portfolio_analytics_source"
+        private const val PAYLOAD = "BittensorPortfolioFragment.Payload"
 
-        fun sourceBundle(source: StakingPortfolioSource) = Bundle().apply {
-            putString(ANALYTICS_SOURCE, source.name)
-        }
+        fun getBundle(payload: BittensorPortfolioPayload) = bundleOf(PAYLOAD to payload)
     }
 
     private val imageLoader by lazy {
@@ -36,7 +33,7 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
             .bittensorDetailsComponentFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 

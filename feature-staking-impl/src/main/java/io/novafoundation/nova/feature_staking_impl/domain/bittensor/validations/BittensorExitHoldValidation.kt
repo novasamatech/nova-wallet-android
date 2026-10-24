@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 
-/** Blocks left on the root hold that refuses the withdrawal; iOS checks the plan's validators in order and names the first held one. */
+/** Blocks left on the root hold that refuses the withdrawal, of the first held validator of the plan. */
 fun BittensorExitValidationPayload.rootHoldBlocks(): BigInteger {
     val holds = quote.plan?.slices?.mapNotNull { preflight.groupMembers[it.hotkey]?.holdRemaining }
     return holds?.firstOrNull { it.isPositive() } ?: holds?.maxOrNull()

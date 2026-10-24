@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 
-/** iOS `SubtensorUnstakeSelection`: one validator of the group, or every sellable validator. */
+/** One validator of the group, or every sellable validator. */
 sealed interface BittensorExitSelection {
 
     data class Validator(val hotkey: AccountIdKey) : BittensorExitSelection
@@ -12,7 +12,7 @@ sealed interface BittensorExitSelection {
     data object All : BittensorExitSelection
 }
 
-/** iOS `SubtensorUnstakeFloors`: the smallest slice worth withdrawing and the nominator remainder the network sweeps. */
+/** The smallest slice worth withdrawing and the nominator remainder the network sweeps. */
 data class BittensorExitFloors(val withdrawal: BigInteger, val sweep: BigInteger)
 
 /** One position of the group; a root hold leaves nothing drawable until it ends. */
@@ -38,7 +38,7 @@ data class BittensorExitBasisPosition(
     }
 }
 
-/** iOS `SubtensorGroupUnstakeBasis`: the positions one withdrawal may draw from, capped by the coldkey's availability. */
+/** The positions one withdrawal may draw from, capped by the coldkey's availability. */
 data class BittensorExitBasis(
     val total: BigInteger,
     val available: BigInteger,
@@ -126,7 +126,7 @@ data class BittensorExitBasis(
 }
 
 /**
- * A coldkey's positions on one netuid in iOS portfolio order (largest stake first, then hotkey; the first is the
+ * A coldkey's positions on one netuid in portfolio order (largest stake first, then hotkey; the first is the
  * primary), with the floors of the current price.
  */
 class BittensorExitGroup(
@@ -137,7 +137,7 @@ class BittensorExitGroup(
 
     companion object {
 
-        /** iOS `SubtensorGroupUnstakeBasis.maxLegs`: the most validators one "All validators" withdrawal covers. */
+        /** The most validators one "All validators" withdrawal covers. */
         const val MAX_LEGS = 16
     }
 
@@ -149,12 +149,12 @@ class BittensorExitGroup(
 
     val heldHotkeys: Set<AccountIdKey> = positions.filter { it.isHeld }.mapTo(mutableSetOf()) { it.hotkey }
 
-    /** iOS `unsellableHotkeys`: held, or with nothing drawable above the withdrawal floor. */
+    /** Held, or with nothing drawable above the withdrawal floor. */
     val unsellableHotkeys: Set<AccountIdKey> = positions.filterNot { it.drawable(floors.withdrawal).isPositive() }.mapTo(mutableSetOf()) { it.hotkey }
 
     val canSellAll: Boolean get() = positions.size > 1 && positions.any { it.hotkey !in unsellableHotkeys }
 
-    /** iOS `SubtensorUnstakeSelection.resolve`: nothing chosen yet means all validators when the group has several and one can sell. */
+    /** Nothing chosen yet means all validators when the group has several and one can sell. */
     fun resolve(requested: BittensorExitSelection?): BittensorExitSelection {
         val sellable = hotkeys.filterNot { it in unsellableHotkeys }
         val fallback = BittensorExitSelection.Validator(sellable.firstOrNull() ?: hotkeys.first())
@@ -186,7 +186,7 @@ class BittensorExitGroup(
         return selection == BittensorExitSelection.All && positions.count { it.hotkey !in unsellableHotkeys } > MAX_LEGS
     }
 
-    /** iOS `anchorHotkey`: the selected validator, else the largest sellable one, else the primary. */
+    /** The selected validator, else the largest sellable one, else the primary. */
     fun anchor(selection: BittensorExitSelection): AccountIdKey {
         return (selection as? BittensorExitSelection.Validator)?.hotkey
             ?: positions.firstOrNull { it.hotkey !in unsellableHotkeys }?.hotkey
@@ -200,7 +200,7 @@ class BittensorExitGroup(
     }
 }
 
-/** iOS `SubtensorUnstakePlan.emptiesGroup`: only full exits, covering every validator of the group. */
+/** Only full exits, covering every validator of the group. */
 fun BittensorExitPlan.emptiesGroup(groupHotkeys: Collection<AccountIdKey>): Boolean {
     return slices.all { it.fullExit } && slices.map { it.hotkey }.containsAll(groupHotkeys)
 }

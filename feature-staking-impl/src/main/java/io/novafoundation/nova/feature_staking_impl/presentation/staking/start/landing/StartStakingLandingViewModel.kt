@@ -272,8 +272,8 @@ class StartStakingLandingViewModel(
         }
     }
 
-    // iOS `startStakingWithGate`: past the account check, an unsupported wallet gets the sheet instead of the setup,
-    // and like iOS `trackGateRefusal` the landing is then not reported as abandoned.
+    // Past the account check, an unsupported wallet gets the sheet instead of the setup,
+    // and the landing is then not reported as abandoned.
     private suspend fun continueToBittensorSetup(wallet: MetaAccount, allOptions: Boolean) {
         walletGate.checkingSupport(wallet, StakingFlow.STAKE, target = null, onRefusal = { flowContinued = true }) {
             if (allOptions) {

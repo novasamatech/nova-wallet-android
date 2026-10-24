@@ -60,7 +60,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         binder.execution.toolbar.setHomeButtonListener { viewModel.back() }
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
         binder.account.setOnClickListener { viewModel.accountClicked() }
-        // As on iOS, only a new position explains the preset validator; an existing one opens its validator info.
+        // Only a new position explains the preset validator; an existing one opens its validator info.
         binder.validator.setOnClickListener {
             if (viewModel.existingPosition) {
                 viewModel.validatorClicked()

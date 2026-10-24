@@ -19,18 +19,18 @@ data class BittensorExitFeeShortfallUi(val required: String, val balance: String
 /** The TAO that [unit] sold for at the shown and at the re-read quote. */
 data class BittensorExitRateUpdateUi(val unit: String, val old: String, val new: String)
 
-/** Formatted values the iOS alerts name for the exit failures. */
+/** Formatted values the alerts name for the exit failures. */
 class BittensorExitFailureValues(
     val minimum: String,
     val maximum: String,
     val priceImpact: String,
+    val nativeSymbol: String,
     val holdEta: String?,
     val feeShortfall: BittensorExitFeeShortfallUi,
     val dustRemainder: BittensorExitDustRemainderUi?,
     val rateUpdate: BittensorExitRateUpdateUi?
 )
 
-// iOS SubtensorErrorPresentable and BaseErrorPresentable; failures without an iOS alert keep their own message.
 private fun BittensorExitValidationFailure.titleAndMessage(
     resources: ResourceManager,
     isRoot: Boolean,
@@ -49,11 +49,10 @@ private fun BittensorExitValidationFailure.titleAndMessage(
         BittensorExitValidationFailure.ORDER_TOO_LARGE ->
             resources.getString(R.string.bittensor_self_impact_title) to resources.getString(R.string.bittensor_self_impact_message)
         BittensorExitValidationFailure.ROOT_LOCKED -> {
-            val message = values.holdEta?.let { resources.getString(R.string.bittensor_exit_locked_message, it) }
+            val message = values.holdEta?.let { resources.getString(R.string.bittensor_exit_locked_message, values.nativeSymbol, it) }
             resources.getString(R.string.bittensor_exit_locked_title) to (message ?: resources.getString(R.string.bittensor_validation_root_locked))
         }
-        BittensorExitValidationFailure.INSUFFICIENT_STAKE ->
-            resources.getString(R.string.common_amount_too_big) to resources.getString(R.string.bittensor_exit_exceeds_available, values.maximum)
+        BittensorExitValidationFailure.INSUFFICIENT_STAKE -> resources.bittensorExitExceedsAvailable(values.maximum)
         BittensorExitValidationFailure.FULL_POSITION_CHANGED -> resources.getString(R.string.bittensor_exit_position_changed_title) to null
         BittensorExitValidationFailure.BELOW_MINIMUM ->
             resources.getString(R.string.common_amount_low) to resources.getString(R.string.bittensor_exit_below_minimum, values.minimum)
@@ -79,9 +78,13 @@ private fun BittensorExitValidationFailure.titleAndMessage(
     }
 }
 
+/** The alert for an amount above [maximum], also shown by the setup before such an amount is quoted. */
+fun ResourceManager.bittensorExitExceedsAvailable(maximum: String): Pair<String, String> =
+    getString(R.string.common_amount_too_big) to getString(R.string.bittensor_exit_exceeds_available, maximum)
+
 /**
- * As on iOS, an accepted warning continues the same validation. On the setup Confirm on a rate update takes the re-read quote
- * (iOS onQuoteUpdate); [acceptsRate] is false on the review, where a moved price raises a banner instead (iOS confirm).
+ * An accepted warning continues the same validation. On the setup Confirm on a rate update takes the re-read quote;
+ * [acceptsRate] is false on the review, where a moved price raises a banner instead.
  */
 fun bittensorExitValidationFailureUi(
     reason: BittensorExitValidationFailure,
@@ -102,7 +105,7 @@ fun bittensorExitValidationFailureUi(
         onOutcome(StakingValidationOutcome.CANCELLED)
     }
     val dialog = when (reason) {
-        // iOS presentDustRemainderWarning: "Unstake all" for sales as well, offered only when given.
+        // "Unstake all" for sales as well, offered only when given.
         BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL -> CustomDialogDisplayer.Payload(
             title = title,
             message = message,
@@ -110,7 +113,7 @@ fun bittensorExitValidationFailureUi(
             cancelAction = cancel,
             neutralAction = unstakeAll?.let { proceed(R.string.staking_unstake_all, it) }
         )
-        // iOS presentRateUpdated: Confirm takes the new rate; the rate check is the last iOS validation.
+        // Confirm takes the new rate; the rate check is the last validation.
         BittensorExitValidationFailure.QUOTE_CHANGED -> if (acceptsRate) {
             CustomDialogDisplayer.Payload(
                 title,

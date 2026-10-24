@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withSafeLoading
@@ -50,7 +51,7 @@ class BittensorRetryControllerTest {
 
     private val logger = mock(Logger::class.java)
 
-    private val controller = BittensorRetryController(resources, logger)
+    private val controller = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
 
     @Before
     fun prepare() {

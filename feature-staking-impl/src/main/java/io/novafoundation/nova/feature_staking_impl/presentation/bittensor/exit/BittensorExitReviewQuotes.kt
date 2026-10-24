@@ -4,7 +4,7 @@ import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
 
 /**
- * iOS `SubtensorConfirmQuoteState`: the quote the sale was acknowledged at, its latest block re-quote and whether the price
+ * The quote the sale was acknowledged at, its latest block re-quote and whether the price
  * moved past the acknowledged limit since. The review shows the latest quote and falls back to the acknowledged one.
  */
 internal data class BittensorExitReviewQuotes(
@@ -19,16 +19,16 @@ internal data class BittensorExitReviewQuotes(
     val latestCrossesAcknowledgedLimit: Boolean
         get() = latest?.let(::crossesAcknowledgedLimit) ?: false
 
-    /** iOS `apply(latest:)`: a re-quote past the acknowledged limit raises the price move until it is acknowledged. */
+    /** A re-quote past the acknowledged limit raises the price move until it is acknowledged. */
     fun withLatest(quote: BittensorExitQuote) = copy(latest = quote, isPriceMoved = isPriceMoved || crossesAcknowledgedLimit(quote))
 
-    /** iOS `applyMovedQuote`: the quote re-read on Confirm did not fill at the acknowledged limit. */
+    /** The quote re-read on Confirm did not fill at the acknowledged limit. */
     fun withMovedPrice(quote: BittensorExitQuote) = copy(latest = quote, isPriceMoved = true)
 
-    /** iOS `acknowledgeLatest`: confirming at the new rate takes the latest quote. */
+    /** Confirming at the new rate takes the latest quote. */
     fun acknowledgeLatest() = copy(acknowledged = latest ?: acknowledged, isPriceMoved = false)
 
-    /** iOS `markLatestFailed`: a failed re-quote drops the latest quote and the price move. */
+    /** A failed re-quote drops the latest quote and the price move. */
     fun withoutLatest() = copy(latest = null, isPriceMoved = false)
 
     private fun crossesAcknowledgedLimit(quote: BittensorExitQuote): Boolean {
@@ -37,7 +37,7 @@ internal data class BittensorExitReviewQuotes(
 }
 
 /**
- * iOS `SubtensorConfirmAnalytics` price-move banner: one validation report per banner, by how it ended. Confirming at the
+ * The price-move banner: one validation report per banner, by how it ended. Confirming at the
  * new rate acknowledges it; the hand-off then reports it proceeded, while a new banner, another tap or leaving reports it blocked.
  */
 internal class BittensorExitPriceMoveBanner(private val report: (StakingValidationOutcome) -> Unit) {

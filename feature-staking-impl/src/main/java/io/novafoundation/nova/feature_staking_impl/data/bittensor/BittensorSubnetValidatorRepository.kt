@@ -43,8 +43,7 @@ interface BittensorSubnetValidatorRepository {
     suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator)
 
     /**
-     * [hotkey] as the chain reports it on [netuid], named by the listing when it is listed, without the recommendation gates,
-     * as iOS SubtensorValidatorDirectoryOperationFactory.createDetailWrapper.
+     * [hotkey] as the chain reports it on [netuid], named by the listing when it is listed, without the recommendation gates.
      */
     suspend fun chainValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey): BittensorSubnetValidator
 
@@ -92,7 +91,7 @@ class RealBittensorSubnetValidatorRepository(
             BittensorValidatorDirectory(rows, listing.status, recommendationFailure = null)
         } ?: throw BittensorTimeoutException("Validator directory")
 
-    /** Root lists the root validators resource, as iOS does for netuid 0; a subnet lists its own validator directory. */
+    /** Root lists the root validators resource; a subnet lists its own validator directory. */
     private suspend fun loadListing(chain: Chain, netuid: BittensorNetuid): DirectoryListing = if (netuid.isRoot()) {
         val response = backend.rootValidators()
         DirectoryListing(mapBittensorRootValidators(chain, response), mapBittensorRootDirectoryStatus(response.meta))
@@ -132,7 +131,7 @@ class RealBittensorSubnetValidatorRepository(
         snapshot: BittensorValidatorSnapshot,
         ranking: BittensorRankedValidatorsRemote?
     ): List<BittensorSubnetValidator> {
-        // As in iOS SubtensorRecommendationOperationFactory, a generation older than the subnet's registration recommends nothing; nor do its names apply.
+        // A generation older than the subnet's registration recommends nothing; nor do its names apply.
         val rankedRows = ranking?.takeUnless { bittensorRankingPredatesRegistration(netuid, snapshot, it) }?.items.orEmpty()
         // A STALE generation still recommends: the recommendations contract makes it usable data, shown as outdated.
         val recommendationRanks = recommendationRanks(rankedRows)
@@ -164,7 +163,7 @@ class RealBittensorSubnetValidatorRepository(
         Result.failure(exception)
     }
 
-    /** Recommended hotkeys by their position in the ranking, which breaks automatic preset ties as on iOS. */
+    /** Recommended hotkeys by their position in the ranking, which breaks automatic preset ties. */
     private fun recommendationRanks(rows: List<BittensorRankedValidatorsRemote.Item>): Map<String, Int> = rows
         .filter { it.eligible == true && it.recommendationClass in RECOMMENDATION_CLASSES }
         .mapNotNull { it.hotkey }
@@ -217,7 +216,7 @@ class RealBittensorSubnetValidatorRepository(
         return BittensorValidator(AccountIdKey(hotkey), identityName ?: stakeName ?: address, reportedStake)
     }
 
-    /** As on iOS, only an inactive validator cannot take a new stake; the take limit gates recommendations alone. */
+    /** Only an inactive validator cannot take a new stake; the take limit gates recommendations alone. */
     override suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator) = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
         val row = enrich(chain, netuid, listOf(validator)).single()
         require(row.canSelect) { "Validator is no longer eligible in this subnet" }
@@ -234,7 +233,7 @@ class RealBittensorSubnetValidatorRepository(
         return mapBittensorValidators(chain, netuid, listOf(validator), snapshot).single()
     }
 
-    /** The listing only names the validator, so an unreadable listing leaves it unnamed, as on iOS. */
+    /** The listing only names the validator, so an unreadable listing leaves it unnamed. */
     private suspend fun listedValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey): BittensorValidator? = try {
         withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
             loadListing(chain, netuid).candidates.firstOrNull { it.hotkey == hotkey }

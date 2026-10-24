@@ -10,7 +10,7 @@ data class BittensorValidatorListHeader(val count: String, val sorting: String)
 
 /**
  * [total] is the directory size of the same snapshot the rows come from; null while the directory loads.
- * [partial]: the backend marks the directory PARTIAL, so its size is no total and the header shows none, as iOS does.
+ * [partial]: the backend marks the directory PARTIAL, so its size is no total and the header shows none.
  */
 data class BittensorValidatorRows(val rows: List<BittensorValidatorUi>, val total: Int?, val partial: Boolean = false)
 

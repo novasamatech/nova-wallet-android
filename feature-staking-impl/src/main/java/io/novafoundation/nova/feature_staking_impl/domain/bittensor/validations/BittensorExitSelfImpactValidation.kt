@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 
 /**
- * iOS `orderWithinSlippageTolerance`: the sale alone must not move the pool price past the limit it is signed at.
+ * The sale alone must not move the pool price past the limit it is signed at.
  * A restored quote without a simulation has no post-trade price to judge; the latest quote is checked later.
  */
 class BittensorExitSelfImpactValidation : BittensorExitValidation {

@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncing
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
 import org.junit.Test
 import java.lang.reflect.Type
@@ -37,7 +36,7 @@ class StakingDashboardIntegrationTest: BaseIntegrationTest() {
             .inBackground()
             .launchIn(this)
 
-        interactor.stakingDashboardFlow(emptyFlow())
+        interactor.stakingDashboardFlow()
             .inBackground()
             .collect(::logDashboard)
     }

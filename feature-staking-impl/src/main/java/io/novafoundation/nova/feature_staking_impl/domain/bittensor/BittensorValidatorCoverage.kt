@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorListedSubnets
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import kotlinx.coroutines.async
@@ -21,11 +21,11 @@ internal fun bittensorValidatorCoverage(
 
 class BittensorValidatorCoverageInteractor(
     private val delegates: BittensorDelegateSource,
-    private val catalogue: BittensorSubnetCatalogueRemoteSource,
+    private val catalogue: BittensorSubnetCatalogueRepository,
     private val timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT
 ) {
 
-    /** The denominator is every subnet the backend catalogue lists, as on iOS; null when the hotkey is not a delegate. */
+    /** The denominator is every subnet the backend catalogue lists; null when the hotkey is not a delegate. */
     suspend fun coverage(hotkey: AccountIdKey): BittensorValidatorCoverage? {
         val result = withTimeoutOrNull(timeoutMillis) {
             coroutineScope {

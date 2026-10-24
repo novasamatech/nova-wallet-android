@@ -22,10 +22,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,16 +58,24 @@ class BittensorDashboardDetailsSource(
     // Unknown positions never trigger the recommendations request: PENDING waits, UNAVAILABLE settles without it.
     private enum class StakeActivity { ACTIVE, NONE, PENDING, UNAVAILABLE }
 
-    fun observe(account: MetaAccount, chains: Collection<Chain>, maximumYieldRefreshes: SharedFlow<Unit>): Flow<Map<String, BittensorDashboardDetails>> {
+    // Only heard while there is known to be no active stake.
+    private val maximumYieldRefreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    // Each time the dashboard appears: asks for the start-staking yield again, keeping the shown one until it succeeds.
+    fun refreshMaximumYield() {
+        maximumYieldRefreshes.tryEmit(Unit)
+    }
+
+    fun observe(account: MetaAccount, chains: Collection<Chain>): Flow<Map<String, BittensorDashboardDetails>> {
         val chain = chains.firstOrNull { chain ->
             chain.assets.any { Chain.Asset.StakingType.BITTENSOR_ROOT in it.staking }
         } ?: return flowOf(emptyMap())
-        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null, maximumYieldRefreshes)
+        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null)
 
-        return flow { emitAll(observe(chain, coldKey, maximumYieldRefreshes)) }
+        return flow { emitAll(observe(chain, coldKey)) }
     }
 
-    private fun observe(chain: Chain, coldKey: AccountId?, maximumYieldRefreshes: SharedFlow<Unit>): Flow<Map<String, BittensorDashboardDetails>> {
+    private fun observe(chain: Chain, coldKey: AccountId?): Flow<Map<String, BittensorDashboardDetails>> {
         val portfolio = if (coldKey != null) {
             positions.observePortfolio(chain.id, coldKey)
         } else {
@@ -75,10 +84,10 @@ class BittensorDashboardDetailsSource(
         // Like iOS persisted dashboard details: shown until positions are known again (cold start, offline).
         val restored = coldKey?.let { snapshots.snapshot(chain.id, it) }
         var lastSaved = restored
-        // Like iOS MaxApyUpdate: only a successful request replaces the stored maximum yield.
+        // Only a successful request replaces the stored maximum yield.
         var latestMaximumYield = restored?.maximumAnnualPercentageYield
         val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(null)
-        // As iOS: yields are requested once per held set, never polled.
+        // Yields are requested once per held set, never polled.
         val rootRates = portfolio
             .map { it.positions?.root.orEmpty().map { position -> position.validatorHotkey }.toSet() }
             .distinctUntilChanged()
@@ -95,7 +104,7 @@ class BittensorDashboardDetailsSource(
                 when (activity) {
                     StakeActivity.ACTIVE, StakeActivity.UNAVAILABLE -> flowOf(null)
                     StakeActivity.PENDING -> flowOf(ExtendedLoadingState.Loading)
-                    StakeActivity.NONE -> maximumYieldRequests(maximumYieldRefreshes)
+                    StakeActivity.NONE -> maximumYieldRequests()
                 }
             }
 
@@ -152,7 +161,7 @@ class BittensorDashboardDetailsSource(
     }
 
     private fun subnetsShowingRate(positions: BittensorPortfolioPositions?, claimableRewards: BigInteger?): Set<BittensorNetuid.Subnet> {
-        // As iOS: the subnet yield is only shown, and requested, without root stake or claimable root rewards.
+        // The subnet yield is only shown, and requested, without root stake or claimable root rewards.
         if (positions == null || positions.root.isNotEmpty() || claimableRewards?.isPositive() == true) return emptySet()
         return positions.subnets.map { it.subnetId }.toSet()
     }
@@ -194,11 +203,10 @@ class BittensorDashboardDetailsSource(
         }
     }
 
-    // Refreshes are only heard while there is known to be no active stake; iOS refreshMaxApy also skips a wallet with active staking.
-    // As iOS performMaxApyFetch: a refresh while a request is in flight does not start another one.
-    private fun maximumYieldRequests(refreshes: SharedFlow<Unit>): Flow<ExtendedLoadingState<Map<BittensorNetuid.Subnet, BigDecimal>>> = channelFlow {
+    // A refresh while a request is in flight does not start another one.
+    private fun maximumYieldRequests(): Flow<ExtendedLoadingState<Map<BittensorNetuid.Subnet, BigDecimal>>> = channelFlow {
         var request: Job? = null
-        refreshes.onSubscription { emit(Unit) }.collect {
+        maximumYieldRefreshes.onSubscription { emit(Unit) }.collect {
             if (request?.isActive != true) {
                 request = launch { requested { recommendedYields.maximumYields() }.collect { send(it) } }
             }

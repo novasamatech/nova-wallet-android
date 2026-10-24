@@ -34,6 +34,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -96,6 +97,7 @@ import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -110,6 +112,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 
 class BittensorSubnetAmountViewModel(
     private val analytics: AnalyticsService,
@@ -141,7 +144,6 @@ class BittensorSubnetAmountViewModel(
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     subnetFactsInteractor: BittensorSubnetFactsInteractor,
-    private val requoteMixin: BittensorSubnetRequoteMixin,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState()
 ) : BaseViewModel(), Validatable by validationExecutor {
 
@@ -151,7 +153,6 @@ class BittensorSubnetAmountViewModel(
 
     private var isTypeSelectedTracked = false
 
-    /** Set once the setup moves on to the review (iOS `abandonTracker.markProceeded`). */
     private var flowContinued = false
 
     private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SETUP)
@@ -181,12 +182,13 @@ class BittensorSubnetAmountViewModel(
 
     private val reviewClosed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // As on iOS: every new block re-quotes unless the review is on top, and coming back from it re-quotes at once.
-    private val requotes = requoteMixin.requotes(
-        scope = this,
-        active = { !reviewShown.value },
+    // Every new block re-quotes unless the review is on top, and coming back from it re-quotes at once.
+    private val requotes = bittensorSubnetStakingInteractor.requotes(
+        active = reviewShown.map { !it },
         immediate = reviewClosed
     )
+        .inBackground()
+        .shareIn(this, SharingStarted.Eagerly)
 
     // A preset handed over by subnet details stays a preset: it is not the user's choice (analytics, re-preset on details).
     private val selectedValidatorOverride = MutableStateFlow(validatorAddress.takeUnless { validatorIsPreset })
@@ -217,10 +219,7 @@ class BittensorSubnetAmountViewModel(
     val buyMoreTitle = subnetState.mapNotNull { state ->
         // Waits for the catalogue so the title does not flash "Subnet N" before the name arrives.
         if (state.isLoading()) return@mapNotNull null
-        val subnet = state.dataOrNull
-        val name = subnet?.title(resources)
-            ?: resources.getString(R.string.bittensor_subnet_number, initialSubnetId?.value ?: 0)
-        resources.getString(R.string.bittensor_buy_more_subnet, name)
+        resources.getString(R.string.bittensor_buy_more_subnet, state.dataOrNull.title(initialSubnetId?.value ?: 0, resources))
     }
         .shareInBackground()
 
@@ -234,7 +233,7 @@ class BittensorSubnetAmountViewModel(
             combine(validatorRetry, selectedValidatorOverride) { _, explicitAddress -> explicitAddress }.flatMapLatest { explicitAddress ->
                 flowOf {
                     if (explicitAddress == null) {
-                        // As on iOS, a subnet without a qualifying preset asks for a validator instead of failing the pick.
+                        // A subnet without a qualifying preset asks for a validator instead of failing the pick.
                         presetValidatorInteractor.preset(subnet.id).let { SubnetValidators(it.directory, it.preset?.address) }
                     } else {
                         val validators = bittensorSubnetStakingInteractor.validators(subnet.id)
@@ -645,7 +644,7 @@ class BittensorSubnetAmountViewModel(
         }
     }
 
-    /** As on iOS, a new position left without a validator (no qualifying preset, or the preset failed) picks one from the button. */
+    /** A new position left without a validator (no qualifying preset, or the preset failed) picks one from the button. */
     private val needsValidatorPick = combine(subnetState, validatorsState, selectedValidatorAddress) { subnet, validators, address ->
         !existingPosition && subnet.dataOrNull != null && !validators.isLoading() && address == null
     }
@@ -769,7 +768,7 @@ class BittensorSubnetAmountViewModel(
 
     private suspend fun openValidatorPicker() {
         val subnetId = subnet.first()?.id ?: return
-        // As iOS `recommendedHotkey`: the preset of this screen, otherwise the one subnet details showed.
+        // The preset of this screen, otherwise the one subnet details showed.
         val recommended = validatorsState.replayCache.lastOrNull()?.dataOrNull?.presetAddress ?: recommendedAddress
         val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first(), selectionState, recommended)
         validatorCommunicator.openRequest(request)
@@ -845,7 +844,6 @@ class BittensorSubnetAmountViewModel(
                                 )
                             }
                         },
-                        // As on iOS, confirming the new rate continues to the review.
                         acceptRate = { actions.resumeFlow() }
                     ) { quoteRefresh.value += 1 }
                 }
@@ -902,9 +900,10 @@ class BittensorSubnetAmountViewModel(
         return QuoteResult(request, draft)
     }
 
-    /** As on iOS, the shown quote stays until a block re-quote replaces it, and a failed re-quote clears it until the next block. */
+    /** The shown quote stays until a block re-quote replaces it, and a failed re-quote clears it until the next block. */
     private fun requotedEachBlock(initial: QuoteResult): Flow<ExtendedLoadingState<QuoteResult>> =
-        requoteMixin.requoted(initial.draft, BittensorSlippage(initial.request.slippage), requotes, chainRpcReads)
+        bittensorSubnetStakingInteractor.requoted(initial.draft, BittensorSlippage(initial.request.slippage), requotes)
+            .onEach { requote -> requote.onFailure(chainRpcReads::failed) }
             .map { requote ->
                 requote.fold(
                     onSuccess = { ExtendedLoadingState.Loaded(initial.copy(draft = it)) },
@@ -920,7 +919,7 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun back() {
-        // As iOS: leaving the setup of a new position before continuing reports it abandoned, with no target while a quick pick
+        // Leaving the setup of a new position before continuing reports it abandoned, with no target while a quick pick
         // has not found its subnet.
         if (!flowContinued && !existingPosition) {
             val target = StakingAnalyticsTarget.SUBNET.takeIf { initialSubnetId != null || subnetState.replayCache.lastOrNull()?.dataOrNull != null }

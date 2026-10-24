@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -185,7 +186,7 @@ class BittensorDetailsRetryTest {
 
     private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry, positionUpdates)
 
-    private val retryController = BittensorRetryController(resources, logger)
+    private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
 
     private val router = mock(StakingRouter::class.java)
 
@@ -220,6 +221,7 @@ class BittensorDetailsRetryTest {
     private val walletGate = BittensorWalletGate(
         BittensorImmediateExecution(mock(SignerProvider::class.java)),
         accountRepository,
+        chainRegistry,
         resources,
         analytics,
         actionLauncherFactory

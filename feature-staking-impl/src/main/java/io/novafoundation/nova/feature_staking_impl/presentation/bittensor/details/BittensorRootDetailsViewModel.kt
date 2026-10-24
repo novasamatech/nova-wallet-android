@@ -137,7 +137,7 @@ class BittensorRootDetailsViewModel(
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
-    // As on iOS, the actions are never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
+    // The actions are never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
     val canAddStake = portfolioState.map { portfolio ->
         portfolio.dataOrNull?.dataStatus is BittensorDataStatus.Fresh
     }

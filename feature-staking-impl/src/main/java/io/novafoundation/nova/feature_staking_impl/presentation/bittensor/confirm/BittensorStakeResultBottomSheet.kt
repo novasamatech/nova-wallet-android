@@ -41,7 +41,7 @@ class BittensorStakeResultBottomSheet(
     }
 
     init {
-        // The sheet only closes through its buttons, as the iOS result sheet cannot be hidden.
+        // The sheet only closes through its buttons.
         setCancelable(false)
         setCanceledOnTouchOutside(false)
 
@@ -115,7 +115,7 @@ class BittensorStakeResultBottomSheet(
         ).joinToString("\n\n")
     }
 
-    /** One button is the primary one; with two, the first is secondary (iOS `bindButtons`). */
+    /** One button is the primary one; with two, the first is secondary. */
     private fun showActions(actions: List<BittensorResultAction>) {
         this.actions = actions
         val secondary = actions.getOrNull(actions.size - 2)

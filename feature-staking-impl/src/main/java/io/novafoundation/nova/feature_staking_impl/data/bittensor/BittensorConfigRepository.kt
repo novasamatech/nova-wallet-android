@@ -52,7 +52,6 @@ class RemoteBittensorConfigRepository(
     }
 }
 
-// iOS gives the config request 30 seconds.
 private const val CONFIG_TIMEOUT_MILLIS = 30_000L
 
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())

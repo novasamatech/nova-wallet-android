@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.first
@@ -34,7 +35,15 @@ class BittensorAddRootStakeTest {
 
     private val submission = mock(BittensorSubmissionExecutor::class.java)
 
-    private val interactor = BittensorStakingInteractor(repository, extrinsics, wallets, validators, submission)
+    private val interactor = BittensorStakingInteractor(
+        repository,
+        mock(BittensorPresetValidatorInteractor::class.java),
+        extrinsics,
+        wallets,
+        validators,
+        submission,
+        mock(Logger::class.java)
+    )
 
     private val chain = mock(Chain::class.java)
 

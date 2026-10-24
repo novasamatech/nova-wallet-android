@@ -167,7 +167,7 @@ class BittensorExitQuoteInteractorTest {
 
     private val interactor = BittensorExitInteractor(
         registry, accounts, wallets, runtime, metadata, source, config, slippage, extrinsics, executor, constants,
-        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", logger, immediate, costBasis, chainState
+        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", logger, immediate, costBasis, chainState, BittensorBlockRequotes(chainState, logger)
     )
 
     @Test

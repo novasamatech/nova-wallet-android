@@ -65,7 +65,7 @@ internal fun mapBittensorDirectoryStatus(meta: BittensorValidatorsRemote.Meta?):
     )
 }
 
-/** The root list is never partial (iOS makeRootListing); its stakes and names both come from the root validators component. */
+/** The root list is never partial; its stakes and names both come from the root validators component. */
 internal fun mapBittensorRootDirectoryStatus(meta: BittensorRootValidatorRemote.Meta?): BittensorValidatorDirectoryStatus {
     val rootValidators = mapDirectoryComponent(meta?.components?.rootValidators)
     return BittensorValidatorDirectoryStatus(Completeness.COMPLETE, rootValidators, mapDirectoryComponent(null), rootValidators)

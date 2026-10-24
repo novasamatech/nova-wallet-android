@@ -38,6 +38,7 @@ import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -106,6 +107,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -114,7 +116,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 class BittensorSubnetReviewViewModel(
@@ -141,7 +145,6 @@ class BittensorSubnetReviewViewModel(
     private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
     private val chainStateRepository: ChainStateRepository,
-    private val requoteMixin: BittensorSubnetRequoteMixin,
     private val selectedSlippage: BigDecimal,
     val existingPosition: Boolean = false,
     private val inactiveValidatorAccepted: Boolean = false
@@ -149,7 +152,7 @@ class BittensorSubnetReviewViewModel(
 
     private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.CONFIRM)
 
-    /** Set once the stake is confirmed, also when it then fails (iOS `abandonTracker.markProceeded`). */
+    /** Set once the stake is confirmed, also when it then fails. */
     private var flowContinued = false
 
     val retryEvents = retryController.events
@@ -186,12 +189,13 @@ class BittensorSubnetReviewViewModel(
 
     private val retryRequotes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // As on iOS: every new block re-quotes until the stake is handed to submission, and a retry re-quotes at once.
-    private val requotes = requoteMixin.requotes(
-        scope = this,
-        active = { submission.value is BittensorSubmissionState.Ready },
+    // Every new block re-quotes until the stake is handed to submission, and a retry re-quotes at once.
+    private val requotes = bittensorSubnetStakingInteractor.requotes(
+        active = submission.map { it is BittensorSubmissionState.Ready },
         immediate = retryRequotes
     )
+        .inBackground()
+        .shareIn(this, SharingStarted.Eagerly)
 
     private val preparedStake = retryController.observe(
         step = "stake preparation",
@@ -221,7 +225,7 @@ class BittensorSubnetReviewViewModel(
     private val draft = preparationState.map { it.dataOrNull?.draft }
         .shareInBackground()
 
-    // As on iOS: block re-quotes only update what is shown. The fee and the confirm check keep the prepared (acknowledged) quote,
+    // Block re-quotes only update what is shown. The fee and the confirm check keep the prepared (acknowledged) quote,
     // so a price move past its limit asks for the updated quote before anything is signed.
     private val acknowledgedDraft = preparedStake.map { it.dataOrNull?.draft }
         .distinctUntilChanged()
@@ -380,7 +384,7 @@ class BittensorSubnetReviewViewModel(
         } else {
             resources.getString(
                 R.string.bittensor_subnet_execution_buying,
-                prepared.dataOrNull?.subnet?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, subnetId.value),
+                prepared.dataOrNull?.subnet.title(subnetId.value, resources),
                 prepared.dataOrNull?.subnet?.symbol.orEmpty()
             )
         }
@@ -459,7 +463,7 @@ class BittensorSubnetReviewViewModel(
             }
         }
         launch {
-            // As iOS: a watch-only wallet is reported blocked once the review opens, and leaving it is not an abandonment.
+            // A watch-only wallet is reported blocked once the review opens, and leaving it is not an abandonment.
             if (accountRepository.getMetaAccount(metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
                 flowContinued = true
                 analytics.reportWatchOnlyStake(StakingAnalyticsTarget.SUBNET)
@@ -522,7 +526,7 @@ class BittensorSubnetReviewViewModel(
                                 )
                             }
                         },
-                        // As on iOS, a moved price is acknowledged before anything is signed: Confirm prepares the stake at the new rate.
+                        // A moved price is acknowledged before anything is signed: Confirm prepares the stake at the new rate.
                         acceptRate = { preparationRefresh.value += 1 }
                     ) { preparationRefresh.value += 1 }
                 }
@@ -657,9 +661,10 @@ class BittensorSubnetReviewViewModel(
         return bittensorAmountFormatter.exchangeRate(prepared.draft.operation.quote, prepared.subnet, token)
     }
 
-    /** iOS shows the acknowledged quote while the latest is missing: a failed re-quote falls back to the prepared stake. */
+    /** A failed re-quote falls back to the prepared stake, so the acknowledged quote stays shown. */
     private fun requotedEachBlock(prepared: BittensorPreparedSubnetStake): Flow<ExtendedLoadingState<BittensorPreparedSubnetStake>> =
-        requoteMixin.requoted(prepared.draft, BittensorSlippage(selectedSlippage), requotes, chainRpcReads)
+        bittensorSubnetStakingInteractor.requoted(prepared.draft, BittensorSlippage(selectedSlippage), requotes)
+            .onEach { requote -> requote.onFailure(chainRpcReads::failed) }
             .map { requote -> ExtendedLoadingState.Loaded(prepared.copy(draft = requote.getOrDefault(prepared.draft))) }
             .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
 
@@ -670,7 +675,6 @@ class BittensorSubnetReviewViewModel(
         retryRequotes.tryEmit(Unit)
     }
 
-    /** The failure page button, as iOS `createPageAction`: Try again when a retry can succeed, otherwise Close leaves the flow. */
     fun failureActionClicked() {
         val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return
         val action = if (failure.canRetry) BittensorResultAction.TRY_AGAIN else BittensorResultAction.CLOSE
@@ -687,7 +691,7 @@ class BittensorSubnetReviewViewModel(
             submission.value is BittensorSubmissionState.Submitting -> Unit
             submission.value.isFinished -> resultNavigation.leave()
             else -> {
-                // As iOS: leaving the review of a new position before confirming reports it abandoned.
+                // Leaving the review of a new position before confirming reports it abandoned.
                 if (!flowContinued && !existingPosition) {
                     analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.CONFIRM, StakingAnalyticsTarget.SUBNET))
                 }

@@ -32,7 +32,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 interface BittensorRootClaimSource {
     suspend fun claims(chainId: String, coldkey: AccountId): BittensorRootClaims
 
-    /** Previews and the claim minimum only: the root claim reads iOS makes with every stake state. */
+    /** Previews and the claim minimum only: the root claim reads made with every stake state. */
     suspend fun claimPreviews(chainId: String, coldkey: AccountId): BittensorRootClaims
 
     fun observe(chainId: String, coldkey: AccountId): Flow<BittensorRootClaimSnapshot>

@@ -36,7 +36,7 @@ class BittensorValidatorInfoFragment : BaseFragment<BittensorValidatorInfoViewMo
 
     override fun subscribe(viewModel: BittensorValidatorInfoViewModel) = with(binder) {
         setupExternalActions(viewModel)
-        // As iOS, Skip on a failed validator read closes the screen.
+        // Skip on a failed validator read closes the screen.
         observeBittensorRetries(viewModel.retryEvents, onSkip = viewModel::back)
         viewModel.account.observe(account::setAddressModel)
         status.showProgress()

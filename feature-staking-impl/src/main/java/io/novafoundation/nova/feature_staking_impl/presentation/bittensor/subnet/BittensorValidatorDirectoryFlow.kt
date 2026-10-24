@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 
 /**
- * The validator list as iOS SubtensorValidatorSelectPresenter provides it: with Hide unusual APY it waits for the recommendations
+ * The validator list: with Hide unusual APY it waits for the recommendations
  * and fails with them; without it the directory shows as soon as it loads, and a failed ranking only leaves it unranked.
  */
 internal fun observeBittensorValidatorDirectory(

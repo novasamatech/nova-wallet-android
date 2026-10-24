@@ -44,14 +44,14 @@ class BittensorSubnetCatalogueTest {
 
     private val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
-    private val catalogueSource = BittensorSubnetCatalogueRemoteSource(backend, urls)
+    private val catalogueRepository = BittensorSubnetCatalogueRepository(backend, urls)
 
-    private val repository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueSource)
+    private val repository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository)
 
     @Test
     fun `slow chain node falls back to backend names within the patience window`() = runBlocking<Unit> {
         calls.delayMillis = 5_000L
-        val slowNodeRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueSource, chainPatienceMillis = 50L)
+        val slowNodeRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository, chainPatienceMillis = 50L)
 
         val catalogue = slowNodeRepository.catalogue()
         val subnets = catalogue.subnets
@@ -71,7 +71,7 @@ class BittensorSubnetCatalogueTest {
         assertEquals(listOf("Backend 7"), repository.subnets().map { it.name })
 
         calls.failure = null
-        val freshRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueSource)
+        val freshRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository)
         assertEquals(listOf("Name"), freshRepository.subnets().map { it.name })
     }
 
@@ -95,7 +95,7 @@ class BittensorSubnetCatalogueTest {
     fun `after the patience window the first source to answer wins`() = runBlocking<Unit> {
         calls.delayMillis = 300L
         backend.delayMillis = 5_000L
-        val slowBackendRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueSource, chainPatienceMillis = 50L)
+        val slowBackendRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository, chainPatienceMillis = 50L)
 
         val catalogue = slowBackendRepository.catalogue()
 
@@ -120,7 +120,7 @@ class BittensorSubnetCatalogueTest {
     @Test
     fun `last good catalogue keeps names without prices and never counts as a fresh load`() = runBlocking<Unit> {
         var now = 0L
-        val clockedRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueSource, nanoTime = { now })
+        val clockedRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository, nanoTime = { now })
         clockedRepository.catalogue()
         calls.failure = IOException("Node down")
         backend.failure = IOException("Backend down")
@@ -159,9 +159,9 @@ class BittensorSubnetCatalogueTest {
         }
         val logger = mock(Logger::class.java)
         val remoteConfig = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
-        val catalogueRepository = RealBittensorSubnetRepository(runtimeCalls, remoteConfig, swaps, catalogueSource)
+        val configlessRepository = RealBittensorSubnetRepository(runtimeCalls, remoteConfig, swaps, catalogueRepository)
 
-        val subnets = catalogueRepository.subnets()
+        val subnets = configlessRepository.subnets()
 
         assertEquals(listOf(BittensorNetuid.Subnet(1)), subnets.map { it.id })
         assertEquals(1, calls.requests)
@@ -185,7 +185,7 @@ class BittensorSubnetCatalogueTest {
     fun `backend catalogue is shared while it is HTTP-fresh`() = runBlocking<Unit> {
         var now = 0L
         backend.cacheControl = "max-age=30"
-        val source = BittensorSubnetCatalogueRemoteSource(backend, urls) { now }
+        val source = BittensorSubnetCatalogueRepository(backend, urls) { now }
 
         source.catalogue()
         now = 29_000_000_000L
@@ -200,7 +200,7 @@ class BittensorSubnetCatalogueTest {
     fun `rejected backend catalogue is fetched again despite its max-age`() = runBlocking<Unit> {
         backend.cacheControl = "max-age=30"
         backend.availability = "UNAVAILABLE"
-        val source = BittensorSubnetCatalogueRemoteSource(backend, urls) { 0L }
+        val source = BittensorSubnetCatalogueRepository(backend, urls) { 0L }
 
         source.catalogue()
         source.catalogue()

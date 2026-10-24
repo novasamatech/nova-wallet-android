@@ -115,7 +115,7 @@ class BittensorStakeConfirmViewModel(
 
     val retryEvents = retryController.events
 
-    /** As on iOS, confirming an add to an existing root position is titled "Add stake to root". */
+    /** Confirming an add to an existing root position is titled "Add stake to root". */
     val titleRes = if (payload.existingPosition) R.string.bittensor_add_stake_to_root else R.string.bittensor_stake_to_root
 
     private val stakeRequest = flowOf { payload.toStakeRequest(chain.await()) }
@@ -196,7 +196,7 @@ class BittensorStakeConfirmViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    /** Set once the stake is confirmed, also when it then fails (iOS `abandonTracker.markProceeded`). */
+    /** Set once the stake is confirmed, also when it then fails. */
     private var flowContinued = false
 
     val confirmButtonState = combine(
@@ -222,7 +222,7 @@ class BittensorStakeConfirmViewModel(
             BittensorFeeEstimate(request, fee)
         }
         launch {
-            // As iOS: a watch-only wallet is reported blocked once the confirmation opens, and leaving it is not an abandonment.
+            // A watch-only wallet is reported blocked once the confirmation opens, and leaving it is not an abandonment.
             if (accountRepository.getMetaAccount(payload.metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
                 flowContinued = true
                 analytics.reportWatchOnlyStake(StakingAnalyticsTarget.ROOT)
@@ -235,7 +235,7 @@ class BittensorStakeConfirmViewModel(
             submission.value is BittensorSubmissionState.Submitting -> Unit
             submission.value.isFinished -> resultNavigation.leave()
             else -> {
-                // As iOS: leaving the confirmation of a new position before confirming reports it abandoned.
+                // Leaving the confirmation of a new position before confirming reports it abandoned.
                 if (!flowContinued && !payload.existingPosition) {
                     analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.CONFIRM, StakingAnalyticsTarget.ROOT))
                 }
@@ -344,7 +344,7 @@ class BittensorStakeConfirmViewModel(
         }
     }
 
-    /** A result sheet button, as iOS `activate(action:)`; Try again hides the sheet so the stake can be confirmed again. */
+    /** A result sheet button; Try again hides the sheet so the stake can be confirmed again. */
     fun resultActionClicked(action: BittensorResultAction) {
         if (action !in submission.value.result?.actions.orEmpty()) return
 

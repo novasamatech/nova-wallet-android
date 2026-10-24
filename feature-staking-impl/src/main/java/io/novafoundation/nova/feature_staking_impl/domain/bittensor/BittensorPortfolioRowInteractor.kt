@@ -38,7 +38,7 @@ class BittensorPortfolioRowInteractor(
         return weeklySummaries(nativePriceId, subnetIds).mapNotNull { (subnet, summary) -> summary?.let { subnet to it.changePercent } }.toMap()
     }
 
-    /** Every listed market of [subnetIds]; a null summary is listed without a computable change, as iOS `.unavailable`. */
+    /** Every listed market of [subnetIds]; a null summary is listed without a computable change. */
     suspend fun weeklySummaries(nativePriceId: String, subnetIds: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BittensorWeeklyPriceSummary?> {
         if (subnetIds.isEmpty()) return emptyMap()
         return withTimeout(25_000L) {

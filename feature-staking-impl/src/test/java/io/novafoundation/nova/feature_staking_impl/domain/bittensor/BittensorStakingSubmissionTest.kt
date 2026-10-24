@@ -22,6 +22,8 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicWatchException
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
@@ -105,8 +107,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     private val rootRepository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(rootDetails)
 
-        override fun observeRootStakingDetails(metaId: Long) = flowOf(rootDetails)
-
         override fun observeRootAccountDetails(metaId: Long) = flowOf(rootDetails)
     }
 
@@ -114,10 +114,12 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val rootInteractor = BittensorStakingInteractor(
         rootRepository,
+        mock(BittensorPresetValidatorInteractor::class.java),
         extrinsicService,
         wallets,
         rootValidators,
-        submission
+        submission,
+        mock(Logger::class.java)
     )
 
     private val subnetValidators = mock(BittensorSubnetValidatorRepository::class.java)
@@ -134,7 +136,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         extrinsicService,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
         submission,
-        costBasis
+        costBasis,
+        BittensorBlockRequotes(mock(ChainStateRepository::class.java), mock(Logger::class.java))
     )
 
     private val subnetId = BittensorNetuid.Subnet(1)

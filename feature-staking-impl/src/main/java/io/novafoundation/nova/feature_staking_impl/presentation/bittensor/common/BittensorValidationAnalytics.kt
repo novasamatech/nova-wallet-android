@@ -5,13 +5,15 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationFailure
 
+/** A missing or unreadable quote reports liquidity, a self-impacting order its own kind. */
 fun BittensorStakeValidationFailure.analyticsKind(): StakingValidationKind? = when (this) {
     BittensorStakeValidationFailure.INSUFFICIENT_BALANCE -> StakingValidationKind.INSUFFICIENT_BALANCE
-    BittensorStakeValidationFailure.FEE_RESERVE -> StakingValidationKind.FEE_RESERVE
+    is BittensorStakeValidationFailure.FeeReserve -> StakingValidationKind.FEE_RESERVE
     is BittensorStakeValidationFailure.BelowMinimumStake -> StakingValidationKind.MIN_STAKE
-    BittensorStakeValidationFailure.QUOTE_UNAVAILABLE -> StakingValidationKind.STALE_DATA
-    BittensorStakeValidationFailure.QUOTE_EXPIRED, BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED -> StakingValidationKind.RATE_UPDATED
-    BittensorStakeValidationFailure.HIGH_PRICE_IMPACT -> StakingValidationKind.PRICE_IMPACT
+    BittensorStakeValidationFailure.QUOTE_UNAVAILABLE -> StakingValidationKind.LIQUIDITY
+    BittensorStakeValidationFailure.SELF_IMPACT -> StakingValidationKind.ORDER_TOO_LARGE
+    BittensorStakeValidationFailure.QUOTE_EXPIRED, is BittensorStakeValidationFailure.SlippageExceeded -> StakingValidationKind.RATE_UPDATED
+    is BittensorStakeValidationFailure.HighPriceImpact -> StakingValidationKind.PRICE_IMPACT
     else -> null
 }
 

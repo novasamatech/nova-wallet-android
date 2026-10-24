@@ -26,14 +26,14 @@ class BittensorResultNavigation(
 
     private var finished = false
 
-    /** Root sheet buttons once the operation is done or unconfirmed, as iOS `landingActions`. */
+    /** Root sheet buttons once the operation is done or unconfirmed. */
     fun landingActions(emptiesPosition: Boolean = false): List<BittensorResultAction> = when {
         newPosition -> listOf(BittensorResultAction.VIEW_POSITION)
         emptiesPosition -> listOf(BittensorResultAction.YOUR_BITTENSOR)
         else -> listOf(BittensorResultAction.YOUR_BITTENSOR, BittensorResultAction.BACK_TO_POSITION)
     }
 
-    /** Root sheet buttons once the operation is done: a new position also offers "Discover subnets" (iOS `createDoneSheet`). */
+    /** Root sheet buttons once the operation is done: a new position also offers "Discover subnets". */
     fun completedActions(emptiesPosition: Boolean = false): List<BittensorResultAction> = if (newPosition) {
         listOf(BittensorResultAction.DISCOVER_SUBNETS, BittensorResultAction.VIEW_POSITION)
     } else {
@@ -62,7 +62,7 @@ class BittensorResultNavigation(
         finish(exit, exit.doneAnalyticsAction)
     }
 
-    /** Only offered on a new position, as iOS `createDoneSheet`; `staking_flow_opened` follows the result action as in iOS `activate(action:)`. */
+    /** Only offered on a new position; `staking_flow_opened` follows the result action. */
     private fun discoverSubnets() {
         if (finished) return
         finished = true

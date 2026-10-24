@@ -56,7 +56,7 @@ internal fun mapRootValidatorDetails(
 }
 
 /**
- * The root validator list as iOS makeRootListing builds it: every root validators entry with a positive root stake, which is the
+ * The root validator list: every root validators entry with a positive root stake, which is the
  * row's reported stake, named by its non-blank name or else its address. Entries without root stake cannot earn root yield.
  */
 internal fun mapBittensorRootValidators(chain: Chain, response: BittensorRootValidatorRemote): List<BittensorValidator> =
@@ -77,7 +77,7 @@ private fun mapRootListing(chain: Chain, response: BittensorRootValidatorRemote)
         RootListingEntry(BittensorValidator(hotkey, name ?: address, stake), name)
     }.distinctBy { it.validator.hotkey }
 
-/** Root yields need the optional stakeYieldWindows component, as iOS makeRootYields does. */
+/** Root yields need the optional stakeYieldWindows component. */
 internal fun requireBittensorRootYieldWindows(response: BittensorRootValidatorRemote) {
     val component = response.meta?.components?.stakeYieldWindows
     requireAvailableBittensorComponent(component, "Root yield data")

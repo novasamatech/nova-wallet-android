@@ -42,7 +42,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
             val requestStartedAt = System.nanoTime()
             val markets = loadMarkets()
             val ids = mapBittensorMarketIds(markets)
-            // No listed subnet is a degraded response, not every subnet unlisted: iOS fails it as dataCorruption.
+            // No listed subnet is a degraded response, not every subnet unlisted, so the read fails.
             require(ids.isNotEmpty()) { "Empty subnet markets" }
             cached = ids
             val byId = markets.associateBy { it.id }

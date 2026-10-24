@@ -20,15 +20,19 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorImmediateExecution
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWalletSupport
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Inject
 
 /**
- * The iOS `checkingSupport(of: .subtensorStaking)` gate in front of a TAO staking flow: a Ledger or proxied wallet, or a multisig
+ * The gate in front of a TAO staking flow: a Ledger or proxied wallet, or a multisig
  * whose calls execute with a delay, gets the unsupported-wallet sheet and one `staking_blocked` instead of the flow.
  */
 class BittensorWalletGate @Inject constructor(
     private val immediateExecution: BittensorImmediateExecution,
     private val accountRepository: AccountRepository,
+    private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
     private val analytics: AnalyticsService,
     actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
@@ -56,14 +60,14 @@ class BittensorWalletGate @Inject constructor(
         analytics.track(BittensorAnalyticsEvent.Blocked(flow, refusal, wallet.type.analyticsWalletType(), target))
         onRefusal()
 
+        val nativeSymbol = chainRegistry.getChain(ChainGeneses.BITTENSOR).utilityAsset.symbol.value
         when (refusal) {
             StakingBlockedReason.LEDGER -> showWarning(R.drawable.ic_ledger, resourceManager.bittensorLedgerNotSupported())
-            StakingBlockedReason.PROXY -> showWarning(R.drawable.ic_proxy, resourceManager.bittensorWalletNotSupported(R.string.account_proxied))
-            else -> showWarning(R.drawable.ic_multisig, resourceManager.bittensorWalletNotSupported(R.string.account_multisig))
+            StakingBlockedReason.PROXY -> showWarning(R.drawable.ic_proxy, resourceManager.bittensorWalletNotSupported(R.string.account_proxied, nativeSymbol))
+            else -> showWarning(R.drawable.ic_multisig, resourceManager.bittensorWalletNotSupported(R.string.account_multisig, nativeSymbol))
         }
     }
 
-    // As iOS presentOperationCompletion: the sheet offers "Okay, back" only.
     private fun showWarning(@DrawableRes imageRes: Int, warning: TitleAndMessage) {
         val (title, message) = warning
         launchBottomSheet(
@@ -76,19 +80,19 @@ class BittensorWalletGate @Inject constructor(
     }
 }
 
-// As iOS: Ledger gets the signer-not-supported copy, proxied and delayed multisig wallets the unsupported-wallet copy.
+// Ledger gets the signer-not-supported copy, proxied and delayed multisig wallets the unsupported-wallet copy.
 fun ResourceManager.bittensorLedgerNotSupported(): TitleAndMessage =
     getString(R.string.account_parity_signer_not_supported_title) to getString(R.string.ledger_sign_raw_not_supported)
 
-fun ResourceManager.bittensorWalletNotSupported(@StringRes walletType: Int): TitleAndMessage =
-    getString(R.string.bittensor_staking_wallet_unsupported_title, getString(walletType)) to getString(R.string.bittensor_staking_wallet_unsupported_message)
+fun ResourceManager.bittensorWalletNotSupported(@StringRes walletType: Int, nativeSymbol: String): TitleAndMessage =
+    getString(R.string.bittensor_staking_wallet_unsupported_title, getString(walletType)) to
+        getString(R.string.bittensor_staking_wallet_unsupported_message, nativeSymbol)
 
-/** As iOS, a watch-only wallet is reported blocked once its stake confirmation opens. */
+/** A watch-only wallet is reported blocked once its stake confirmation opens. */
 fun AnalyticsService.reportWatchOnlyStake(target: StakingAnalyticsTarget) {
     track(BittensorAnalyticsEvent.Blocked(StakingFlow.STAKE, StakingBlockedReason.WATCH_ONLY, AnalyticsWalletType.WATCH_ONLY, target))
 }
 
-/** iOS `MetaAccountModelType.analyticsWalletType`. */
 private fun LightMetaAccount.Type.analyticsWalletType(): AnalyticsWalletType = when (this) {
     LightMetaAccount.Type.SECRETS -> AnalyticsWalletType.SECRETS
     LightMetaAccount.Type.WATCH_ONLY -> AnalyticsWalletType.WATCH_ONLY

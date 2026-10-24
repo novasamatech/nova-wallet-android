@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 
 /**
- * iOS `passesRealtimeQuote`: the re-read quote must still fill at the tighter of its own and the acknowledged limit.
+ * The re-read quote must still fill at the tighter of its own and the acknowledged limit.
  * Its service fee follows the output, so it may differ; the signature takes the re-read quote as it is.
  */
 class BittensorExitQuoteValidation : BittensorExitValidation {

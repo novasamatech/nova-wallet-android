@@ -73,9 +73,9 @@ enum class BackendRefusal {
     REQUEST
 }
 
-/** The backend refusal behind this failure, graded as the iOS client grades it, or null when a later attempt may pass. */
+/** The backend refusal behind this failure, or null when a later attempt may pass. */
 fun Throwable.backendRefusal(): BackendRefusal? {
-    val causes = generateSequence(this) { it.cause }.take(MAX_CAUSE_DEPTH).toList()
+    val causes = causeChain().toList()
     val refusal = causes.firstNotNullOfOrNull { it as? AttestationRefusedException }
     // The backend's answer to the call itself; below an attestation failure it answered the client's bootstrap instead.
     val responses = causes.takeWhile { it !is AttestationUnavailableException }.filterIsInstance<HttpException>()
@@ -88,14 +88,21 @@ fun Throwable.backendRefusal(): BackendRefusal? {
     }
 }
 
-// The bootstrap refusals iOS reports as device-bound, as it does a bearer the backend keeps denying.
-private fun AttestationRefusedException.isDeviceBound() = when (status) {
-    401 -> code == "attestation_failed"
-    403 -> code == "app_not_allowed" || code == "binding_not_allowed"
-    else -> false
+/** How the backend refused a client bootstrap, or null when a bootstrap after the cooldown may pass. */
+internal fun bootstrapRefusal(status: Int, code: String?): BackendRefusal? = when (status) {
+    401 -> BackendRefusal.DEVICE.takeIf { code == "attestation_failed" }
+    403 -> when (code) {
+        "app_not_allowed", "binding_not_allowed" -> BackendRefusal.DEVICE
+        "insufficient_scope" -> BackendRefusal.REQUEST
+        else -> null
+    }
+    409 -> BackendRefusal.REQUEST.takeIf { code == "client_already_registered" }
+    else -> null
 }
 
-// The answers iOS grades as rejected; any other error status may pass on a later attempt.
+private fun AttestationRefusedException.isDeviceBound() = bootstrapRefusal(status, code) == BackendRefusal.DEVICE
+
+// The answers graded as rejected; any other error status may pass on a later attempt.
 private fun HttpException.isRejectedCall() = when (code()) {
     400, 405, 413, 415, 422 -> true
     403 -> peekErrorCode() == "insufficient_scope"
@@ -103,6 +110,9 @@ private fun HttpException.isRejectedCall() = when (code()) {
     409 -> peekErrorCode() == "client_already_registered"
     else -> false
 }
+
+/** This failure followed by its causes. */
+fun Throwable.causeChain(): Sequence<Throwable> = generateSequence(this) { it.cause }.take(MAX_CAUSE_DEPTH)
 
 private const val MAX_CAUSE_DEPTH = 16
 

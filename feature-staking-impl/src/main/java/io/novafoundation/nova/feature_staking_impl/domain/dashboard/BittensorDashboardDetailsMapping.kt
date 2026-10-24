@@ -20,7 +20,7 @@ internal fun mapBittensorDashboardDetails(
     pricingPending: Boolean = positions == null,
     claimableRootRewards: BigInteger? = null
 ): BittensorDashboardDetails {
-    // Like iOS rootStakeInRao, claimable root rewards add Root to a subnet stake. Without any stake
+    // Claimable root rewards add Root to a subnet stake. Without any stake
     // they get their own panel instead.
     val rootStake = when {
         positions == null -> null

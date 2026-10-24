@@ -40,7 +40,7 @@ fun BittensorSaleCostBasis.carriedPayload(): BittensorSaleCostBasisPayload? = (t
     ?.totals
     ?.toPayload()
 
-/** The cost basis of a sale from [positions]; as iOS loads it with the sale, it reads as loading until a position arrives, never as unknown. */
+/** The cost basis of a sale from [positions]; it reads as loading until a position arrives, never as unknown. */
 internal fun BittensorEstimatesMixin.observeSaleCostBasis(
     positions: Flow<BittensorExitPosition>,
     netuid: Int,

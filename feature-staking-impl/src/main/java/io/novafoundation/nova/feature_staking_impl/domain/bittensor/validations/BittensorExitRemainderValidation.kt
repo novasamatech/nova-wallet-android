@@ -21,7 +21,7 @@ data class BittensorExitDustRemainder(val remainderTao: BigInteger, val minimumT
 /**
  * Subtensor sweeps a non-owner remainder whose TAO value (alpha × price for subnets) is below the nominator
  * minimum, checked after the sale at the pool price it leaves (`clear_small_nomination_if_required`); the limit price
- * bounds that price when the quote carries no simulation. As iOS `SubtensorAmountPolicy.sellPlan` decides per slice,
+ * bounds that price when the quote carries no simulation. Decided per slice,
  * the sweep pays out only when the coldkey's availability on the netuid covers that validator's position.
  */
 fun BittensorExitValidationPayload.dustRemainders(): List<BittensorExitDustRemainder> {

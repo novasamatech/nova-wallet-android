@@ -24,7 +24,7 @@ internal fun sortBittensorSubnets(
         BittensorSubnetSorting.SEVEN_DAY_CHANGE -> compareByDescending<BittensorSubnet> { weekly[it.id] }
         BittensorSubnetSorting.POOL_DEPTH -> compareByDescending { it.taoReserveInPlanks }
         BittensorSubnetSorting.AGE -> compareBy { it.registrationBlock }
-        // As on iOS, by the title the row shows: an unnamed subnet sorts as "Subnet <netuid>".
+        // By the title the row shows: an unnamed subnet sorts as "Subnet <netuid>".
         BittensorSubnetSorting.NAME -> compareBy(BittensorNaturalOrder(locale)) { subnet ->
             subnet.name.trim().ifEmpty { subnetNumber(subnet.id.value) }
         }
@@ -43,7 +43,7 @@ internal fun passesBittensorThinPoolFilter(subnet: BittensorSubnet, favorites: B
 
 private val THIN_POOL_THRESHOLD = BigInteger.valueOf(2_000_000_000_000L)
 
-/** Finder order, like iOS localizedStandardCompare: case-insensitive, runs of digits compared by value ("Subnet 2" before "Subnet 10"). */
+/** Finder order: case-insensitive, runs of digits compared by value ("Subnet 2" before "Subnet 10"). */
 internal class BittensorNaturalOrder(locale: Locale) : Comparator<String> {
 
     private val letters = Collator.getInstance(locale).apply { strength = Collator.SECONDARY }

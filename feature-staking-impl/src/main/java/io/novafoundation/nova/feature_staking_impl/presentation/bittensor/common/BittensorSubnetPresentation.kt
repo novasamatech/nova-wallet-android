@@ -21,6 +21,14 @@ fun BittensorSubnet?.title(netuid: Int, resources: ResourceManager): String {
     return this?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, netuid)
 }
 
+/** The display name of subnet [netuid], also while its metadata is unavailable. */
+fun BittensorSubnet?.displayName(netuid: Int, resources: ResourceManager): String {
+    return this?.displayName(resources) ?: resources.getString(R.string.bittensor_subnet_number, netuid)
+}
+
+/** The alpha symbol of subnet [netuid], "SN<netuid>" when it has none, as iOS `SubtensorSubnetNaming.symbol`. */
+fun BittensorSubnet?.alphaSymbol(netuid: Int): String = this?.symbol?.takeIf { it.isNotBlank() } ?: "SN$netuid"
+
 /** Title followed by the alpha symbol, e.g. "Chutes ش" or "Subnet 42 ش". */
 fun BittensorSubnet.displayName(resources: ResourceManager): String = displayName(title(resources))
 

@@ -64,7 +64,7 @@ class BittensorValidatorInfoViewModel(
 
     val retryEvents = retryController.events
 
-    // Without the list row the listing names the validator and the chain reports its take and status, as iOS loadDetail.
+    // Without the list row the listing names the validator and the chain reports its take and status.
     private val detail: Flow<ExtendedLoadingState<BittensorValidatorInfoPayload.Detail>> = when (val known = payload.detail) {
         null -> retryController.observe(
             step = "validator detail",
@@ -113,7 +113,7 @@ class BittensorValidatorInfoViewModel(
             emit(null)
         }
 
-    // As on iOS, the reward shows with the rest of the validator's staking details.
+    // The reward shows with the rest of the validator's staking details.
     val reward: Flow<BittensorValidatorRewardUi> = combine(loadedDetail, rewardRate) { _, rate -> formatReward(rate) }
         .shareInBackground()
 

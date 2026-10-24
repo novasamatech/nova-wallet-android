@@ -6,6 +6,7 @@ import io.novafoundation.nova.infrastructure.attestation.AttestationRefusedExcep
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnavailableException
 import io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException
+import io.novafoundation.nova.infrastructure.attestation.bootstrapRefusal
 import io.novafoundation.nova.infrastructure.attestation.isAttestationUnsupported
 import io.novafoundation.nova.infrastructure.attestation.peekErrorCode
 import io.novafoundation.nova.infrastructure.attestation.signedContext
@@ -51,7 +52,7 @@ class RealProfile3AccessTokenProvider(
 
         var failures = 0
 
-        // The backend refused this device or client (iOS: device-bound or rejected); it is not asked again in this process.
+        // The backend refused this device or client; it is not asked again in this process.
         var refusal: Refusal? = null
 
         // The last bootstrap failed because this device cannot attest; later refusals keep saying so.
@@ -151,7 +152,7 @@ class RealProfile3AccessTokenProvider(
                 state.unsupported = failure.isAttestationUnsupported()
                 if (failure is HttpException) {
                     val code = failure.peekErrorCode()
-                    state.refusal = if (isRefusal(failure.code(), code)) Refusal(failure.code(), code) else null
+                    state.refusal = bootstrapRefusal(failure.code(), code)?.let { Refusal(failure.code(), code) }
                     state.cooldownUntil = if (failure.code() == 429) {
                         retryDeadline(failure.response()?.headers()?.get("Retry-After"))
                     } else {
@@ -235,15 +236,6 @@ class RealProfile3AccessTokenProvider(
     } catch (timeout: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
         throw IOException("Profile-3 bootstrap timed out", timeout)
-    }
-
-    // The bootstrap answers iOS grades device-bound or rejected. Any other error status is bootstrapped again on the next
-    // request once the cooldown ends, as iOS does for user-driven requests.
-    private fun isRefusal(status: Int, code: String?): Boolean = when (status) {
-        401 -> code == "attestation_failed"
-        403 -> code in listOf("app_not_allowed", "binding_not_allowed", "insufficient_scope")
-        409 -> code == "client_already_registered"
-        else -> false
     }
 
     private fun retryDeadline(retryAfter: String?): Long {

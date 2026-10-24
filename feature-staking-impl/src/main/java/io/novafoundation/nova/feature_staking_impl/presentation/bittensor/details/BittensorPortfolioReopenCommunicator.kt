@@ -5,7 +5,7 @@ import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.common.navigation.InterScreenCommunicator
 import kotlinx.parcelize.Parcelize
 
-/** Responds when a finished flow returns to a portfolio that is already open, as iOS `SubtensorPortfolioPresenter.reopen(from:)`. */
+/** Responds when a finished flow returns to a portfolio that is already open. */
 interface BittensorPortfolioReopenCommunicator :
     InterScreenCommunicator<BittensorPortfolioReopenCommunicator.EmptyRequest, BittensorPortfolioReopenCommunicator.Response> {
 

@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.postTradePrice
 
 /**
- * iOS passesRealtimeQuote: the re-read market must still fill at the tighter of both limits.
+ * The re-read market must still fill at the tighter of both limits.
  * A move past it is a warning whose alert offers the new rate; an unread market blocks the stake.
  */
 class BittensorSlippageValidation : BittensorStakeValidation {
@@ -19,6 +19,6 @@ class BittensorSlippageValidation : BittensorStakeValidation {
         val quote = value.quote ?: return valid()
         val latestQuote = value.latestQuote ?: return validationError(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE)
         val limitPrice = minOf(quote.limitPrice, latestQuote.limitPrice)
-        return validOrWarning(latestQuote.postTradePrice() < limitPrice) { BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED }
+        return validOrWarning(latestQuote.postTradePrice() < limitPrice) { BittensorStakeValidationFailure.SlippageExceeded(quote, latestQuote) }
     }
 }

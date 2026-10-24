@@ -11,7 +11,7 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
-// Subtensor's DefaultDelegateTake: the take of a hotkey without a Delegates entry, as iOS defaultDelegateTake.
+// Subtensor's DefaultDelegateTake: the take of a hotkey without a Delegates entry.
 private val DEFAULT_DELEGATE_TAKE_IN_U16 = 11_796.toBigInteger()
 
 internal data class BittensorValidatorSnapshot(
@@ -24,7 +24,7 @@ internal data class BittensorValidatorSnapshot(
 )
 
 /**
- * Every validator is listed, as on iOS: the take limit and the permit and activity gates only decide recommendations
+ * Every validator is listed: the take limit and the permit and activity gates only decide recommendations
  * (see [passesBittensorRecommendationGates]), and only an inactive validator cannot take a new stake.
  */
 internal fun mapBittensorValidators(
@@ -58,7 +58,7 @@ private fun mapBittensorValidator(
 internal fun BittensorValidatorSnapshot.commissionInU16(hotkey: AccountIdKey): BigInteger = commissionsInU16[hotkey] ?: DEFAULT_DELEGATE_TAKE_IN_U16
 
 /**
- * As iOS SubtensorRecommendationVerifier.passesGates: only a validator registered on [netuid] with a readable chain status,
+ * Only a validator registered on [netuid] with a readable chain status,
  * a take within the limit and, on a subnet, the permit and activity the [gates] require can be recommended.
  */
 internal fun BittensorValidatorSnapshot.passesBittensorRecommendationGates(

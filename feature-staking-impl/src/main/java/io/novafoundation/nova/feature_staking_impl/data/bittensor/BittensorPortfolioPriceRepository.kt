@@ -19,14 +19,14 @@ interface BittensorPortfolioPriceRepository {
 }
 
 class RealBittensorPortfolioPriceRepository(
-    private val catalogueSource: BittensorSubnetCatalogueRemoteSource,
+    private val catalogueRepository: BittensorSubnetCatalogueRepository,
     private val runtimePrices: BittensorRuntimePriceSource,
     private val logger: Logger
 ) : BittensorPortfolioPriceRepository {
 
     override suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
         if (heldSubnets.isEmpty()) return emptyMap()
-        val backend = loadPrices("backend") { mapBittensorPortfolioPrices(catalogueSource.catalogue()) }
+        val backend = loadPrices("backend") { mapBittensorPortfolioPrices(catalogueRepository.catalogue()) }
             .filterKeys { it in heldSubnets }
         val missing = heldSubnets - backend.keys
         if (missing.isEmpty()) return backend

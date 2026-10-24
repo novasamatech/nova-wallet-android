@@ -4,13 +4,13 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorFailureStage
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRetryable
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.isRetryable
 
-/** [landingActions] are the unconfirmed sheet buttons, as iOS `createUnconfirmedSheet`. */
+/** [landingActions] are the unconfirmed sheet buttons. */
 fun BittensorOperationResult.Unknown.mapResult(
     resources: ResourceManager,
     landingActions: List<BittensorResultAction> = emptyList()

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
+import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
@@ -14,6 +15,8 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.dashboard.BittensorDashboardDetailsSource
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -46,7 +49,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockingDetails
 import org.mockito.Mockito.verify
@@ -97,10 +99,11 @@ class StakingDashboardDeepLinkTest {
         val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCED)
         val dashboard = StakingDashboard(emptyList(), listOf(option))
         dashboardState.value = ExtendedLoadingState.Loaded(dashboard)
-        `when`(interactor.stakingDashboardFlow(any() ?: emptyFlow())).thenReturn(dashboardState)
+        `when`(interactor.stakingDashboardFlow()).thenReturn(dashboardState)
 
         viewModel = StakingDashboardViewModel(
             interactor = interactor,
+            bittensorDetailsSource = mock(BittensorDashboardDetailsSource::class.java),
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             stakingDashboardUpdateSystem = updateSystem,
@@ -159,7 +162,7 @@ class StakingDashboardDeepLinkTest {
         viewModel.openDeepLinkDestination(destination)
         viewModel.openDeepLinkDestination(destination)
 
-        verify(router).openBittensorPortfolio()
+        verify(router).openBittensorPortfolio(BittensorPortfolioPayload(StakingPortfolioSource.DASHBOARD))
         verifyNoInteractions(startRouter)
         assertTrue(analytics.events.isEmpty())
     }

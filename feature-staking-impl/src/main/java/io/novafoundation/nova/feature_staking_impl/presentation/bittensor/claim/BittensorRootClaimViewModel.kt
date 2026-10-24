@@ -260,7 +260,7 @@ class BittensorRootClaimViewModel(
     }
         .shareInBackground()
 
-    // Root validators of the account: the claim result names the validator when it is the only one, as on iOS.
+    // Root validators of the account: the claim result names the validator when it is the only one.
     private val rootHotkeys = claimState.filterNotNull()
         .distinctUntilChangedBy { it.coldkey }
         .flatMapLatest(bittensorRootClaimInteractor::observeRootHotkeys)
@@ -540,7 +540,7 @@ class BittensorRootClaimViewModel(
         }
     }
 
-    /** iOS `createClaimDoneSheet`: a claim that redeemed nothing only charged the fee and can only be closed. */
+    /** A claim that redeemed nothing only charged the fee and can only be closed. */
     private suspend fun mapClaimed(draft: BittensorRootClaimDraft, outcome: BittensorOperationOutcome?): BittensorStakeResultUi {
         val claim = draft.state
         val fee = outcome.formatNetworkFee(draft.fee, claim.chain, resources, tokenFormatter)
@@ -589,7 +589,7 @@ class BittensorRootClaimViewModel(
     private fun validatorName(claim: BittensorRootClaimState, hotkey: AccountIdKey, details: Map<AccountIdKey, BittensorRootValidatorDetails>?): String =
         details?.get(hotkey)?.validator?.name?.takeIf { it.isNotBlank() } ?: claim.chain.addressOf(hotkey.value).ellipsizeAddress()
 
-    /** A result sheet button, as iOS `activate(action:)`; Try again hides the sheet so the claim can be confirmed again. */
+    /** A result sheet button; Try again hides the sheet so the claim can be confirmed again. */
     fun resultActionClicked(action: BittensorResultAction) {
         if (action !in resultModel()?.actions.orEmpty()) return
 

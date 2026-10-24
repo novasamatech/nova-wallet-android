@@ -37,14 +37,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioValueSeries
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -114,25 +112,6 @@ class BittensorDetailsViewModel(
     private val portfolio = portfolioState.filterLoaded()
         .shareInBackground()
 
-    init {
-        // A finished flow that returns here reports the opening again, as iOS `reopen(from: .result)`.
-        portfolioReopenCommunicator.responseFlow
-            .onEach { unreportedOpenSource.value = it.source }
-            .launchIn(this)
-
-        combine(portfolio, unreportedOpenSource) { data, source ->
-            val positions = data.positions
-            if (source == null || positions == null || data.dataStatus is BittensorDataStatus.Loading) return@combine
-            if (!unreportedOpenSource.compareAndSet(source, null)) return@combine
-
-            val hasRoot = positions.rootStake.isPositive()
-            val count = positions.subnets.filter { it.alphaInPlanks.isPositive() }.distinctBy { it.subnetId }.size +
-                if (hasRoot) 1 else 0
-            analytics.track(BittensorAnalyticsEvent.PortfolioOpened(source, count, hasRoot, null))
-        }
-            .launchIn(this)
-    }
-
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()
 
@@ -147,7 +126,7 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
-    // As on iOS, Add position is never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
+    // Add position is never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
     val canAddStake = portfolioState.map { portfolio ->
         portfolio.dataOrNull?.dataStatus is BittensorDataStatus.Fresh
     }
@@ -312,6 +291,25 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
+    init {
+        // A finished flow that returns here reports the opening again.
+        portfolioReopenCommunicator.responseFlow
+            .onEach { unreportedOpenSource.value = it.source }
+            .launchIn(this)
+
+        combine(portfolio, unreportedOpenSource) { data, source ->
+            val positions = data.positions
+            if (source == null || positions == null || data.dataStatus is BittensorDataStatus.Loading) return@combine
+            if (!unreportedOpenSource.compareAndSet(source, null)) return@combine
+
+            val hasRoot = positions.rootStake.isPositive()
+            val count = positions.subnets.filter { it.alphaInPlanks.isPositive() }.distinctBy { it.subnetId }.size +
+                if (hasRoot) 1 else 0
+            analytics.track(BittensorAnalyticsEvent.PortfolioOpened(source, count, hasRoot, null))
+        }
+            .launchIn(this)
+    }
+
     private fun createHistoryRequest(state: ExtendedLoadingState<BittensorPortfolio>, period: BittensorPortfolioPeriod): BittensorPortfolioHistoryRequest? {
         val portfolio = state.dataOrNull ?: return null
         val token = portfolio.asset.token
@@ -381,8 +379,7 @@ class BittensorDetailsViewModel(
     fun back() = router.back()
 
     /**
-     * Re-entry goes through the same Earn landing as a first stake (iOS `SubtensorPortfolioWireframe.showAddPosition`), once the
-     * wallet passes the iOS `checkingSupport` gate.
+     * Re-entry goes through the same Earn landing as a first stake, once the wallet passes the wallet gate.
      */
     fun addPosition() = launchUnit {
         val portfolio = portfolio.first()
@@ -430,9 +427,4 @@ private data class WeeklyChangesRequest(val metaId: Long, val nativePriceId: Str
 
 private data class AccountRowValue<T>(val metaId: Long?, val state: ExtendedLoadingState<T>) {
     fun forAccount(metaId: Long): ExtendedLoadingState<T> = if (this.metaId == null || this.metaId == metaId) state else ExtendedLoadingState.Loading
-}
-
-internal fun subnetPositionTitle(subnet: BittensorSubnet?, fallback: String): String {
-    if (subnet == null) return fallback
-    return subnet.displayName(fallback)
 }

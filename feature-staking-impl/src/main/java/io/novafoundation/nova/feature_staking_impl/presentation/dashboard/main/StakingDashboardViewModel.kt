@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlowSource
+import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -21,6 +22,7 @@ import io.novafoundation.nova.common.utils.throttleLast
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.dashboard.BittensorDashboardDetailsSource
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
@@ -35,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.mapDashboardStakingStatus
@@ -55,8 +58,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -77,6 +78,7 @@ private class DashboardFormatters(
 
 class StakingDashboardViewModel(
     private val interactor: StakingDashboardInteractor,
+    private val bittensorDetailsSource: BittensorDashboardDetailsSource,
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
@@ -103,9 +105,7 @@ class StakingDashboardViewModel(
     val walletUi = accountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    private val maximumYieldRefreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-
-    private val stakingDashboardFlow = interactor.stakingDashboardFlow(maximumYieldRefreshes)
+    private val stakingDashboardFlow = interactor.stakingDashboardFlow()
         .shareInBackground()
 
     private val pendingDeepLinkTarget = MutableStateFlow<StakingDeepLinkTarget?>(null)
@@ -168,11 +168,11 @@ class StakingDashboardViewModel(
     }
 
     fun onResume() {
-        maximumYieldRefreshes.tryEmit(Unit)
+        bittensorDetailsSource.refreshMaximumYield()
     }
 
     /**
-     * As iOS `StakingDashboardPresenter`: waits until the dashboard settles the item, and once [pendingDeepLinkTimeout]
+     * Waits until the dashboard settles the item, and once [pendingDeepLinkTimeout]
      * passes takes the item as it is or drops the link.
      */
     private fun pendingDeepLinkDestination(target: StakingDeepLinkTarget) = flow<StakingDeepLinkDestination?> {
@@ -305,7 +305,7 @@ class StakingDashboardViewModel(
         stakingType: Chain.Asset.StakingType
     ) {
         if (stakingType == Chain.Asset.StakingType.BITTENSOR_ROOT) {
-            router.openBittensorPortfolio()
+            router.openBittensorPortfolio(BittensorPortfolioPayload(StakingPortfolioSource.DASHBOARD))
             return
         }
         stakingSharedState.setSelectedOption(

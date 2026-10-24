@@ -18,33 +18,24 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.map
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.bittensorFloorsClose
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.rootHoldBlocks
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlin.time.Duration.Companion.milliseconds
@@ -65,14 +56,13 @@ class BittensorExitInteractor(
     private val logger: Logger,
     private val immediateExecution: BittensorImmediateExecution,
     private val costBasisInteractor: BittensorCostBasisInteractor,
-    private val chainState: ChainStateRepository
+    private val chainState: ChainStateRepository,
+    private val blockRequotes: BittensorBlockRequotes
 ) {
 
     private companion object {
 
         const val SUBNET_METADATA_ATTEMPTS = 5
-
-        const val BLOCKS_RESUBSCRIBE_DELAY_MILLIS = 5_000L
     }
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
@@ -87,7 +77,7 @@ class BittensorExitInteractor(
         val initial = load(metaId, netuid, hotkeyAddress)
         var subnet = initial.subnet
         val metadataRetry = BittensorBlockBackoff(SUBNET_METADATA_ATTEMPTS)
-        val snapshots = newBlocks(initial.chain.id, shown)
+        val snapshots = blockRequotes.newBlocks(initial.chain.id, shown)
             .mapNotNull {
                 requireWallet(metaId, initial.coldkey, initial.chain)
                 if (subnet == null && !netuid.isRoot() && metadataRetry.shouldAttempt()) subnet = loadSubnetMetadata(netuid)
@@ -107,20 +97,8 @@ class BittensorExitInteractor(
             .distinctUntilChanged()
     }
 
-    /** Each block after the current one while [shown]; a hidden screen skips them and resumes with the next block. */
-    fun newBlocks(chainId: ChainId, shown: Flow<Boolean>): Flow<Unit> = shown.distinctUntilChanged()
-        .flatMapLatest { visible ->
-            if (visible) flowOfAll { chainState.currentRemoteBlockNumberFlow(chainId) }.drop(1).map { } else emptyFlow()
-        }
-        .conflate()
-
-    /** What re-quotes a sale: each new block while [shown] and each of [immediate]; a lost block subscription is restored after a short pause. */
-    fun requotes(shown: Flow<Boolean>, immediate: Flow<Unit>): Flow<Unit> = merge(newBlocks(ChainGeneses.BITTENSOR, shown), immediate)
-        .retryWhen { cause, _ ->
-            if (cause is CancellationException) throw cause
-            delay(BLOCKS_RESUBSCRIBE_DELAY_MILLIS)
-            true
-        }
+    /** What re-quotes a sale: each new block while [shown] and each of [immediate]. */
+    fun requotes(shown: Flow<Boolean>, immediate: Flow<Unit>): Flow<Unit> = blockRequotes.requotes(shown, immediate)
 
     suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition = coroutineScope {
         val wallet = accountRepository.getMetaAccount(metaId)
@@ -232,16 +210,9 @@ class BittensorExitInteractor(
             .copy(plan = reviewed.plan, exitHotkeys = reviewed.exitHotkeys, groupHotkeys = reviewed.groupHotkeys)
     }
 
-    /** A block re-quote of the sale; a failed or timed-out read fails it, as iOS clears a failed quote. */
+    /** A block re-quote of the sale; a failed or timed-out read fails it. */
     suspend fun blockRequote(position: BittensorExitPosition, reviewed: BittensorExitQuote): Result<BittensorExitQuote> {
-        return try {
-            Result.success(refreshQuote(position, reviewed))
-        } catch (cause: Exception) {
-            if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
-            logger.log("[BittensorExit] Block re-quote failed")
-            logger.log(cause)
-            Result.failure(cause)
-        }
+        return blockRequotes.requote { refreshQuote(position, reviewed) }
     }
 
     /** The draft with the fee taken from the stake when the free balance cannot pay it. */
@@ -402,7 +373,7 @@ class BittensorExitInteractor(
         val minimumTaoOut = simulation.amountIn * limitPrice / BittensorProtocolUnits.RAO_PER_TAO
         val commission = configRepository.config().commission
         val serviceFee = commission.feeFor(simulation.amountOut)
-        // As on iOS, a sale that its own impact cannot fill at the limit price is still quoted; validation blocks it.
+        // A sale that its own impact cannot fill at the limit price is still quoted; validation blocks it.
         require(minimumTaoOut.isPositive())
 
         return BittensorExitQuote(

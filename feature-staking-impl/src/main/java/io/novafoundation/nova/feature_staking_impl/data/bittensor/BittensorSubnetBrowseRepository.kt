@@ -9,14 +9,14 @@ import kotlinx.coroutines.coroutineScope
 
 /** Manual buy catalogue only; held positions must never be filtered through this repository. */
 class BittensorSubnetBrowseRepository(
-    private val catalogueSource: BittensorSubnetCatalogueRemoteSource,
+    private val catalogueRepository: BittensorSubnetCatalogueRepository,
     private val subnets: BittensorSubnetRepository,
     private val availability: BittensorSubnetTradingAvailabilityRepository
 ) {
 
     suspend fun subnets(): List<BittensorSubnet> = coroutineScope {
         val runtime = async { subnets.catalogue() }
-        val response = catalogueSource.catalogue()
+        val response = catalogueRepository.catalogue()
         val catalogue = runtime.await()
         val candidates = mapBittensorBrowseSubnets(response, catalogue.subnets, chainVerified = catalogue.fromChain)
         val enabled = availability.enabledSubnets(candidates.map { it.id })

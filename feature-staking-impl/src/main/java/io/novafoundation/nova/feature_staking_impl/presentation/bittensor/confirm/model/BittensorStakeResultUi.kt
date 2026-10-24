@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 
 sealed interface BittensorStakeResultUi {
 
-    /** Result sheet buttons in display order; the last one is the primary button, as on iOS. */
+    /** Result sheet buttons in display order; the last one is the primary button. */
     val actions: List<BittensorResultAction>
 
     data class Unconfirmed(
@@ -44,7 +44,7 @@ sealed interface BittensorStakeResultUi {
         val fee: BittensorFeeUi? = null
     ) : BittensorStakeResultUi {
 
-        /** Close, plus Try again when a retry can succeed (iOS `createFailedSheet`). */
+        /** Close, plus Try again when a retry can succeed. */
         override val actions: List<BittensorResultAction>
             get() = if (canRetry) listOf(BittensorResultAction.CLOSE, BittensorResultAction.TRY_AGAIN) else listOf(BittensorResultAction.CLOSE)
     }

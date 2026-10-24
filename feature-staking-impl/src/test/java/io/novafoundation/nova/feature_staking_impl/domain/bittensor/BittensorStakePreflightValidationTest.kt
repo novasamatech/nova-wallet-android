@@ -29,6 +29,7 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 
 class BittensorStakePreflightValidationTest {
@@ -113,7 +114,7 @@ class BittensorStakePreflightValidationTest {
         `when`(immediateExecution.support(account)).thenReturn(BittensorWalletSupport.DELAYED_EXECUTION)
         for (netuid in listOf(BittensorNetuid.Root, BittensorNetuid.Subnet(1))) {
             val failure = system.validate(payload.copy(netuid = netuid)).getOrThrow().notValidOrNull()
-            assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason?.failure)
+            assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason)
         }
         assertEquals(0, loads)
         verify(accounts, never()).getSelectedMetaAccount()
@@ -129,7 +130,7 @@ class BittensorStakePreflightValidationTest {
         for ((support, expected) in refusals) {
             `when`(immediateExecution.support(account)).thenReturn(support)
 
-            assertEquals(expected, system.validate(payload).getOrThrow().notValidOrNull()?.reason?.failure)
+            assertEquals(expected, system.validate(payload).getOrThrow().notValidOrNull()?.reason)
         }
         assertEquals(0, loads)
         org.mockito.Mockito.verifyNoInteractions(wallets, subnetInteractor, validators)
@@ -140,7 +141,7 @@ class BittensorStakePreflightValidationTest {
         assertNull(system.validate(payload).getOrThrow().notValidOrNull())
         `when`(immediateExecution.support(account)).thenReturn(BittensorWalletSupport.DELAYED_EXECUTION)
         val failure = system.validate(payload.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()
-        assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason?.failure)
+        assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason)
         assertEquals(1, loads)
     }
 
@@ -153,13 +154,13 @@ class BittensorStakePreflightValidationTest {
     }
 
     @Test
-    fun `revalidation reads current restrictions and balance even after warning acceptance`() = runBlocking {
+    fun `revalidation reads current restrictions and balance even after warning acceptance`() = runBlocking<Unit> {
         assertNull(system.validate(payload).getOrThrow().notValidOrNull())
         snapshot = snapshot.copy(safeModeActive = true)
         val failure = system.validate(payload.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()
-        assertEquals(BittensorStakeValidationFailure.SAFE_MODE_ACTIVE, failure?.reason?.failure)
-        assertEquals(BigInteger.valueOf(989_999_990), failure?.reason?.maximumStake)
+        assertEquals(BittensorStakeValidationFailure.SAFE_MODE_ACTIVE, failure?.reason)
         assertEquals(2, loads)
+        verify(wallets, times(2)).assetFlow(7L, chainAsset)
     }
 
     @Test
@@ -180,9 +181,7 @@ class BittensorStakePreflightValidationTest {
             .getOrThrow()
             .notValidOrNull()
 
-        assertEquals(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED, failure?.reason?.failure)
-        assertEquals(reviewedQuote, failure?.reason?.quote)
-        assertEquals(movedQuote, failure?.reason?.latestQuote)
+        assertEquals(BittensorStakeValidationFailure.SlippageExceeded(reviewedQuote, movedQuote), failure?.reason)
         assertEquals(BigInteger.valueOf(1_005_000_000), subnetPayload.quote?.limitPrice)
         assertEquals(2, loads)
     }
@@ -195,7 +194,7 @@ class BittensorStakePreflightValidationTest {
 
         val failure = system.validate(subnetPayload).getOrThrow().notValidOrNull()
 
-        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, failure?.reason?.failure)
+        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, failure?.reason)
     }
 
     @Test
@@ -218,12 +217,12 @@ class BittensorStakePreflightValidationTest {
         `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks)).thenReturn(quote)
         `when`(validators.existingPositionValidator(chain, quote.subnetId, validator)).thenReturn(row)
         val existing = payload.copy(netuid = quote.subnetId, quote = quote, existingPosition = true)
-        assertEquals(BittensorStakeValidationFailure.INACTIVE_VALIDATOR, system.validate(existing).getOrThrow().notValidOrNull()?.reason?.failure)
+        assertEquals(BittensorStakeValidationFailure.INACTIVE_VALIDATOR, system.validate(existing).getOrThrow().notValidOrNull()?.reason)
         assertNull(system.validate(existing.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull())
         snapshot = snapshot.copy(safeModeActive = true)
         assertEquals(
             BittensorStakeValidationFailure.SAFE_MODE_ACTIVE,
-            system.validate(existing.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull()?.reason?.failure
+            system.validate(existing.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull()?.reason
         )
     }
 

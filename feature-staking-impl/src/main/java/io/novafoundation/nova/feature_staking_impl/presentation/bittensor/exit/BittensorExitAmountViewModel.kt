@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.resolvedValidatorNames
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
@@ -70,6 +72,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitExceedsAvailable
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -119,7 +122,7 @@ private data class ExitPreparationRequest(
 )
 
 /**
- * [requested] is the entered amount; the quote carries the planned one, which may differ (iOS `inputAmount`).
+ * [requested] is the entered amount; the quote carries the planned one, which may differ.
  * The fee is estimated for the [prepared] request; [exit] carries its latest block re-quote, none after a failed one.
  */
 private data class ExitAmountRequest(
@@ -135,7 +138,6 @@ private data class ExitAmountRequest(
 
 private data class ExitMaximum(val display: BittensorMaxAmount, val fill: BigDecimal)
 
-/** One row of the validator picker; the picker only exists for a group of more than one validator. */
 data class BittensorExitValidatorChoice(val hotkey: AccountIdKey) : Identifiable {
 
     override val identifier: String = hotkey.value.toHexString()
@@ -184,13 +186,12 @@ class BittensorExitAmountViewModel(
 
     private val input = MutableStateFlow(ExitAmountInput(""))
 
-    // iOS `selection`: nothing chosen yet resolves to all validators for a group of several.
+    // Nothing chosen yet resolves to all validators for a group of several.
     private val selection = MutableStateFlow<BittensorExitSelection?>(null)
 
     private var continuationJob: Job? = null
 
-    // As iOS pauses them while the review is shown, block re-quotes pause while the setup is hidden and showing it again re-quotes at once.
-    // The position refresh pauses with them.
+    // Block re-quotes and the position refresh pause while the setup is hidden; showing it again re-quotes at once.
     private val shown = MutableStateFlow(true)
 
     private val shownAgain = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -232,7 +233,7 @@ class BittensorExitAmountViewModel(
     private val currentSelection = combine(exitGroup, selection) { group, requested -> group?.resolve(requested) }
         .shareInBackground()
 
-    // iOS `retryValidatorNames`: a validator tap or Continue asks again after a failed lookup.
+    // A validator tap or Continue asks again after a failed name lookup.
     private val validatorNamesRetries = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     private val validatorNames = exitGroup.map { it?.hotkeys.orEmpty().toSet() }
@@ -242,7 +243,7 @@ class BittensorExitAmountViewModel(
 
     private val amountValidator = precisionValidator.forPrecision(position.map { it?.amountPrecision })
 
-    // The input whose amount exceeds the maximum: as on iOS, Continue stays available and explains the maximum.
+    // The input whose amount exceeds the maximum: Continue stays available and explains the maximum.
     private val exceedingInput = MutableStateFlow<ExitAmountInput?>(null)
 
     val amountError = amountValidator.observe(amount)
@@ -268,7 +269,7 @@ class BittensorExitAmountViewModel(
         }
         .shareInBackground()
 
-    // iOS `forceQuoteRefresh` on every block: the shown quote follows the pool, the fee stays with the prepared request.
+    // On every block the shown quote follows the pool; the fee stays with the prepared request.
     private val requestState = preparedState.flatMapLatest { state ->
         state.dataOrNull?.let(::requotedEachBlock) ?: flowOf { state }
     }
@@ -307,7 +308,7 @@ class BittensorExitAmountViewModel(
         } else {
             resources.getString(
                 R.string.bittensor_exit_sell_title,
-                it?.subnet?.displayName(resources) ?: resources.getString(R.string.bittensor_subnet_number, payload.netuid)
+                it?.subnet.displayName(payload.netuid, resources)
             )
         }
     }
@@ -384,7 +385,6 @@ class BittensorExitAmountViewModel(
         .shareInBackground()
 
     // Same directory name as the position, review and result screens; the address only as a fallback.
-    // As on iOS, the row loads until the selected validator is known.
     val validator = combine(position, currentSelection, validatorNames) { position, selection, names ->
         when (selection) {
             null -> ExtendedLoadingState.Loading
@@ -457,13 +457,11 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    // iOS `isFullyLocked`: nothing of the selected validators' stake can be withdrawn.
     private val isFullyLocked = combine(exitGroup, currentSelection) { group, selection ->
         group != null && selection != null && group.basis(selection).available.isZero
     }
         .distinctUntilChanged()
 
-    // iOS `createAction`: a fully locked stake, then an empty amount, take the label before Continue.
     val continueButtonState = combine(
         combine(positionState, prepared, ::Pair),
         validating,
@@ -556,7 +554,6 @@ class BittensorExitAmountViewModel(
                         resources,
                         isRoot = isRoot,
                         values = failureValues,
-                        // iOS `createUnstakeAllOffer`: only when the selected validators can be exited in full.
                         unstakeAll = { exitAll(current) }.takeIf { group.basis(selection).canExitAll },
                         acceptsRate = true,
                         onOutcome = { analytics.trackExitValidation(failure.reason, StakingValidationStage.SETUP, it, isRoot) }
@@ -576,7 +573,6 @@ class BittensorExitAmountViewModel(
                             null
                         )
                     )
-                    // The review names the validator of a single-validator plan, otherwise the selection's anchor (iOS confirm validator).
                     val reviewedHotkey = validated.quote.plan?.slices?.map { it.hotkey }?.distinct()?.singleOrNull() ?: group.anchor(selection)
                     val reviewedPosition = payload.copy(hotkeyAddress = draft.position.chain.addressOf(reviewedHotkey.value))
                     router.openBittensorExitReview(
@@ -585,7 +581,6 @@ class BittensorExitAmountViewModel(
                             allValidators = selection == BittensorExitSelection.All
                         )
                     )
-                    // iOS shows the planned amount in the field once the sale proceeds with it.
                     if (draft.quote.amount != quoted.requested) {
                         input.update { it.edit(BigDecimal(draft.quote.amount, draft.position.amountPrecision).toStripTrailingZerosString()) }
                     }
@@ -602,18 +597,18 @@ class BittensorExitAmountViewModel(
 
     /**
      * "Unstake all" from the remainder alert: fill Max so the setup re-quotes the full position.
-     * Only a later manual edit cancels it; a refreshed position or quote does not (iOS `selectMax`).
+     * Only a later manual edit cancels it; a refreshed position or quote does not.
      */
     private fun exitAll(validated: ExitAmountInput) = launchUnit {
         validating.first { !it }
         if (validated.hasSameIntent(input.value)) maxClicked()
     }
 
-    /** iOS `presentSellExceedsAvailable`: an amount above the maximum is refused on Continue with the maximum it allows. */
     private suspend fun showExceedsMaximum() {
         val maximum = maxAmount.first() ?: return
         analytics.trackExitValidation(BittensorExitValidationFailure.INSUFFICIENT_STAKE, StakingValidationStage.SETUP, StakingValidationOutcome.BLOCKED, isRoot)
-        showError(resources.getString(R.string.common_amount_too_big), resources.getString(R.string.bittensor_exit_exceeds_available, maximum))
+        val (title, message) = resources.bittensorExitExceedsAvailable(maximum)
+        showError(title, message)
     }
 
     fun validatorClicked() = launchUnit {
@@ -645,7 +640,6 @@ class BittensorExitAmountViewModel(
         }
     }
 
-    /** iOS `applySelection`: a new selection starts over with an empty amount. */
     private suspend fun applySelection(newSelection: BittensorExitSelection) {
         if (newSelection == currentSelection.first()) return
         selection.value = newSelection
@@ -678,7 +672,6 @@ class BittensorExitAmountViewModel(
             )
         }
         val selectedHotkey = (selection as? BittensorExitSelection.Validator)?.hotkey
-        // iOS `SubtensorValidatorPickerViewModelFactory`: the group's validators with their stake, "All validators" on top.
         return ChooseStakedStakeTargetsBottomSheet.Payload(
             data = rows,
             selected = rows.firstOrNull { it.payload.hotkey == selectedHotkey },
@@ -689,14 +682,13 @@ class BittensorExitAmountViewModel(
     }
 
     private fun alphaSymbol(position: BittensorExitPosition): TokenSymbol {
-        return if (isRoot) position.asset.token.configuration.symbol else TokenSymbol(bittensorAlphaSymbol(payload.netuid, position.subnet?.symbol))
+        return if (isRoot) position.asset.token.configuration.symbol else TokenSymbol(position.subnet.alphaSymbol(payload.netuid))
     }
 
     fun back() = router.back()
 
     private fun currentSlippage(): BigDecimal = if (isRoot) bittensorExitInteractor.slippage.fraction else slippageSettings.get()
 
-    // A block re-quote keeps the request current.
     private suspend fun isCurrent(quoted: ExitAmountRequest): Boolean {
         val current = ExitPreparationRequest(position.first(), input.value, currentSlippage(), selection.value)
         return quoted.preparation == current && quoted.isSameRequest(requestState.first().dataOrNull)
@@ -784,7 +776,7 @@ class BittensorExitAmountViewModel(
         return ExitAmountRequest(request, BittensorExitRequest(position, quote), estimateOnly, amount)
     }
 
-    /** A failed re-quote leaves no quote until the next block brings one, as iOS clears a failed quote. */
+    /** A failed re-quote leaves no quote until the next block brings one. */
     private fun requotedEachBlock(request: ExitAmountRequest): Flow<ExtendedLoadingState<ExitAmountRequest?>> = requotes
         .mapLatest<Unit, ExtendedLoadingState<ExitAmountRequest?>> {
             val position = request.prepared.position

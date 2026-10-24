@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.resolvedValidatorNames
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.analytics.StakingFlow
@@ -186,7 +187,7 @@ class BittensorExitReviewViewModel(
 
     private val execution = MutableStateFlow<ExitExecution>(ExitExecution.Idle)
 
-    // As on iOS confirm, the rows show the latest block re-quote; the fee and the limit Confirm checks against stay with the acknowledged quote.
+    // The rows show the latest block re-quote; the fee and the limit Confirm checks against stay with the acknowledged quote.
     private val quotes = MutableStateFlow(BittensorExitReviewQuotes(payload.quote()))
 
     private val acknowledgedQuote = quotes.map { it.acknowledged }
@@ -300,7 +301,6 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    // iOS `createStakeAfter`: the ticker only after the arrow.
     val stakeAfter = prepared.mapLoading {
         it?.let { draft ->
             val before = tokenFormatter.formatToken(
@@ -371,7 +371,6 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    /** iOS confirm and result: a plan over several validators lists them instead of naming one. */
     val isMultiValidator = acknowledgedQuote.map { quote -> quote.plan?.slices.orEmpty().map { it.hotkey }.distinct().size > 1 }
         .shareInBackground()
 
@@ -532,7 +531,7 @@ class BittensorExitReviewViewModel(
         feeLoaderMixin.connectWith(request) { _, request -> bittensorExitInteractor.feeEstimate(request) }
 
         if (!isRoot) {
-            // As on iOS, every new block re-quotes the sale until it is handed to submission, and a retry re-quotes at once.
+            // Every new block re-quotes the sale until it is handed to submission, and a retry re-quotes at once.
             bittensorExitInteractor.requotes(flowOf { true }, retryRequotes)
                 .filter { execution.value is ExitExecution.Idle }
                 .mapLatest { requote() }
@@ -557,7 +556,7 @@ class BittensorExitReviewViewModel(
         return (running.estimatedDuration - elapsed).coerceAtLeast(Duration.ZERO)
     }
 
-    /** iOS `didRequestRetry`: Try again returns to the review with the position, fee and quote refreshed; Confirm signs again. */
+    /** Try again returns to the review with the position, fee and quote refreshed; Confirm signs again. */
     fun retryClicked() {
         val failure = execution.value as? ExitExecution.Failure ?: return
         if (!failure.model.canRetry) return
@@ -572,7 +571,7 @@ class BittensorExitReviewViewModel(
             priceMoveBanner.beginTap()
             if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
             val loaded = prepared.first().dataOrNull ?: return@launchUnit
-            // iOS `applyTapGate`: Confirm at the new rate acknowledges the latest quote; a crossing the banner does not show yet only raises it.
+            // Confirm at the new rate acknowledges the latest quote; a crossing the banner does not show yet only raises it.
             val reviewed = when {
                 quotes.value.isPriceMoved -> {
                     priceMoveBanner.acknowledge()
@@ -601,7 +600,6 @@ class BittensorExitReviewViewModel(
                 validationSystem = exitValidationSystem,
                 payload = validationPayload,
                 validationFailureTransformerCustom = { failure, actions ->
-                    // iOS `applyMovedQuote`: the moved price shows in the banner and the next Confirm takes it.
                     val moved = validationPayload.latestQuote?.takeIf { failure.reason == BittensorExitValidationFailure.QUOTE_CHANGED }
                     moved?.let { latest -> quotes.update { if (it.acknowledged == acknowledged) it.withMovedPrice(latest) else it } }
                     bittensorExitValidationFailureUi(
@@ -610,7 +608,7 @@ class BittensorExitReviewViewModel(
                         resources,
                         isRoot = isRoot,
                         values = failureValues,
-                        // iOS confirm warns about a swept remainder again, with Proceed and Cancel only.
+                        // A swept remainder is warned about again, with Proceed and Cancel only.
                         unstakeAll = null,
                         acceptsRate = false,
                         onOutcome = { analytics.trackExitValidation(failure.reason, StakingValidationStage.CONFIRM, it, isRoot) }
@@ -622,7 +620,7 @@ class BittensorExitReviewViewModel(
                 val current = validated.latestQuote?.let { verified ->
                     quotes.updateAndGet { if (it.acknowledged == acknowledged) it.withLatest(verified) else it }
                 } ?: quotes.value
-                // iOS hands off only while no block re-quote has moved the price past the acknowledged limit since the tap.
+                // Hand off only while no block re-quote has moved the price past the acknowledged limit since the tap.
                 if (current.acknowledged == acknowledged && !current.isPriceMoved && !handedOff) {
                     priceMoveBanner.takeAcknowledgement()
                     execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
@@ -639,14 +637,14 @@ class BittensorExitReviewViewModel(
         }
     }
 
-    /** iOS signs the verified re-read quote, with its service fee, at the tighter of its own and the acknowledged limit. */
+    /** Signs the verified re-read quote, with its service fee, at the tighter of its own and the acknowledged limit. */
     private fun signedDraft(draft: BittensorExitDraft, validated: BittensorExitValidationPayload): BittensorExitDraft {
         val verified = validated.latestQuote ?: return draft
         val signed = verified.signedAt(verified.tighterLimit(than = requireNotNull(validated.acknowledgedLimit)))
         return bittensorExitInteractor.prepare(draft.position, signed, draft.fee, draft.feeFromStake)
     }
 
-    /** Re-quotes the acknowledged sale on a block (iOS `refreshQuote`); after a failed one the review shows the acknowledged quote. */
+    /** Re-quotes the acknowledged sale on a block; after a failed one the review shows the acknowledged quote. */
     private suspend fun requote() {
         val current = request.filterNotNull().first()
         val latest = bittensorExitInteractor.blockRequote(current.position, current.quote)
@@ -724,14 +722,13 @@ class BittensorExitReviewViewModel(
         router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(payload.position.netuid, validator))
     }
 
-    /** A root result sheet button, as iOS `activate(action:)`; Try again returns to the refreshed review. */
     fun resultActionClicked(action: BittensorResultAction) {
         if (!isRoot || action !in shownResultActions()) return
 
         resultNavigation.activate(action, finishedEmptiesPosition() ?: false) { retryClicked() }
     }
 
-    /** The subnet failure page button, as iOS `createPageAction`: Try again when a retry can succeed, otherwise Close leaves the flow. */
+    /** The subnet failure page button: Try again when a retry can succeed, otherwise Close leaves the flow. */
     fun failureActionClicked() {
         val failure = execution.value as? ExitExecution.Failure ?: return
         val action = if (failure.model.canRetry) BittensorResultAction.TRY_AGAIN else BittensorResultAction.CLOSE

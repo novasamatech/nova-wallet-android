@@ -17,14 +17,14 @@ data class BittensorExitValidationPayload(
     val priceImpactAccepted: Boolean = false,
     // The user chose to proceed although the network will sweep a dust remainder (iOS "Position will be closed").
     val remainderSweepAccepted: Boolean = false,
-    // iOS `acknowledgedLimit`: the limit of the quote the review was acknowledged at; the shown quote's own one at setup.
+    // The limit of the quote the review was acknowledged at; the shown quote's own one at setup.
     val acknowledgedLimit: BigInteger? = null
 ) {
 
     val feeFromStake: Boolean
         get() = transferable < fee + existentialDeposit
 
-    /** iOS `signingLimit`: the tighter of the shown quote's and the acknowledged limit. */
+    /** The tighter of the shown quote's and the acknowledged limit. */
     val signingLimit: BigInteger?
         get() = quote.limitPrice?.let { limit -> acknowledgedLimit?.let(quote::tighterLimit) ?: limit }
 }

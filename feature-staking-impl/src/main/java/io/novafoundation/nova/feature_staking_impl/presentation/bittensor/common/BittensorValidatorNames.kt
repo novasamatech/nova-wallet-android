@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
+package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import kotlinx.coroutines.CancellationException
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 
 /**
- * Directory names of the validators, null until a lookup succeeds. As on iOS a failed lookup is asked again on the
+ * Directory names of the validators, null until a lookup succeeds. A failed lookup is asked again on the
  * next of [retries], and a resolved one is kept while the validators stay the same. Without [retries] a failed lookup stays null.
  */
 internal fun Flow<Set<AccountIdKey>>.resolvedValidatorNames(

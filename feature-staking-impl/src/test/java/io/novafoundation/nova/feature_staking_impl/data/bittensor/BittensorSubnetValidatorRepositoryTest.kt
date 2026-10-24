@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
@@ -223,7 +224,7 @@ class BittensorSubnetValidatorRepositoryTest {
         `when`(api.rankedValidators(RANKING_URL)).thenReturn(Response.error(503, "".toResponseBody()))
         val resources = mock(ResourceManager::class.java)
         val logger = mock(Logger::class.java)
-        val controller = BittensorRetryController(resources, logger)
+        val controller = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
         `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
         val retryStarted = CompletableDeferred<Unit>()
@@ -290,7 +291,7 @@ class BittensorSubnetValidatorRepositoryTest {
 
         withTimeout(3_000L) {
             observeBittensorValidatorDirectory(
-                retryController = BittensorRetryController(resources, mock(Logger::class.java)),
+                retryController = BittensorRetryController(resources, mock(Logger::class.java), mock(AutomaticInteractionGate::class.java)),
                 hideUnusualApy = hideUnusualApy,
                 loadDirectory = { repository.unrankedDirectory(chain, subnet) },
                 rankDirectory = { repository.rankDirectory(chain, subnet, it) }

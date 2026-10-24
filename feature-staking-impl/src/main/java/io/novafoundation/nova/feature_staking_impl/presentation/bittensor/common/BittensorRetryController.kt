@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
@@ -12,11 +14,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
 /** Screen-local recovery for reads. Never retries a submitted transaction. */
-class BittensorRetryController(private val resources: ResourceManager, private val logger: Logger) {
+class BittensorRetryController(
+    private val resources: ResourceManager,
+    private val logger: Logger,
+    private val automaticInteractionGate: AutomaticInteractionGate
+) {
 
     // The failure awaiting the user is state, not a one-shot event: a dialog lost to a configuration change shows again,
     // and failures raised while the screen is hidden wait as one dialog instead of a stack of them.
@@ -56,14 +64,34 @@ class BittensorRetryController(private val resources: ResourceManager, private v
         }
     }
 
+    /**
+     * Each attempt of a read whose failure raises no dialog. A failed read is requested again once the app returns from
+     * the background.
+     */
+    fun <T> observeQuietly(step: String, load: suspend () -> T): Flow<Result<T>> = flow {
+        while (true) {
+            val attempt = try {
+                Result.success(load())
+            } catch (cause: Exception) {
+                currentCoroutineContext().ensureActive()
+                if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+                logFailure(step, cause)
+                Result.failure(cause)
+            }
+            emit(attempt)
+            if (attempt.isSuccess) return@flow
+            automaticInteractionGate.isInteractionAllowedFlow.first { allowed -> !allowed }
+            automaticInteractionGate.awaitInteractionAllowed()
+        }
+    }
+
     private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
-        logger.log("[Bittensor] Failed to load $step")
-        logger.log(cause)
+        logFailure(step, cause)
         val kind = cause.bittensorReadFailureKind()
         synchronized(pendingRetries) {
             val shown = pending.value
             if (shown != null) {
-                // iOS presents one alert at a time, so a later failure adds no dialog of its own.
+                // One dialog at a time: a later failure adds no dialog of its own.
                 if (shown.retryable && kind.retryable) pendingRetries += onRetry
                 return
             }
@@ -85,6 +113,11 @@ class BittensorRetryController(private val resources: ResourceManager, private v
             BittensorReadFailureKind.REJECTED -> R.string.common_error_general_title to R.string.bittensor_load_rejected_message
         }
         return BittensorReadFailure(kind, resources.getString(title), resources.getString(message), ::resolve)
+    }
+
+    private fun logFailure(step: String, cause: Throwable) {
+        logger.log("[Bittensor] Failed to load $step")
+        logger.log(cause)
     }
 
     private fun resolve(failure: BittensorReadFailure, retry: Boolean) {

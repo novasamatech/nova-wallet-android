@@ -114,12 +114,12 @@ class StakingDashboardFragment :
 
     override fun onResume() {
         super.onResume()
-        // As iOS on every dashboard appearance: request the start-staking maximum yield again while there is no stake
+        // On every dashboard appearance: request the start-staking maximum yield again while there is no stake
         viewModel.onResume()
     }
 
     override fun onDestroyView() {
-        // iOS drops a pending staking link once the dashboard leaves the screen for another tab or a pushed screen
+        // A pending staking link is dropped once the dashboard leaves the screen for another tab or a pushed screen
         if (!requireActivity().isChangingConfigurations) viewModel.cancelDeepLink()
 
         super.onDestroyView()

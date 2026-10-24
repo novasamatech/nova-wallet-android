@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemote
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemoteSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorListedSubnets
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import kotlinx.coroutines.awaitCancellation
@@ -57,7 +57,7 @@ class BittensorValidatorCoverageTest {
         val delegates = object : BittensorDelegateSource {
             override suspend fun validatorPermits(chainId: String, hotkey: AccountIdKey): Set<BittensorNetuid.Subnet>? = awaitCancellation()
         }
-        val catalogue = mock(BittensorSubnetCatalogueRemoteSource::class.java)
+        val catalogue = mock(BittensorSubnetCatalogueRepository::class.java)
         val hotkey = AccountIdKey(ByteArray(32))
         `when`(catalogue.catalogue()).thenReturn(emptyCatalogue())
         val interactor = BittensorValidatorCoverageInteractor(delegates, catalogue, timeoutMillis = 100)
@@ -71,7 +71,7 @@ class BittensorValidatorCoverageTest {
     @Test
     fun `non-delegate hotkey resolves to unknown coverage without timing out`() = runTest {
         val delegates = mock(BittensorDelegateSource::class.java)
-        val catalogue = mock(BittensorSubnetCatalogueRemoteSource::class.java)
+        val catalogue = mock(BittensorSubnetCatalogueRepository::class.java)
         val hotkey = AccountIdKey(ByteArray(32))
         `when`(delegates.validatorPermits(ChainGeneses.BITTENSOR, hotkey)).thenReturn(null)
         `when`(catalogue.catalogue()).thenReturn(emptyCatalogue())

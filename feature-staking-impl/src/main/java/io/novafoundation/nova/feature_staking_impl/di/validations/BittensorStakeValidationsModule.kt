@@ -49,7 +49,7 @@ class BittensorStakeValidationsModule {
 
         val inactiveValidator = BittensorInactiveValidatorValidation()
 
-        // The iOS validateStake order: the same failure level shows the first listed failure.
+        // Order matters: the same failure level shows the first listed failure.
         return bittensorStakeValidationSystem(
             quoteValidations = listOf(
                 quoteAvailability,

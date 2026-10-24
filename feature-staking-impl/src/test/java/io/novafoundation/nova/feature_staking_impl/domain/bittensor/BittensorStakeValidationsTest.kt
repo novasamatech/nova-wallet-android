@@ -120,7 +120,7 @@ class BittensorStakeValidationsTest {
     fun `fee reserve accepts exact maximum and rejects one rao above`() = runBlocking {
         val validation = BittensorStakeFeeReserveValidation()
         assertNull(validation.validate(payload.copy(amount = BigDecimal("0.989999990"))).notValidOrNull())
-        assertFailure(validation, payload.copy(amount = BigDecimal("0.989999991")), BittensorStakeValidationFailure.FEE_RESERVE)
+        assertFailure(validation, payload.copy(amount = BigDecimal("0.989999991")), BittensorStakeValidationFailure.FeeReserve(BigInteger.valueOf(989_999_990)))
     }
 
     @Test
@@ -202,7 +202,7 @@ class BittensorStakeValidationsTest {
 
         val failure = validation.validate(payload.copy(quote = quote, latestQuote = moved)).notValidOrNull()
 
-        assertEquals(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED, failure?.reason)
+        assertEquals(BittensorStakeValidationFailure.SlippageExceeded(quote, moved), failure?.reason)
         assertEquals(DefaultFailureLevel.WARNING, failure?.level)
     }
 
@@ -229,7 +229,7 @@ class BittensorStakeValidationsTest {
         val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
         val value = payload.copy(quote = highImpact)
         val failure = validation.validate(value).notValidOrNull()
-        assertEquals(BittensorStakeValidationFailure.HIGH_PRICE_IMPACT, failure?.reason)
+        assertEquals(BittensorStakeValidationFailure.HighPriceImpact(highImpact), failure?.reason)
         assertEquals(DefaultFailureLevel.WARNING, failure?.level)
         assertNull(validation.validate(value.copy(priceImpactAccepted = true)).notValidOrNull())
     }
@@ -256,7 +256,7 @@ class BittensorStakeValidationsTest {
 
         assertEquals(BittensorStakeValidationFailure.INACTIVE_VALIDATOR, system.validate(value).getOrThrow().notValidOrNull()?.reason)
         assertEquals(
-            BittensorStakeValidationFailure.HIGH_PRICE_IMPACT,
+            BittensorStakeValidationFailure.HighPriceImpact(highImpact),
             system.validate(value.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull()?.reason
         )
     }
@@ -268,9 +268,9 @@ class BittensorStakeValidationsTest {
         val moved = highImpact.copy(limitPrice = highImpact.postTradePrice())
         val value = payload.copy(netuid = quote.subnetId, quote = highImpact, latestQuote = moved)
 
-        assertEquals(BittensorStakeValidationFailure.HIGH_PRICE_IMPACT, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+        assertEquals(BittensorStakeValidationFailure.HighPriceImpact(moved), system.validate(value).getOrThrow().notValidOrNull()?.reason)
         assertEquals(
-            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED,
+            BittensorStakeValidationFailure.SlippageExceeded(highImpact, moved),
             system.validate(value.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()?.reason
         )
     }
@@ -294,7 +294,7 @@ class BittensorStakeValidationsTest {
         assertEquals(BigInteger.valueOf(303), exactBoundary.postTradePrice())
         assertNull(validation.validate(payload.copy(quote = exactBoundary)).notValidOrNull())
         val aboveBoundary = exactBoundary.copy(simulation = exactBoundary.simulation.copy(amountIn = BigInteger.valueOf(302)))
-        assertFailure(validation, payload.copy(quote = aboveBoundary), BittensorStakeValidationFailure.HIGH_PRICE_IMPACT)
+        assertFailure(validation, payload.copy(quote = aboveBoundary), BittensorStakeValidationFailure.HighPriceImpact(aboveBoundary))
     }
 
     @Test
@@ -318,7 +318,7 @@ class BittensorStakeValidationsTest {
         assertFailure(
             validation,
             payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
-            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED
+            BittensorStakeValidationFailure.SlippageExceeded(reviewedQuote, latestQuote)
         )
     }
 
@@ -331,7 +331,7 @@ class BittensorStakeValidationsTest {
         assertFailure(
             validation,
             payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
-            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED
+            BittensorStakeValidationFailure.SlippageExceeded(reviewedQuote, latestQuote)
         )
     }
 
@@ -368,7 +368,7 @@ class BittensorStakeValidationsTest {
         assertFailure(
             validation,
             payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
-            BittensorStakeValidationFailure.HIGH_PRICE_IMPACT
+            BittensorStakeValidationFailure.HighPriceImpact(latestQuote)
         )
     }
 

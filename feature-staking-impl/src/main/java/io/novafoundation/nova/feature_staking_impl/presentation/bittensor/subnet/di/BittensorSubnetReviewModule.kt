@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetRequoteMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -59,8 +58,7 @@ class BittensorSubnetReviewModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         estimatesMixin: BittensorEstimatesMixin,
         tokenFormatter: TokenFormatter,
-        chainStateRepository: ChainStateRepository,
-        requoteMixin: BittensorSubnetRequoteMixin
+        chainStateRepository: ChainStateRepository
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             analytics, operationAnalytics, BittensorNetuid.Subnet(payload.subnetId),
@@ -84,7 +82,6 @@ class BittensorSubnetReviewModule {
             estimatesMixin = estimatesMixin,
             tokenFormatter = tokenFormatter,
             chainStateRepository = chainStateRepository,
-            requoteMixin = requoteMixin,
             selectedSlippage = payload.slippage,
             existingPosition = payload.existingPosition,
             inactiveValidatorAccepted = payload.inactiveValidatorAccepted

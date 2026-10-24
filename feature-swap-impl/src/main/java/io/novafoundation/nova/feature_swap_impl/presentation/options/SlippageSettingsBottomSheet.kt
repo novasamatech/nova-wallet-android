@@ -1,27 +1,20 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
 import android.os.Bundle
-import android.view.Gravity
-import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
-import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.validation.observeErrors
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
-import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSlippageSettingsSheetBinding
+import io.novafoundation.nova.feature_swap_impl.databinding.ItemSlippagePresetBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 
 /**
@@ -70,30 +63,18 @@ class SlippageSettingsBottomSheet : BaseBottomSheetFragment<SlippageSettingsView
         viewModel.slippageWarningState.observe(binder.slippageSettingsAlert::setMessageOrHide)
     }
 
-    // As iOS SubtensorSlippagePresetsControl: equal-width presets above the custom field, the selected one filled.
     private fun showPresets(presets: List<SlippagePresetModel>) {
         binder.slippageSettingsPresets.removeAllViews()
         presets.forEachIndexed { index, preset ->
-            val layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f).apply {
-                if (index > 0) marginStart = 8.dp(requireContext())
+            with(ItemSlippagePresetBinding.inflate(layoutInflater, binder.slippageSettingsPresets, true).root) {
+                text = preset.title
+                isSelected = preset.isSelected
+                setOnClickListener {
+                    binder.slippageSettingsInput.content.clearFocus()
+                    binder.slippageSettingsInput.content.hideSoftKeyboard()
+                    viewModel.presetClicked(index)
+                }
             }
-            binder.slippageSettingsPresets.addView(presetView(preset, index), layoutParams)
-        }
-    }
-
-    private fun presetView(preset: SlippagePresetModel, index: Int) = TextView(requireContext()).apply {
-        text = preset.title
-        gravity = Gravity.CENTER
-        setTextAppearance(R.style.TextAppearance_NovaFoundation_SemiBold_Footnote)
-        setTextColorRes(if (preset.isSelected) R.color.text_primary else R.color.text_secondary)
-        background = context.getRoundedCornerDrawable(
-            fillColorRes = if (preset.isSelected) R.color.button_background_primary else R.color.chips_background,
-            cornerSizeInDp = 10
-        )
-        setOnClickListener {
-            binder.slippageSettingsInput.content.clearFocus()
-            binder.slippageSettingsInput.content.hideSoftKeyboard()
-            viewModel.presetClicked(index)
         }
     }
 }

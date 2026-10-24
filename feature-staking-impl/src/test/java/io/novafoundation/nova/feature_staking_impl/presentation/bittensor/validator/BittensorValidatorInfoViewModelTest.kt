@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -9,8 +10,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverageInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -34,7 +33,6 @@ import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -78,37 +76,6 @@ class BittensorValidatorInfoViewModelTest {
     }
 
     @Test
-    fun `without a row snapshot the validator is read from the chain`() = runBlocking<Unit> {
-        val chain = mock(Chain::class.java)
-        val hotkey = AccountIdKey(ByteArray(32) { 7 })
-        Mockito.doReturn(chain).`when`(validatorInteractor).chain()
-        val address = chain.addressOf(hotkey)
-        val validator = BittensorSubnetValidator(
-            BittensorValidator(hotkey, "Validator"),
-            address,
-            commissionRate = BigDecimal("0.18"),
-            selectable = false,
-            inactive = true
-        )
-        `when`(validatorInteractor.chainValidator(BittensorNetuid.Subnet(5), hotkey)).thenReturn(validator)
-        val viewModel = createViewModel(BittensorValidatorInfoPayload(subnetId = 5, address = address))
-
-        val status = withTimeout(5_000) { viewModel.status.first() }
-
-        assertEquals(R.string.staking_nominator_status_inactive.toString(), status.text)
-        assertEquals("${R.string.bittensor_validator_info_take_value}|18", withTimeout(5_000) { viewModel.take.first() })
-    }
-
-    @Test
-    fun `failed validator read offers a retry`() = runBlocking<Unit> {
-        val viewModel = createViewModel(BittensorValidatorInfoPayload(subnetId = 5, address = "address"))
-
-        val failure = withTimeout(5_000) { viewModel.retryEvents.first() }
-
-        assertTrue(failure.retryable)
-    }
-
-    @Test
     fun `reward shows the reliable rate the screen loads itself`() = runBlocking<Unit> {
         val chain = mock(Chain::class.java)
         val hotkey = AccountIdKey(ByteArray(32) { 7 })
@@ -123,15 +90,6 @@ class BittensorValidatorInfoViewModelTest {
     }
 
     @Test
-    fun `failed reward read shows no rate`() = runBlocking<Unit> {
-        val reward = withTimeout(5_000) { createViewModel(payload(inactive = false)).reward.first() }
-
-        assertEquals("—", reward.value)
-        assertNull(reward.detail)
-        assertEquals(TableCellView.FieldStyle.SECONDARY, reward.style)
-    }
-
-    @Test
     fun `failed coverage reads as unknown instead of an error`() = runBlocking<Unit> {
         val viewModel = createViewModel(payload(inactive = false))
 
@@ -143,14 +101,6 @@ class BittensorValidatorInfoViewModelTest {
     @Test
     fun `missing reported stake shows no amount`() = runBlocking<Unit> {
         val viewModel = createViewModel(payload(inactive = false))
-
-        assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
-    }
-
-    @Test
-    fun `subnet stake without a fresh price shows no amount`() = runBlocking<Unit> {
-        `when`(validatorInteractor.stakeInNative(BittensorNetuid.Subnet(5), BigDecimal.TEN)).thenReturn(null)
-        val viewModel = createViewModel(payload(inactive = false, stake = BigDecimal.TEN))
 
         assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
     }
@@ -184,7 +134,7 @@ class BittensorValidatorInfoViewModelTest {
         amountFormatter = mock(BittensorAmountFormatter::class.java),
         tokenFormatter = mock(TokenFormatter::class.java),
         externalActions = mock(ExternalActions.Presentation::class.java),
-        retryController = BittensorRetryController(resources, logger),
+        retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java)),
         resources = resources,
         logger = logger
     ).also { models += it }

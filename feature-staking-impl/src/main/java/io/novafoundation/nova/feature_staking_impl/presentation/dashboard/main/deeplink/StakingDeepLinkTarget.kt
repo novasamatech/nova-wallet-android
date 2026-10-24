@@ -23,7 +23,7 @@ class StakingDeepLinkDestination(
 )
 
 /**
- * As iOS `StakingDashboardPresenter.processPendingNavigation`: a staked item opens at once, an item without stake once its
+ * A staked item opens at once, an item without stake once its
  * primary (on-chain) sync is done, or as it is when [waitingForSync] is off after the pending link times out.
  * An unresolved item cannot start staking, as tapping its dashboard row cannot.
  */

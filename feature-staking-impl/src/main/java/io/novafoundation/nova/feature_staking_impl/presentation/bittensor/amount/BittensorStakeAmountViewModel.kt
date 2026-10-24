@@ -123,7 +123,7 @@ class BittensorStakeAmountViewModel(
 
     private var isNoBalanceTracked = false
 
-    /** Set once the setup moves on to the confirmation (iOS `abandonTracker.markProceeded`). */
+    /** Set once the setup moves on to the confirmation. */
     private var flowContinued = false
 
     private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.SETUP)
@@ -132,7 +132,7 @@ class BittensorStakeAmountViewModel(
     val retryEvents = retryController.events
 
     /**
-     * As on iOS, adding to an existing root position is titled "Add stake to root", and the Where to stake root card or a quick pick
+     * Adding to an existing root position is titled "Add stake to root", and the Where to stake root card or a quick pick
      * switched to root "Earn with Bittensor".
      */
     val titleRes = when {
@@ -379,8 +379,8 @@ class BittensorStakeAmountViewModel(
     }
 
     fun back() {
-        // As iOS: leaving the setup of a new position before continuing reports it abandoned. A setup replaced by the
-        // subnet setup is not left, as iOS keeps one setup and only changes its target.
+        // Leaving the setup of a new position before continuing reports it abandoned. A setup replaced by the
+        // subnet setup is not left: the flow keeps one setup and only changes its target.
         if (!flowContinued && payload?.validatorAddress == null) {
             analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SETUP, StakingAnalyticsTarget.ROOT))
         }
@@ -406,7 +406,7 @@ class BittensorStakeAmountViewModel(
             externalActions.showAddressActions(fixedAddress, details.chain)
             return@launchUnit
         }
-        // As iOS: the root preset is the recommended validator, so confirming it again is not a manual change.
+        // The root preset is the recommended validator, so confirming it again is not a manual change.
         val preset = stakingDetailsState.first().dataOrNull?.validator
         validatorCommunicator.openRequest(
             BittensorSelectValidatorCommunicator.Request(
@@ -539,7 +539,7 @@ class BittensorStakeAmountViewModel(
         fee: FeeStatus<BittensorFeeEstimate<BittensorRootStakeRequest>, FeeDisplay>
     ): DescriptiveButtonState {
         val label = resourceManager.getString(R.string.common_continue)
-        // As on iOS, the root button never asks for a validator: it reads "Enter amount" until an amount is entered.
+        // The root button never asks for a validator: it reads "Enter amount" until an amount is entered.
         if (amount == null || !amount.isPositive()) {
             return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
         }

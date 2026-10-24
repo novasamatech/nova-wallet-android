@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightFailure
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
@@ -30,6 +29,7 @@ class BittensorStakeValidationUiTest {
     private val resources = mock(ResourceManager::class.java)
 
     private val format = BittensorStakeAlertFormat(
+        nativeSymbol = "TAO",
         amount = { "$it rao" },
         requiredAmount = { "$it planks" },
         rate = { "rate ${it.limitPrice}" }
@@ -76,7 +76,7 @@ class BittensorStakeValidationUiTest {
     fun `market move shows the old and new rate and confirm takes the new rate`() {
         `when`(resources.getString(R.string.bittensor_rate_updated_message, "rate 1", "rate 2")).thenReturn("Old rate: rate 1.\nNew rate: rate 2")
         val outcomes = mutableListOf<StakingValidationOutcome>()
-        val failure = BittensorStakePreflightFailure(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED, quote(BigInteger.ONE), quote(BigInteger.TWO))
+        val failure = BittensorStakeValidationFailure.SlippageExceeded(quote(BigInteger.ONE), quote(BigInteger.TWO))
 
         val transformed = transform(failure, DefaultFailureLevel.WARNING) { outcomes += it } as TransformedFailure.Custom
 
@@ -93,7 +93,7 @@ class BittensorStakeValidationUiTest {
     fun `order too large for the tolerance only closes`() {
         val outcomes = mutableListOf<StakingValidationOutcome>()
 
-        val failure = BittensorStakePreflightFailure(BittensorStakeValidationFailure.SELF_IMPACT)
+        val failure = BittensorStakeValidationFailure.SELF_IMPACT
 
         val transformed = transform(failure) { outcomes += it } as TransformedFailure.Default
 
@@ -112,9 +112,12 @@ class BittensorStakeValidationUiTest {
 
     @Test
     fun `liquidity and order size report the iOS analytics kinds`() {
-        assertEquals(StakingValidationKind.LIQUIDITY, BittensorStakePreflightFailure(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE).analyticsKind())
-        assertEquals(StakingValidationKind.ORDER_TOO_LARGE, BittensorStakePreflightFailure(BittensorStakeValidationFailure.SELF_IMPACT).analyticsKind())
-        assertEquals(StakingValidationKind.RATE_UPDATED, BittensorStakePreflightFailure(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED).analyticsKind())
+        assertEquals(StakingValidationKind.LIQUIDITY, BittensorStakeValidationFailure.QUOTE_UNAVAILABLE.analyticsKind())
+        assertEquals(StakingValidationKind.ORDER_TOO_LARGE, BittensorStakeValidationFailure.SELF_IMPACT.analyticsKind())
+        assertEquals(
+            StakingValidationKind.RATE_UPDATED,
+            BittensorStakeValidationFailure.SlippageExceeded(quote(BigInteger.ONE), quote(BigInteger.TWO)).analyticsKind()
+        )
     }
 
     @Test
@@ -132,8 +135,7 @@ class BittensorStakeValidationUiTest {
     @Test
     fun `accepting price impact repeats validations instead of resuming past them`() {
         `when`(resources.getString(R.string.bittensor_price_impact_message, "1.66%")).thenReturn("This order moves the pool price by 1.66%.")
-        val latestQuote = quote(BigInteger.TEN, amountIn = 302, spot = 300)
-        val failure = BittensorStakePreflightFailure(BittensorStakeValidationFailure.HIGH_PRICE_IMPACT, latestQuote = latestQuote)
+        val failure = BittensorStakeValidationFailure.HighPriceImpact(quote(BigInteger.TEN, amountIn = 302, spot = 300))
 
         val transformed = transform(failure, DefaultFailureLevel.WARNING) as TransformedFailure.Custom
 
@@ -150,7 +152,7 @@ class BittensorStakeValidationUiTest {
     @Test
     fun `validation analytics reports only the chosen dialog outcome`() {
         val outcomes = mutableListOf<StakingValidationOutcome>()
-        val failure = BittensorStakePreflightFailure(BittensorStakeValidationFailure.QUOTE_EXPIRED)
+        val failure = BittensorStakeValidationFailure.QUOTE_EXPIRED
         val transformed = transform(failure) { outcomes += it } as TransformedFailure.Custom
         assertEquals(emptyList<StakingValidationOutcome>(), outcomes)
         transformed.dialogPayload.cancelAction!!.action()
@@ -163,7 +165,7 @@ class BittensorStakeValidationUiTest {
         `when`(resources.getString(R.string.bittensor_validation_minimum_stake, "122 planks"))
             .thenReturn("You can't stake less than the network minimum value (122 planks)")
         val outcomes = mutableListOf<StakingValidationOutcome>()
-        val failure = BittensorStakePreflightFailure(BittensorStakeValidationFailure.BelowMinimumStake(122.toBigInteger()))
+        val failure = BittensorStakeValidationFailure.BelowMinimumStake(122.toBigInteger())
 
         val transformed = transform(failure) { outcomes += it } as TransformedFailure.Default
 
@@ -176,7 +178,7 @@ class BittensorStakeValidationUiTest {
     fun `fee reserve names the maximum stake and the reserve`() {
         `when`(resources.getString(R.string.bittensor_fee_reserve_title, "10000000 rao")).thenReturn("Keep 10000000 rao for fees")
         `when`(resources.getString(R.string.bittensor_fee_reserve_message, "123 rao", "10000000 rao")).thenReturn("Lower the amount to 123 rao or less.")
-        val failure = BittensorStakePreflightFailure(BittensorStakeValidationFailure.FEE_RESERVE, maximumStake = 123.toBigInteger())
+        val failure = BittensorStakeValidationFailure.FeeReserve(123.toBigInteger())
 
         val (title, message) = failure.titleAndMessage(resources, format)
 
@@ -195,7 +197,7 @@ class BittensorStakeValidationUiTest {
             BittensorStakeValidationFailure.SAFE_MODE_ACTIVE to (R.string.bittensor_validation_safe_mode_title to R.string.bittensor_validation_safe_mode)
         )
         for ((reason, copy) in restrictions) {
-            val (title, message) = BittensorStakePreflightFailure(reason).titleAndMessage(resources, format)
+            val (title, message) = reason.titleAndMessage(resources, format)
 
             assertEquals(copy.first.toString(), title)
             assertEquals(copy.second.toString(), message)
@@ -204,7 +206,7 @@ class BittensorStakeValidationUiTest {
 
     @Test
     fun `balance failures keep the generic error title`() {
-        val (title, message) = BittensorStakePreflightFailure(BittensorStakeValidationFailure.INSUFFICIENT_BALANCE).titleAndMessage(resources, format)
+        val (title, message) = BittensorStakeValidationFailure.INSUFFICIENT_BALANCE.titleAndMessage(resources, format)
 
         assertEquals(R.string.common_error_general_title.toString(), title)
         assertEquals(R.string.common_error_not_enough_tokens.toString(), message)
@@ -212,7 +214,7 @@ class BittensorStakeValidationUiTest {
 
     @Test
     fun `ledger refusal shows the iOS signing not supported copy`() {
-        val (title, message) = BittensorStakePreflightFailure(BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED).titleAndMessage(resources, format)
+        val (title, message) = BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED.titleAndMessage(resources, format)
 
         assertEquals(R.string.account_parity_signer_not_supported_title.toString(), title)
         assertEquals(R.string.ledger_sign_raw_not_supported.toString(), message)
@@ -224,22 +226,19 @@ class BittensorStakeValidationUiTest {
             .thenReturn("Bittensor staking is not supported for Proxied wallets")
         `when`(resources.getString(R.string.bittensor_staking_wallet_unsupported_title, R.string.account_multisig.toString()))
             .thenReturn("Bittensor staking is not supported for Multisig wallets")
-        val proxied = BittensorStakePreflightFailure(BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED).titleAndMessage(resources, format)
-        val multisig = BittensorStakePreflightFailure(BittensorStakeValidationFailure.DELAYED_EXECUTION).titleAndMessage(resources, format)
+        `when`(resources.getString(R.string.bittensor_staking_wallet_unsupported_message, "TAO"))
+            .thenReturn("To stake TAO, please switch to a different type of wallet.")
+        val proxied = BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED.titleAndMessage(resources, format)
+        val multisig = BittensorStakeValidationFailure.DELAYED_EXECUTION.titleAndMessage(resources, format)
 
         assertEquals("Bittensor staking is not supported for Proxied wallets", proxied.first)
         assertEquals("Bittensor staking is not supported for Multisig wallets", multisig.first)
-        assertEquals(R.string.bittensor_staking_wallet_unsupported_message.toString(), proxied.second)
-        assertEquals(R.string.bittensor_staking_wallet_unsupported_message.toString(), multisig.second)
+        assertEquals("To stake TAO, please switch to a different type of wallet.", proxied.second)
+        assertEquals("To stake TAO, please switch to a different type of wallet.", multisig.second)
     }
 
     private fun transform(
-        reason: BittensorStakeValidationFailure,
-        level: DefaultFailureLevel = DefaultFailureLevel.ERROR
-    ): TransformedFailure = transform(BittensorStakePreflightFailure(reason), level)
-
-    private fun transform(
-        failure: BittensorStakePreflightFailure,
+        failure: BittensorStakeValidationFailure,
         level: DefaultFailureLevel = DefaultFailureLevel.ERROR,
         onOutcome: (StakingValidationOutcome) -> Unit = {}
     ): TransformedFailure = bittensorStakeValidationFailureUi(

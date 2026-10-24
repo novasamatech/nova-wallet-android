@@ -35,7 +35,8 @@ sealed interface BittensorStakeValidationFailure {
 
     data object INSUFFICIENT_BALANCE : BittensorStakeValidationFailure
 
-    data object FEE_RESERVE : BittensorStakeValidationFailure
+    /** [maximumStakeInPlanks] is what the balance leaves after the network fee and the fee reserve. */
+    data class FeeReserve(val maximumStakeInPlanks: BigInteger) : BittensorStakeValidationFailure
 
     /** [requiredAmountInPlanks] is the smallest entered amount that passes, including any fees taken before staking. */
     data class BelowMinimumStake(val requiredAmountInPlanks: BigInteger) : BittensorStakeValidationFailure
@@ -55,10 +56,11 @@ sealed interface BittensorStakeValidationFailure {
     /** The order alone moves the price past its slippage limit, so no quote at this tolerance can fill it. */
     data object SELF_IMPACT : BittensorStakeValidationFailure
 
-    /** The market moved: the latest quote no longer fills within the limit the user acknowledged. */
-    data object SLIPPAGE_EXCEEDED : BittensorStakeValidationFailure
+    /** The market moved: the [latestQuote] no longer fills within the limit the user acknowledged at [quote]. */
+    data class SlippageExceeded(val quote: BittensorSubnetBuyQuote, val latestQuote: BittensorSubnetBuyQuote) : BittensorStakeValidationFailure
 
-    data object HIGH_PRICE_IMPACT : BittensorStakeValidationFailure
+    /** [quote] is the quote the warning is raised for. */
+    data class HighPriceImpact(val quote: BittensorSubnetBuyQuote) : BittensorStakeValidationFailure
 
     data object INACTIVE_VALIDATOR : BittensorStakeValidationFailure
 }
@@ -67,7 +69,7 @@ typealias BittensorStakeValidationSystem = ValidationSystem<BittensorStakeValida
 
 typealias BittensorStakeValidation = Validation<BittensorStakeValidationPayload, BittensorStakeValidationFailure>
 
-/** As on iOS, a subnet stake checks its quote ([quoteValidations]) before the balance and the remaining [validations]. */
+/** A subnet stake checks its quote ([quoteValidations]) before the balance and the remaining [validations]. */
 fun bittensorStakeValidationSystem(
     quoteValidations: List<BittensorStakeValidation>,
     validations: List<BittensorStakeValidation>

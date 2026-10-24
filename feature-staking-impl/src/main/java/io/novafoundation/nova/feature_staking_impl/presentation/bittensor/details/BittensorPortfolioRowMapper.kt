@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
@@ -76,7 +77,6 @@ class BittensorPortfolioRowMapper(
         weeklyChanges: ExtendedLoadingState<Map<BittensorNetuid.Subnet, BigDecimal>>
     ): BittensorPositionUi {
         val subnet = metadata.dataOrNull?.get(subnetId)
-        val fallback = resources.getString(R.string.bittensor_subnet_number, subnetId.value)
         val alpha = portfolio.positions?.subnets.orEmpty().filter { it.subnetId == subnetId }.sumOf { it.alphaInPlanks }
         val subtitle = if (metadata.isLoading()) {
             null
@@ -100,7 +100,7 @@ class BittensorPortfolioRowMapper(
         }
         return BittensorPositionUi(
             id = "subnet-${subnetId.value}",
-            title = subnetPositionTitle(subnet, fallback),
+            title = subnet.displayName(subnetId.value, resources),
             subtitle = subtitle,
             amount = formatAmount(portfolio.positions?.subnetStake(subnetId), portfolio).copy(fiat = null),
             icon = subnet?.logoUrl?.asUrlIcon() ?: Icon.FromDrawableRes(R.drawable.ic_fallback_network_icon),

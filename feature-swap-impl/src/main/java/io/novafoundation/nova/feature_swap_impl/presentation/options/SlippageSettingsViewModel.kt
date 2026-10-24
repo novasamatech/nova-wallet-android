@@ -44,7 +44,7 @@ class SlippageSettingsViewModel(
 
     val slippageInput = MutableStateFlow("")
 
-    // As on iOS a preset is selected only while the custom field is empty.
+    // A preset is selected only while the custom field is empty.
     private val selectedPresetIndex = MutableStateFlow<Int?>(null)
 
     private val selectedPreset = combine(selectedPresetIndex, slippageInput) { index, input -> index.takeIf { input.isEmpty() } }
@@ -71,11 +71,11 @@ class SlippageSettingsViewModel(
     private var slippageResponded = false
 
     init {
-        // As iOS applyInput: a value equal to a preset shows that preset selected and the custom field empty.
+        // A value equal to a preset shows that preset selected and the custom field empty.
         val presetIndex = slippageConfig.slippageTips.indexOfFirst(initialSlippage::sameAs)
         if (presetIndex >= 0) selectedPresetIndex.value = presetIndex else slippageInput.value = slippageInputText(initialSlippage)
 
-        // Typing a custom value deselects the preset, so emptying the field again leaves no value, as on iOS.
+        // Typing a custom value deselects the preset, so emptying the field again leaves no value.
         slippageInput
             .onEach { if (it.isNotEmpty()) selectedPresetIndex.value = null }
             .launchIn(this)
@@ -100,10 +100,10 @@ class SlippageSettingsViewModel(
         }
     }
 
-    // As on iOS, an empty field is no value and Done applies nothing.
+    // An empty field is no value and Done applies nothing.
     private fun String.toSlippage(): Fraction? = toDoubleOrNull()?.takeIf { it.isFinite() }?.percents
 
-    // A single Done action, as on iOS, which keeps its title while disabled.
+    // A single Done action, which keeps its title while disabled.
     private fun formatButtonState(slippage: Fraction?, validationResult: FieldValidationResult): DescriptiveButtonState {
         val label = resourceManager.getString(R.string.common_done)
         val canApply = slippage != null && validationResult !is FieldValidationResult.Error && slippage != initialSlippage
@@ -119,7 +119,7 @@ internal fun slippageInputText(slippage: Fraction): String = BigDecimal(slippage
     .stripTrailingZeros()
     .toPlainString()
 
-/** As iOS reports a slippage change: back to the default is a reset, a listed tip is a preset, anything else is custom. */
+/** Back to the default is a reset, a listed tip is a preset, anything else is custom. */
 internal fun slippageChangeMethod(initial: Fraction, selected: Fraction, config: SlippageConfig): SlippageSettingsCommunicator.Method = when {
     selected.sameAs(config.defaultSlippage) && !initial.sameAs(config.defaultSlippage) -> SlippageSettingsCommunicator.Method.RESET
     config.slippageTips.any(selected::sameAs) -> SlippageSettingsCommunicator.Method.PRESET

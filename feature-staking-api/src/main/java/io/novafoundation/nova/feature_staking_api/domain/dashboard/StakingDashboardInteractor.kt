@@ -9,7 +9,7 @@ interface StakingDashboardInteractor {
 
     suspend fun syncDapps()
 
-    fun stakingDashboardFlow(maximumYieldRefreshes: Flow<Unit>): Flow<ExtendedLoadingState<StakingDashboard>>
+    fun stakingDashboardFlow(): Flow<ExtendedLoadingState<StakingDashboard>>
 
     fun moreStakingOptionsFlow(): Flow<MoreStakingOptions>
 }

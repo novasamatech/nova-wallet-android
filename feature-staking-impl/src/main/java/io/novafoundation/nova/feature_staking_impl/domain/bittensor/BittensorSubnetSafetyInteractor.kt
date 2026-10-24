@@ -13,7 +13,7 @@ class BittensorSubnetSafetyInteractor(
     private val chainStateRepository: ChainStateRepository
 ) {
 
-    /** The exact time since the registration block, as on iOS; only the age label rounds it to days. */
+    /** The exact time since the registration block; only the age label rounds it to days. */
     suspend fun age(subnet: BittensorSubnet): Duration? {
         val registration = subnet.registrationBlock ?: return null
         val header = rpcCalls.getBlockHeader(ChainGeneses.BITTENSOR)

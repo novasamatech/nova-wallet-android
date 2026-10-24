@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * The validator to show. Without a [detail], as from a position, a review or a claim, the screen reads it from the listing and
- * the chain, as iOS does without a directory item. It loads the reward rate and the price itself in any case.
+ * the chain. It loads the reward rate and the price itself in any case.
  */
 @Parcelize
 class BittensorValidatorInfoPayload(

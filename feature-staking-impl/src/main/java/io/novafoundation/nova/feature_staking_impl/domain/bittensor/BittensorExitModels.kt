@@ -55,13 +55,19 @@ data class BittensorExitQuote(
             return average * average / spot
         }
 
-    /** iOS `isFillable(atLimit:)`: the pool price the sale leaves stays above [atLimit]. */
+    val priceImpact: BittensorPriceImpact?
+        get() {
+            val spot = spotPrice ?: return null
+            return postTradePrice?.let { BittensorPriceImpact(spot, it) }
+        }
+
+    /** The pool price the sale leaves stays above [atLimit]. */
     fun isFillable(atLimit: BigInteger): Boolean = postTradePrice?.let { it > atLimit } ?: false
 
-    /** iOS `tighterLimit(than:)`: a sale keeps the higher of the two limit prices. */
+    /** A sale keeps the higher of the two limit prices. */
     fun tighterLimit(than: BigInteger): BigInteger = requireNotNull(limitPrice).max(than)
 
-    /** The quote signed at [limit], as iOS signs a verified quote at its signing limit. */
+    /** The quote signed at [limit]. */
     fun signedAt(limit: BigInteger): BittensorExitQuote = copy(
         limitPrice = limit,
         minimumTaoOut = requireNotNull(simulatedInput) * limit / BittensorProtocolUnits.RAO_PER_TAO

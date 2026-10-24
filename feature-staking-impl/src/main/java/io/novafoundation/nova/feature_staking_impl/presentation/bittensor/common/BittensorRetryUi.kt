@@ -20,7 +20,6 @@ fun BaseFragmentMixin<*>.observeBittensorRetries(events: Flow<BittensorReadFailu
             ) {
                 setTitle(error.title)
                 setMessage(error.message)
-                // iOS offers Skip beside Retry on a failed read.
                 setNegativeButton(R.string.common_skip) { _, _ -> skip() }
             }
         } else {

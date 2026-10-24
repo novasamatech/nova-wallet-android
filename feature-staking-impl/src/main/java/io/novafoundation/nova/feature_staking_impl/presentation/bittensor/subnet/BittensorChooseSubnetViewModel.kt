@@ -79,7 +79,7 @@ class BittensorChooseSubnetViewModel(
 
     private var isSearchTracked = false
 
-    // As on iOS, only the picker opened from the staking start (see all options) reports abandonment, not the one from the amount screen.
+    // Only the picker opened from the staking start (see all options) reports abandonment, not the one from the amount screen.
     private val tracksAbandonment = !payload.replaceAmount
 
     // Subnet details opened from here report the abandonment themselves or finish the flow, so the picker reports nothing while they are open.
@@ -211,7 +211,7 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    // As on iOS, a search without matches shows only its message: no root row, sorting, filters or count. A failed load is not one.
+    // A search without matches shows only its message: no root row, sorting, filters or count. A failed load is not one.
     private val searchHasNoMatches = combine(subnets, isLoading, hasError, query) { subnets, loading, failed, query ->
         !loading && !failed && query.isNotBlank() && subnets.isEmpty()
     }
@@ -363,7 +363,7 @@ class BittensorChooseSubnetViewModel(
             .map { subnet -> mapSubnetRow(subnet, favorites, asset, weeklyChange(subnet.id, weeklySummaries)) }
     }
 
-    // As on iOS: a failed or unpriced read and a listed subnet without a change show a dash, only an unlisted one has no history.
+    // A failed or unpriced read and a listed subnet without a change show a dash, only an unlisted one has no history.
     private fun weeklyChange(subnetId: BittensorNetuid.Subnet, state: ExtendedLoadingState<WeeklySummaries?>): BittensorSubnetWeeklyChange {
         val summaries = when (state) {
             ExtendedLoadingState.Loading -> return BittensorSubnetWeeklyChange.Loading

@@ -13,7 +13,7 @@ class BittensorImmediateExecution(
     private val signerProvider: SignerProvider
 ) {
 
-    // As iOS FeatureSupportChecker: Ledger and proxied wallets are refused by type, a multisig only when its calls
+    // Ledger and proxied wallets are refused by type, a multisig only when its calls
     // execute with a delay. This is not signing authorization: submission still uses the normal signer hierarchy.
     suspend fun support(wallet: MetaAccount): BittensorWalletSupport = when (wallet.type) {
         LightMetaAccount.Type.SECRETS,

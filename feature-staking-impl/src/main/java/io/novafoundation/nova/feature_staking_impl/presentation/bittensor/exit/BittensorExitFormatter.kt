@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
-import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitFailureValues
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitFeeShortfallUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitRateUpdateUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatPercents
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -37,11 +38,6 @@ class BittensorExitFormatter @Inject constructor(
     @Named("BittensorWithdrawalDuration") private val durationFormatter: DurationFormatter
 ) {
 
-    private companion object {
-
-        const val IMPACT_SCALE = 6
-    }
-
     /** Alpha is valued at [quote]'s spot price when there is one, as [bittensorAlphaSpotPrice]. */
     fun amount(position: BittensorExitPosition, planks: BigInteger, alpha: Boolean, quote: BittensorExitQuote? = null): AmountModel {
         val token = position.asset.token
@@ -55,7 +51,7 @@ class BittensorExitFormatter @Inject constructor(
         )
     }
 
-    /** The values the iOS exit alerts name, from the snapshot the validation read. */
+    /** The values the exit alerts name, from the snapshot the validation read. */
     fun failureValues(
         payload: BittensorExitValidationPayload,
         position: BittensorExitPosition,
@@ -64,7 +60,8 @@ class BittensorExitFormatter @Inject constructor(
         return BittensorExitFailureValues(
             minimum = tao(position, payload.preflight.minStake),
             maximum = amount(position, limits.maximum, alpha = !position.isRoot).token.toString(),
-            priceImpact = priceImpact(payload.quote),
+            priceImpact = payload.quote.priceImpact.formatPercents(),
+            nativeSymbol = position.asset.token.configuration.symbol.value,
             holdEta = limits.holdDuration?.let(durationFormatter::format),
             feeShortfall = feeShortfall(payload, position),
             dustRemainder = payload.dustRemainder()?.let { BittensorExitDustRemainderUi(tao(position, it.remainderTao), tao(position, it.minimumTao)) },
@@ -77,7 +74,7 @@ class BittensorExitFormatter @Inject constructor(
         return tokenFormatter.formatToken(token.amountFromPlanks(planks), token.configuration.symbol).toString()
     }
 
-    // iOS: a batch keeps the fee and the existential deposit in the free balance; a single root unstake pays the fee from its position.
+    // A batch keeps the fee and the existential deposit in the free balance; a single root unstake pays the fee from its position.
     private fun feeShortfall(payload: BittensorExitValidationPayload, position: BittensorExitPosition): BittensorExitFeeShortfallUi {
         val quote = payload.quote
         if (!position.isRoot || quote.plan?.isBatched == true || quote.exitHotkeys.size > 1) {
@@ -87,18 +84,6 @@ class BittensorExitFormatter @Inject constructor(
         }
         val stake = quote.plan?.slices?.singleOrNull()?.let { payload.preflight.groupMembers[it.hotkey]?.stake } ?: payload.preflight.stake
         return BittensorExitFeeShortfallUi(tao(position, payload.fee), tao(position, stake), missing = null)
-    }
-
-    // iOS `NumberFormatter.percentSingle`: the pool price move against spot, at most two fraction digits rounded down.
-    private fun priceImpact(quote: BittensorExitQuote?): String {
-        val spot = quote?.spotPrice?.takeIf { it.isPositive() }
-        val executed = quote?.postTradePrice
-        val impact = if (spot != null && executed != null) {
-            (spot - executed).abs().toBigDecimal().divide(spot.toBigDecimal(), IMPACT_SCALE, RoundingMode.DOWN)
-        } else {
-            BigDecimal.ZERO
-        }
-        return impact.movePointRight(2).formatAsPercentage()
     }
 
     /** The Swap rate explanation with the quoted Nova commission; a root unstake has none. */
@@ -138,10 +123,10 @@ class BittensorExitFormatter @Inject constructor(
         return tokenFormatter.formatToken(ratio, position.asset.token.configuration.symbol).toString()
     }
 
-    private fun alphaSymbol(position: BittensorExitPosition): String = bittensorAlphaSymbol(position.netuid.value, position.subnet?.symbol)
+    private fun alphaSymbol(position: BittensorExitPosition): String = position.subnet.alphaSymbol(position.netuid.value)
 }
 
-/** iOS `alphaSpotPrice`: the spot price of the current [quote], otherwise the subnet price; null unless it is positive. */
+/** The spot price of the current [quote], otherwise the subnet price; null unless it is positive. */
 internal fun bittensorAlphaSpotPrice(position: BittensorExitPosition, quote: BittensorExitQuote?): BigInteger? {
     return (quote?.spotPrice ?: position.subnet?.priceInRao)?.takeIf { it.isPositive() }
 }

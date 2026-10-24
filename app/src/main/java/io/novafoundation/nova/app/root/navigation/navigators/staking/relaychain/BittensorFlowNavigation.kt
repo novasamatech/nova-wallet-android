@@ -17,9 +17,8 @@ private val BITTENSOR_FLOW_HOSTS = setOf(
 )
 
 /**
- * Browse screens a staking deep link may pop, nested graphs included: iOS pushes them inside a tab and pops the staking
- * tab to its root. Anything else on the split screen back stack (a setup or confirmation, Send, Swap, signing...)
- * is a flow in progress the link must not interrupt.
+ * Browse screens a staking deep link may pop, nested graphs included. Anything else on the split screen back stack
+ * (a setup or confirmation, Send, Swap, signing...) is a flow in progress the link must not interrupt.
  */
 private val STAKING_DEEP_LINK_BROWSE_SCREENS = setOf(
     R.id.split_screen_nav_graph,
@@ -97,7 +96,7 @@ internal sealed interface BittensorFlowExitPlan {
     /** Pops everything above [destination], then optionally continues to the "Where to stake" quick pick. */
     data class PopTo(@IdRes val destination: Int, val openWhereToStake: Boolean = false) : BittensorFlowExitPlan
 
-    /** The portfolio is on the back stack: pop back to it and let it report its opening again, as iOS `reopen(from: .result)`. */
+    /** The portfolio is on the back stack: pop back to it and let it report its opening again. */
     data object ReturnToPortfolio : BittensorFlowExitPlan
 
     /** The flow did not start from the portfolio: replace the whole flow with the portfolio over the dashboard. */
@@ -149,5 +148,5 @@ internal fun NavController.backStackDestinationIds(): List<Int> = backStack
 @SuppressLint("RestrictedApi")
 internal fun NavController.backStackIdsWithGraphs(): List<Int> = backStack.map { it.destination.id }
 
-/** A dialog destination is on top; iOS ignores the link under any presented sheet. */
+/** A dialog destination is on top: the link is ignored under any presented sheet. */
 internal fun NavController.isShowingDialog(): Boolean = currentDestination is FloatingWindow

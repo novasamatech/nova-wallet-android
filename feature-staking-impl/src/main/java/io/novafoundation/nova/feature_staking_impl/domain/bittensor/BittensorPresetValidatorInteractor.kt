@@ -29,7 +29,7 @@ class BittensorValidatorPreset(
 /**
  * Automatic presets only. An explicitly selected hotkey must never be silently replaced.
  *
- * Mirrors iOS (NW-2303): an existing position keeps its primary validator unless the chain reports it inactive; otherwise the
+ * An existing position keeps its primary validator unless the chain reports it inactive; otherwise the
  * preset is the recommended validator with the highest reliable APY that is active on the subnet, with a single fallback to the
  * runner-up.
  */
@@ -60,7 +60,7 @@ class BittensorPresetValidatorInteractor @Inject constructor(
     }
 
     /**
-     * The subnet preset applied to netuid 0, as on iOS: the held root validator first, otherwise the recommended root validators
+     * The subnet preset applied to netuid 0: the held root validator first, otherwise the recommended root validators
      * ranked by their 30-day root APY. The directory is read only when no held validator qualifies.
      */
     suspend fun rootPreset(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator? = coroutineScope {
@@ -72,8 +72,8 @@ class BittensorPresetValidatorInteractor @Inject constructor(
     }
 
     /**
-     * The first of the two best [bittensorPresetCandidates] that passes the chain check, shared by subnets and root as iOS shares
-     * SubtensorValidatorPresetOperationFactory. A failed recommendations read fails the preset.
+     * The first of the two best [bittensorPresetCandidates] that passes the chain check, shared by subnets and root.
+     * A failed recommendations read fails the preset.
      */
     private suspend fun recommendedPreset(
         chain: Chain,
@@ -117,7 +117,7 @@ class BittensorPresetValidatorInteractor @Inject constructor(
         emptyMap()
     }
 
-    /** [hotkey] of an existing position as the chain reports it (iOS createItemWrapper), or null when unreadable or inactive. */
+    /** [hotkey] of an existing position as the chain reports it, or null when unreadable or inactive. */
     private suspend fun activeExistingValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey?): BittensorSubnetValidator? {
         if (hotkey == null) return null
         return try {
@@ -131,7 +131,7 @@ class BittensorPresetValidatorInteractor @Inject constructor(
         }
     }
 
-    /** Waits for positions to load or fail, as iOS requests the preset only then, so a held validator is never replaced. */
+    /** Waits for positions to load or fail, so a held validator is never replaced. */
     private suspend fun existingPrimaryHotkey(subnet: BittensorNetuid.Subnet): AccountIdKey? = try {
         portfolioRepository.observePortfolio().first { it.dataStatus !is BittensorDataStatus.Loading }
             .positions
@@ -157,7 +157,7 @@ private const val MAX_PRESET_ATTEMPTS = 2
 
 /**
  * Recommended, active and gate-passing rows, highest reliable APY first. Equal APYs and rows without a reliable APY follow the
- * ranking, as iOS highestYield takes the first ranked recommendation with the highest rate.
+ * ranking, so the first ranked recommendation with the highest rate wins.
  */
 internal fun bittensorPresetCandidates(
     directory: List<BittensorSubnetValidator>,

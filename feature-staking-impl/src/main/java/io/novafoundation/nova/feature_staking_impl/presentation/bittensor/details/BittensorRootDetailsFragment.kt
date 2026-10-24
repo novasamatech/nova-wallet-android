@@ -28,7 +28,7 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
             .bittensorDetailsComponentFactory()
-            .create(this)
+            .create(this, portfolioPayload = null)
             .inject(this)
     }
 

@@ -39,7 +39,7 @@ interface BittensorSubnetRepository {
 
 /**
  * Subnet names and symbols come from the chain (`get_all_dynamic_info`, a heavy call) or, when the node is slow or
- * failing, from the backend `/subnets` catalogue - the source iOS names subnets from. When both fail, the last good
+ * failing, from the backend `/subnets` catalogue. When both fail, the last good
  * catalogue stands in with its metadata only, so a failing node never blanks subnet names; prices and reserves are never
  * served from that last good catalogue, and the next read asks both sources again.
  */
@@ -47,7 +47,7 @@ class RealBittensorSubnetRepository(
     private val runtimeCalls: MultiChainRuntimeCallsApi,
     private val configRepository: BittensorConfigRepository,
     private val swapSource: BittensorSwapSource,
-    private val catalogueSource: BittensorSubnetCatalogueRemoteSource,
+    private val catalogueRepository: BittensorSubnetCatalogueRepository,
     private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS,
     private val nanoTime: () -> Long = System::nanoTime
 ) : BittensorSubnetRepository {
@@ -140,7 +140,7 @@ class RealBittensorSubnetRepository(
         return BittensorSubnetCatalogue(chain.await().getOrThrow(), fromChain = true)
     }
 
-    private suspend fun loadBackendCatalogue(): List<BittensorSubnet> = mapBittensorBackendCatalogue(catalogueSource.catalogue())
+    private suspend fun loadBackendCatalogue(): List<BittensorSubnet> = mapBittensorBackendCatalogue(catalogueRepository.catalogue())
 
     private suspend fun <T> catching(load: suspend () -> T): Result<T> = try {
         Result.success(load())
@@ -167,9 +167,9 @@ class RealBittensorSubnetRepository(
 }
 
 /**
- * The backend catalogue as [BittensorSubnet]s; STALE metadata is still listed, as on iOS. A STALE price never values
- * anything: [BittensorSubnet.priceInRao] stays null (iOS `freshTaoPerAlpha`) until a FRESH or live chain price is
- * available. The subnet picker still lists it from the backend rows, as iOS lists `taoPerAlpha` whatever its freshness.
+ * The backend catalogue as [BittensorSubnet]s; STALE metadata is still listed. A STALE price never values
+ * anything: [BittensorSubnet.priceInRao] stays null until a FRESH or live chain price is
+ * available. The subnet picker still lists it from the backend rows whatever its freshness.
  */
 internal fun mapBittensorBackendCatalogue(remote: BittensorSubnetCatalogueRemote): List<BittensorSubnet> {
     requireAvailableBittensorComponent(remote.meta?.components?.subnetMetadata, "Subnet metadata")
@@ -194,6 +194,13 @@ internal fun mapBittensorBackendCatalogue(remote: BittensorSubnetCatalogueRemote
     }.distinctBy { it.id }.sortedBy { it.id.value }
     require(subnets.isNotEmpty()) { "Empty subnet catalogue" }
     return subnets
+}
+
+/** Every non-root netuid the catalogue lists; an unavailable component fails the read. */
+internal fun mapBittensorListedSubnets(remote: BittensorSubnetCatalogueRemote): Set<BittensorNetuid.Subnet> {
+    requireAvailableBittensorComponent(remote.meta?.components?.subnetMetadata, "Subnet metadata")
+    requireAvailableBittensorComponent(remote.meta?.components?.alphaPrices, "Subnet prices")
+    return requireNotNull(remote.items).mapNotNullTo(mutableSetOf()) { BittensorNetuid.from(requireNotNull(it.netuid)) as? BittensorNetuid.Subnet }
 }
 
 private fun bittensorBackendPlanks(value: String): BigInteger {

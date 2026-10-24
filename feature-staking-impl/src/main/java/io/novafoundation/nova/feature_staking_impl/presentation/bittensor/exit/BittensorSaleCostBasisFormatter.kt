@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.isNegative
@@ -49,7 +50,7 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
     }
 
     fun averagePrice(sale: BittensorSaleCostBasis, position: BittensorExitPosition?): AmountModel {
-        return averagePrice(sale, position?.asset?.token, position?.let { bittensorAlphaSymbol(it.netuid.value, it.subnet?.symbol) })
+        return averagePrice(sale, position?.asset?.token, position?.let { it.subnet.alphaSymbol(it.netuid.value) })
     }
 
     fun averagePrice(sale: BittensorSaleCostBasis, token: TokenBase?, alphaSymbol: String?): AmountModel = when (sale) {

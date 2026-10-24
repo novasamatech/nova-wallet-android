@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.postTradePrice
 
-/** iOS orderWithinSlippageTolerance: the checked quote must fill at its own limit, otherwise the order itself is too large. */
+/** The checked quote must fill at its own limit, otherwise the order itself is too large. */
 class BittensorOrderToleranceValidation : BittensorStakeValidation {
 
     override suspend fun validate(value: BittensorStakeValidationPayload): ValidationStatus<BittensorStakeValidationFailure> {
