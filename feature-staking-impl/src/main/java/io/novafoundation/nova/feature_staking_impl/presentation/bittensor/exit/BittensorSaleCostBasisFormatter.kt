@@ -48,6 +48,10 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
         return averagePriceOf(totals, token, alphaSymbol)
     }
 
+    fun averagePrice(sale: BittensorSaleCostBasis, position: BittensorExitPosition?): AmountModel {
+        return averagePrice(sale, position?.asset?.token, position?.let { bittensorAlphaSymbol(it.netuid.value, it.subnet?.symbol) })
+    }
+
     fun averagePrice(sale: BittensorSaleCostBasis, token: TokenBase?, alphaSymbol: String?): AmountModel = when (sale) {
         is BittensorSaleCostBasis.Known -> token?.let { averagePriceOf(sale.totals, it, alphaSymbol) } ?: AmountModel("—", null)
         BittensorSaleCostBasis.NoPurchases -> AmountModel(

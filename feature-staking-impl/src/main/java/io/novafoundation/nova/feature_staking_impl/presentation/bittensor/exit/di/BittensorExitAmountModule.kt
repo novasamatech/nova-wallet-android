@@ -13,6 +13,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -33,8 +34,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
-import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
-import javax.inject.Named
 
 @Module(includes = [ViewModelModule::class])
 class BittensorExitAmountModule {
@@ -65,7 +64,7 @@ class BittensorExitAmountModule {
         precisionValidator: BittensorExitPrecisionValidator,
         validatorInteractor: BittensorValidatorInteractor,
         rootHoldFormatter: BittensorRootHoldFormatter,
-        @Named("BittensorWithdrawalDuration") durationFormatter: DurationFormatter
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return BittensorExitAmountViewModel(
             analytics, payload,
@@ -89,7 +88,7 @@ class BittensorExitAmountModule {
             precisionValidator = precisionValidator,
             validatorInteractor = validatorInteractor,
             rootHoldFormatter = rootHoldFormatter,
-            durationFormatter = durationFormatter
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

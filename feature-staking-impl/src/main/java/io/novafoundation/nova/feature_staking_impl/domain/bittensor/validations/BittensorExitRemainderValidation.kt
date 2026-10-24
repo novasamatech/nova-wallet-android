@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 
 /**
@@ -30,7 +31,7 @@ fun BittensorExitValidationPayload.dustRemainders(): List<BittensorExitDustRemai
         val remainder = position - amount
         val value = if (quote.netuid.isRoot()) remainder else remainder * requireNotNull(price) / BittensorProtocolUnits.RAO_PER_TAO
         BittensorExitDustRemainder(value, minimum, returned = preflight.availability.available >= position)
-            .takeIf { remainder.signum() > 0 && value < minimum }
+            .takeIf { remainder.isPositive() && value < minimum }
     }
     val partials = quote.plan?.slices?.filterNot { it.fullExit }
     if (partials != null) {

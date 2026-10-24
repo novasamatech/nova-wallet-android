@@ -5,8 +5,10 @@ import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.validation.TransformedFailure
+import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
 
 /** Formatted TAO values of a remainder the network would sweep, see `BittensorExitDustRemainder`. */
 data class BittensorExitDustRemainderUi(val remainder: String, val minimum: String)
@@ -77,17 +79,19 @@ private fun BittensorExitValidationFailure.titleAndMessage(
     }
 }
 
-/** [acceptRate] is null on the review, where a moved price raises a banner instead of an alert (iOS confirm). */
+/**
+ * As on iOS, an accepted warning continues the same validation. On the setup Confirm on a rate update takes the re-read quote
+ * (iOS onQuoteUpdate); [acceptsRate] is false on the review, where a moved price raises a banner instead (iOS confirm).
+ */
 fun bittensorExitValidationFailureUi(
     reason: BittensorExitValidationFailure,
+    actions: ValidationFlowActions<BittensorExitValidationPayload>,
     resources: ResourceManager,
     isRoot: Boolean,
     values: BittensorExitFailureValues,
     unstakeAll: (() -> Unit)?,
-    acceptRemainder: () -> Unit,
-    acceptRate: (() -> Unit)?,
-    acceptImpact: () -> Unit,
-    onOutcome: (StakingValidationOutcome) -> Unit = {}
+    acceptsRate: Boolean,
+    onOutcome: (StakingValidationOutcome) -> Unit
 ): TransformedFailure? {
     val (title, message) = reason.titleAndMessage(resources, isRoot, values)
     fun proceed(label: Int, action: () -> Unit) = CustomDialogDisplayer.Payload.DialogAction(resources.getString(label)) {
@@ -102,16 +106,27 @@ fun bittensorExitValidationFailureUi(
         BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL -> CustomDialogDisplayer.Payload(
             title = title,
             message = message,
-            okAction = proceed(R.string.common_proceed, acceptRemainder),
+            okAction = proceed(R.string.common_proceed) { actions.revalidate { it.copy(remainderSweepAccepted = true) } },
             cancelAction = cancel,
             neutralAction = unstakeAll?.let { proceed(R.string.staking_unstake_all, it) }
         )
-        // iOS presentRateUpdated: Confirm takes the new rate.
-        BittensorExitValidationFailure.QUOTE_CHANGED -> acceptRate?.let {
-            CustomDialogDisplayer.Payload(title, message, okAction = proceed(R.string.common_confirm, it), cancelAction = cancel)
-        } ?: return null
-        BittensorExitValidationFailure.PRICE_IMPACT_TOO_HIGH ->
-            CustomDialogDisplayer.Payload(title, message, okAction = proceed(R.string.common_proceed, acceptImpact), cancelAction = cancel)
+        // iOS presentRateUpdated: Confirm takes the new rate; the rate check is the last iOS validation.
+        BittensorExitValidationFailure.QUOTE_CHANGED -> if (acceptsRate) {
+            CustomDialogDisplayer.Payload(
+                title,
+                message,
+                okAction = proceed(R.string.common_confirm) { actions.resumeFlow { it.copy(quote = requireNotNull(it.latestQuote)) } },
+                cancelAction = cancel
+            )
+        } else {
+            return null
+        }
+        BittensorExitValidationFailure.PRICE_IMPACT_TOO_HIGH -> CustomDialogDisplayer.Payload(
+            title,
+            message,
+            okAction = proceed(R.string.common_proceed) { actions.revalidate { it.copy(priceImpactAccepted = true) } },
+            cancelAction = cancel
+        )
         else -> {
             onOutcome(StakingValidationOutcome.BLOCKED)
             return TransformedFailure.Default(title to message)

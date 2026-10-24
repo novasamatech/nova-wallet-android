@@ -2,8 +2,15 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorPositionCostBasis
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.parcelize.Parcelize
 
 /** What a sale screen can say about the cost basis of one subnet. */
@@ -32,6 +39,19 @@ fun BittensorSaleCostBasis.carriedPayload(): BittensorSaleCostBasisPayload? = (t
     ?.takeIf { it.settled }
     ?.totals
     ?.toPayload()
+
+/** The cost basis of a sale from [positions]; as iOS loads it with the sale, it reads as loading until a position arrives, never as unknown. */
+internal fun BittensorEstimatesMixin.observeSaleCostBasis(
+    positions: Flow<BittensorExitPosition>,
+    netuid: Int,
+    carried: BittensorEstimatedPurchaseTotals? = null
+): Flow<ExtendedLoadingState<BittensorSaleCostBasis>> {
+    val context = positions.map { position -> position.takeUnless { it.isRoot }?.let { BittensorEstimateContext(it.metaId, it.chain) } }
+        .distinctUntilChanged()
+    return observePositionCostBasis(context)
+        .onStart { emit(BittensorPositionCostBasis(ExtendedLoadingState.Loading, isSettling = false)) }
+        .map { resolveSaleCostBasis(it, netuid, carried) }
+}
 
 fun resolveSaleCostBasis(
     update: BittensorPositionCostBasis,

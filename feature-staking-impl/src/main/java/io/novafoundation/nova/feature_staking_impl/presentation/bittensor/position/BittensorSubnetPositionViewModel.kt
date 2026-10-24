@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.hasBittensor
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -35,6 +36,7 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
@@ -62,11 +64,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.B
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolveSaleCostBasis
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.bittensorAlphaSymbol
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.bittensorValidatorFallbackName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolvedValidatorNames
 import kotlinx.coroutines.flow.drop
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -216,8 +216,8 @@ class BittensorSubnetPositionViewModel(
                 BittensorAnalyticsEvent.PositionOpened(
                     StakingAnalyticsTarget.SUBNET,
                     subnetId.value,
-                    withdrawal.holdDurationMillis.signum() > 0,
-                    withdrawal.locked.signum() > 0,
+                    withdrawal.holdDurationMillis.isPositive(),
+                    withdrawal.locked.isPositive(),
                     StakingRewardsState.NONE
                 )
             )
@@ -350,7 +350,7 @@ class BittensorSubnetPositionViewModel(
                 val annualYield = yields.dataOrNull?.get(position.validatorHotkey)
                 BittensorPositionUi(
                     address,
-                    names?.get(position.validatorHotkey) ?: address.bittensorValidatorFallbackName(),
+                    names?.get(position.validatorHotkey) ?: address.ellipsizeAddress(),
                     resources.getString(R.string.bittensor_validator),
                     AmountModel(
                         annualYield?.formatAsPercentage() ?: "",
@@ -521,8 +521,9 @@ class BittensorSubnetPositionViewModel(
         }
     }
 
-    fun validatorClicked(row: BittensorPositionUi) {
-        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(subnetId.value, row.id))
+    fun validatorClicked(row: BittensorPositionUi) = launchUnit {
+        portfolio.first()
+            ?.let { externalActions.showAddressActions(row.id, it.chain) }
     }
 
     fun selectChartPoint(selection: PriceChartSelection?) {

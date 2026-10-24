@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import java.math.BigDecimal
+import kotlin.time.Duration
 
 data class BittensorExitPosition(
     val metaId: Long,
@@ -102,3 +103,6 @@ data class BittensorExitDraft(
 }
 
 data class BittensorExitRequest(val position: BittensorExitPosition, val quote: BittensorExitQuote)
+
+/** What the exit failure explanations name besides the validated payload: the selection's [maximum] and the root hold left. */
+data class BittensorExitFailureLimits(val maximum: BigInteger, val holdDuration: Duration?)

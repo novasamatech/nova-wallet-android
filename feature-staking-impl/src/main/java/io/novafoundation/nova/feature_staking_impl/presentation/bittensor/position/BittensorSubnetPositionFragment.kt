@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.dp
@@ -146,7 +147,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
                 sheet.setTitle(R.string.bittensor_exit_select_position)
                 choices.forEach { payload ->
                     val row = TableCellView.createTableCellView(requireContext())
-                    row.title.text = payload.hotkeyAddress
+                    row.title.text = payload.hotkeyAddress.ellipsizeAddress()
                     row.setOnClickListener {
                         sheet.dismiss()
                         viewModel.selectPosition(action, payload)

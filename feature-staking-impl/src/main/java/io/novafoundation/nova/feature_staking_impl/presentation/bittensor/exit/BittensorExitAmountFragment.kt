@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
-import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setMessageOrHide
 
@@ -27,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
+import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
 
@@ -38,8 +38,6 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
 
         fun getBundle(payload: BittensorExitPositionPayload) = bundleOf(PAYLOAD to payload)
     }
-
-    private var validatorPicker: BittensorExitValidatorPickerBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorExitAmountBinding.inflate(layoutInflater)
 
@@ -119,18 +117,14 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
             }
         }
         viewModel.legCapNote.observe(legCapNote::setTextOrHide)
-        viewModel.validatorPicker.observe(
-            viewLifecycleOwner,
-            EventObserver { picker ->
-                validatorPicker?.dismiss()
-                validatorPicker = BittensorExitValidatorPickerBottomSheet(
-                    requireContext(),
-                    picker,
-                    onValidatorPicked = viewModel::validatorPicked,
-                    onAllValidatorsPicked = if (picker.allValidators) viewModel::allValidatorsPicked else null
-                ).also { it.show() }
-            }
-        )
+        viewModel.chooseValidatorAction.awaitableActionLiveData.observeEvent { action ->
+            ChooseStakedStakeTargetsBottomSheet(
+                context = requireContext(),
+                payload = action.payload,
+                onResponse = action.onSuccess,
+                onCancel = action.onCancel
+            ).show()
+        }
         viewModel.fee.observe(fee::showBittensorLoadingValue)
         viewModel.feeCaption.observe {
             caption.text = it
@@ -148,11 +142,5 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
     override fun onPause() {
         viewModel.onHidden()
         super.onPause()
-    }
-
-    override fun onDestroyView() {
-        validatorPicker?.dismiss()
-        validatorPicker = null
-        super.onDestroyView()
     }
 }

@@ -1,8 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
+import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitFailureLimits
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
@@ -12,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitFailureValues
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitFeeShortfallUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorExitRateUpdateUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -21,10 +27,14 @@ import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
+import javax.inject.Inject
+import javax.inject.Named
 
-class BittensorExitFormatter(
+class BittensorExitFormatter @Inject constructor(
+    private val resources: ResourceManager,
     private val tokenFormatter: TokenFormatter,
-    private val fiatFormatter: FiatFormatter
+    private val fiatFormatter: FiatFormatter,
+    @Named("BittensorWithdrawalDuration") private val durationFormatter: DurationFormatter
 ) {
 
     private companion object {
@@ -45,18 +55,17 @@ class BittensorExitFormatter(
         )
     }
 
-    /** The values the iOS exit alerts name, from the snapshot the validation read; [maximum] is in the position's units. */
+    /** The values the iOS exit alerts name, from the snapshot the validation read. */
     fun failureValues(
         payload: BittensorExitValidationPayload,
         position: BittensorExitPosition,
-        maximum: BigInteger,
-        holdEta: String?
+        limits: BittensorExitFailureLimits
     ): BittensorExitFailureValues {
         return BittensorExitFailureValues(
             minimum = tao(position, payload.preflight.minStake),
-            maximum = amount(position, maximum, alpha = !position.isRoot).token.toString(),
+            maximum = amount(position, limits.maximum, alpha = !position.isRoot).token.toString(),
             priceImpact = priceImpact(payload.quote),
-            holdEta = holdEta,
+            holdEta = limits.holdDuration?.let(durationFormatter::format),
             feeShortfall = feeShortfall(payload, position),
             dustRemainder = payload.dustRemainder()?.let { BittensorExitDustRemainderUi(tao(position, it.remainderTao), tao(position, it.minimumTao)) },
             rateUpdate = payload.latestQuote?.let { BittensorExitRateUpdateUi("1 ${alphaSymbol(position)}", rate(position, payload.quote), rate(position, it)) }
@@ -90,6 +99,28 @@ class BittensorExitFormatter(
             BigDecimal.ZERO
         }
         return impact.movePointRight(2).formatAsPercentage()
+    }
+
+    /** The Swap rate explanation with the quoted Nova commission; a root unstake has none. */
+    fun swapRateDescription(position: BittensorExitPosition, quote: BittensorExitQuote): String? {
+        if (position.isRoot) return null
+        val percentage = quote.serviceFeeRate?.movePointRight(2)?.toStripTrailingZerosString() ?: return null
+        return resources.getString(
+            R.string.bittensor_swap_rate_sell_description,
+            position.asset.token.configuration.symbol.value,
+            position.subnet.title(position.netuid.value, resources),
+            percentage
+        )
+    }
+
+    /** Where the network fee of the exit is paid from. */
+    fun feeSource(draft: BittensorExitDraft): String = resources.getString(
+        if (draft.feeFromStake) R.string.bittensor_exit_fee_from_stake else R.string.bittensor_exit_fee_from_free,
+        draft.position.asset.token.configuration.symbol.value
+    )
+
+    fun averagePriceDescription(position: BittensorExitPosition): String? = position.subnet?.let {
+        resources.getString(R.string.bittensor_average_price_description, alphaSymbol(position), it.title(resources))
     }
 
     fun exchangeRate(draft: BittensorExitDraft?): String {

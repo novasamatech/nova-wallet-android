@@ -16,6 +16,11 @@ fun BittensorSubnet.title(context: Context): String = title { context.getString(
 
 internal inline fun BittensorSubnet.title(subnetNumber: (Int) -> String): String = name.ifBlank { subnetNumber(id.value) }
 
+/** The title of subnet [netuid], also while its metadata is unavailable. */
+fun BittensorSubnet?.title(netuid: Int, resources: ResourceManager): String {
+    return this?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, netuid)
+}
+
 /** Title followed by the alpha symbol, e.g. "Chutes ش" or "Subnet 42 ش". */
 fun BittensorSubnet.displayName(resources: ResourceManager): String = displayName(title(resources))
 

@@ -54,8 +54,8 @@ data class BittensorExitBasis(
 
     /**
      * The primary takes the whole amount when it can; otherwise the smallest positions are drained first and the last
-     * slice moves to the nearest amount that leaves no remainder for the network to sweep, so the planned amount may
-     * differ from the requested one.
+     * slice moves down to the nearest amount that leaves no remainder for the network to sweep, so the planned amount may
+     * be smaller than the requested one. It never grows past the requested amount: the validations warn about the remainder instead.
      */
     fun plan(amount: BigInteger, floors: BittensorExitFloors): BittensorExitPlan? {
         val primary = positions.firstOrNull()
@@ -106,15 +106,17 @@ data class BittensorExitBasis(
             slice >= floors.withdrawal && position.leavesSweepFloor(slice, floors)
         }
 
-        val slice = listOf(needed, BigInteger.ZERO, (position.free - floors.sweep).max(BigInteger.ZERO), drawable)
+        val nearest = listOf(needed, BigInteger.ZERO, (position.free - floors.sweep).max(BigInteger.ZERO), drawable)
             .filter { it <= drawable && drawn + it <= max && fits(it) }
             .minWithOrNull(compareBy<BigInteger> { (it - needed).abs() }.thenBy { it })
             ?: return null
+        // A larger slice would silently enlarge the requested amount, so the requested slice stays.
+        val slice = nearest.min(needed)
 
-        return when {
-            !slice.isPositive() -> planOf(exits, partials)
-            slice == drawable && !position.locked.isPositive() -> planOf(exits + BittensorExitSlice(position.hotkey, position.alpha, fullExit = true), partials)
-            else -> planOf(exits, partials + BittensorExitSlice(position.hotkey, slice, fullExit = false))
+        return if (slice.isPositive()) {
+            planOf(exits, partials + BittensorExitSlice(position.hotkey, slice, fullExit = false))
+        } else {
+            planOf(exits, partials)
         }
     }
 
@@ -173,7 +175,7 @@ class BittensorExitGroup(
 
     fun maximum(selection: BittensorExitSelection): BigInteger = basis(selection).max(floors.withdrawal)
 
-    /** The amount Max fills in: the planned amount at the maximum, which avoids a swept remainder like any other plan. */
+    /** The amount Max fills in: the planned amount at the maximum, which moves down off a remainder the network would sweep. */
     fun maximumFill(selection: BittensorExitSelection): BigInteger {
         val basis = basis(selection)
         val maximum = basis.max(floors.withdrawal)

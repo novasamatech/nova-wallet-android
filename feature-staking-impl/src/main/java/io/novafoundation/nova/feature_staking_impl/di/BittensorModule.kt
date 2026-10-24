@@ -95,7 +95,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.dashboard.BittensorDas
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.PRICE_API_BASE_URL
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -145,10 +144,6 @@ class BittensorModule {
     ): BittensorBalanceUpdaterFactory {
         return RealBittensorBalanceUpdaterFactory(scope, positionRepository, externalBalanceDao)
     }
-
-    @Provides
-    fun provideBittensorExitFormatter(tokenFormatter: TokenFormatter, fiatFormatter: FiatFormatter) =
-        BittensorExitFormatter(tokenFormatter, fiatFormatter)
 
     @Provides
     fun provideBittensorSubnetSafetyInteractor(rpcCalls: RpcCalls, chainStateRepository: ChainStateRepository) =

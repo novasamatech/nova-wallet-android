@@ -4,20 +4,17 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 
-private const val FALLBACK_PREFIX = 6
-
-private const val FALLBACK_SUFFIX = 7
-
 /**
  * Directory names of the validators, null until a lookup succeeds. As on iOS a failed lookup is asked again on the
- * next of [retries], and a resolved one is kept while the validators stay the same.
+ * next of [retries], and a resolved one is kept while the validators stay the same. Without [retries] a failed lookup stays null.
  */
 internal fun Flow<Set<AccountIdKey>>.resolvedValidatorNames(
-    retries: Flow<Unit>,
+    retries: Flow<Unit> = emptyFlow(),
     onFailure: (Exception) -> Unit = {},
     lookup: suspend (Set<AccountIdKey>) -> Map<AccountIdKey, String>
 ): Flow<Map<AccountIdKey, String>?> = distinctUntilChanged().flatMapLatest { hotkeys ->
@@ -33,12 +30,7 @@ internal fun Flow<Set<AccountIdKey>>.resolvedValidatorNames(
                 null
             }
             if (names != null) return@flow emit(names)
-            retries.first()
+            retries.firstOrNull() ?: return@flow
         }
     }
-}
-
-/** iOS `mediumTruncated`: the address a validator without a directory name reads as. */
-internal fun String.bittensorValidatorFallbackName(): String {
-    return if (length > FALLBACK_PREFIX + FALLBACK_SUFFIX) take(FALLBACK_PREFIX) + "..." + takeLast(FALLBACK_SUFFIX) else this
 }

@@ -138,6 +138,12 @@ class BittensorExitPlanTest {
     }
 
     @Test
+    fun `all validators never enlarges the requested amount to remove a remainder`() {
+        val swept = basis().copy(sweepFloor = number(150))
+        assertEquals(listOf(BittensorExitSlice(secondary, number(400), true), BittensorExitSlice(primary, number(580), false)), plan(swept, 980).slices)
+    }
+
+    @Test
     fun `changed partial balance or missing member invalidates reviewed plan`() = runBlocking {
         val basis = basis()
         val plan = plan(basis, 800)
