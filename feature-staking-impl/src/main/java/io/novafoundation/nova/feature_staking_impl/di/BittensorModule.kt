@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import com.google.gson.Gson
 import android.os.SystemClock
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
@@ -14,6 +17,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorClaimClock
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingClaims
 import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
@@ -49,6 +54,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubne
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketsApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
@@ -106,9 +113,13 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
+import okhttp3.OkHttpClient
 
 private const val SERVICE_FEE_BENEFICIARY = "BittensorServiceFeeBeneficiary"
+
+private const val CONFIG_REQUEST_TIMEOUT_SECONDS = 30L
 
 @Module(includes = [BittensorStakeValidationsModule::class, BittensorExitValidationsModule::class, BittensorClaimValidationsModule::class])
 class BittensorModule {
@@ -209,8 +220,16 @@ class BittensorModule {
     ): BittensorRootValidatorSource =
         RemoteBittensorRootValidatorSource(backend, validators, logger)
 
+    // iOS gives the config request a 30 second timeout; the shared client times out after 20 seconds.
     @Provides
-    fun provideBittensorConfigApi(apiCreator: NetworkApiCreator): BittensorConfigApi = apiCreator.create(BittensorConfigApi::class.java)
+    fun provideBittensorConfigApi(okHttpClient: OkHttpClient): BittensorConfigApi {
+        val client = okHttpClient.newBuilder()
+            .connectTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
+        return NetworkApiCreator(client, "https://placeholder.com").create(BittensorConfigApi::class.java)
+    }
 
     @Provides
     @FeatureScope
@@ -227,8 +246,15 @@ class BittensorModule {
     fun provideBittensorSubnetRepository(
         runtimeCalls: MultiChainRuntimeCallsApi,
         configRepository: BittensorConfigRepository,
-        swapSource: BittensorSwapSource
-    ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource)
+        swapSource: BittensorSwapSource,
+        catalogueApi: BittensorSubnetCatalogueApi,
+        infrastructureUrls: InfrastructureUrls
+    ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueApi, infrastructureUrls)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorDashboardSnapshots(preferences: Preferences, gson: Gson): BittensorDashboardSnapshotRepository =
+        RealBittensorDashboardSnapshotRepository(preferences, gson)
 
     @Provides
     @FeatureScope
@@ -338,6 +364,10 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
+    fun provideBittensorDelegateSource(runtimeCalls: MultiChainRuntimeCallsApi): BittensorDelegateSource = RealBittensorDelegateSource(runtimeCalls)
+
+    @Provides
+    @FeatureScope
     fun provideBittensorPortfolioPriceRepository(
         api: BittensorSubnetCatalogueApi,
         infrastructureUrls: InfrastructureUrls,
@@ -433,8 +463,9 @@ class BittensorModule {
     fun provideBittensorHistoryRepository(
         remoteSource: BittensorEstimatesRemoteSource,
         infrastructureUrls: InfrastructureUrls,
-        computationalCache: ComputationalCache
-    ) = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls, computationalCache)
+        computationalCache: ComputationalCache,
+        preferences: Preferences
+    ) = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls, computationalCache, preferences)
 
     @Provides
     @FeatureScope
@@ -508,8 +539,12 @@ class BittensorModule {
         )
 
     @Provides
-    fun provideBittensorExitSource(@Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource, rpc: RpcCalls, chains: ChainRegistry): BittensorExitRuntimeSource =
-        RealBittensorExitRuntimeSource(storage, rpc, chains)
+    fun provideBittensorExitSource(
+        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
+        rpc: RpcCalls,
+        chains: ChainRegistry,
+        @DefaultBulkRetriever bulkRetriever: BulkRetriever
+    ): BittensorExitRuntimeSource = RealBittensorExitRuntimeSource(storage, rpc, chains, bulkRetriever)
 
     @Provides
     fun provideBittensorSubnetMetadata(subnets: BittensorSubnetRepository) =
@@ -520,11 +555,13 @@ class BittensorModule {
         positions: BittensorPositionRepository,
         validators: BittensorValidatorInteractor,
         recommendedYields: BittensorRecommendedYieldInteractor,
+        snapshots: BittensorDashboardSnapshotRepository,
         logger: Logger
     ) = BittensorDashboardDetailsSource(
         positions,
         validators,
         recommendedYields,
+        snapshots,
         logger
     )
 

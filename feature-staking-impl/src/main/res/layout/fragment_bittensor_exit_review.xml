@@ -31,6 +31,15 @@
                 android:paddingHorizontal="16dp"
                 android:paddingBottom="24dp">
 
+                <io.novafoundation.nova.common.view.AlertView
+                    android:id="@+id/priceMoved"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/bittensor_exit_price_moved"
+                    android:visibility="gone"
+                    app:alertMode="info" />
+
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
                     android:id="@+id/primaryAmount"
                     android:layout_width="match_parent"
@@ -113,6 +122,15 @@
                         app:title="@string/network_fee"
                         app:titleIcon="@drawable/ic_info" />
                 </io.novafoundation.nova.common.view.TableView>
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:id="@+id/validators"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    app:drawDividers="true"
+                    app:title="@string/bittensor_validators_count" />
 
                 <io.novafoundation.nova.common.view.TableView
                     android:id="@+id/saleWalletInformation"

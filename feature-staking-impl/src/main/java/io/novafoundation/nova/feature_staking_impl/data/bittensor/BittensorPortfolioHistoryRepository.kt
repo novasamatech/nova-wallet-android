@@ -25,7 +25,7 @@ class BittensorPortfolioHistoryRepository(
             }
         } catch (e: TimeoutCancellationException) {
             currentCoroutineContext().ensureActive()
-            throw IllegalStateException("Portfolio history timed out", e)
+            throw BittensorTimeoutException("Portfolio history", e)
         }
     }
 

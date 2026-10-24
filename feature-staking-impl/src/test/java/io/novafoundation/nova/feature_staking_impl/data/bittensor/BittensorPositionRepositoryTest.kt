@@ -23,6 +23,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -210,6 +211,7 @@ class BittensorPositionRepositoryTest {
                 val initial = updates.next { it.status is BittensorDataStatus.Fresh }
                 assertEquals(positions.subnets, initial.positions?.subnets)
                 assertNull(initial.positions?.totalStake)
+                assertTrue(initial.pricesPending)
 
                 val changed = positions.copy(subnets = listOf(positions.subnets.single().copy(alphaInPlanks = BigInteger.TEN)))
                 `when`(positionSource.positions("chain", coldKey)).thenReturn(changed)
@@ -227,6 +229,7 @@ class BittensorPositionRepositoryTest {
                 val priced = updates.next { it.positions?.subnetPrices?.isNotEmpty() == true }
                 assertTrue(priced.status is BittensorDataStatus.Stale)
                 assertEquals(changed.subnets, priced.positions?.subnets)
+                assertFalse(priced.pricesPending)
                 assertEquals(1, priceCalls)
             }
         } finally {

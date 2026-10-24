@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isError
 import io.novafoundation.nova.common.domain.isLoading
-import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -43,7 +42,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWee
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.passesBittensorThinPoolFilter
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorSubnets
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetsFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
@@ -75,10 +76,14 @@ class BittensorChooseSubnetViewModel(
     private val resources: ResourceManager,
     listChooserMixinFactory: ListChooserMixin.Factory,
     private val payload: BittensorChooseSubnetPayload,
-    private val validatorCommunicator: BittensorSelectValidatorCommunicator
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator,
+    private val abandonment: BittensorChooseSubnetAbandonment
 ) : BaseViewModel() {
 
     private var isSearchTracked = false
+
+    // As on iOS, only the picker opened from the staking start (see all options) reports abandonment, not the one from the amount screen.
+    private val tracksAbandonment = !payload.replaceAmount
 
     private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SUBNET_SELECT)
     private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SUBNET_SELECT)
@@ -105,9 +110,12 @@ class BittensorChooseSubnetViewModel(
 
     val hideThinPools = MutableStateFlow(payload.browseState.hideThinPools)
 
+    private val catalogueRetry = BittensorInlineRetry()
+
     private val catalogueState = retryController.observe(
         step = "subnet catalogue",
         analytics = subnetsReads,
+        inlineRetry = catalogueRetry,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { browseRepository.subnets() }
@@ -116,6 +124,13 @@ class BittensorChooseSubnetViewModel(
 
     private val catalogue = catalogueState.filterLoaded()
         .onStart { emit(emptyList()) }
+        .shareInBackground()
+
+    // As on iOS, a failed catalogue keeps the root row and explains itself below it, with Try again unless no retry can help.
+    val catalogueFailure = catalogueState.map { state ->
+        (state as? ExtendedLoadingState.Error)?.exception?.bittensorSubnetsFailure(resources)
+    }
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val query = MutableStateFlow("")
@@ -170,6 +185,7 @@ class BittensorChooseSubnetViewModel(
     }
         .shareInBackground()
 
+    // Null without a native price id. A subnet missing from the map has no market listing; a null summary is listed without a computable change.
     private val weeklySummariesState = combine(catalogue, asset) { catalogue, asset ->
         WeeklySummaryRequest(asset.token.configuration.priceId, catalogue.map { it.id }.toSet())
     }
@@ -180,15 +196,16 @@ class BittensorChooseSubnetViewModel(
                 analytics = priceServerReads,
                 transform = { it.withSafeLoading() }
             ) {
-                flowOf {
-                    val priceId = request.nativePriceId
-                    if (priceId == null) emptyMap() else rowInteractor.weeklySummaries(priceId, request.subnetIds)
+                flowOf<WeeklySummaries?> {
+                    request.nativePriceId?.let { rowInteractor.weeklySummaries(it, request.subnetIds) }
                 }
             }
         }
         .shareInBackground()
 
-    private val weekly = weeklySummariesState.map { state -> state.dataOrNull.orEmpty().mapValues { it.value.changePercent } }
+    private val weekly = weeklySummariesState.map { state ->
+        state.dataOrNull.orEmpty().mapNotNull { (subnet, summary) -> summary?.let { subnet to it.changePercent } }.toMap()
+    }
         .shareInBackground()
 
     private val orderedCatalogue = combine(catalogue, sortingMixin.selectedValue, favorites, yields, weekly, ::BrowseInput)
@@ -204,17 +221,39 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val listState = combine(rootIcon, subnets, isLoading) { icon, subnets, loading ->
+    // As on iOS, a search without matches shows only its message: no root row, sorting, filters or count. A failed load is not one.
+    private val searchHasNoMatches = combine(subnets, isLoading, hasError, query) { subnets, loading, failed, query ->
+        !loading && !failed && query.isNotBlank() && subnets.isEmpty()
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val listState = combine(rootIcon, subnets, isLoading, searchHasNoMatches) { icon, subnets, loading, noMatches ->
+        val visible = if (loading) emptyList() else subnets
         BittensorSubnetListState(
-            items = bittensorSubnetList(icon, if (loading) emptyList() else subnets),
+            items = bittensorSubnetList(icon, visible, searchHasNoMatches = noMatches),
             loading = loading
         )
     }
         .distinctUntilChanged()
         .shareInBackground()
 
-    val subnetCount = combine(filteredCatalogue, catalogue, query) { filtered, all, query ->
-        resources.getString(R.string.bittensor_subnet_count, filtered.count { it.matchesQuery(query) }, all.size)
+    val controlsVisible = searchHasNoMatches.map { !it }
+        .shareInBackground()
+
+    // Sorting and filtering act on the catalogue, so they stay disabled until it is loaded (as on iOS).
+    val controlsEnabled = catalogueState.map { it is ExtendedLoadingState.Loaded }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val subnetCount = combine(orderedCatalogue, hideThinPools, favorites, query, catalogueState) { ordered, hideThin, favorites, query, state ->
+        // Count only once the sorted list is the loaded catalogue, so neither "0 of 0" nor "0 of N" flashes while it settles.
+        if (state is ExtendedLoadingState.Loaded && ordered.size == state.data.size && ordered.toSet() == state.data.toSet()) {
+            val shown = ordered.count { it.matchesQuery(query) && (!hideThin || passesBittensorThinPoolFilter(it, favorites)) }
+            resources.getString(R.string.bittensor_subnet_count, shown, state.data.size)
+        } else {
+            resources.getString(R.string.bittensor_subnet_count_loading)
+        }
     }
         .shareInBackground()
 
@@ -231,6 +270,7 @@ class BittensorChooseSubnetViewModel(
         .shareInBackground()
 
     init {
+        if (tracksAbandonment) abandonment.start(selectionState.flowId)
         analytics.track(
             BittensorAnalyticsEvent.SubnetListOpened(
                 if (payload.replaceAmount) SubnetListSource.SEE_ALL_SUBNETS else SubnetListSource.SEE_ALL_OPTIONS,
@@ -249,12 +289,20 @@ class BittensorChooseSubnetViewModel(
             .launchIn(this)
     }
 
+    fun becomeActive() {
+        if (tracksAbandonment) abandonment.becomeActive(selectionState.flowId, BittensorScreen.SUBNET_SELECT, null)
+    }
+
     fun search(query: String) {
         if (query.isNotBlank() && !isSearchTracked) {
             isSearchTracked = true
             analytics.track(BittensorAnalyticsEvent.SubnetSearch())
         }
         this.query.value = query.trim()
+    }
+
+    fun retryCatalogue() {
+        catalogueRetry.retry()
     }
 
     fun select(row: BittensorSubnetRowUi) = launchUnit {
@@ -291,6 +339,7 @@ class BittensorChooseSubnetViewModel(
                 0
             )
         )
+        if (tracksAbandonment) abandonment.markProceeded(selectionState.flowId)
         rememberBrowseState()
         if (payload.replaceAmount) {
             router.replaceBittensorSubnetAmountWithRoot(selectionState)
@@ -300,10 +349,14 @@ class BittensorChooseSubnetViewModel(
     }
 
     fun back() = launchUnit {
-        if (!payload.replaceAmount) analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SUBNET_SELECT, null))
         rememberBrowseState()
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
+    }
+
+    override fun onCleared() {
+        if (tracksAbandonment) abandonment.finish(selectionState.flowId)?.let(analytics::track)
+        super.onCleared()
     }
 
     private suspend fun rememberBrowseState() {
@@ -316,13 +369,22 @@ class BittensorChooseSubnetViewModel(
         query: String,
         favorites: BittensorSubnetFavorites,
         asset: Asset,
-        weeklySummaries: ExtendedLoadingState<Map<BittensorNetuid.Subnet, BittensorWeeklyPriceSummary>>
+        weeklySummaries: ExtendedLoadingState<WeeklySummaries?>
     ): List<BittensorSubnetRowUi> {
         return subnets
             .filter { it.matchesQuery(query) }
-            .map { subnet ->
-                mapSubnetRow(subnet, favorites, asset).copy(weeklySummary = weeklySummaries.map { it[subnet.id] })
-            }
+            .map { subnet -> mapSubnetRow(subnet, favorites, asset, weeklyChange(subnet.id, weeklySummaries)) }
+    }
+
+    // As on iOS: a failed or unpriced read and a listed subnet without a change show a dash, only an unlisted one has no history.
+    private fun weeklyChange(subnetId: BittensorNetuid.Subnet, state: ExtendedLoadingState<WeeklySummaries?>): BittensorSubnetWeeklyChange {
+        val summaries = when (state) {
+            ExtendedLoadingState.Loading -> return BittensorSubnetWeeklyChange.Loading
+            is ExtendedLoadingState.Error -> return BittensorSubnetWeeklyChange.Unavailable
+            is ExtendedLoadingState.Loaded -> state.data ?: return BittensorSubnetWeeklyChange.Unavailable
+        }
+        if (subnetId !in summaries) return BittensorSubnetWeeklyChange.NotListed
+        return summaries[subnetId]?.let(BittensorSubnetWeeklyChange::Available) ?: BittensorSubnetWeeklyChange.Unavailable
     }
 
     private fun BittensorSubnet.matchesQuery(query: String): Boolean = query.isBlank() ||
@@ -359,10 +421,15 @@ class BittensorChooseSubnetViewModel(
             input.weekly,
             previousOrder,
             Locale.getDefault()
-        )
+        ) { resources.getString(R.string.bittensor_subnet_number, it) }
     }
 
-    private fun mapSubnetRow(subnet: BittensorSubnet, favorites: BittensorSubnetFavorites, asset: Asset): BittensorSubnetRowUi {
+    private fun mapSubnetRow(
+        subnet: BittensorSubnet,
+        favorites: BittensorSubnetFavorites,
+        asset: Asset,
+        weeklyChange: BittensorSubnetWeeklyChange
+    ): BittensorSubnetRowUi {
         val price = subnet.priceInRao
             ?.let { tokenFormatter.formatToken(it, asset) }
             ?.toString() ?: "—"
@@ -370,7 +437,8 @@ class BittensorChooseSubnetViewModel(
             subnet = subnet,
             metaId = favorites.metaId,
             favorite = subnet in favorites,
-            price = price
+            price = price,
+            weeklyChange = weeklyChange
         )
     }
 }
@@ -380,8 +448,21 @@ data class BittensorSubnetRowUi(
     val metaId: Long,
     val favorite: Boolean,
     val price: String,
-    val weeklySummary: ExtendedLoadingState<BittensorWeeklyPriceSummary?> = ExtendedLoadingState.Loaded(null)
+    val weeklyChange: BittensorSubnetWeeklyChange = BittensorSubnetWeeklyChange.Loading
 )
+
+sealed interface BittensorSubnetWeeklyChange {
+
+    data object Loading : BittensorSubnetWeeklyChange
+
+    data object NotListed : BittensorSubnetWeeklyChange
+
+    data object Unavailable : BittensorSubnetWeeklyChange
+
+    data class Available(val summary: BittensorWeeklyPriceSummary) : BittensorSubnetWeeklyChange
+}
+
+private typealias WeeklySummaries = Map<BittensorNetuid.Subnet, BittensorWeeklyPriceSummary?>
 
 private data class WeeklySummaryRequest(val nativePriceId: String?, val subnetIds: Set<BittensorNetuid.Subnet>)
 

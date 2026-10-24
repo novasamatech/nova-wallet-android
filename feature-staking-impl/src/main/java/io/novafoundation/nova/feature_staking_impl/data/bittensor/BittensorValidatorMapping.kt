@@ -46,12 +46,9 @@ internal fun parseBittensorTimestamp(value: String): BigDecimal {
 
 private val BITTENSOR_TIMESTAMP = Regex("(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})(\\.\\d{1,9})?(Z|[+-]\\d{2}:\\d{2})")
 
-internal fun hasFreshBittensorDirectoryStake(status: BittensorValidatorDirectoryStatus): Boolean {
-    val available = listOf(status.stakes, status.metagraph, status.identities)
-        .filter { it.availability == Availability.AVAILABLE }
-    return status.stakes.availability == Availability.AVAILABLE && available.all {
-        it.freshness == Freshness.FRESH && it.asOfEpochSeconds != null
-    }
+/** A STALE stakes component is usable data (response-metadata contract); only an unavailable or malformed one withholds the stake. */
+internal fun hasUsableBittensorDirectoryStake(status: BittensorValidatorDirectoryStatus): Boolean = with(status.stakes) {
+    availability == Availability.AVAILABLE && freshness != Freshness.UNKNOWN && asOfEpochSeconds != null
 }
 
 internal fun mapBittensorDirectoryStatus(meta: BittensorValidatorsRemote.Meta?): BittensorValidatorDirectoryStatus {
@@ -66,6 +63,12 @@ internal fun mapBittensorDirectoryStatus(meta: BittensorValidatorsRemote.Meta?):
         mapDirectoryComponent(meta?.components?.validatorMetagraph),
         mapDirectoryComponent(meta?.components?.validatorIdentities)
     )
+}
+
+/** The root list is never partial (iOS makeRootListing); its stakes and names both come from the root validators component. */
+internal fun mapBittensorRootDirectoryStatus(meta: BittensorRootValidatorRemote.Meta?): BittensorValidatorDirectoryStatus {
+    val rootValidators = mapDirectoryComponent(meta?.components?.rootValidators)
+    return BittensorValidatorDirectoryStatus(Completeness.COMPLETE, rootValidators, mapDirectoryComponent(null), rootValidators)
 }
 
 private fun mapDirectoryComponent(remote: BittensorRecommendationsRemote.Component?): Component {
@@ -83,10 +86,13 @@ private fun mapDirectoryComponent(remote: BittensorRecommendationsRemote.Compone
     return Component(availability, freshness, timestamp, remote?.availabilityReason)
 }
 
+/**
+ * A STALE policy still applies: its take/permit/activity limits are configuration. A STALE generation still recommends too,
+ * and the validator list shows it as outdated - see [hasFreshBittensorRecommendations].
+ */
 internal fun requireUsableBittensorRecommendations(response: BittensorRecommendationsRemote) {
     val meta = requireNotNull(response.meta) { "Missing validator policy" }
-    val component = requireNotNull(meta.components?.recommendations)
-    require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Validator policy is unavailable or stale" }
+    requireAvailableBittensorComponent(meta.components?.recommendations, "Validator policy")
     val gates = requireNotNull(meta.clientGates)
     val maxCommissionRate = requireNotNull(gates.maxTake).toBigDecimal()
     require(maxCommissionRate.isNonNegative && maxCommissionRate <= BigDecimal.ONE) { "Invalid validator take limit" }

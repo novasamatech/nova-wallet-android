@@ -23,11 +23,16 @@ class BittensorSubnetListTest {
     }
 
     @Test
-    fun `empty subnet search keeps root entry in the list`() {
+    fun `empty filter result keeps root entry in the list`() {
         assertEquals(
             listOf(BittensorSubnetListItem.Root(icon)),
             bittensorSubnetList(icon, emptyList())
         )
+    }
+
+    @Test
+    fun `search without matches hides the root entry`() {
+        assertEquals(emptyList<BittensorSubnetListItem>(), bittensorSubnetList(icon, emptyList(), searchHasNoMatches = true))
     }
 
     @Test

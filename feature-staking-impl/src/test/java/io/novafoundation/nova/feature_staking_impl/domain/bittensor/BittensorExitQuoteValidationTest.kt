@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitA
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitQuoteValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitSelfImpactValidation
 import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -37,6 +38,8 @@ class BittensorExitQuoteValidationTest {
 
     private val impactValidation = BittensorExitPriceImpactValidation()
 
+    private val selfImpactValidation = BittensorExitSelfImpactValidation()
+
     @Test
     fun `latest quote inside reviewed limit passes without changing reviewed terms`() = runBlocking {
         assertTrue(validation.validate(payload) is ValidationStatus.Valid)
@@ -56,16 +59,77 @@ class BittensorExitQuoteValidationTest {
     }
 
     @Test
-    fun `unavailable quote and commission change block signing`() = runBlocking {
+    fun `unavailable quote blocks signing`() = runBlocking {
         assertTrue(validation.validate(payload.copy(latestQuote = null)) is ValidationStatus.NotValid)
-        assertTrue(validation.validate(payload.copy(latestQuote = quote.copy(serviceFee = BigInteger.TEN))) is ValidationStatus.NotValid)
     }
 
     @Test
-    fun `impact is post trade move not average and requires explicit consent`() = runBlocking {
-        val latest = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(994) / BigInteger.valueOf(1000))
-        val changed = payload.copy(latestQuote = latest)
+    fun `latest quote still filling at the reviewed limit passes with another service fee`() = runBlocking {
+        assertTrue(validation.validate(payload.copy(latestQuote = quote.copy(serviceFee = BigInteger.TEN))) is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `latest quote after a price rise must fill at its own tighter limit`() = runBlocking {
+        val latest = quote.copy(
+            estimatedTaoOut = scale * BigInteger.valueOf(103) / BigInteger.valueOf(100),
+            limitPrice = scale * BigInteger.valueOf(1029) / BigInteger.valueOf(1000),
+            spotPrice = scale * BigInteger.valueOf(105) / BigInteger.valueOf(100)
+        )
+        assertTrue(latest.isFillable(atLimit = requireNotNull(quote.limitPrice)))
+        assertEquals(
+            BittensorExitValidationFailure.QUOTE_CHANGED,
+            (validation.validate(payload.copy(latestQuote = latest)) as ValidationStatus.NotValid).reason
+        )
+    }
+
+    @Test
+    fun `impact is the post trade move of the shown quote and requires explicit consent`() = runBlocking {
+        val shown = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(994) / BigInteger.valueOf(1000))
+        val changed = payload.copy(quote = shown)
         assertEquals(BittensorExitValidationFailure.PRICE_IMPACT_TOO_HIGH, (impactValidation.validate(changed) as ValidationStatus.NotValid).reason)
         assertTrue(impactValidation.validate(changed.copy(priceImpactAccepted = true)) is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `impact of the re-read quote is not judged`() = runBlocking {
+        val latest = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(994) / BigInteger.valueOf(1000))
+        assertTrue(impactValidation.validate(payload.copy(latestQuote = latest)) is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `sale moving the pool price past its own limit is too large for the tolerance`() = runBlocking {
+        val belowLimit = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(985) / BigInteger.valueOf(1000))
+        val belowMinimum = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(97) / BigInteger.valueOf(100))
+        assertTrue(selfImpactValidation.validate(payload) is ValidationStatus.Valid)
+        for (unfillable in listOf(belowLimit, belowMinimum)) {
+            assertEquals(
+                BittensorExitValidationFailure.ORDER_TOO_LARGE,
+                (selfImpactValidation.validate(payload.copy(quote = unfillable)) as ValidationStatus.NotValid).reason
+            )
+        }
+    }
+
+    @Test
+    fun `latest quote on the review is checked against the acknowledged limit`() = runBlocking {
+        val reviewed = payload.copy(acknowledgedLimit = scale * BigInteger.valueOf(99) / BigInteger.valueOf(100))
+        val holding = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(995) / BigInteger.valueOf(1000))
+        val moved = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(994) / BigInteger.valueOf(1000))
+        assertTrue(validation.validate(reviewed.copy(latestQuote = holding)) is ValidationStatus.Valid)
+        assertTrue(validation.validate(payload.copy(latestQuote = moved)) is ValidationStatus.Valid)
+        assertEquals(
+            BittensorExitValidationFailure.QUOTE_CHANGED,
+            (validation.validate(reviewed.copy(latestQuote = moved)) as ValidationStatus.NotValid).reason
+        )
+    }
+
+    @Test
+    fun `self impact on the review is judged at the tighter of the shown and acknowledged limit`() = runBlocking {
+        val shown = payload.copy(quote = quote.copy(estimatedTaoOut = scale * BigInteger.valueOf(995) / BigInteger.valueOf(1000)))
+        val acknowledged = shown.copy(acknowledgedLimit = scale * BigInteger.valueOf(995) / BigInteger.valueOf(1000))
+        assertTrue(selfImpactValidation.validate(shown) is ValidationStatus.Valid)
+        assertEquals(
+            BittensorExitValidationFailure.ORDER_TOO_LARGE,
+            (selfImpactValidation.validate(acknowledged) as ValidationStatus.NotValid).reason
+        )
     }
 }

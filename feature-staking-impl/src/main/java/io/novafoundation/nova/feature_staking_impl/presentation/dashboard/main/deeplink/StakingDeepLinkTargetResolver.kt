@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class StakingDeepLinkTargetResolver(private val chainRegistry: ChainRegistry) {
 
@@ -20,11 +19,6 @@ class StakingDeepLinkTargetResolver(private val chainRegistry: ChainRegistry) {
             ?: throw StakingHandlingException.ChainIsNotFound
         val asset = chain.assetsById[target.assetId] ?: throw StakingHandlingException.AssetIsNotFound
         if (asset.staking.isEmpty()) throw StakingHandlingException.StakingIsNotSupported
-        val destination = if (asset.staking.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT) {
-            StakingDeepLinkTarget.Destination.BITTENSOR_PORTFOLIO
-        } else {
-            StakingDeepLinkTarget.Destination.RESOLVE_POSITION
-        }
-        return StakingDeepLinkTarget(chain.id, asset.id, destination)
+        return StakingDeepLinkTarget(chain.id, asset.id)
     }
 }

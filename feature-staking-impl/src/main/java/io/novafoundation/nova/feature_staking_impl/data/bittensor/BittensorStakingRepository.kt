@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRoo
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorRootPrimaryHotkey
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -125,12 +126,11 @@ class RealBittensorStakingRepository(
         positions: List<BittensorRootPosition>,
         cachedSelection: DefaultValidatorSelection?
     ): DefaultValidatorSelection {
-        val largestPositionHotkey = positions.maxByOrNull { it.stakeInPlanks }
-            ?.validatorHotkey
-        if (cachedSelection != null && cachedSelection.positionHotkey == largestPositionHotkey) return cachedSelection
+        val primaryHotkey = bittensorRootPrimaryHotkey(positions)
+        if (cachedSelection != null && cachedSelection.positionHotkey == primaryHotkey) return cachedSelection
 
         val validator = validatorSource.preferredValidator(chain, positions)
-        return DefaultValidatorSelection(largestPositionHotkey, validator)
+        return DefaultValidatorSelection(primaryHotkey, validator)
     }
 
     private data class DefaultValidatorSelection(val positionHotkey: AccountIdKey?, val validator: BittensorValidator?)

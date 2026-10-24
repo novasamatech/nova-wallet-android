@@ -83,6 +83,16 @@
                     app:shouldDrawDivider="false" />
             </io.novafoundation.nova.common.view.TableView>
 
+            <TextView
+                android:id="@+id/legCapNote"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+
             <io.novafoundation.nova.common.view.AlertView
                 android:id="@+id/saleFeeWarning"
                 android:layout_width="match_parent"

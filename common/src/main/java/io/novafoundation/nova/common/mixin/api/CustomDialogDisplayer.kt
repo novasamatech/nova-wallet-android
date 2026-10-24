@@ -18,6 +18,7 @@ interface CustomDialogDisplayer {
         val okAction: DialogAction?,
         val cancelAction: DialogAction? = null,
         @StyleRes val customStyle: Int? = null,
+        val neutralAction: DialogAction? = null,
     ) {
 
         class DialogAction(

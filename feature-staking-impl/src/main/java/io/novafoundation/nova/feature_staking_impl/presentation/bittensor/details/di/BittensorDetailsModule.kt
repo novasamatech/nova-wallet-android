@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioRowMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
@@ -96,7 +97,8 @@ class BittensorDetailsModule {
         retryController: BittensorRetryController,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
         rowInteractor: BittensorPortfolioRowInteractor,
-        rootClaimInteractor: BittensorRootClaimInteractor
+        rootClaimInteractor: BittensorRootClaimInteractor,
+        walletGate: BittensorWalletGate
     ): ViewModel = BittensorDetailsViewModel(
         analytics, bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
@@ -109,10 +111,10 @@ class BittensorDetailsModule {
         chartAxisFormatterFactory = chartAxisFormatterFactory,
         rowInteractor = rowInteractor,
         rootClaimInteractor = rootClaimInteractor,
+        walletGate = walletGate,
         analyticsSource = StakingPortfolioSource.entries.firstOrNull {
             it.name == fragment.arguments?.getString(BittensorPortfolioFragment.ANALYTICS_SOURCE)
-        } ?: StakingPortfolioSource.DASHBOARD,
-        entry = BittensorPortfolioFragment.entryFrom(fragment.arguments)
+        } ?: StakingPortfolioSource.DASHBOARD
     )
 
     @Provides
@@ -134,7 +136,8 @@ class BittensorDetailsModule {
         slippageSettings: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings,
         rootValidatorSource: BittensorRootValidatorSource,
         rootHoldFormatter: BittensorRootHoldFormatter,
-        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
+        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings,
+        walletGate: BittensorWalletGate
     ): ViewModel = BittensorRootDetailsViewModel(
         analytics, interactor,
         router,
@@ -150,7 +153,8 @@ class BittensorDetailsModule {
         slippageSettings = slippageSettings,
         rootValidatorSource = rootValidatorSource,
         rootHoldFormatter = rootHoldFormatter,
-        debugSettings = debugSettings
+        debugSettings = debugSettings,
+        walletGate = walletGate
     )
 
     @Provides

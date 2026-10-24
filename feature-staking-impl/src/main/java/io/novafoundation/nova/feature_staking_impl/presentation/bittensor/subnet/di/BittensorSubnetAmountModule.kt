@@ -15,9 +15,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
@@ -49,14 +46,6 @@ class BittensorSubnetAmountModule {
         BittensorSubnetFactsInteractor(backend, chainStateRepository)
 
     @Provides
-    fun presetValidators(
-        repository: BittensorSubnetValidatorRepository,
-        yields: BittensorAlphaYieldRepository,
-        chains: ChainRegistry,
-        logger: Logger
-    ) = BittensorPresetValidatorInteractor(repository, yields, chains, logger)
-
-    @Provides
     @IntoMap
     @ViewModelKey(BittensorSubnetAmountViewModel::class)
     fun provideViewModel(
@@ -83,13 +72,16 @@ class BittensorSubnetAmountModule {
         costBasisFormatter: BittensorSaleCostBasisFormatter,
         quickPickInteractor: BittensorQuickPickInteractor,
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
-        subnetFactsInteractor: BittensorSubnetFactsInteractor
+        subnetFactsInteractor: BittensorSubnetFactsInteractor,
+        chainStateRepository: ChainStateRepository
     ): ViewModel = BittensorSubnetAmountViewModel(
         analytics, initialSubnetId = payload.subnetId?.let { BittensorNetuid.Subnet(it) },
         quickPickOrder = payload.quickPickOrder,
         quickPickInteractor = quickPickInteractor,
         presetValidatorInteractor = presetValidatorInteractor,
         validatorAddress = payload.validatorAddress,
+        validatorIsPreset = payload.validatorIsPreset,
+        recommendedAddress = payload.recommendedAddress,
         bittensorSubnetInteractor = bittensorSubnetInteractor,
         router = router,
         resources = resources,
@@ -111,6 +103,7 @@ class BittensorSubnetAmountModule {
         validatorCommunicator = validatorCommunicator,
         getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
         subnetFactsInteractor = subnetFactsInteractor,
+        chainStateRepository = chainStateRepository,
         initialSelectionState = payload.selectionState
     )
 

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.validation.positiveAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBalance
 import java.math.BigDecimal
+import java.math.BigInteger
 
 data class BittensorStakeValidationPayload(
     val asset: Asset,
@@ -22,29 +23,57 @@ data class BittensorStakeValidationPayload(
     val inactiveValidatorAccepted: Boolean = false
 )
 
-enum class BittensorStakeValidationFailure {
-    DELAYED_EXECUTION,
-    NON_POSITIVE_AMOUNT,
-    INSUFFICIENT_BALANCE,
-    FEE_RESERVE,
-    BELOW_MINIMUM_STAKE,
-    HOTKEY_NOT_REGISTERED,
-    SUBNET_STAKING_DISABLED,
-    COLDKEY_SWAP_PENDING,
-    SAFE_MODE_ACTIVE,
-    QUOTE_UNAVAILABLE,
-    QUOTE_EXPIRED,
-    SLIPPAGE_EXCEEDED,
-    HIGH_PRICE_IMPACT,
-    INACTIVE_VALIDATOR
+sealed interface BittensorStakeValidationFailure {
+
+    data object LEDGER_NOT_SUPPORTED : BittensorStakeValidationFailure
+
+    data object PROXIED_NOT_SUPPORTED : BittensorStakeValidationFailure
+
+    data object DELAYED_EXECUTION : BittensorStakeValidationFailure
+
+    data object NON_POSITIVE_AMOUNT : BittensorStakeValidationFailure
+
+    data object INSUFFICIENT_BALANCE : BittensorStakeValidationFailure
+
+    data object FEE_RESERVE : BittensorStakeValidationFailure
+
+    /** [requiredAmountInPlanks] is the smallest entered amount that passes, including any fees taken before staking. */
+    data class BelowMinimumStake(val requiredAmountInPlanks: BigInteger) : BittensorStakeValidationFailure
+
+    data object HOTKEY_NOT_REGISTERED : BittensorStakeValidationFailure
+
+    data object SUBNET_STAKING_DISABLED : BittensorStakeValidationFailure
+
+    data object COLDKEY_SWAP_PENDING : BittensorStakeValidationFailure
+
+    data object SAFE_MODE_ACTIVE : BittensorStakeValidationFailure
+
+    data object QUOTE_UNAVAILABLE : BittensorStakeValidationFailure
+
+    data object QUOTE_EXPIRED : BittensorStakeValidationFailure
+
+    /** The order alone moves the price past its slippage limit, so no quote at this tolerance can fill it. */
+    data object SELF_IMPACT : BittensorStakeValidationFailure
+
+    /** The market moved: the latest quote no longer fills within the limit the user acknowledged. */
+    data object SLIPPAGE_EXCEEDED : BittensorStakeValidationFailure
+
+    data object HIGH_PRICE_IMPACT : BittensorStakeValidationFailure
+
+    data object INACTIVE_VALIDATOR : BittensorStakeValidationFailure
 }
 
 typealias BittensorStakeValidationSystem = ValidationSystem<BittensorStakeValidationPayload, BittensorStakeValidationFailure>
 
 typealias BittensorStakeValidation = Validation<BittensorStakeValidationPayload, BittensorStakeValidationFailure>
 
-fun bittensorStakeValidationSystem(validations: List<BittensorStakeValidation>): BittensorStakeValidationSystem = ValidationSystem {
+/** As on iOS, a subnet stake checks its quote ([quoteValidations]) before the balance and the remaining [validations]. */
+fun bittensorStakeValidationSystem(
+    quoteValidations: List<BittensorStakeValidation>,
+    validations: List<BittensorStakeValidation>
+): BittensorStakeValidationSystem = ValidationSystem {
     positiveAmount(amount = { it.amount }, error = { BittensorStakeValidationFailure.NON_POSITIVE_AMOUNT })
+    quoteValidations.forEach(::validate)
     sufficientBalance(
         fee = { it.fee },
         amount = { it.amount },

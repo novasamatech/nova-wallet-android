@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -41,15 +40,23 @@ class BittensorPortfolioRowMapper(
     ): List<BittensorPositionUi> {
         val positions = portfolio.positions ?: return emptyList()
         return buildList {
-            if (hasRootPortfolioRow(positions, rootRewards)) add(rootRow(portfolio, rootApy))
+            if (hasRootPortfolioRow(positions, rootRewards)) add(rootRow(portfolio, rootRewards, rootApy))
             positions.subnets.map { it.subnetId }.distinct().sortedBy { it.value }.forEach { subnetId ->
                 add(subnetRow(portfolio, subnetId, metadata, weeklyChanges))
             }
         }
     }
 
-    private fun rootRow(portfolio: BittensorPortfolio, apy: ExtendedLoadingState<BigDecimal?>): BittensorPositionUi {
-        val subtitle = apy.dataOrNull?.let { resources.getString(R.string.staking_apy, it.formatAsPercentage()) }
+    private fun rootRow(portfolio: BittensorPortfolio, rewards: BigInteger?, apy: ExtendedLoadingState<BigDecimal?>): BittensorPositionUi {
+        // Without root stake the row exists only for claimable rewards; an APY of nothing explains nothing.
+        val rewardsOnly = !portfolio.positions?.rootStake.isPositiveAmount() && rewards.isPositiveAmount()
+        val subtitle = if (rewardsOnly) {
+            resources.getString(R.string.bittensor_portfolio_root_claimable, formatAmount(rewards, portfolio).token)
+        } else {
+            (apy as? ExtendedLoadingState.Loaded)?.let {
+                resources.getString(R.string.bittensor_portfolio_root_apy, it.data?.formatAsPercentage() ?: "—")
+            }
+        }
         return BittensorPositionUi(
             id = "root",
             title = resources.getString(R.string.bittensor_root_staking),
@@ -57,7 +64,7 @@ class BittensorPortfolioRowMapper(
             amount = formatAmount(portfolio.positions?.rootStake, portfolio),
             icon = assetIconProvider.getAssetIconOrFallback(portfolio.asset.token.configuration),
             action = BittensorPositionAction.RootDetails,
-            isSubtitleLoading = apy.isLoading()
+            isSubtitleLoading = !rewardsOnly && apy.isLoading()
         )
     }
 
@@ -111,8 +118,11 @@ class BittensorPortfolioRowMapper(
     }
 }
 
+/** [rewards] are claimable root rewards: amounts below the claim minimum do not keep the row, as on iOS. */
 internal fun hasRootPortfolioRow(positions: BittensorPortfolioPositions, rewards: BigInteger?): Boolean =
-    positions.rootStake.isPositive() || rewards?.isPositive() == true
+    positions.rootStake.isPositiveAmount() || rewards.isPositiveAmount()
+
+private fun BigInteger?.isPositiveAmount(): Boolean = this != null && signum() > 0
 
 internal fun isPortfolioEmpty(positions: BittensorPortfolioPositions?, rewards: BigInteger?): Boolean =
     positions != null && rewards != null && !hasRootPortfolioRow(positions, rewards) && positions.subnets.isEmpty()

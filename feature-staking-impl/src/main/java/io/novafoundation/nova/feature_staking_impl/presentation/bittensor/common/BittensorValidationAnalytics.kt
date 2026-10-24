@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorCla
 fun BittensorStakeValidationFailure.analyticsKind(): StakingValidationKind? = when (this) {
     BittensorStakeValidationFailure.INSUFFICIENT_BALANCE -> StakingValidationKind.INSUFFICIENT_BALANCE
     BittensorStakeValidationFailure.FEE_RESERVE -> StakingValidationKind.FEE_RESERVE
-    BittensorStakeValidationFailure.BELOW_MINIMUM_STAKE -> StakingValidationKind.MIN_STAKE
+    is BittensorStakeValidationFailure.BelowMinimumStake -> StakingValidationKind.MIN_STAKE
     BittensorStakeValidationFailure.QUOTE_UNAVAILABLE -> StakingValidationKind.STALE_DATA
     BittensorStakeValidationFailure.QUOTE_EXPIRED, BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED -> StakingValidationKind.RATE_UPDATED
     BittensorStakeValidationFailure.HIGH_PRICE_IMPACT -> StakingValidationKind.PRICE_IMPACT
@@ -16,12 +16,12 @@ fun BittensorStakeValidationFailure.analyticsKind(): StakingValidationKind? = wh
 }
 
 fun BittensorExitValidationFailure.analyticsKind(): StakingValidationKind? = when (this) {
-    BittensorExitValidationFailure.ROOT_LOCKED -> StakingValidationKind.HOLD_LOCKED
+    BittensorExitValidationFailure.ROOT_LOCKED, BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM -> StakingValidationKind.HOLD_LOCKED
+    BittensorExitValidationFailure.ORDER_TOO_LARGE -> StakingValidationKind.ORDER_TOO_LARGE
     BittensorExitValidationFailure.INSUFFICIENT_STAKE -> StakingValidationKind.INSUFFICIENT_BALANCE
     BittensorExitValidationFailure.FULL_POSITION_CHANGED -> StakingValidationKind.STALE_DATA
     BittensorExitValidationFailure.BELOW_MINIMUM -> StakingValidationKind.MIN_STAKE
-    BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM, BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL ->
-        StakingValidationKind.DUST_REMAINDER
+    BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL -> StakingValidationKind.DUST_REMAINDER
     BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE, BittensorExitValidationFailure.FEE_SOURCE_CHANGED ->
         StakingValidationKind.FEE_RESERVE
     BittensorExitValidationFailure.QUOTE_CHANGED -> StakingValidationKind.RATE_UPDATED

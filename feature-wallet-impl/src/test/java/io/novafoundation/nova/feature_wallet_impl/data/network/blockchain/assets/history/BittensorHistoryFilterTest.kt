@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history
 
 import com.google.gson.Gson
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.feature_wallet_api.domain.model.BittensorServiceFeeRecipients
+import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.network.model.response.SubqueryHistoryElementResponse.Query.HistoryElements.Node
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -14,7 +16,6 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
-/** Synthetic SubQuery fixtures only; live indexer row co-occurrence is unproven. */
 class BittensorHistoryFilterTest {
 
     private val chain = mock(Chain::class.java)
@@ -39,9 +40,14 @@ class BittensorHistoryFilterTest {
     }
 
     @Test
-    fun `successful subnet transfers are hidden only with matching direct stake evidence`() {
-        for (call in listOf("addStake", "add_stake_limit", "removeStake", "remove_stake_limit", "removeStakeFullLimit")) {
-            val parent = parent(call = call)
+    fun `successful subnet transfers inside an extrinsic are hidden whatever the enclosing call`() {
+        for (parent in listOf(
+            parent(call = "addStake"),
+            parent(call = "remove_stake_limit"),
+            parent(module = "utility", call = "batchAll"),
+            parent(module = "proxy", call = "proxy"),
+            parent(success = false)
+        )) {
             val incoming = transfer(from = subnetAddress, to = userAddress)
             val outgoing = transfer(from = userAddress, to = subnetAddress)
 
@@ -50,49 +56,24 @@ class BittensorHistoryFilterTest {
     }
 
     @Test
-    fun `standalone transfer to subnet account stays visible with or without hash`() {
-        val transfer = transfer()
-        val standaloneParent = parent(module = "balances", call = "transferKeepAlive")
-        assertEquals(listOf(transfer), filter(listOf(transfer)))
-        assertEquals(listOf(standaloneParent, transfer), filter(listOf(standaloneParent, transfer)))
-        val unhashed = transfer(hash = null)
-        assertEquals(listOf(unhashed), filter(listOf(unhashed)))
+    fun `hashed subnet transfer is hidden even without its extrinsic on the page`() {
+        assertEquals(emptyList<Node>(), filter(listOf(transfer())))
     }
 
     @Test
-    fun `failed transfer and failed parent remain visible`() {
-        val failedTransfer = transfer(success = false)
-        val parent = parent()
-        assertEquals(listOf(parent, failedTransfer), filter(listOf(parent, failedTransfer)))
-        val failedParent = parent(success = false)
-        val transfer = transfer()
-        assertEquals(listOf(failedParent, transfer), filter(listOf(failedParent, transfer)))
-    }
-
-    @Test
-    fun `other block account hash or missing parent cannot establish technical origin`() {
-        val transfer = transfer()
-        for (parent in listOf(parent(block = 11), parent(account = "other"), parent(hash = "0x" + "cd".repeat(32)))) {
-            assertEquals(listOf(parent, transfer), filter(listOf(parent, transfer)))
-        }
-        for (invalidHash in listOf(null, "", "0x", "not-hex", "0x12")) {
-            val parent = parent(hash = invalidHash)
+    fun `subnet transfer without a valid extrinsic hash stays visible`() {
+        for (invalidHash in listOf(null, "", "0x", "not-hex", "0x12", "0x" + "zz".repeat(32))) {
             val candidate = transfer(hash = invalidHash)
-            assertEquals(listOf(parent, candidate), filter(listOf(parent, candidate)))
+            assertEquals(listOf(candidate), filter(listOf(candidate)))
         }
     }
 
     @Test
-    fun `utility proxy multisig and unknown calls are not inferred to be staking`() {
-        val transfer = transfer()
-        for (parent in listOf(
-            parent(module = "utility", call = "batchAll"),
-            parent(module = "proxy", call = "proxy"),
-            parent(module = "multisig", call = "asMulti"),
-            parent(call = "unknownCall")
-        )) {
-            assertEquals(listOf(parent, transfer), filter(listOf(parent, transfer)))
-        }
+    fun `failed subnet transfer and ordinary transfers remain visible`() {
+        val failedTransfer = transfer(success = false)
+        val ordinary = transfer(to = ByteArray(32) { 3 }.toAddress(42))
+        val parent = parent()
+        assertEquals(listOf(parent, failedTransfer, ordinary), filter(listOf(parent, failedTransfer, ordinary)))
     }
 
     @Test
@@ -177,13 +158,7 @@ class BittensorHistoryFilterTest {
     }
 
     @Test
-    fun `conflicting parent evidence preserves the transfer`() {
-        val nodes = listOf(parent(), parent(module = "balances", call = "transfer"), transfer())
-        assertEquals(nodes, filter(nodes))
-    }
-
-    @Test
-    fun `existing response fields decode required evidence without invented nested calls`() {
+    fun `existing response fields decode the extrinsic hash evidence`() {
         val json = """[
             {"id":"parent","timestamp":1,"blockNumber":10,"address":"$userAddress","extrinsicHash":"$hash",
              "extrinsic":{"module":"subtensorModule","call":"addStake","fee":"1","success":true}},
@@ -193,13 +168,41 @@ class BittensorHistoryFilterTest {
         val nodes = gson.fromJson(json, Array<Node>::class.java).toList()
 
         assertEquals(listOf("parent"), filter(nodes).map { it.id })
-        // A transfer-only page has no evidence about its enclosing call.
-        assertEquals(listOf(nodes[1]), filter(listOf(nodes[1])))
-        val withoutBlocks = gson.fromJson(json.replace("\"blockNumber\":10,", ""), Array<Node>::class.java).toList()
-        assertEquals(withoutBlocks, filter(withoutBlocks))
+        assertEquals(emptyList<Node>(), filter(listOf(nodes[1])))
+        val withoutHashes = gson.fromJson(json.replace("\"extrinsicHash\":\"$hash\",", ""), Array<Node>::class.java).toList()
+        assertEquals(withoutHashes, filter(withoutHashes))
+    }
+
+    @Test
+    fun `realtime fee recipient and subnet transfers are not stored`() {
+        val fee = realtimeTransfer(to = beneficiary.toAccountId())
+        val subnetLeg = realtimeTransfer(to = subnetAddress.toAccountId())
+        val ordinary = realtimeTransfer(to = ByteArray(32) { 3 })
+
+        assertEquals(listOf(ordinary), filterRealtime(listOf(fee, subnetLeg, ordinary)))
+    }
+
+    @Test
+    fun `failed realtime fee transfer and other chains keep realtime transfers`() {
+        val failedFee = realtimeTransfer(to = beneficiary.toAccountId(), status = Operation.Status.FAILED)
+        assertEquals(listOf(failedFee), filterRealtime(listOf(failedFee)))
+
+        val fee = realtimeTransfer(to = beneficiary.toAccountId())
+        `when`(chain.id).thenReturn("other-chain")
+        assertEquals(listOf(fee), filterRealtime(listOf(fee)))
     }
 
     private fun filter(nodes: List<Node>) = filterBittensorTechnicalTransfers(nodes, chain, asset)
+
+    private fun filterRealtime(updates: List<RealtimeHistoryUpdate>) = filterBittensorTechnicalRealtimeTransfers(updates, chain, asset)
+
+    private fun realtimeTransfer(
+        to: ByteArray,
+        status: Operation.Status = Operation.Status.COMPLETED
+    ): RealtimeHistoryUpdate {
+        val transfer = RealtimeHistoryUpdate.Type.Transfer(userAddress.toAccountId(), to, BigInteger.TEN, asset)
+        return RealtimeHistoryUpdate(hash, status, transfer)
+    }
 
     private fun parent(
         module: String = "subtensorModule",

@@ -7,6 +7,7 @@ import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -27,6 +28,8 @@ class BittensorValidatorTimeoutTest {
     private val api = object : BittensorValidatorsApi by apiDelegate {
         override suspend fun validators(url: String): Response<BittensorValidatorsRemote> = awaitCancellation()
 
+        override suspend fun rootValidators(url: String): Response<BittensorRootValidatorRemote> = awaitCancellation()
+
         override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> = awaitCancellation()
     }
 
@@ -34,7 +37,14 @@ class BittensorValidatorTimeoutTest {
 
     private val backend = BittensorValidatorBackend(api, urls)
 
-    private val storage = mock(StorageDataSource::class.java)
+    private val storage = object : StorageDataSource by mock(StorageDataSource::class.java) {
+        override suspend fun <R> query(
+            chainId: String,
+            at: String?,
+            applyStorageDefault: Boolean,
+            query: suspend StorageQueryContext.() -> R
+        ): R = awaitCancellation()
+    }
 
     private val rpc = mock(RpcCalls::class.java)
 
@@ -45,7 +55,7 @@ class BittensorValidatorTimeoutTest {
     @Test
     fun `owned directory timeout is recoverable not cancellation`() = runTest {
         val failure = runCatching { repository.rootValidators(chain) }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertFalse(failure is CancellationException)
     }
 
@@ -53,7 +63,7 @@ class BittensorValidatorTimeoutTest {
     fun `owned eligibility timeout is recoverable not cancellation`() = runTest {
         val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator")
         val failure = runCatching { repository.validateRoot(chain, validator) }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
+        assertTrue(failure is BittensorTimeoutException)
         assertFalse(failure is CancellationException)
     }
 

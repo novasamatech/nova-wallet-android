@@ -69,11 +69,41 @@
                 android:textColor="@color/text_secondary"
                 android:visibility="gone" />
 
-            <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
-                android:id="@+id/chart"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp" />
+                android:layout_marginTop="16dp" >
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+                    android:id="@+id/chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:id="@+id/chartFailure"
+                    android:layout_width="match_parent"
+                    android:layout_height="208dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="24dp"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:focusable="true" >
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/bittensor_price_history_failed"
+                        android:textColor="@color/text_secondary" />
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="@string/common_try_again"
+                        android:textColor="@color/button_text_accent" />
+                </LinearLayout>
+            </FrameLayout>
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
                 android:layout_width="match_parent"

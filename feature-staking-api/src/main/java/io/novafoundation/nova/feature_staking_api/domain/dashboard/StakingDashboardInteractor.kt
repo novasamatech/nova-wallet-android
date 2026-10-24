@@ -12,4 +12,6 @@ interface StakingDashboardInteractor {
     fun stakingDashboardFlow(): Flow<ExtendedLoadingState<StakingDashboard>>
 
     fun moreStakingOptionsFlow(): Flow<MoreStakingOptions>
+
+    fun refreshMaximumYields()
 }

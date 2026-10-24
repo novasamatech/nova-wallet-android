@@ -128,9 +128,13 @@ class BittensorPortfolioPriceRepositoryTest {
         assertTrue(mapBittensorPortfolioPrices(response("0")).isEmpty())
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `stale prices cannot value holdings`() {
-        mapBittensorPortfolioPrices(response("0.5", freshness = "STALE"))
+    @Test
+    fun `stale prices cannot value holdings but are still a listing price`() {
+        assertTrue(mapBittensorPortfolioPrices(response("0.5", freshness = "STALE")).isEmpty())
+        assertEquals(
+            mapOf(BittensorNetuid.Subnet(1) to BigInteger.valueOf(500_000_000)),
+            mapBittensorSubnetPrices(response("0.5", freshness = "STALE"))
+        )
     }
 
     @Test(expected = IllegalArgumentException::class)

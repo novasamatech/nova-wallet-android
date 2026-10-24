@@ -16,9 +16,17 @@ internal fun mapBittensorDashboardDetails(
     rootYields: Map<AccountIdKey, BigDecimal>,
     subnetYields: Map<BittensorNetuid.Subnet, Map<AccountIdKey, BigDecimal>>,
     recommendedYields: Map<BittensorNetuid.Subnet, BigDecimal>,
-    pricingPending: Boolean = positions == null
+    pricingPending: Boolean = positions == null,
+    claimableRootRewards: BigInteger? = null
 ): BittensorDashboardDetails {
-    val rootStake = positions?.rootStake?.takeIf { positions.root.isNotEmpty() }
+    // Like iOS rootStakeInRao, claimable root rewards add Root to a subnet stake. Without any stake
+    // they get their own panel instead.
+    val rootStake = when {
+        positions == null -> null
+        positions.root.isNotEmpty() -> positions.rootStake
+        positions.subnets.isNotEmpty() && claimableRootRewards?.signum() == 1 -> BigInteger.ZERO
+        else -> null
+    }
     val rootRate = positions?.root?.let { roots ->
         weightedDashboardRate(roots.map { WeightedRate(rootYields[it.validatorHotkey], it.stakeInPlanks) })
     }
@@ -42,9 +50,14 @@ internal fun mapBittensorDashboardDetails(
         subnetCount = positions?.subnets?.map { it.subnetId }?.distinct()?.size ?: 0,
         rootAnnualPercentageYield = rootRate,
         subnetAnnualPercentageYield = subnetRate.takeUnless { pricingPending },
-        maximumAnnualPercentageYield = recommendedYields.values.filter { it.isNonNegative }.maxOrNull(),
-        pricing = pricing
+        maximumAnnualPercentageYield = maximumYield(recommendedYields),
+        pricing = pricing,
+        claimableRootRewardsInPlanks = claimableRootRewards
     )
+}
+
+internal fun maximumYield(recommendedYields: Map<BittensorNetuid.Subnet, BigDecimal>): BigDecimal? {
+    return recommendedYields.values.filter { it.isNonNegative }.maxOrNull()
 }
 
 private data class WeightedRate(val annualPercentageYield: BigDecimal?, val stake: BigInteger?)

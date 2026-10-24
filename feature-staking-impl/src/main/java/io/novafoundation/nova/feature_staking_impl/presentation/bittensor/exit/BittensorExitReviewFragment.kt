@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import android.text.TextUtils
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -17,6 +18,7 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.ExecutionTimerView
+import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -49,7 +51,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
 
     override fun initViews() = with(binder) {
         toolbar.setTitle(viewModel.title)
-        retryExecution.setOnClickListener { viewModel.retryClicked() }
+        retryExecution.setOnClickListener { viewModel.failureActionClicked() }
         execution.toolbar.setHomeButtonListener { viewModel.back() }
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
@@ -74,9 +76,6 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             height = 18.dp(requireContext())
         }
         validator.setOnClickListener { viewModel.validatorClicked() }
-        validator.title.setOnClickListener {
-            showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
-        }
         if (viewModel.isRoot) validator.setPrimaryValueEndIcon(R.drawable.ic_info)
         information.setOnAccountClickedListener { viewModel.accountClicked() }
         saleAccount.setOnClickListener { viewModel.accountClicked() }
@@ -133,10 +132,13 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             validator.showValue(it)
             execution.validator.showValue(it)
         }
-        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
-        viewModel.earned.observe { state ->
-            earned.showBittensorLoadingAmount(state.map { it.amount })
-            earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+        // A loading TableCellView makes itself visible: bind rows only where the operation shows them.
+        if (!viewModel.isRoot) {
+            viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
+            viewModel.earned.observe { state ->
+                earned.showBittensorLoadingAmount(state.map { it.amount })
+                earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+            }
         }
         viewModel.swapRateDescription.observe { description ->
             rate.setOnClickListener { description?.let { showDescription(R.string.bittensor_exchange_rate, it) } }
@@ -154,14 +156,23 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             execution.validator.image.isVisible = it != null
             execution.validator.image.setImageDrawable(it)
         }
-        viewModel.stakeAfter.observe(stakeAfter::showBittensorLoadingValue)
-        viewModel.rate.observe {
-            rate.showBittensorLoadingValue(it)
-            execution.rate.showBittensorLoadingValue(it)
+        viewModel.isMultiValidator.observe { multiValidator ->
+            validator.isVisible = !multiValidator
+            execution.validator.isVisible = !multiValidator
+        }
+        viewModel.legs.observe(::showLegs)
+        if (viewModel.isRoot) {
+            viewModel.stakeAfter.observe(stakeAfter::showBittensorLoadingValue)
+        } else {
+            viewModel.rate.observe {
+                rate.showBittensorLoadingValue(it)
+                execution.rate.showBittensorLoadingValue(it)
+            }
         }
         viewModel.commissionCaption.observe { commissionCaption.text = it }
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.confirmButtonState.observe(confirm::setState)
+        viewModel.isPriceMoved.observe { priceMoved.isVisible = it }
         viewModel.showExecution.observe {
             reviewContent.isVisible = !it
             execution.root.isVisible = it
@@ -183,7 +194,8 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         viewModel.executionSubtitle.observe { execution.subtitle.text = it }
         viewModel.executionFailure.observe {
             execution.showFailure(it)
-            retryExecution.isVisible = it?.canRetry == true
+            retryExecution.isVisible = it != null
+            retryExecution.setText(if (it?.canRetry == false) R.string.common_close else R.string.common_try_again)
         }
         viewModel.canFinish.observe { done.isVisible = it && !viewModel.isRoot }
         viewModel.executionUnconfirmed.observe { state ->
@@ -192,13 +204,21 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
                 retryExecution.isVisible = false
             }
         }
-        bindBittensorStakeResults(
-            results = viewModel.resultState,
-            onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::confirmClicked,
-            onViewPosition = viewModel::doneClicked,
-            onDiscoverSubnets = viewModel::doneClicked
-        )
+        bindBittensorStakeResults(viewModel.resultState, viewModel::resultActionClicked)
+    }
+
+    private fun showLegs(legs: List<BittensorExitLegUi>) = with(binder) {
+        validators.removeViews(1, validators.childCount - 1)
+        legs.forEach { leg ->
+            val row = TableCellView.createTableCellView(requireContext())
+            row.setTitleEllipsisable(true)
+            row.title.ellipsize = TextUtils.TruncateAt.END
+            row.title.maxLines = 1
+            row.title.text = leg.name
+            row.showValue(leg.amount, leg.detail)
+            validators.addView(row)
+        }
+        validators.invalidateChildrenVisibility()
     }
 
     private fun showDescription(titleRes: Int, description: String) {

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
@@ -28,7 +29,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -58,7 +58,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorNeedsFunding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.titleAndMessage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
@@ -123,10 +123,23 @@ class BittensorStakeAmountViewModel(
 
     private var isNoBalanceTracked = false
 
+    /** Set once the setup moves on to the confirmation (iOS `abandonTracker.markProceeded`). */
+    private var flowContinued = false
+
     private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.SETUP)
     private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SETUP)
 
     val retryEvents = retryController.events
+
+    /**
+     * As on iOS, adding to an existing root position is titled "Add stake to root", and the Where to stake root card or a quick pick
+     * switched to root "Earn with Bittensor".
+     */
+    val titleRes = when {
+        payload?.validatorAddress != null -> R.string.bittensor_add_stake_to_root
+        payload?.quickPick == true || initialSelectionState.quickPick -> R.string.bittensor_earn_title
+        else -> R.string.bittensor_stake_to_root
+    }
 
     private val stakingDetailsState = retryController.observe(
         step = "root staking details",
@@ -186,8 +199,6 @@ class BittensorStakeAmountViewModel(
 
     private val preparing = MutableStateFlow(false)
 
-    private var initializedMetaId: Long? = null
-
     private val amountInPlanks = combine(
         stakingDetails,
         amount
@@ -218,7 +229,7 @@ class BittensorStakeAmountViewModel(
     ) { state, fee ->
         val details = state.dataOrNull
         val networkFee = details?.let { fee.loadedFeeOrNull()?.maxAmountDeductionFor(it.asset.token.configuration) }
-        bittensorNeedsFunding(details?.asset?.transferableInPlanks, networkFee, locked = payload != null)
+        bittensorNeedsFunding(details?.asset?.transferableInPlanks, networkFee, locked = payload?.metaId != null)
     }
         .distinctUntilChanged()
         .shareInBackground()
@@ -251,7 +262,7 @@ class BittensorStakeAmountViewModel(
         val details = state.dataOrNull ?: return@combine null
         val stake = details.position?.stakeInPlanks?.takeIf { it.isPositive() } ?: return@combine null
         val validator = details.validator ?: return@combine null
-        if (payload == null || funding || details.dataStatus !is BittensorDataStatus.Fresh) return@combine null
+        if (payload?.metaId == null || funding || details.dataStatus !is BittensorDataStatus.Fresh) return@combine null
         val name = validator.name.ifBlank { details.chain.addressOf(validator.hotkey).ellipsizeAddress() }
         val amount = formatToken(details.asset.token.amountFromPlanks(stake), details.asset.token.configuration.symbol)
         resourceManager.getString(R.string.bittensor_adds_to_position, amount, name)
@@ -289,7 +300,7 @@ class BittensorStakeAmountViewModel(
             val validator = details.validator
             val fixedAddress = payload?.validatorAddress
             val hotkey = validator?.hotkey?.value ?: fixedAddress?.let(details.chain::accountIdOf)
-                ?: return@map BittensorValidatorUi(resourceManager.getString(R.string.bittensor_select_validator), null)
+                ?: return@map BittensorValidatorUi(resourceManager.getString(R.string.bittensor_select_validator_title), null)
             val name = validator?.name ?: requireNotNull(fixedAddress).ellipsizeAddress()
             BittensorValidatorUi(
                 name,
@@ -356,10 +367,6 @@ class BittensorStakeAmountViewModel(
             }
         }
 
-        stakingDetails
-            .onEach(::setInitialAmount)
-            .launchIn(viewModelScope)
-
         validatorCommunicator.responseFlow
             .onEach { response ->
                 if (!selectionState.accepts(response)) return@onEach
@@ -372,6 +379,11 @@ class BittensorStakeAmountViewModel(
     }
 
     fun back() {
+        // As iOS: leaving the setup of a new position before continuing reports it abandoned. A setup replaced by the
+        // subnet setup is not left, as iOS keeps one setup and only changes its target.
+        if (!flowContinued && payload?.validatorAddress == null) {
+            analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SETUP, StakingAnalyticsTarget.ROOT))
+        }
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
     }
@@ -394,11 +406,14 @@ class BittensorStakeAmountViewModel(
             externalActions.showAddressActions(fixedAddress, details.chain)
             return@launchUnit
         }
+        // As iOS: the root preset is the recommended validator, so confirming it again is not a manual change.
+        val preset = stakingDetailsState.first().dataOrNull?.validator
         validatorCommunicator.openRequest(
             BittensorSelectValidatorCommunicator.Request(
                 BittensorNetuid.Root.value,
                 details.validator?.let { details.chain.addressOf(it.hotkey) },
-                selectionState
+                selectionState,
+                recommendedAddress = preset?.let { details.chain.addressOf(it.hotkey) }
             )
         )
     }
@@ -409,6 +424,7 @@ class BittensorStakeAmountViewModel(
         val fee = fee.first()
             .loadedFeeOrNull()
             ?.takeIf { it.request == request } ?: return@launchUnit
+        val token = stakingDetails.first().asset.token
         preparing.value = true
         try {
             val payload = bittensorStakingInteractor.validationPayload(request, fee)
@@ -428,7 +444,7 @@ class BittensorStakeAmountViewModel(
                             )
                         )
                     }
-                    resourceManager.getString(R.string.common_error_general_title) to failure.message(resourceManager)
+                    failure.titleAndMessage(resourceManager, tokenFormatter.bittensorStakeAlertFormat(token))
                 }
             ) { openConfirmation(request) }
         } catch (e: CancellationException) {
@@ -440,10 +456,10 @@ class BittensorStakeAmountViewModel(
     }
 
     private fun observeStakingDetails(): Flow<BittensorRootStakingDetails> {
-        return when {
-            payload == null -> bittensorStakingInteractor.observeRootStakingDetails()
-            payload.validatorAddress == null -> bittensorStakingInteractor.observeRootStakingDetails(payload.metaId)
-            else -> bittensorStakingInteractor.observeRootAccountDetails(payload.metaId)
+        val metaId = payload?.metaId ?: return bittensorStakingInteractor.observeRootStakingDetails()
+        return when (payload.validatorAddress) {
+            null -> bittensorStakingInteractor.observeRootStakingDetails(metaId)
+            else -> bittensorStakingInteractor.observeRootAccountDetails(metaId)
         }
     }
 
@@ -463,6 +479,7 @@ class BittensorStakeAmountViewModel(
     }
 
     private fun openConfirmation(request: BittensorRootStakeRequest) {
+        flowContinued = true
         val payload = BittensorStakeConfirmPayload(
             metaId = request.metaId,
             amountInPlanks = request.amountInPlanks,
@@ -516,25 +533,17 @@ class BittensorStakeAmountViewModel(
         }
     }
 
-    private fun setInitialAmount(details: BittensorRootStakingDetails) {
-        if (initializedMetaId == details.metaId) return
-        initializedMetaId = details.metaId
-        if (amountChooser.inputState.value.value.isNotEmpty()) return
-
-        val suggested = minOf(SUGGESTED_AMOUNT, details.asset.transferable)
-        amountChooser.setAmountInput(suggested.toStripTrailingZerosString())
-    }
-
     private fun continueButtonState(
         details: BittensorRootStakingDetails,
         amount: BigInteger?,
         fee: FeeStatus<BittensorFeeEstimate<BittensorRootStakeRequest>, FeeDisplay>
     ): DescriptiveButtonState {
         val label = resourceManager.getString(R.string.common_continue)
-        val validator = details.validator ?: return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.bittensor_select_validator))
+        // As on iOS, the root button never asks for a validator: it reads "Enter amount" until an amount is entered.
         if (amount == null || !amount.isPositive()) {
             return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
         }
+        val validator = details.validator ?: return DescriptiveButtonState.Disabled(label)
 
         if (fee is FeeStatus.Loading) return DescriptiveButtonState.Loading
         val loadedFee = fee.loadedFeeOrNull() ?: return DescriptiveButtonState.Disabled(label)
@@ -563,7 +572,5 @@ class BittensorStakeAmountViewModel(
 
     private companion object {
         const val FEE_DEBOUNCE_MILLIS = 350L
-
-        val SUGGESTED_AMOUNT: BigDecimal = BigDecimal("5")
     }
 }

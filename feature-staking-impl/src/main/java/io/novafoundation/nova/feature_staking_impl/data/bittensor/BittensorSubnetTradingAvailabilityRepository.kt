@@ -14,4 +14,19 @@ class BittensorSubnetTradingAvailabilityRepository(private val storage: StorageD
             .storage("SubtokenEnabled")
             .query(subnetId.value.toBigInteger()) { it?.let(::bindBoolean) ?: false }
     }
+
+    /** One multi-key storage read for the whole list, so a slow node costs one round trip, not one per subnet. */
+    suspend fun enabledSubnets(subnetIds: List<BittensorNetuid.Subnet>): Set<BittensorNetuid.Subnet> {
+        if (subnetIds.isEmpty()) return emptySet()
+        val enabled = storage.query(ChainGeneses.BITTENSOR) {
+            runtime.metadata.module("SubtensorModule")
+                .storage("SubtokenEnabled")
+                .entries(
+                    keysArguments = subnetIds.map { listOf(it.value.toBigInteger()) },
+                    keyExtractor = { key -> BittensorNetuid.Subnet(bindBittensorU16(key.component1())) },
+                    binding = { value, _ -> value?.let(::bindBoolean) ?: false }
+                )
+        }
+        return subnetIds.filterTo(mutableSetOf()) { enabled[it] == true }
+    }
 }

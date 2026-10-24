@@ -2,6 +2,7 @@
 
 package io.novafoundation.nova.feature_staking_impl.domain.dashboard
 
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.model.isStaking
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
@@ -50,13 +53,17 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+
+private const val BITTENSOR_DETAILS_CACHE = "StakingDashboard.BittensorDetails"
 
 class RealStakingDashboardInteractor(
     private val dashboardRepository: StakingDashboardRepository,
@@ -67,6 +74,7 @@ class RealStakingDashboardInteractor(
     private val walletRepository: WalletRepository,
     private val totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
     private val bittensorDetailsSource: BittensorDashboardDetailsSource,
+    private val computationalCache: ComputationalCache,
 ) : StakingDashboardInteractor {
 
     override suspend fun syncDapps() {
@@ -95,7 +103,7 @@ class RealStakingDashboardInteractor(
                 val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
 
                 val pricedDashboard = combine(noPriceDashboardFlow, assetsFlow, ::addPricesToDashboard)
-                combine(pricedDashboard, bittensorDetailsSource.observe(metaAccount, stakingChains.values)) { dashboard, details ->
+                combine(pricedDashboard, bittensorDetailsFlow(metaAccount, stakingChains)) { dashboard, details ->
                     dashboard.map { it.withBittensorDetails(details) }
                 }
             }
@@ -120,11 +128,28 @@ class RealStakingDashboardInteractor(
                 }
                 val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
                 val dashboardFlow = combine(noPriceDashboardFlow, assetsFlow, dApps, ::combineNoMoreOptionsInfo)
-                combine(dashboardFlow, bittensorDetailsSource.observe(metaAccount, stakingChains.values)) { options, details ->
+                combine(dashboardFlow, bittensorDetailsFlow(metaAccount, stakingChains)) { options, details ->
                     MoreStakingOptions(options.inAppStaking.map { it.withBittensorDetails(details) }, options.browserStaking)
                 }
             }
             emitAll(accountOptions)
+        }
+    }
+
+    override fun refreshMaximumYields() {
+        bittensorDetailsSource.refreshMaximumYield()
+    }
+
+    // The dashboard and its More options show the same Bittensor figures: one observation serves both,
+    // so its requests are not doubled.
+    private fun bittensorDetailsFlow(metaAccount: MetaAccount, stakingChains: ChainsById): Flow<Map<String, BittensorDashboardDetails>> = flow {
+        coroutineScope {
+            val shared = computationalCache.useSharedFlow(BITTENSOR_DETAILS_CACHE, this) {
+                accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
+                    bittensorDetailsSource.observe(account, stakingChains.values).map { details -> account.id to details }
+                }
+            }
+            emitAll(shared.filter { (metaId, _) -> metaId == metaAccount.id }.map { (_, details) -> details })
         }
     }
 

@@ -41,6 +41,17 @@ internal fun errorCodeOf(body: String?): String? = body?.let { ERROR_CODE.find(i
 
 internal fun HttpException.errorCode(): String? = errorCodeOf(runCatching { response()?.errorBody()?.string() }.getOrNull())
 
+/** Like [errorCode], but leaves the error body unread, so the code can be checked more than once. */
+fun HttpException.peekErrorCode(): String? = try {
+    val source = response()?.errorBody()?.source()
+    source?.request(ERROR_PEEK_BYTES)
+    source?.buffer?.clone()?.let { errorCodeOf(it.readUtf8(minOf(it.size, ERROR_PEEK_BYTES))) }
+} catch (failure: Exception) {
+    null
+}
+
+private const val ERROR_PEEK_BYTES = 4_096L
+
 // The attestation contract's error codes, the same list the iOS client knows
 private val ATTESTATION_ERROR_CODES = setOf(
     "invalid_request", "unsupported_profile", "invalid_target", "unsupported_platform", "unsupported_attestation_type",

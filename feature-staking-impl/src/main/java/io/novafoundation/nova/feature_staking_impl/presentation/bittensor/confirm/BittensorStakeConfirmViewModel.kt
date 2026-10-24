@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingResultAction
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
@@ -12,6 +12,8 @@ import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.AnalyticsWalletType
+import io.novafoundation.nova.analytics.StakingBlockedReason
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -34,6 +36,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -52,14 +55,18 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.titleAndMessage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -80,6 +87,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 class BittensorStakeConfirmViewModel(
     private val analytics: AnalyticsService,
@@ -107,6 +115,9 @@ class BittensorStakeConfirmViewModel(
     private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.CONFIRM)
 
     val retryEvents = retryController.events
+
+    /** As on iOS, confirming an add to an existing root position is titled "Add stake to root". */
+    val titleRes = if (payload.existingPosition) R.string.bittensor_add_stake_to_root else R.string.bittensor_stake_to_root
 
     private val stakeRequest = flowOf { payload.toStakeRequest(chain.await()) }
         .shareInBackground()
@@ -186,6 +197,9 @@ class BittensorStakeConfirmViewModel(
 
     private val validating = MutableStateFlow(false)
 
+    /** Set once the stake is confirmed, also when it then fails (iOS `abandonTracker.markProceeded`). */
+    private var flowContinued = false
+
     val confirmButtonState = combine(
         stakingDetailsState,
         validating,
@@ -208,10 +222,34 @@ class BittensorStakeConfirmViewModel(
             val fee = bittensorStakingInteractor.estimateRootStakeFee(request)
             BittensorFeeEstimate(request, fee)
         }
+        launch {
+            // As iOS: a watch-only wallet is reported blocked once the confirmation opens, and leaving it is not an abandonment.
+            if (accountRepository.getMetaAccount(payload.metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
+                flowContinued = true
+                analytics.track(
+                    BittensorAnalyticsEvent.Blocked(
+                        StakingFlow.STAKE,
+                        StakingBlockedReason.WATCH_ONLY,
+                        AnalyticsWalletType.WATCH_ONLY,
+                        StakingAnalyticsTarget.ROOT
+                    )
+                )
+            }
+        }
     }
 
     fun back() {
-        if (submission.value !is BittensorSubmissionState.Submitting) router.back()
+        when {
+            submission.value is BittensorSubmissionState.Submitting -> Unit
+            submission.value.isFinished -> resultNavigation.leave()
+            else -> {
+                // As iOS: leaving the confirmation of a new position before confirming reports it abandoned.
+                if (!flowContinued && !payload.existingPosition) {
+                    analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.CONFIRM, StakingAnalyticsTarget.ROOT))
+                }
+                router.back()
+            }
+        }
     }
 
     fun accountClicked() = launchUnit {
@@ -219,6 +257,10 @@ class BittensorStakeConfirmViewModel(
             account.first().address,
             chain.await()
         )
+    }
+
+    fun validatorClicked() {
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(BittensorNetuid.Root.value, payload.validatorAddress))
     }
 
     fun confirmClicked() = launchUnit {
@@ -232,6 +274,7 @@ class BittensorStakeConfirmViewModel(
                 .loadedFeeOrNull()
                 ?.takeIf { it.request == request } ?: return@launchUnit
             val payload = bittensorStakingInteractor.validationPayload(request, fee)
+            val token = stakingDetails.first().asset.token
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
@@ -248,17 +291,25 @@ class BittensorStakeConfirmViewModel(
                             )
                         )
                     }
-                    resourceManager.getString(R.string.common_error_general_title) to failure.message(resourceManager)
+                    failure.titleAndMessage(resourceManager, tokenFormatter.bittensorStakeAlertFormat(token))
                 }
             ) { executeStake(request, fee.fee) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            submission.value = e.mapBittensorPreSubmissionError().mapResult(resourceManager).toSubmissionState()
+            submission.value = e.mapBittensorPreSubmissionError().mapResult(resourceManager, resultNavigation.landingActions()).toSubmissionState()
         } finally {
             validating.value = false
         }
     }
+
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.STAKE,
+        StakingAnalyticsTarget.ROOT,
+        newPosition = !payload.existingPosition
+    )
 
     private val analyticsMode get() = if (payload.existingPosition) StakingMode.ADD_STAKE else StakingMode.NEW_POSITION
 
@@ -268,6 +319,7 @@ class BittensorStakeConfirmViewModel(
             val details = stakingDetails.first()
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
             operationAnalytics.startOperation()
+            flowContinued = true
             analytics.track(
                 BittensorAnalyticsEvent.Confirmed(
                     BittensorAnalyticsEvent.NETWORK,
@@ -284,36 +336,27 @@ class BittensorStakeConfirmViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = result.toSubmissionState(resourceManager)
+                    submission.value = result.toSubmissionState(resourceManager, resultNavigation.landingActions())
                 }
-                is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resourceManager).toSubmissionState()
+                is BittensorOperationResult.Unknown ->
+                    submission.value = result.mapResult(resourceManager, resultNavigation.landingActions()).toSubmissionState()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             val result = e.mapBittensorSubmissionError()
             operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.STAKE, mode = analyticsMode)
-            submission.value = result.mapResult(resourceManager).toSubmissionState()
+            submission.value = result.mapResult(resourceManager, resultNavigation.landingActions()).toSubmissionState()
         } finally {
             validating.value = false
         }
     }
 
-    fun resultDismissed() {
-        submission.value = submission.value.dismissResult()
-    }
+    /** A result sheet button, as iOS `activate(action:)`; Try again hides the sheet so the stake can be confirmed again. */
+    fun resultActionClicked(action: BittensorResultAction) {
+        if (action !in submission.value.result?.actions.orEmpty()) return
 
-    fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.VIEW_POSITION,
-                    StakingFlow.STAKE,
-                    StakingAnalyticsTarget.ROOT
-                )
-            )
-            router.openBittensorRootDetails()
-        }
+        resultNavigation.activate(action) { submission.value = submission.value.dismissResult() }
     }
 
     private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {
@@ -358,7 +401,8 @@ class BittensorStakeConfirmViewModel(
             description = resourceManager.getString(R.string.bittensor_staking_success_description),
             validator = request.validator.name,
             fee = outcome.formatNetworkFee(fee, request.chain, resourceManager, tokenFormatter),
-            amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter)
+            amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter),
+            actions = resultNavigation.completedActions()
         )
     }
 

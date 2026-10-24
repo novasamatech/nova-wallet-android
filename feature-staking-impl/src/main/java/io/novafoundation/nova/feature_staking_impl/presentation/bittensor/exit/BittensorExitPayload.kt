@@ -38,7 +38,10 @@ data class BittensorExitReviewPayload(
     val simulatedInput: String? = null,
     val slippageFraction: String = "0.005",
     val groupHotkeys: List<String> = emptyList(),
-    val serviceFeeRate: String? = null
+    val serviceFeeRate: String? = null,
+    val costBasis: BittensorSaleCostBasisPayload? = null,
+    // The setup's "All validators" selection; otherwise the sale stays with the position's validator.
+    val allValidators: Boolean = false
 ) : Parcelable {
 
     fun quote() = BittensorExitQuote(

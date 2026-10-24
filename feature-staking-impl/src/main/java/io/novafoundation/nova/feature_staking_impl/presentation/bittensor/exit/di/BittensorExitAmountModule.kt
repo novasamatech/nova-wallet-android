@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -31,6 +32,9 @@ import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageS
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import javax.inject.Named
 
 @Module(includes = [ViewModelModule::class])
 class BittensorExitAmountModule {
@@ -58,7 +62,10 @@ class BittensorExitAmountModule {
         slippageSettings: BittensorSlippageSettings,
         slippageSettingsCommunicator: SlippageSettingsCommunicator,
         costBasisFormatter: BittensorSaleCostBasisFormatter,
-        precisionValidator: BittensorExitPrecisionValidator
+        precisionValidator: BittensorExitPrecisionValidator,
+        validatorInteractor: BittensorValidatorInteractor,
+        rootHoldFormatter: BittensorRootHoldFormatter,
+        @Named("BittensorWithdrawalDuration") durationFormatter: DurationFormatter
     ): ViewModel {
         return BittensorExitAmountViewModel(
             analytics, payload,
@@ -79,7 +86,10 @@ class BittensorExitAmountModule {
             slippageSettings = slippageSettings,
             slippageSettingsCommunicator = slippageSettingsCommunicator,
             costBasisFormatter = costBasisFormatter,
-            precisionValidator = precisionValidator
+            precisionValidator = precisionValidator,
+            validatorInteractor = validatorInteractor,
+            rootHoldFormatter = rootHoldFormatter,
+            durationFormatter = durationFormatter
         )
     }
 

@@ -14,7 +14,10 @@ import okhttp3.HttpUrl
 import retrofit2.HttpException
 import retrofit2.Response
 
-/** Only HTTP-fresh data is reused; stale data never supplies a fallback eligibility policy. */
+/**
+ * Only HTTP-fresh responses are reused. A backend-STALE policy still gates selection, and a STALE recommendation
+ * generation still recommends: the recommendations contract makes it usable data.
+ */
 class BittensorValidatorBackend(
     private val api: BittensorValidatorsApi,
     private val infrastructureUrls: InfrastructureUrls,
@@ -68,8 +71,8 @@ class BittensorValidatorBackend(
             return@withLock rootValidators?.data ?: throw e
         }
         val cached = readCacheEntry(response, startedAt)
+        // stakeYieldWindows is optional: the root list stays usable without it, only its yield consumers need it.
         requireAvailableRootComponent(cached.data.meta?.components?.rootValidators)
-        requireAvailableRootComponent(cached.data.meta?.components?.stakeYieldWindows)
         requireNotNull(cached.data.items).forEach { row ->
             row.rootStakeTao?.toBigDecimal()
             row.stakeYield?.d30?.let { requireNotNull(it.apy).toBigDecimal() }
@@ -99,9 +102,8 @@ class BittensorValidatorBackend(
     }
 
     private fun requireAvailableRootComponent(component: BittensorRecommendationsRemote.Component?) {
-        val metadata = requireNotNull(component) { "Missing root yield metadata" }
-        require(metadata.availability == "AVAILABLE" && metadata.freshness in setOf("FRESH", "STALE")) { "Root yield data is unavailable" }
-        parseBittensorTimestamp(requireNotNull(metadata.asOf))
+        requireAvailableBittensorComponent(component, "Root yield data")
+        parseBittensorTimestamp(requireNotNull(component?.asOf))
     }
 
     suspend fun rankedValidators(netuid: Int): BittensorRankedValidatorsRemote = mutex.withLock {
@@ -146,22 +148,23 @@ class BittensorValidatorBackend(
     }
 
     suspend fun recommendedHotkeys(netuid: Int): List<String> {
-        val recommendations = recommendedValidators()
-        return recommendations
+        return mapRecommendedValidators(recommendationsDocument())
             .filter { it.netuid == netuid }
             .mapNotNull { it.hotkey }
             .distinct()
     }
 
-    suspend fun recommendedValidators(): List<BittensorRecommendationsRemote.Item> = mutex.withLock {
+    suspend fun recommendedValidators(): List<BittensorRecommendationsRemote.Item> = mapRecommendedValidators(recommendationsDocument())
+
+    private suspend fun recommendationsDocument(): BittensorRecommendationsRemote = mutex.withLock {
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "recommendations")
         val cached = validatorRecommendations?.takeIf { nanoTime() < it.deadlineNanos }
             ?: loadRecommendations(url)
-        val validators = mapRecommendedValidators(cached.data)
+        mapRecommendedValidators(cached.data)
         admitGeneration(cached.data.meta)
         validatorRecommendations = cached
-        validators
+        cached.data
     }
 
     private suspend fun loadRecommendations(url: String): Cached<BittensorRecommendationsRemote> {

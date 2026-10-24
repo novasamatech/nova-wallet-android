@@ -49,7 +49,9 @@ class BittensorSubnetPositionModule {
         withdrawalInteractor: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor,
         withdrawalFormatter: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWithdrawalFormatter,
         slippageSettings: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings,
-        costBasisFormatter: BittensorSaleCostBasisFormatter
+        costBasisFormatter: BittensorSaleCostBasisFormatter,
+        validatorInteractor: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor,
+        walletGate: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
     ): ViewModel =
         BittensorSubnetPositionViewModel(
             analytics,
@@ -69,7 +71,9 @@ class BittensorSubnetPositionModule {
             withdrawalInteractor,
             withdrawalFormatter,
             slippageSettings,
-            costBasisFormatter
+            costBasisFormatter,
+            validatorInteractor,
+            walletGate
         )
 
     @Provides

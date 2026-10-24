@@ -18,6 +18,7 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -31,8 +32,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.bittensorFloorsClose
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class BittensorExitInteractor(
     private val chainRegistry: ChainRegistry,
@@ -53,30 +64,58 @@ class BittensorExitInteractor(
     private val chainState: ChainStateRepository
 ) {
 
+    private companion object {
+
+        const val SUBNET_METADATA_ATTEMPTS = 5
+    }
+
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
-    fun observe(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): Flow<BittensorExitPosition> = flowOfAll {
+    /** The position refreshed on each new block while [shown]; the load already read the current block. */
+    fun observe(
+        metaId: Long,
+        netuid: BittensorNetuid,
+        hotkeyAddress: String,
+        shown: Flow<Boolean> = flowOf(true)
+    ): Flow<BittensorExitPosition> = flowOfAll {
         val initial = load(metaId, netuid, hotkeyAddress)
-        val snapshots = flowOfAll { chainState.currentRemoteBlockNumberFlow(initial.chain.id) }
-            .conflate()
-            .map {
+        var subnet = initial.subnet
+        val metadataRetry = BittensorBlockBackoff(SUBNET_METADATA_ATTEMPTS)
+        val snapshots = newBlocks(initial.chain.id, shown)
+            .mapNotNull {
                 requireWallet(metaId, initial.coldkey, initial.chain)
-                exitRuntimeSource.preflight(initial.chain.id, initial.coldkey.value, initial.hotkey.value, netuid)
-                    .withWithdrawalFloor(netuid)
+                if (subnet == null && !netuid.isRoot() && metadataRetry.shouldAttempt()) subnet = loadSubnetMetadata(netuid)
+                refreshPreflight(initial, netuid)?.let { it to subnet }
             }
-            .onStart { emit(initial.preflight) }
-        combine(snapshots, walletRepository.assetFlow(metaId, initial.chain.utilityAsset)) { preflight, asset ->
-            initial.copy(preflight = preflight, asset = asset)
+            .onStart { emit(initial.preflight to initial.subnet) }
+            .map { (preflight, subnet) -> preflight.withWithdrawalFloor(netuid) to subnet }
+            // Price drift alone must not restart the quote and fee of an unchanged position every block;
+            // the Max floor is refreshed once it moves by more than the bucket.
+            .distinctUntilChanged { old, new ->
+                old.second == new.second && old.first.refreshIdentity() == new.first.refreshIdentity() &&
+                    bittensorFloorsClose(old.first.withdrawalFloor, new.first.withdrawalFloor)
+            }
+        combine(snapshots, walletRepository.assetFlow(metaId, initial.chain.utilityAsset)) { (preflight, subnet), asset ->
+            initial.copy(preflight = preflight, subnet = subnet, asset = asset)
         }
             .distinctUntilChanged()
     }
 
-    suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition {
+    /** Each block after the current one while [shown]; a hidden screen skips them and resumes with the next block. */
+    fun newBlocks(chainId: ChainId, shown: Flow<Boolean>): Flow<Unit> = shown.distinctUntilChanged()
+        .flatMapLatest { visible ->
+            if (visible) flowOfAll { chainState.currentRemoteBlockNumberFlow(chainId) }.drop(1).map { } else emptyFlow()
+        }
+        .conflate()
+
+    suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition = coroutineScope {
         val wallet = accountRepository.getMetaAccount(metaId)
         immediateExecution.requireSupported(wallet)
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val coldkey = AccountIdKey(wallet.requireAccountIdIn(chain))
         val hotkey = AccountIdKey(chain.accountIdOf(hotkeyAddress))
+        // Optional display metadata loads alongside the chain snapshot instead of after it.
+        val subnet = async { loadSubnetMetadata(netuid) }
         val preflight = exitRuntimeSource.preflight(
             chain.id,
             coldkey.value,
@@ -85,10 +124,9 @@ class BittensorExitInteractor(
         )
         val asset = walletRepository.assetFlow(metaId, chain.utilityAsset)
             .first()
-        val subnet = loadSubnetMetadata(netuid)
         val directSigner = wallet.type != LightMetaAccount.Type.PROXIED && wallet.type != LightMetaAccount.Type.MULTISIG
         requireWallet(metaId, coldkey, chain)
-        return BittensorExitPosition(
+        BittensorExitPosition(
             metaId = metaId,
             chain = chain,
             coldkey = coldkey,
@@ -96,48 +134,69 @@ class BittensorExitInteractor(
             validatorAddress = hotkeyAddress,
             netuid = netuid,
             asset = asset,
-            subnet = subnet,
+            subnet = subnet.await(),
             preflight = preflight.withWithdrawalFloor(netuid),
             supportsFeeFromStake = directSigner && !preflight.rootHoldEnabled,
             existentialDeposit = walletConstants.existentialDeposit(chain.id)
         )
     }
 
-    fun maximumAmount(position: BittensorExitPosition, slippageFraction: BigDecimal = slippage.fraction): BigInteger {
-        return position.preflight.withWithdrawalFloor(position.netuid, slippageFraction = slippageFraction).maximumAmount
+    /** The position's group with the floors of the selected slippage, from the same snapshot as Max and the plan. */
+    fun exitGroup(position: BittensorExitPosition, slippageFraction: BigDecimal = slippage.fraction): BittensorExitGroup {
+        return position.preflight.withWithdrawalFloor(position.netuid, slippageFraction).exitGroup(position.hotkey)
     }
 
+    fun maximumAmount(
+        position: BittensorExitPosition,
+        selection: BittensorExitSelection? = null,
+        slippageFraction: BigDecimal = slippage.fraction
+    ): BigInteger {
+        val group = exitGroup(position, slippageFraction)
+        return group.maximum(group.resolve(selection))
+    }
+
+    /**
+     * Quotes the plan for [amount] within the selected validators; the plan may settle on a nearby amount, which is
+     * the one quoted. A plan that empties the whole group is the full exit.
+     */
     suspend fun quote(
         position: BittensorExitPosition,
         amount: BigInteger,
-        fullExit: Boolean,
+        selection: BittensorExitSelection? = null,
         slippageFraction: BigDecimal = slippage.fraction
     ): BittensorExitQuote {
         require(amount.isPositive() && amount.bitLength() <= 64)
-        val exitAmount = if (fullExit) position.preflight.totalStake else amount
+        val group = exitGroup(position, slippageFraction)
+        val plan = group.basis(group.resolve(selection)).plan(amount, group.floors) ?: throw BittensorExitExceedsStakeException()
+        val fullExit = plan.emptiesGroup(group.hotkeys)
         val quote = when (val netuid = position.netuid) {
-            BittensorNetuid.Root -> rootQuote(exitAmount, fullExit)
+            BittensorNetuid.Root -> rootQuote(plan.amount, fullExit)
             is BittensorNetuid.Subnet -> subnetQuote(
                 position.chain,
                 netuid,
-                exitAmount,
+                plan.amount,
                 fullExit,
                 slippageFraction
             )
         }
-        val basis = position.preflight.withWithdrawalFloor(position.netuid, quote.spotPrice, slippageFraction)
-        val plan = basis.plan(exitAmount, position.hotkey)
-        val exitHotkeys = if (fullExit) {
-            position.preflight.orderedHotkeys.ifEmpty { listOf(position.hotkey) }
-        } else {
-            emptyList()
-        }
         return quote.copy(
-            exitHotkeys = exitHotkeys,
+            exitHotkeys = if (fullExit) group.hotkeys else emptyList(),
             plan = plan,
             slippageFraction = slippageFraction,
             groupHotkeys = position.preflight.groupStakes.keys.toSet()
         )
+    }
+
+    /** The root hold of one group validator, for the hold explanation; null when it is not held. */
+    suspend fun rootHold(position: BittensorExitPosition, hotkey: AccountIdKey): BittensorRootHold? {
+        val remaining = position.preflight.groupMembers[hotkey]?.holdRemaining?.takeIf { it.isPositive() } ?: return null
+        val blockMillis = chainState.expectedBlockTimeInMillis(position.chain.id)
+        return BittensorRootHold(remaining * blockMillis, position.preflight.rootHoldInterval * blockMillis)
+    }
+
+    /** How long [blocks] last at the expected block time. */
+    suspend fun blocksDuration(position: BittensorExitPosition, blocks: BigInteger): Duration {
+        return (blocks * chainState.expectedBlockTimeInMillis(position.chain.id)).toLong().milliseconds
     }
 
     suspend fun estimateFee(position: BittensorExitPosition, quote: BittensorExitQuote): Fee {
@@ -188,17 +247,8 @@ class BittensorExitInteractor(
         val asset = walletRepository.assetFlow(position.metaId, position.chain.utilityAsset)
             .first()
         val existentialDeposit = walletConstants.existentialDeposit(position.chain.id)
-        val latestQuote = if (position.isRoot) {
-            null
-        } else {
-            subnetQuote(
-                position.chain,
-                position.netuid as BittensorNetuid.Subnet,
-                quote.amount,
-                quote.fullExit,
-                quote.slippageFraction
-            )
-        }
+        // The re-read quote keeps the plan, so a confirmed rate update or the signature can take it as it is.
+        val latestQuote = if (position.isRoot) null else refreshQuote(position, quote)
         return BittensorExitValidationPayload(
             preflight = preflight,
             quote = quote,
@@ -255,15 +305,30 @@ class BittensorExitInteractor(
         }
     }
 
+    /** Background refresh: a failed read keeps the last snapshot; validation always re-reads the chain. */
+    private suspend fun refreshPreflight(initial: BittensorExitPosition, netuid: BittensorNetuid): BittensorExitPreflight? {
+        return try {
+            exitRuntimeSource.preflight(initial.chain.id, initial.coldkey.value, initial.hotkey.value, netuid)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logger.log("[BittensorExit] Background preflight refresh failed")
+            logger.log(e)
+            null
+        }
+    }
+
     private fun BittensorExitPreflight.withWithdrawalFloor(
         netuid: BittensorNetuid,
-        price: BigInteger? = withdrawalPrice,
         slippageFraction: BigDecimal = slippage.fraction
     ): BittensorExitPreflight {
-        val marginalPrice = price ?: return this
+        val marginalPrice = withdrawalPrice ?: return this
         val selectedSlippage = BittensorSlippage(slippageFraction)
         val limit = if (netuid.isRoot()) marginalPrice else selectedSlippage.limitPrice(marginalPrice, BittensorSwapDirection.ALPHA_TO_TAO)
-        return copy(withdrawalFloor = bittensorWithdrawalFloor(minStake, limit, swapFeeRate))
+        return copy(
+            withdrawalFloor = bittensorWithdrawalFloor(minStake, limit, swapFeeRate),
+            sweepFloor = bittensorWithdrawalFloor(minNominatorStake, limit, BigInteger.ZERO)
+        )
     }
 
     private fun rootQuote(amount: BigInteger, fullExit: Boolean): BittensorExitQuote = BittensorExitQuote(
@@ -299,7 +364,8 @@ class BittensorExitInteractor(
         val minimumTaoOut = simulation.amountIn * limitPrice / BittensorProtocolUnits.RAO_PER_TAO
         val commission = configRepository.config().commission
         val serviceFee = commission.feeFor(simulation.amountOut)
-        require(minimumTaoOut.isPositive() && simulation.amountOut >= minimumTaoOut)
+        // As on iOS, a sale that its own impact cannot fill at the limit price is still quoted; validation blocks it.
+        require(minimumTaoOut.isPositive())
 
         return BittensorExitQuote(
             netuid = subnetId,
@@ -334,5 +400,23 @@ class BittensorExitInteractor(
         check(
             wallet.id == metaId && wallet.requireAccountIdIn(chain).contentEquals(coldkey.value)
         ) { "The staking wallet has changed" }
+    }
+}
+
+/** Exponential backoff over block ticks: attempts on ticks 1, 3, 7, 15, … and gives up after [maxAttempts]. */
+internal class BittensorBlockBackoff(private val maxAttempts: Int) {
+
+    private var tick = 0L
+
+    private var attempts = 0
+
+    private var nextTick = 1L
+
+    fun shouldAttempt(): Boolean {
+        tick += 1
+        if (attempts >= maxAttempts || tick < nextTick) return false
+        attempts += 1
+        nextTick = tick + (1L shl attempts)
+        return true
     }
 }

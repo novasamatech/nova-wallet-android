@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitMinimumValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitRemainderValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitSafeModeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitSelfImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitTradingEnabledValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorFullExitValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitPlanValidation
@@ -49,11 +50,14 @@ class BittensorExitValidationsModule {
 
         val exitTradingEnabledValidation = BittensorExitTradingEnabledValidation()
 
+        val exitSelfImpactValidation = BittensorExitSelfImpactValidation()
+
         return ValidationSystem.from(
             listOf(
                 exitColdkeySwapValidation,
                 exitSafeModeValidation,
                 exitTradingEnabledValidation,
+                exitSelfImpactValidation,
                 exitHoldValidation,
                 exitBalanceValidation,
                 fullExitValidation,
@@ -61,8 +65,8 @@ class BittensorExitValidationsModule {
                 exitMinimumValidation,
                 exitRemainderValidation,
                 exitPlanValidation,
-                exitQuoteValidation,
                 exitPriceImpactValidation,
+                exitQuoteValidation,
                 exitFeeSourceValidation
             )
         )

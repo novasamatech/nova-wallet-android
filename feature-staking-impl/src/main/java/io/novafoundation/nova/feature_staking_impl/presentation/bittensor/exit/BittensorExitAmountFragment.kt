@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.common.utils.EventObserver
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setMessageOrHide
 
 import androidx.core.os.bundleOf
@@ -36,6 +38,8 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
 
         fun getBundle(payload: BittensorExitPositionPayload) = bundleOf(PAYLOAD to payload)
     }
+
+    private var validatorPicker: BittensorExitValidatorPickerBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorExitAmountBinding.inflate(layoutInflater)
 
@@ -83,7 +87,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
         viewModel.amountError.observe(amount::setError)
-        validator.showValue(viewModel.validator)
+        viewModel.validator.observe(validator::showBittensorLoadingValue)
         if (!viewModel.isRoot) {
             viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
             viewModel.averagePriceDescription.observe { description ->
@@ -107,6 +111,26 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
             validator.image.isVisible = it != null
             validator.image.setImageDrawable(it)
         }
+        viewModel.isValidatorSelectable.observe { selectable ->
+            if (selectable) {
+                validator.setPrimaryValueEndIcon(R.drawable.ic_chevron_right)
+            } else {
+                validator.setPrimaryValueEndIcon(R.drawable.ic_info)
+            }
+        }
+        viewModel.legCapNote.observe(legCapNote::setTextOrHide)
+        viewModel.validatorPicker.observe(
+            viewLifecycleOwner,
+            EventObserver { picker ->
+                validatorPicker?.dismiss()
+                validatorPicker = BittensorExitValidatorPickerBottomSheet(
+                    requireContext(),
+                    picker,
+                    onValidatorPicked = viewModel::validatorPicked,
+                    onAllValidatorsPicked = if (picker.allValidators) viewModel::allValidatorsPicked else null
+                ).also { it.show() }
+            }
+        )
         viewModel.fee.observe(fee::showBittensorLoadingValue)
         viewModel.feeCaption.observe {
             caption.text = it
@@ -114,5 +138,21 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         }
         viewModel.saleFeeWarning.observe(saleFeeWarning::setMessageOrHide)
         viewModel.continueButtonState.observe(continueButton::setState)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onShown()
+    }
+
+    override fun onPause() {
+        viewModel.onHidden()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        validatorPicker?.dismiss()
+        validatorPicker = null
+        super.onDestroyView()
     }
 }

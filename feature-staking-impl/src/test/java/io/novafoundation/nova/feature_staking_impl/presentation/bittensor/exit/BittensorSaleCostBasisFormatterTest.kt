@@ -49,7 +49,7 @@ class BittensorSaleCostBasisFormatterTest {
 
     private val chainAsset = mock(Chain.Asset::class.java)
 
-    private val purchase = BittensorReportedOperation(1, "hotkey", "10", "100", "0.1", "buy", "2026-10-01T12:00:00Z", "purchase", "buy")
+    private val purchase = BittensorReportedOperation(1, "hotkey", "10", "100", "0.1", "StakeAdded", "2026-10-01T12:00:00Z", "purchase", "buy")
 
     private val basis = BittensorEstimatedCostBasis(listOf(purchase), true)
 
@@ -168,6 +168,30 @@ class BittensorSaleCostBasisFormatterTest {
 
         assertEquals("Not available", result.token)
         assertEquals("no purchases", result.fiat)
+    }
+
+    @Test
+    fun `sale average shows no purchases only for a settled empty history`() {
+        val known = profitFormatter.averagePrice(BittensorSaleCostBasis.Known(BittensorEstimatedPurchaseTotals(number(10), number(100)), false), token, "α")
+        assertEquals("0.1 NATIVE", known.token)
+        assertEquals("per α", known.fiat)
+
+        val none = profitFormatter.averagePrice(BittensorSaleCostBasis.NoPurchases, token, "α")
+        assertEquals("Not available", none.token)
+        assertEquals("no purchases", none.fiat)
+
+        val settling = profitFormatter.averagePrice(BittensorSaleCostBasis.Unknown, token, "α")
+        assertEquals("—", settling.token)
+        assertNull(settling.fiat)
+    }
+
+    @Test
+    fun `sale earned needs settled totals`() {
+        val totals = BittensorEstimatedPurchaseTotals(number(200), number(100))
+
+        assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Known(totals, false), quote, token).amount.token)
+        assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Unknown, quote, token).amount.token)
+        assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Known(totals, true), null, token).amount.token)
     }
 
     private fun number(value: Long): BigInteger = BigInteger.valueOf(value)

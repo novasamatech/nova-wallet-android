@@ -34,6 +34,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import javax.inject.Named
 
 @Module(includes = [ViewModelModule::class])
 class BittensorExitReviewModule {
@@ -64,7 +66,8 @@ class BittensorExitReviewModule {
         exitFormatter: BittensorExitFormatter,
         saleCostBasisFormatter: BittensorSaleCostBasisFormatter,
         validatorInteractor: BittensorValidatorInteractor,
-        logger: Logger
+        logger: Logger,
+        @Named("BittensorWithdrawalDuration") durationFormatter: DurationFormatter
     ): ViewModel {
         return BittensorExitReviewViewModel(
             analytics, operationAnalytics, payload,
@@ -88,7 +91,8 @@ class BittensorExitReviewModule {
             exitFormatter,
             saleCostBasisFormatter,
             validatorInteractor,
-            logger
+            logger,
+            durationFormatter
         )
     }
 

@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import java.math.BigDecimal
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -38,6 +41,53 @@ class BittensorSubnetHistoryTest {
         assertEquals(listOf(200_000L), history.map { it.timestamp })
         assertTrue(convertBittensorSubnetHistory(alpha, native, BittensorSubnetChartPeriod.DAY, nowSeconds = 300_000).isEmpty())
         assertTrue(convertBittensorSubnetHistory(alpha, native, BittensorSubnetChartPeriod.DAY, nowSeconds = 199_999).isEmpty())
+    }
+
+    @Test
+    fun `prices before the current registration are dropped so a window starting earlier has no change`() {
+        val day = 86_400L
+        val now = 400 * day
+        val registeredAt = now - 71 * day
+        // A recycled netuid: the market quotes a full year, but the current subnet exists for 71 days only.
+        val points = (0..365).map { BittensorSubnetPricePoint(now - (365 - it) * day, BigDecimal.ONE, BigDecimal.ONE) }
+
+        assertTrue(hasBittensorSubnetHistoryCoverage(points, BittensorSubnetChartPeriod.YEAR, now))
+        val clipped = clipBittensorSubnetHistory(points, registeredAt)
+        assertTrue(clipped.all { it.timestamp >= registeredAt })
+        assertFalse(hasBittensorSubnetHistoryCoverage(clipped, BittensorSubnetChartPeriod.YEAR, now))
+        assertTrue(hasBittensorSubnetHistoryCoverage(clipped, BittensorSubnetChartPeriod.ALL, now))
+        assertEquals(points, clipBittensorSubnetHistory(points, null))
+    }
+
+    @Test
+    fun `registration time is the exact age before now rounded up to a whole second`() {
+        assertEquals(1_000_000L - 32_400L, bittensorRegistrationEpochSeconds(9.hours, 1_000_000_000L))
+        assertEquals(1_000_000L - 32_399L, bittensorRegistrationEpochSeconds(9.hours - 500.milliseconds, 1_000_000_000L))
+    }
+
+    @Test
+    fun `a subnet registered nine hours ago keeps the prices quoted since its registration`() {
+        val now = 1_000L * 86_400
+        val points = hourlyPoints(hours = 48, now = now)
+
+        val clipped = clipBittensorSubnetHistory(points, bittensorRegistrationEpochSeconds(9.hours, now * 1_000))
+
+        assertEquals((0..9).map { now - (9 - it) * 3_600L }, clipped.map { it.timestamp })
+    }
+
+    @Test
+    fun `a subnet registered less than a week ago has no weekly change`() {
+        val now = 1_000L * 86_400
+        val week = hourlyPoints(hours = 168, now = now)
+
+        val clipped = clipBittensorSubnetHistory(week, bittensorRegistrationEpochSeconds(6.6.days, now * 1_000))
+
+        assertTrue(hasBittensorSubnetHistoryCoverage(week, BittensorSubnetChartPeriod.WEEK, now))
+        assertFalse(hasBittensorSubnetHistoryCoverage(clipped, BittensorSubnetChartPeriod.WEEK, now))
+    }
+
+    private fun hourlyPoints(hours: Int, now: Long) = (0..hours).map {
+        BittensorSubnetPricePoint(now - (hours - it) * 3_600L, BigDecimal.ONE, BigDecimal.ONE)
     }
 
     private fun point(timestamp: Long, price: String) = HistoricalCoinRate(timestamp, price.toBigDecimal())

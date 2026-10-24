@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -238,11 +239,11 @@ class BittensorStakeAmountViewModelTest {
     @Before
     fun prepare() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        `when`(resources.getString(R.string.bittensor_select_validator)).thenReturn("Choose validator")
+        `when`(resources.getString(R.string.bittensor_select_validator_title)).thenReturn("Select validator")
         `when`(resources.getString(R.string.common_continue)).thenReturn("Continue")
         `when`(resources.getString(R.string.common_enter_amount)).thenReturn("Enter amount")
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
+        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(chainAsset.precision).thenReturn(Precision(9))
         `when`(chainAsset.chainId).thenReturn("bittensor")
@@ -260,7 +261,7 @@ class BittensorStakeAmountViewModelTest {
         createViewModel()
     }
 
-    private fun createViewModel(payload: BittensorStakeAmountPayload? = null) {
+    private fun createViewModel(payload: BittensorStakeAmountPayload? = null, selectionState: BittensorSelectionState = BittensorSelectionState()) {
         if (::viewModel.isInitialized) {
             runBlocking { viewModel.coroutineContext.job.cancelAndJoin() }
         }
@@ -281,7 +282,8 @@ class BittensorStakeAmountViewModelTest {
             feeLoaderMixinFactory = feeLoaderFactory,
             externalActions = externalActions,
             getAssetOptionsMixinFactory = getAssetOptionsFactory,
-            payload = payload
+            payload = payload,
+            initialSelectionState = selectionState
         )
     }
 
@@ -382,8 +384,47 @@ class BittensorStakeAmountViewModelTest {
         withTimeout(3_000L) {
             val position = BittensorRootPosition(estimateValidator.hotkey, BigInteger("10000000"))
             assets.emit(details(10).copy(validator = estimateValidator, position = position))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             assertEquals(null, viewModel.addStakeCaption.first())
+        }
+    }
+
+    @Test
+    fun `where to stake root card is titled as a quick pick`() {
+        createViewModel(BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true))
+        assertEquals(R.string.bittensor_earn_title, viewModel.titleRes)
+    }
+
+    @Test
+    fun `quick pick switched to root keeps the quick pick title`() {
+        createViewModel(selectionState = BittensorSelectionState(quickPick = true))
+        assertEquals(R.string.bittensor_earn_title, viewModel.titleRes)
+
+        createViewModel()
+        assertEquals(R.string.bittensor_stake_to_root, viewModel.titleRes)
+    }
+
+    @Test
+    fun `leaving the setup of a new root position reports it abandoned at setup`() {
+        createViewModel()
+        viewModel.back()
+
+        createViewModel(BittensorStakeAmountPayload(metaId = 1L, validatorAddress = "validator"))
+        viewModel.back()
+
+        val abandoned = analyticsService.events.single { it.name == "staking_abandoned" }
+        assertEquals("setup", abandoned.properties["stage"])
+        assertEquals("root", abandoned.properties["target"])
+    }
+
+    @Test
+    fun `setup without a validator asks for an amount and then reads continue`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            assets.emit(details(10))
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Disabled("Enter amount") }
+            viewModel.amountChanged("5")
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Disabled("Continue") }
         }
     }
 
@@ -391,6 +432,7 @@ class BittensorStakeAmountViewModelTest {
     fun `zero input retains a placeholder fee without enabling continue`() = runBlocking<Unit> {
         withTimeout(3_000L) {
             assets.emit(details(10).copy(validator = estimateValidator))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("0")
             val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
@@ -408,6 +450,7 @@ class BittensorStakeAmountViewModelTest {
     fun `cleared input retains a placeholder fee and a new amount invalidates it`() = runBlocking<Unit> {
         withTimeout(3_000L) {
             assets.emit(details(10).copy(validator = estimateValidator))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("")
             val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
@@ -425,9 +468,31 @@ class BittensorStakeAmountViewModelTest {
     }
 
     @Test
+    fun `setup opens with an empty amount even when the balance is below the old suggestion`() = runBlocking {
+        withTimeout(3_000L) {
+            assets.emit(details(1))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.99")) == 0 }
+
+            assertEquals("", viewModel.amount.first())
+        }
+    }
+
+    @Test
+    fun `add stake opens with an empty amount instead of the full transferable balance`() = runBlocking {
+        createViewModel(BittensorStakeAmountPayload(1L, null))
+        withTimeout(3_000L) {
+            explicitAssets.emit(details(1))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.99")) == 0 }
+
+            assertEquals("", viewModel.amount.first())
+        }
+    }
+
+    @Test
     fun `a balance refresh does not repopulate an amount cleared by the user`() = runBlocking {
         withTimeout(3_000L) {
             assets.emit(details(10))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("")
             viewModel.amount.first { it.isEmpty() }

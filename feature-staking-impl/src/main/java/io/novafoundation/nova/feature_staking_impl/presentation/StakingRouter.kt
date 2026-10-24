@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 import io.novafoundation.nova.analytics.StakingPortfolioSource
@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.B
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
@@ -31,6 +32,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import kotlinx.coroutines.flow.Flow
 
 interface StakingRouter {
 
@@ -132,12 +134,16 @@ interface StakingRouter {
         selectionState: BittensorSelectionState = BittensorSelectionState()
     )
 
-    fun openBittensorPortfolio(
-        source: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD,
-        entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO
-    )
+    fun openBittensorPortfolio(source: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD)
 
-    fun replaceBittensorPortfolioWithStart(payload: StartStakingLandingPayload)
+    /** Opens the Bittensor Earn landing on top of the current screen ("Add position" on the portfolio). */
+    fun openBittensorStartStaking(payload: StartStakingLandingPayload)
+
+    /** Leaves a finished Bittensor operation, dropping its flow screens from the back stack. */
+    fun finishBittensorFlow(exit: BittensorFlowExit)
+
+    /** Emits when [finishBittensorFlow] returns to a portfolio that is already open, as iOS `SubtensorPortfolioPresenter.reopen(from:)`. */
+    val bittensorPortfolioReopenings: Flow<StakingPortfolioSource>
 
     fun openBittensorRootDetails()
 
@@ -152,6 +158,8 @@ interface StakingRouter {
     fun openBittensorWhereToStake()
 
     fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload)
+
+    fun openBittensorValidatorInfo(payload: BittensorValidatorInfoPayload)
 
     fun openBittensorSubnetPosition(payload: BittensorSubnetPositionPayload)
 

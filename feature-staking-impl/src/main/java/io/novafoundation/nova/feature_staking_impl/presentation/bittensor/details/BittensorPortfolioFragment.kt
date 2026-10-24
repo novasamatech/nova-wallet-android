@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorPortfolioBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
@@ -17,15 +18,10 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
 
     companion object {
         const val ANALYTICS_SOURCE = "bittensor_portfolio_analytics_source"
-        private const val ENTRY = "bittensor_portfolio_entry"
 
-        fun sourceBundle(source: StakingPortfolioSource, entry: BittensorPortfolioEntry) = Bundle().apply {
+        fun sourceBundle(source: StakingPortfolioSource) = Bundle().apply {
             putString(ANALYTICS_SOURCE, source.name)
-            putString(ENTRY, entry.name)
         }
-
-        fun entryFrom(arguments: Bundle?): BittensorPortfolioEntry = BittensorPortfolioEntry.entries
-            .firstOrNull { it.name == arguments?.getString(ENTRY) } ?: BittensorPortfolioEntry.PORTFOLIO
     }
 
     private val imageLoader by lazy {
@@ -66,13 +62,8 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
     }
 
     override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
-        viewModel.entryResolution.observe { resolution ->
-            if (resolution != null) {
-                arguments?.remove(ENTRY)
-                viewModel.completeEntry(resolution)
-            }
-        }
         observeBittensorRetries(viewModel.retryEvents)
+        observeActionBottomSheet(viewModel.walletGate)
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
         viewModel.chartChangeFormatter.observe { it.format(chartChange) }
         viewModel.priceChartModels.observe(priceChart::setCharts)

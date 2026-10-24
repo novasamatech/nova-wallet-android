@@ -3,19 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 import android.os.Parcelable
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
-import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class StakingDeepLinkTarget(
-    val chainId: String,
-    val assetId: Int,
-    val destination: Destination = Destination.RESOLVE_POSITION
-) : Parcelable {
-
-    enum class Destination { RESOLVE_POSITION, BITTENSOR_PORTFOLIO }
-}
+data class StakingDeepLinkTarget(val chainId: String, val assetId: Int) : Parcelable
 
 internal fun parseStakingDeepLinkTarget(chainId: String?, assetId: String?): StakingDeepLinkTarget? {
     if (chainId == null) return null
@@ -25,29 +17,26 @@ internal fun parseStakingDeepLinkTarget(chainId: String?, assetId: String?): Sta
     return StakingDeepLinkTarget(chainId.removePrefix("0x"), parsedAssetId)
 }
 
-sealed interface StakingDeepLinkNavigation {
-    val target: StakingDeepLinkTarget
+class StakingDeepLinkDestination(
+    val target: StakingDeepLinkTarget,
+    val option: AggregatedStakingDashboardOption<*>
+)
+
+/**
+ * As iOS `StakingDashboardPresenter.processPendingNavigation`: a staked item opens at once, an item without stake once its
+ * primary (on-chain) sync is done, or as it is when [waitingForSync] is off after the pending link times out.
+ * An unresolved item cannot start staking, as tapping its dashboard row cannot.
+ */
+internal fun resolveStakingDeepLink(target: StakingDeepLinkTarget, dashboard: StakingDashboard, waitingForSync: Boolean): StakingDeepLinkDestination? {
+    dashboard.hasStake.firstOrNull { it.isTarget(target) }?.let { return StakingDeepLinkDestination(target, it) }
+
+    val option = dashboard.withoutStake.firstOrNull { it.isTarget(target) } ?: return null
+    if (option.stakingState !is AggregatedStakingDashboardOption.NoStake) return null
+    if (waitingForSync && option.syncingStage.isSyncingPrimary()) return null
+
+    return StakingDeepLinkDestination(target, option)
 }
 
-class BittensorPortfolioDeepLink(override val target: StakingDeepLinkTarget) : StakingDeepLinkNavigation
-
-class StakingDeepLinkDestination(
-    override val target: StakingDeepLinkTarget,
-    val option: AggregatedStakingDashboardOption<*>
-) : StakingDeepLinkNavigation
-
-internal fun resolveStakingDeepLink(target: StakingDeepLinkTarget, dashboard: StakingDashboard): StakingDeepLinkDestination? {
-    val options = dashboard.hasStake + dashboard.withoutStake
-    val option = options.firstOrNull { it.chain.id == target.chainId && it.token.configuration.id == target.assetId } ?: return null
-    val isBittensor = when (val state = option.stakingState) {
-        is AggregatedStakingDashboardOption.HasStake -> state.stakingType == Chain.Asset.StakingType.BITTENSOR_ROOT
-        is AggregatedStakingDashboardOption.NoStake -> state.flowType.allStakingTypes.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT
-        else -> false
-    }
-    // Bittensor has no secondary dashboard updater. Primary sync already resolves positions and root rewards.
-    val positionsReady = option.syncingStage == AggregatedStakingDashboardOption.SyncingStage.SYNCED ||
-        isBittensor && option.syncingStage == AggregatedStakingDashboardOption.SyncingStage.SYNCING_SECONDARY
-    if (!positionsReady) return null
-    if (option.stakingState == AggregatedStakingDashboardOption.NotYetResolved) return null
-    return StakingDeepLinkDestination(target, option)
+private fun AggregatedStakingDashboardOption<*>.isTarget(target: StakingDeepLinkTarget): Boolean {
+    return chain.id == target.chainId && token.configuration.id == target.assetId
 }

@@ -171,6 +171,14 @@ enum class StakingRewardsState(val value: String) {
     UNAVAILABLE("unavailable")
 }
 
+/** `source` of `staking_flow_opened` (iOS `StakingFlowSource`). */
+enum class StakingFlowSource(val value: String) {
+    DASHBOARD("dashboard"),
+    DEEP_LINK("deep_link"),
+    PORTFOLIO_ADD_POSITION("portfolio_add_position"),
+    RESULT_DISCOVER("result_discover")
+}
+
 enum class StakingResultAction(val value: String) {
     DISCOVER_SUBNETS("discover_subnets"),
     VIEW_POSITION("view_position"),

@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.dialog.dialog
+import io.novafoundation.nova.common.view.setMessageOrHide
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -11,6 +13,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSelectValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setBittensorFailure
 
 private const val PAYLOAD_KEY = "payload"
 
@@ -58,6 +61,7 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             count.text = it.count
             sortLabel.text = it.sorting
         }
+        viewModel.staleRankingWarning.observe(staleRankingWarning::setMessageOrHide)
         viewModel.rows.observe(adapter::submitList)
         viewModel.selectedAddress.observe(adapter::select)
         viewModel.buttonState.observe(confirm::setState)
@@ -66,11 +70,28 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             progress.isVisible = it
         }
         viewModel.isEmpty.observe { emptyState.isVisible = it }
+        viewModel.failure.observe {
+            failure.setBittensorFailure(it, viewModel::retry)
+            header.isVisible = it == null
+            list.isVisible = it == null
+        }
+        viewModel.inactiveValidatorEvents.observe {
+            dialog(requireContext()) {
+                setTitle(R.string.bittensor_inactive_validator_title)
+                setMessage(R.string.bittensor_inactive_validator_message)
+                setPositiveButton(R.string.common_close, null)
+            }
+        }
         viewModel.emptyMessage.observe { empty.text = it }
         viewModel.canRemoveFilters.observe {
             removeFilters.isVisible = it
             emptyIcon.isVisible = it
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.becomeActive()
     }
 
     override fun onDestroyView() {

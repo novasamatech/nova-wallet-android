@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDat
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -64,12 +65,14 @@ class BittensorPortfolioRowMapperTest {
         `when`(resources.getString(R.string.bittensor_root_staking)).thenReturn("Root")
         `when`(resources.getString(R.string.bittensor_subnet_number, 1)).thenReturn("Subnet 1")
         `when`(resources.getString(R.string.bittensor_chart_week)).thenReturn("7D")
-        `when`(resources.getString(R.string.bittensor_weekly_change, "+0%", "7D")).thenReturn("+0% · 7D")
-        `when`(resources.getString(R.string.staking_apy, "0%")).thenReturn("0% APY")
+        `when`(resources.getString(R.string.bittensor_weekly_change, "+0%", "7D")).thenReturn("+0% 7D")
+        `when`(resources.getString(R.string.bittensor_portfolio_root_apy, "0%")).thenReturn("APY 0% · 30 days")
+        `when`(resources.getString(R.string.bittensor_portfolio_root_apy, "—")).thenReturn("APY — · 30 days")
+        `when`(resources.getString(R.string.bittensor_portfolio_root_claimable, "0.000000001 NATIVE")).thenReturn("Claimable rewards: 0.000000001 NATIVE")
     }
 
     @Test
-    fun `mixed rewards only root and subnet display zero APY alpha and zero weekly change`() {
+    fun `mixed rewards only root and subnet display claimable rewards alpha and zero weekly change`() {
         val rows = mapper.map(
             portfolio,
             ExtendedLoadingState.Loaded(mapOf(subnetId to subnet)),
@@ -79,10 +82,28 @@ class BittensorPortfolioRowMapperTest {
         )
         assertEquals(listOf("root", "subnet-1"), rows.map { it.id })
         assertEquals("0 NATIVE", rows[0].amount.token)
-        assertEquals("0% APY", rows[0].subtitle)
+        assertEquals("Claimable rewards: 0.000000001 NATIVE", rows[0].subtitle)
+        assertFalse(rows[0].isSubtitleLoading)
         assertEquals("2 ALPHA", rows[1].subtitle)
-        assertEquals("+0% · 7D", rows[1].change?.text)
+        assertEquals("+0% 7D", rows[1].change?.text)
         assertFalse(rows[1].isChangeLoading)
+    }
+
+    @Test
+    fun `staked root row shows the 30 day APY with a dash for an unknown rate and nothing when rates failed`() {
+        assertEquals("APY 0% · 30 days", stakedRootSubtitle(ExtendedLoadingState.Loaded(BigDecimal.ZERO)))
+        assertEquals("APY — · 30 days", stakedRootSubtitle(ExtendedLoadingState.Loaded(null)))
+        assertNull(stakedRootSubtitle(ExtendedLoadingState.Error(IllegalStateException("Unavailable"))))
+    }
+
+    @Test
+    fun `rewards only root row does not wait for APY and zero rewards drop the row`() {
+        val rows = mapper.map(portfolio, ExtendedLoadingState.Loading, BigInteger.ONE, ExtendedLoadingState.Loading, ExtendedLoadingState.Loading)
+        assertEquals("Claimable rewards: 0.000000001 NATIVE", rows.first().subtitle)
+        assertFalse(rows.first().isSubtitleLoading)
+
+        val withoutRewards = mapper.map(portfolio, ExtendedLoadingState.Loading, BigInteger.ZERO, ExtendedLoadingState.Loading, ExtendedLoadingState.Loading)
+        assertEquals(listOf("subnet-1"), withoutRewards.map { it.id })
     }
 
     @Test
@@ -109,5 +130,11 @@ class BittensorPortfolioRowMapperTest {
         assertFalse(failed.isChangeLoading)
         assertNull(failed.change)
         assertEquals("2 ALPHA", failed.subtitle)
+    }
+
+    private fun stakedRootSubtitle(apy: ExtendedLoadingState<BigDecimal?>): CharSequence? {
+        val root = BittensorRootPosition(AccountIdKey(ByteArray(32)), BigInteger.ONE)
+        val staked = portfolio.copy(positions = holdings.copy(root = listOf(root)))
+        return mapper.map(staked, ExtendedLoadingState.Loading, null, apy, ExtendedLoadingState.Loading).first().subtitle
     }
 }

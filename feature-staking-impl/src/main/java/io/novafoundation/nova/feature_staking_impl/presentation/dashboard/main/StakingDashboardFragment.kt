@@ -65,7 +65,10 @@ class StakingDashboardFragment :
     }
 
     override fun initViews() {
-        viewModel.setDeepLinkTarget(argumentOrNull(DEEP_LINK_TARGET))
+        argumentOrNull<StakingDeepLinkTarget>(DEEP_LINK_TARGET)?.let { target ->
+            arguments?.remove(DEEP_LINK_TARGET)
+            viewModel.setDeepLinkTarget(target)
+        }
         binder.stakingDashboardContent.setHasFixedSize(true)
 
         binder.stakingDashboardContent.adapter = ConcatAdapter(
@@ -84,10 +87,7 @@ class StakingDashboardFragment :
 
     override fun subscribe(viewModel: StakingDashboardViewModel) {
         viewModel.deepLinkDestination.observe { destination ->
-            if (destination != null) {
-                arguments?.remove(DEEP_LINK_TARGET)
-                viewModel.openDeepLinkDestination(destination)
-            }
+            destination?.let(viewModel::openDeepLinkDestination)
         }
 
         viewModel.stakingDashboardUiFlow.observe { dashboardLoading ->
@@ -112,28 +112,32 @@ class StakingDashboardFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // As iOS on every dashboard appearance: request the start-staking maximum yield again while there is no stake
+        viewModel.onResume()
+    }
+
+    override fun onDestroyView() {
+        // iOS drops a pending staking link once the dashboard leaves the screen for another tab or a pushed screen
+        if (!requireActivity().isChangingConfigurations) viewModel.cancelDeepLink()
+
+        super.onDestroyView()
+    }
+
     override fun onHasStakeItemClicked(index: Int) {
-        cancelDeepLink()
         viewModel.onHasStakeItemClicked(index)
     }
 
     override fun onNoStakeItemClicked(index: Int) {
-        cancelDeepLink()
         viewModel.onNoStakeItemClicked(index)
     }
 
     override fun avatarClicked() {
-        cancelDeepLink()
         viewModel.avatarClicked()
     }
 
     override fun onMoreOptionsClicked() {
-        cancelDeepLink()
         viewModel.onMoreOptionsClicked()
-    }
-
-    private fun cancelDeepLink() {
-        arguments?.remove(DEEP_LINK_TARGET)
-        viewModel.setDeepLinkTarget(null)
     }
 }

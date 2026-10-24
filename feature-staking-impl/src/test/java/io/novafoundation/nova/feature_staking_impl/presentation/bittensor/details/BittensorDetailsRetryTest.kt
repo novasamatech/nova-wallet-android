@@ -1,12 +1,17 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -20,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootC
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.portfolioHistoryResponse
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorImmediateExecution
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartInteractor
@@ -33,6 +39,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -54,6 +61,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -73,12 +82,16 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoInteractions
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.ArgumentCaptor
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
+import org.mockito.Mockito.timeout
+import org.mockito.Mockito.verifyNoMoreInteractions
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorDetailsRetryTest {
@@ -176,6 +189,8 @@ class BittensorDetailsRetryTest {
 
     private val router = mock(StakingRouter::class.java)
 
+    private val portfolioReopenings = MutableSharedFlow<StakingPortfolioSource>(extraBufferCapacity = 1)
+
     private val assetIconProvider = mock(AssetIconProvider::class.java)
 
     private val rowMapper = mock(BittensorPortfolioRowMapper::class.java)
@@ -196,11 +211,24 @@ class BittensorDetailsRetryTest {
 
     private val axisFormatterFactory = BittensorChartAxisFormatter.Factory(fiatFormatter, tokenFormatter)
 
+    private val actionLauncherFactory = object : ActionBottomSheetLauncherFactory {
+        override fun create(): ActionBottomSheetLauncher = mock(ActionBottomSheetLauncher::class.java)
+    }
+
+    private val walletGate = BittensorWalletGate(
+        BittensorImmediateExecution(mock(SignerProvider::class.java)),
+        accountRepository,
+        resources,
+        analytics,
+        actionLauncherFactory
+    )
+
     private lateinit var viewModel: BittensorDetailsViewModel
 
     @Before
     fun prepare(): Unit = runBlocking {
         `when`(metaAccount.id).thenReturn(1L)
+        `when`(metaAccount.type).thenReturn(LightMetaAccount.Type.SECRETS)
         `when`(chain.id).thenReturn("chain")
         `when`(chain.name).thenReturn("Bittensor")
         `when`(chainRegistry.getChain("chain")).thenReturn(chain)
@@ -235,6 +263,7 @@ class BittensorDetailsRetryTest {
         `when`(rootClaimInteractor.observe(1L)).thenReturn(rootClaims)
         `when`(rootClaimInteractor.observe(2L)).thenReturn(otherClaims)
         `when`(rowInteractor.weeklyChanges("native", emptySet())).thenReturn(emptyMap())
+        `when`(router.bittensorPortfolioReopenings).thenReturn(portfolioReopenings)
     }
 
     @After
@@ -300,6 +329,17 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
+    fun `returning from a finished flow reports the portfolio opened again from the result`() = runBlocking {
+        createViewModel()
+        withTimeout(3_000L) { while (portfolioOpenedSources().isEmpty()) delay(10L) }
+
+        portfolioReopenings.emit(StakingPortfolioSource.RESULT)
+
+        withTimeout(3_000L) { while (portfolioOpenedSources().size < 2) delay(10L) }
+        assertEquals(listOf("dashboard", "result"), portfolioOpenedSources())
+    }
+
+    @Test
     fun `chart dialog retries prices without restarting portfolio`() = runBlocking {
         failFirstChart = true
         createViewModel()
@@ -347,15 +387,11 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `add stake follows immediate capability and still requires fresh positions`() = runBlocking<Unit> {
+    fun `add stake requires fresh positions whatever the wallet executes`() = runBlocking<Unit> {
         portfolioUpdates.value = portfolioUpdates.value.copy(supportsImmediateOperations = false)
         createViewModel()
 
         withTimeout(3_000L) {
-            viewModel.isLoading.first { !it }
-            assertFalse(viewModel.canAddStake.first())
-
-            portfolioUpdates.value = portfolioUpdates.value.copy(supportsImmediateOperations = true)
             viewModel.canAddStake.first { it }
 
             portfolioUpdates.value = portfolioUpdates.value.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException("Offline")))
@@ -363,13 +399,12 @@ class BittensorDetailsRetryTest {
 
             portfolioUpdates.value = portfolioUpdates.value.copy(dataStatus = BittensorDataStatus.Fresh)
             viewModel.canAddStake.first { it }
-
-            portfolioUpdates.value = portfolioUpdates.value.copy(supportsImmediateOperations = false)
-            viewModel.canAddStake.first { !it }
         }
     }
 
-    private fun createViewModel(entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO) {
+    private fun portfolioOpenedSources() = analyticsService.events.toList().filter { it.name == "staking_portfolio_opened" }.map { it.properties["source"] }
+
+    private fun createViewModel() {
         viewModel = BittensorDetailsViewModel(
             analytics, bittensorPortfolioInteractor = portfolioInteractor,
             router = router,
@@ -382,53 +417,48 @@ class BittensorDetailsRetryTest {
             chartAxisFormatterFactory = axisFormatterFactory,
             rowInteractor = rowInteractor,
             rootClaimInteractor = rootClaimInteractor,
-            entry = entry
+            walletGate = walletGate
         )
     }
 
     @Test
-    fun `deep link with no stake replaces portfolio with start exactly once`() = runBlocking {
-        portfolioUpdates.value = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
-        createViewModel(BittensorPortfolioEntry.DEEP_LINK)
+    fun `add position opens the earn landing for the portfolio asset`() = runBlocking {
+        createViewModel()
+        withTimeout(3_000L) { viewModel.canAddStake.first { it } }
 
-        val resolution = withTimeout(3_000L) { viewModel.entryResolution.first { it != null } }
-        assertTrue(resolution is BittensorEntryResolution.Start)
-        val start = resolution as BittensorEntryResolution.Start
-        viewModel.completeEntry(start)
-        viewModel.completeEntry(start)
+        viewModel.addPosition()
 
-        verify(router).replaceBittensorPortfolioWithStart(start.payload)
+        val captor = ArgumentCaptor.forClass(StartStakingLandingPayload::class.java)
+        // Mockito's capture() returns null; the placeholder only satisfies Kotlin's non-null parameter.
+        verify(router, timeout(3_000L)).openBittensorStartStaking(captor.capture() ?: StartStakingLandingPayload(AvailableStakingOptionsPayload("", 0, emptyList())))
+        val options = captor.value.availableStakingOptions
+        assertEquals("chain", options.chainId)
+        assertEquals(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT), options.stakingTypes)
+        verify(router).bittensorPortfolioReopenings
+        verifyNoMoreInteractions(router)
+        val flowOpened = analyticsService.events.single { it.name == "staking_flow_opened" }
+        assertEquals("portfolio_add_position", flowOpened.properties["source"])
     }
 
     @Test
-    fun `deep link with stake stays on portfolio`() = runBlocking {
-        createViewModel(BittensorPortfolioEntry.DEEP_LINK)
+    fun `add position from a proxied wallet is blocked without opening the landing`() = runBlocking {
+        `when`(metaAccount.type).thenReturn(LightMetaAccount.Type.PROXIED)
+        createViewModel()
+        withTimeout(3_000L) { viewModel.canAddStake.first { it } }
 
-        val resolution = withTimeout(3_000L) { viewModel.entryResolution.first { it != null } }
-        assertEquals(BittensorEntryResolution.Portfolio, resolution)
-        viewModel.completeEntry(requireNotNull(resolution))
+        viewModel.addPosition()
 
-        verifyNoInteractions(router)
-    }
-
-    @Test
-    fun `entry does not interpret loading stale or missing rewards as no stake`() {
-        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
-        val claims = rootClaims.value
-        assertNull(resolveBittensorEntry(emptyPortfolio.copy(dataStatus = BittensorDataStatus.Loading), claims))
-        assertNull(resolveBittensorEntry(emptyPortfolio.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException())), claims))
-        assertNull(resolveBittensorEntry(emptyPortfolio, null))
-        assertNull(resolveBittensorEntry(emptyPortfolio, claims.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException()))))
-        assertNull(resolveBittensorEntry(emptyPortfolio, claims.copy(metaId = 2L)))
-    }
-
-    @Test
-    fun `redeemable root rewards without stake keep portfolio accessible`() {
-        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
-        val preview = BittensorRootClaimPreview(hotkey, BigInteger.TEN, BigInteger.TEN, BigInteger.ZERO)
-        val claims = BittensorRootClaims(listOf(preview), BigInteger.ONE)
-
-        assertEquals(BittensorEntryResolution.Portfolio, resolveBittensorEntry(emptyPortfolio, rootClaims.value.copy(claims = claims)))
+        val blocked = withTimeout(3_000L) {
+            while (analyticsService.events.none { it.name == "staking_blocked" }) delay(10L)
+            analyticsService.events.single { it.name == "staking_blocked" }
+        }
+        assertEquals("stake", blocked.properties["flow"])
+        assertEquals("proxy", blocked.properties["reason"])
+        assertEquals("proxied", blocked.properties["wallet_type"])
+        assertFalse(blocked.properties.containsKey("target"))
+        assertTrue(analyticsService.events.none { it.name == "staking_flow_opened" })
+        verify(router).bittensorPortfolioReopenings
+        verifyNoMoreInteractions(router)
     }
 
     @Test
@@ -502,3 +532,4 @@ class BittensorDetailsRetryTest {
         }
     }
 }
+

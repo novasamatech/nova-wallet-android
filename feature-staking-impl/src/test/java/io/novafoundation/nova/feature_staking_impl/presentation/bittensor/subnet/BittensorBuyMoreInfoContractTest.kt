@@ -57,14 +57,14 @@ class BittensorBuyMoreInfoContractTest {
     fun `confirmation uses the amount sheet copy with current subnet symbol and name`() {
         val amount = source("BittensorSubnetAmountViewModel.kt")
         val review = source("BittensorSubnetReviewViewModel.kt")
-        val description = "resources.getString(R.string.bittensor_average_price_description, subnet.symbol, subnet.name)"
+        val description = "resources.getString(R.string.bittensor_average_price_description, subnet.symbol, subnet.title(resources))"
 
         assertTrue(
             "Amount description must use the current subnet symbol and name",
             Regex(
                 """val averagePriceDescription = subnet\.map \{ subnet ->\s*""" +
                     """subnet\?\.let \{\s*""" +
-                    Regex.escape("resources.getString(R.string.bittensor_average_price_description, it.symbol, it.name)")
+                    Regex.escape("resources.getString(R.string.bittensor_average_price_description, it.symbol, it.title(resources))")
             ).containsMatchIn(amount)
         )
         assertTrue(

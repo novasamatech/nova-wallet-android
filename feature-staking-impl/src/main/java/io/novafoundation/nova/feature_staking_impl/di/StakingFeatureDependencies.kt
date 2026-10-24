@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
@@ -91,6 +92,7 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
+import okhttp3.OkHttpClient
 
 interface StakingFeatureDependencies {
 
@@ -163,6 +165,8 @@ interface StakingFeatureDependencies {
 
     val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
 
+    val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+
     val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
 
     val selectAddressMixinFactory: SelectAddressMixin.Factory
@@ -230,6 +234,8 @@ interface StakingFeatureDependencies {
     fun stakingTotalRewardsDao(): StakingTotalRewardDao
 
     fun networkApiCreator(): NetworkApiCreator
+
+    val okHttpClient: OkHttpClient
 
     fun httpExceptionHandler(): HttpExceptionHandler
 

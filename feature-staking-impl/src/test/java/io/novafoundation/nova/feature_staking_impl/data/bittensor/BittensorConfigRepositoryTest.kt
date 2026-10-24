@@ -175,7 +175,7 @@ class BittensorConfigRepositoryTest {
     @Test
     fun `config timeout fails while optional logos fall back and next request recovers`() = runTest {
         val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
-        api.delayMillis = 15_001L
+        api.delayMillis = 30_001L
         val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
 
         assertTrue(runCatching { repository.config() }.exceptionOrNull() is IOException)

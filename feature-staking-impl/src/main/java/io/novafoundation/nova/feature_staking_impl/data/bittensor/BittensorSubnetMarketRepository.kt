@@ -41,7 +41,10 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
         if (loadedAt == 0L || System.nanoTime() - loadedAt > MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
             val requestStartedAt = System.nanoTime()
             val markets = loadMarkets()
-            cached = mapBittensorMarketIds(markets)
+            val ids = mapBittensorMarketIds(markets)
+            // No listed subnet is a degraded response, not every subnet unlisted: iOS fails it as dataCorruption.
+            require(ids.isNotEmpty()) { "Empty subnet markets" }
+            cached = ids
             val byId = markets.associateBy { it.id }
             cachedMarkets = cached.mapValues { (_, id) -> requireNotNull(byId[id]) }
             loadedAt = requestStartedAt
@@ -56,7 +59,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
                 if (markets.size < MARKET_PAGE_SIZE) break
             }
         }
-    } ?: error("Subnet markets timed out")
+    } ?: throw BittensorTimeoutException("Subnet markets")
 }
 
 internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {

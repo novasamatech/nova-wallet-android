@@ -1,9 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectory
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectoryStatus
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -11,11 +14,11 @@ import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 
 class BittensorRootValidatorSourceTest {
 
@@ -45,7 +48,7 @@ class BittensorRootValidatorSourceTest {
             BittensorRootValidatorRemote.Validator(second.address, "Other", null, "100"),
             BittensorRootValidatorRemote.Validator("invalid", "Invalid", null, null)
         )
-        `when`(backend.rootValidators()).thenReturn(BittensorRootValidatorRemote(rows, null))
+        `when`(backend.rootValidators()).thenReturn(BittensorRootValidatorRemote(rows, rootMeta()))
 
         val details = source.validatorDetails(chain)
 
@@ -76,52 +79,64 @@ class BittensorRootValidatorSourceTest {
     }
 
     @Test
-    fun `eligible primary root position takes priority over backend recommendations`() = runBlocking {
-        `when`(validators.rootValidators(chain)).thenReturn(listOf(first, second))
+    fun `primary root position takes priority over the recommended preset without reading recommendations`() = runBlocking<Unit> {
+        `when`(validators.chainValidator(chain, BittensorNetuid.Root, second.validator.hotkey)).thenReturn(second)
         val positions = listOf(
             BittensorRootPosition(first.validator.hotkey, BigInteger.ONE),
             BittensorRootPosition(second.validator.hotkey, BigInteger.TEN)
         )
 
         assertEquals(second.validator, source.preferredValidator(chain, positions))
-        verifyNoInteractions(backend)
+        verify(validators, never()).directory(chain, BittensorNetuid.Root)
     }
 
     @Test
-    fun `new position uses the first eligible recommended hotkey rather than catalogue order`() = runBlocking {
-        `when`(validators.rootValidators(chain)).thenReturn(listOf(first, second))
-        `when`(backend.recommendedHotkeys(0)).thenReturn(listOf("invalid-address", second.address, first.address))
+    fun `new position presets the recommended root validator with the highest root APY`() = runBlocking<Unit> {
+        stubDirectory(first.copy(recommended = true), second.copy(recommended = true))
+        `when`(backend.rootValidators()).thenReturn(BittensorRootValidatorRemote(listOf(rootRow(first, "5"), rootRow(second, "9")), rootMeta()))
 
         assertEquals(second.validator, source.preferredValidator(chain, emptyList()))
+        verify(validators).validateRoot(chain, second.validator)
+        verify(validators, never()).validateRoot(chain, first.validator)
     }
 
     @Test
-    fun `ineligible existing validator is not silently reused`() = runBlocking {
-        `when`(validators.rootValidators(chain)).thenReturn(listOf(first.copy(selectable = false), second))
-        `when`(backend.recommendedHotkeys(0)).thenReturn(listOf(first.address, second.address))
+    fun `existing root validator the chain cannot read falls back to the recommendation`() = runBlocking {
+        stubDirectory(first.copy(recommended = true), second.copy(recommended = true))
+        `when`(validators.chainValidator(chain, BittensorNetuid.Root, second.validator.hotkey)).thenThrow(IllegalStateException("offline"))
 
-        assertEquals(second.validator, source.preferredValidator(chain, listOf(BittensorRootPosition(first.validator.hotkey, BigInteger.TEN))))
+        assertEquals(first.validator, source.preferredValidator(chain, listOf(BittensorRootPosition(second.validator.hotkey, BigInteger.TEN))))
     }
 
     @Test
-    fun `no eligible recommendation leaves the validator unselected for manual choice`() = runBlocking {
-        `when`(validators.rootValidators(chain)).thenReturn(listOf(first, second.copy(selectable = false)))
-        `when`(backend.recommendedHotkeys(0)).thenReturn(listOf(second.address))
+    fun `no selectable recommendation leaves the validator unselected for manual choice`() = runBlocking {
+        stubDirectory(first, second.copy(selectable = false, recommended = true))
 
         assertNull(source.preferredValidator(chain, emptyList()))
     }
 
     @Test
-    fun `backend failure cannot choose an arbitrary validator`() = runBlocking {
-        `when`(validators.rootValidators(chain)).thenReturn(listOf(first, second))
-        val failure = IllegalStateException("Recommendations unavailable")
-        `when`(backend.recommendedHotkeys(0)).thenThrow(failure)
+    fun `directory failure cannot choose an arbitrary validator`() = runBlocking {
+        stubDirectory(first.copy(recommended = true), failure = IllegalStateException("Recommendations unavailable"))
 
-        assertSame(
-            failure,
-            runCatching { source.preferredValidator(chain, emptyList()) }
-                .exceptionOrNull()
-        )
+        assertEquals("Recommendations unavailable", runCatching { source.preferredValidator(chain, emptyList()) }.exceptionOrNull()?.message)
+    }
+
+    private suspend fun stubDirectory(vararg rows: BittensorSubnetValidator, failure: Throwable? = null) {
+        val status = mock(BittensorValidatorDirectoryStatus::class.java)
+        `when`(validators.directory(chain, BittensorNetuid.Root)).thenReturn(BittensorValidatorDirectory(rows.toList(), status, failure))
+    }
+
+    private fun rootRow(validator: BittensorSubnetValidator, apy: String) = BittensorRootValidatorRemote.Validator(
+        validator.address,
+        validator.validator.name,
+        BittensorRootValidatorRemote.Yield(BittensorRootValidatorRemote.Window(apy)),
+        "100"
+    )
+
+    private fun rootMeta(): BittensorRootValidatorRemote.Meta {
+        val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH", "2026-10-19T00:00:00Z")
+        return BittensorRootValidatorRemote.Meta(BittensorRootValidatorRemote.Components(component, component))
     }
 
     private fun validator(seed: Byte): BittensorSubnetValidator {

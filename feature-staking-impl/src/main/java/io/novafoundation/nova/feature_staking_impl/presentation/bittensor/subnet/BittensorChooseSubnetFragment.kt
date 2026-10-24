@@ -21,6 +21,8 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
     companion object {
         private const val PAYLOAD_KEY = "payload"
 
+        private const val DISABLED_CONTROL_ALPHA = 0.48f
+
         fun getBundle(payload: BittensorChooseSubnetPayload) = Bundle().apply { putParcelable(PAYLOAD_KEY, payload) }
     }
 
@@ -31,6 +33,8 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
     }
 
     private val shimmeringAdapter = CustomPlaceholderAdapter(R.layout.layout_bittensor_subnets_shimmering)
+
+    private val failureAdapter by lazy { BittensorSubnetFailureAdapter(viewModel::retryCatalogue) }
 
     private val rootAdapter by lazy {
         BittensorSubnetListAdapter(imageLoader, viewModel::rootStaking, viewModel::select, viewModel::toggleFavorite)
@@ -54,7 +58,7 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         subnets.itemAnimator = null
-        subnets.adapter = ConcatAdapter(rootAdapter, shimmeringAdapter, adapter)
+        subnets.adapter = ConcatAdapter(rootAdapter, failureAdapter, shimmeringAdapter, adapter)
         toolbar.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
         sorting.setDrawableEnd(R.drawable.ic_chevron_right_16, widthInDp = 16, tint = R.color.icon_accent)
         sorting.setOnClickListener { viewModel.sortingMixin.selectorClicked() }
@@ -90,8 +94,21 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
                 shimmeringAdapter.show(state.loading)
             }
         }
+        viewModel.controlsEnabled.observe { enabled ->
+            sorting.isEnabled = enabled
+            filters.isEnabled = enabled
+            sorting.alpha = if (enabled) 1f else DISABLED_CONTROL_ALPHA
+            filters.alpha = if (enabled) 1f else DISABLED_CONTROL_ALPHA
+        }
+        viewModel.catalogueFailure.observe(failureAdapter::setFailure)
+        viewModel.controlsVisible.observe { controls.isVisible = it }
         viewModel.isEmpty.observe { empty.isVisible = it }
         viewModel.emptyMessage.observe { empty.text = it }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.becomeActive()
     }
 
     override fun onDestroyView() {

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.catch
@@ -46,7 +47,7 @@ class BittensorWhereToStakeViewModel(
 
     fun quickPick(order: BittensorQuickPickOrder) {
         val browseState = BittensorSubnetBrowseState.fromQuickPick(order)
-        val visitState = selectionState.copy(browseState = browseState)
+        val visitState = selectionState.copy(browseState = browseState, quickPick = true)
         router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(quickPickOrder = order, selectionState = visitState))
     }
 
@@ -59,7 +60,8 @@ class BittensorWhereToStakeViewModel(
                 0
             )
         )
-        router.openBittensorRootStaking(selectionState = selectionState)
+        val payload = BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true)
+        router.openBittensorRootStaking(payload, selectionState)
     }
 
     fun back() {
