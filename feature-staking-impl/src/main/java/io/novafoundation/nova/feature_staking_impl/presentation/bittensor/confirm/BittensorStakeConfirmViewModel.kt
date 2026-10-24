@@ -12,6 +12,8 @@ import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.AnalyticsWalletType
+import io.novafoundation.nova.analytics.StakingBlockedReason
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -34,6 +36,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -84,6 +87,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 
 class BittensorStakeConfirmViewModel(
     private val analytics: AnalyticsService,
@@ -217,6 +221,20 @@ class BittensorStakeConfirmViewModel(
         feeLoaderMixin.connectWith(stakeRequest) { _, request ->
             val fee = bittensorStakingInteractor.estimateRootStakeFee(request)
             BittensorFeeEstimate(request, fee)
+        }
+        launch {
+            // As iOS: a watch-only wallet is reported blocked once the confirmation opens, and leaving it is not an abandonment.
+            if (accountRepository.getMetaAccount(payload.metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
+                flowContinued = true
+                analytics.track(
+                    BittensorAnalyticsEvent.Blocked(
+                        StakingFlow.STAKE,
+                        StakingBlockedReason.WATCH_ONLY,
+                        AnalyticsWalletType.WATCH_ONLY,
+                        StakingAnalyticsTarget.ROOT
+                    )
+                )
+            }
         }
     }
 

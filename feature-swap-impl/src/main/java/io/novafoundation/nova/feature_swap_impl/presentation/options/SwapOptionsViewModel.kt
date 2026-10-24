@@ -35,8 +35,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class SwapOptionsViewModel(
@@ -71,25 +73,32 @@ class SwapOptionsViewModel(
 
     val slippageInput = MutableStateFlow("")
 
+    // The sheet's preset chip; as on iOS it is selected only while the custom field is empty.
+    private val selectedTipIndex = MutableStateFlow<Int?>(null)
+
+    private val selectedTip = combine(selectedTipIndex, slippageInput) { tip, input -> tip.takeIf { input.isEmpty() } }
+
+    // The value Done applies: the selected preset, or else the field.
+    private val slippageValue = combine(selectedTip, slippageInput, slippageConfig) { tip, input, config ->
+        tip?.let(config.slippageTips::getOrNull) ?: input.formatToPercent()
+    }
+
     private val slippageFieldValidator = slippageConfig.map { slippageFieldValidatorFactory.create(it) }
         .shareInBackground()
 
     val slippageInputValidationResult = slippageFieldValidator.flatMapLatest { it.observe(slippageInput) }
         .shareInBackground()
 
-    private val slippageAlertMixin = slippageAlertMixinFactory.create(
-        slippageConfig,
-        slippageInput.map { it.formatToPercent() }
-    )
+    private val slippageAlertMixin = slippageAlertMixinFactory.create(slippageConfig, slippageValue)
 
     val slippageWarningState = slippageAlertMixin.slippageAlertMessage
 
-    val resetButtonEnabled = combine(slippageInput, slippageConfig) { input, slippageConfig ->
-        formatResetButtonVisibility(input, slippageConfig)
+    val resetButtonEnabled = combine(slippageValue, slippageConfig) { value, slippageConfig ->
+        value != slippageConfig.defaultSlippage
     }
 
-    val buttonState = combine(slippageInput, swapSettingsStateFlow, slippageInputValidationResult) { input, state, validationStatus ->
-        formatButtonState(input, state, validationStatus)
+    val buttonState = combine(slippageValue, swapSettingsStateFlow, slippageInputValidationResult) { value, state, validationStatus ->
+        formatButtonState(value, state, validationStatus)
     }
 
     val defaultSlippage = slippageConfig.map { it.defaultSlippage }
@@ -98,17 +107,29 @@ class SwapOptionsViewModel(
     val slippageTips = slippageConfig.map { it.slippageTips }
         .mapList { it.formatPercents() }
 
+    val slippagePresets = combine(slippageTips, selectedTip) { tips, selected ->
+        tips.mapIndexed { index, title -> SlippagePresetModel(title, isSelected = index == selected) }
+    }
+        .shareInBackground()
+
     private var slippageResponded = false
 
     init {
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
-            val defaultSlippage = slippageConfig.first().defaultSlippage
-            // The sheet always shows the current value: an empty field there is no value, not the default.
-            if (payload != null || selectedSlippage != defaultSlippage) {
-                slippageInput.value = formatInput(selectedSlippage)
+            val config = slippageConfig.first()
+            val presetIndex = config.slippageTips.indexOfFirst(selectedSlippage::sameAs).takeIf { payload != null && it >= 0 }
+            when {
+                // As iOS applyInput: a value equal to a preset shows that preset selected and the custom field empty.
+                presetIndex != null -> selectedTipIndex.value = presetIndex
+                // The sheet always shows the current value: an empty field there is no value, not the default.
+                payload != null || selectedSlippage != config.defaultSlippage -> slippageInput.value = formatInput(selectedSlippage)
             }
         }
+        // Typing a custom value deselects the preset, so emptying the field again leaves no value, as on iOS.
+        slippageInput
+            .onEach { if (it.isNotEmpty()) selectedTipIndex.value = null }
+            .launchIn(this)
     }
 
     fun slippageInfoClicked() {
@@ -116,6 +137,12 @@ class SwapOptionsViewModel(
     }
 
     fun tipClicked(index: Int) {
+        if (payload != null) {
+            // As iOS: a tapped preset is shown selected with the custom field emptied.
+            slippageInput.value = ""
+            selectedTipIndex.value = index
+            return
+        }
         launch {
             val slippageTips = slippageConfig.first().slippageTips
             slippageInput.value = formatInput(slippageTips[index])
@@ -124,7 +151,7 @@ class SwapOptionsViewModel(
 
     fun applyClicked() {
         launch {
-            val slippage = slippageInput.value.formatToPercent() ?: return@launch
+            val slippage = slippageValue.first() ?: return@launch
             val config = slippageConfig.first()
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
             if (payload != null) {
@@ -167,12 +194,11 @@ class SwapOptionsViewModel(
         }
     }
 
-    private suspend fun formatButtonState(
-        insertedSlippage: String,
+    private fun formatButtonState(
+        slippage: Fraction?,
         settings: SwapSettings,
         validationResult: FieldValidationResult
     ): DescriptiveButtonState {
-        val slippage = insertedSlippage.formatToPercent()
         // The payload sheet mirrors iOS: a single Done action, which keeps its title while disabled, instead of Reset + Apply.
         val label = resourceManager.getString(if (payload != null) R.string.common_done else R.string.common_apply)
         val disabledLabel = if (payload != null) label else resourceManager.getString(R.string.swap_slippage_disabled_button_state)
@@ -183,11 +209,9 @@ class SwapOptionsViewModel(
             else -> Disabled(label)
         }
     }
-
-    private suspend fun formatResetButtonVisibility(slippageInput: String, slippageConfig: SlippageConfig): Boolean {
-        return slippageInput.formatToPercent() != slippageConfig.defaultSlippage
-    }
 }
+
+class SlippagePresetModel(val title: String, val isSelected: Boolean)
 
 /** A plain, locale-independent percent with at most [SLIPPAGE_MAX_FRACTION_DIGITS] decimals, e.g. 0.0125. */
 internal fun slippageInputText(slippage: Fraction): String = BigDecimal(slippage.inPercents)

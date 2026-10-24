@@ -23,8 +23,8 @@ class BittensorReadAnalytics(
         if (kind == BittensorReadFailureKind.DEVICE_UNSUPPORTED) return
         val reason = when {
             kind == BittensorReadFailureKind.REJECTED -> BittensorDataFailureReason.REJECTED
-            // iOS reports any other error status, a rate limit included, as a server error.
-            cause is HttpException -> BittensorDataFailureReason.SERVER_ERROR
+            // iOS reports any other error status, a rate limit or a failed bootstrap included, as a server error.
+            cause.causes().any { it is HttpException } -> BittensorDataFailureReason.SERVER_ERROR
             cause is IOException || cause is TimeoutCancellationException -> BittensorDataFailureReason.TRANSPORT
             cause is IllegalArgumentException -> BittensorDataFailureReason.CONTRACT_VIOLATION
             else -> BittensorDataFailureReason.SERVER_ERROR
@@ -38,4 +38,8 @@ class BittensorReadAnalytics(
         failureReported.set(false)
         analytics.track(BittensorAnalyticsEvent.DataRetryTapped(endpoint, screen))
     }
+
+    private fun Throwable.causes() = generateSequence(this) { it.cause }.take(MAX_CAUSE_DEPTH)
 }
+
+private const val MAX_CAUSE_DEPTH = 16

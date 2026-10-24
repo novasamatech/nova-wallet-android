@@ -92,6 +92,7 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
+import okhttp3.OkHttpClient
 
 interface StakingFeatureDependencies {
 
@@ -233,6 +234,8 @@ interface StakingFeatureDependencies {
     fun stakingTotalRewardsDao(): StakingTotalRewardDao
 
     fun networkApiCreator(): NetworkApiCreator
+
+    val okHttpClient: OkHttpClient
 
     fun httpExceptionHandler(): HttpExceptionHandler
 

@@ -113,9 +113,13 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
+import okhttp3.OkHttpClient
 
 private const val SERVICE_FEE_BENEFICIARY = "BittensorServiceFeeBeneficiary"
+
+private const val CONFIG_REQUEST_TIMEOUT_SECONDS = 30L
 
 @Module(includes = [BittensorStakeValidationsModule::class, BittensorExitValidationsModule::class, BittensorClaimValidationsModule::class])
 class BittensorModule {
@@ -216,8 +220,16 @@ class BittensorModule {
     ): BittensorRootValidatorSource =
         RemoteBittensorRootValidatorSource(backend, validators, logger)
 
+    // iOS gives the config request a 30 second timeout; the shared client times out after 20 seconds.
     @Provides
-    fun provideBittensorConfigApi(apiCreator: NetworkApiCreator): BittensorConfigApi = apiCreator.create(BittensorConfigApi::class.java)
+    fun provideBittensorConfigApi(okHttpClient: OkHttpClient): BittensorConfigApi {
+        val client = okHttpClient.newBuilder()
+            .connectTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(CONFIG_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
+        return NetworkApiCreator(client, "https://placeholder.com").create(BittensorConfigApi::class.java)
+    }
 
     @Provides
     @FeatureScope

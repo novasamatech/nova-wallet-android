@@ -195,6 +195,21 @@ class Profile3AccessTokenProviderTest {
     }
 
     @Test
+    fun `bootstrap error the backend may accept later is requested again after the cooldown`() = runTest {
+        val fixture = Profile3Fixture(backgroundScope)
+        fixture.api.failure = httpFailure(401, "invalid_proof")
+        val provider = fixture.provider()
+        val failure = runCatching { provider.token(fixture.configuredOrigin) }.exceptionOrNull()
+        assertTrue(failure is AttestationUnavailableException)
+        assertFalse(failure is AttestationRefusedException)
+
+        fixture.api.failure = null
+        fixture.clock.now += 60_000
+        provider.token(fixture.configuredOrigin)
+        assertEquals(2, fixture.api.tokenRequests.size)
+    }
+
+    @Test
     fun `device without play integrity is unsupported even while cooling down and recovers once attested`() = runTest {
         val fixture = Profile3Fixture(backgroundScope)
         fixture.integrityFailure = AttestationUnsupportedException("Play Integrity is unavailable on this device")

@@ -37,11 +37,18 @@
         android:layout_marginTop="4dp"
         android:text="@string/bittensor_slippage_explanation" />
 
+    <LinearLayout
+        android:id="@+id/slippageSettingsPresets"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal" />
+
     <io.novafoundation.nova.common.view.TipsInputField
         android:id="@+id/slippageSettingsInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:hint="@string/bittensor_slippage_custom"
         android:inputType="numberDecimal"
         app:postfix="@string/common_percent" />

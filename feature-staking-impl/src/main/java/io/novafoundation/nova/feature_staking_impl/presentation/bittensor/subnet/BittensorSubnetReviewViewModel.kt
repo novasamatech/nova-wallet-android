@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.AnalyticsWalletType
+import io.novafoundation.nova.analytics.StakingBlockedReason
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 
@@ -44,6 +46,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -121,6 +124,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 
 class BittensorSubnetReviewViewModel(
     private val analytics: AnalyticsService,
@@ -462,6 +466,20 @@ class BittensorSubnetReviewViewModel(
             draft?.let {
                 val fee = bittensorSubnetStakingInteractor.estimateFee(it)
                 BittensorFeeEstimate(it, fee)
+            }
+        }
+        launch {
+            // As iOS: a watch-only wallet is reported blocked once the review opens, and leaving it is not an abandonment.
+            if (accountRepository.getMetaAccount(metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
+                flowContinued = true
+                analytics.track(
+                    BittensorAnalyticsEvent.Blocked(
+                        StakingFlow.STAKE,
+                        StakingBlockedReason.WATCH_ONLY,
+                        AnalyticsWalletType.WATCH_ONLY,
+                        StakingAnalyticsTarget.SUBNET
+                    )
+                )
             }
         }
     }
