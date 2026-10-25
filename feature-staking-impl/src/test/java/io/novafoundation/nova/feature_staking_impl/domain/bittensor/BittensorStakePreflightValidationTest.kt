@@ -29,6 +29,7 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 
 class BittensorStakePreflightValidationTest {
@@ -98,7 +99,7 @@ class BittensorStakePreflightValidationTest {
         `when`(chain.assets).thenReturn(listOf(chainAsset))
         `when`(account.accountIdIn(chain)).thenReturn(coldKey)
         `when`(accounts.getMetaAccount(7L)).thenReturn(account)
-        `when`(immediateExecution.isSupported(account)).thenReturn(true)
+        `when`(immediateExecution.support(account)).thenReturn(BittensorWalletSupport.SUPPORTED)
         `when`(wallets.assetFlow(7L, chainAsset)).thenReturn(flowOf(asset))
         `when`(asset.token).thenReturn(token)
         `when`(token.configuration).thenReturn(chainAsset)
@@ -110,7 +111,7 @@ class BittensorStakePreflightValidationTest {
 
     @Test
     fun `direct root and subnet review reject delayed operation wallet before loading transaction data`() = runBlocking {
-        `when`(immediateExecution.isSupported(account)).thenReturn(false)
+        `when`(immediateExecution.support(account)).thenReturn(BittensorWalletSupport.DELAYED_EXECUTION)
         for (netuid in listOf(BittensorNetuid.Root, BittensorNetuid.Subnet(1))) {
             val failure = system.validate(payload.copy(netuid = netuid)).getOrThrow().notValidOrNull()
             assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason)
@@ -121,9 +122,24 @@ class BittensorStakePreflightValidationTest {
     }
 
     @Test
+    fun `ledger and proxied wallets are refused before loading transaction data`() = runBlocking {
+        val refusals = mapOf(
+            BittensorWalletSupport.LEDGER_NOT_SUPPORTED to BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED,
+            BittensorWalletSupport.PROXIED_NOT_SUPPORTED to BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED
+        )
+        for ((support, expected) in refusals) {
+            `when`(immediateExecution.support(account)).thenReturn(support)
+
+            assertEquals(expected, system.validate(payload).getOrThrow().notValidOrNull()?.reason)
+        }
+        assertEquals(0, loads)
+        org.mockito.Mockito.verifyNoInteractions(wallets, subnetInteractor, validators)
+    }
+
+    @Test
     fun `warning continuation rechecks execution type of explicit wallet`() = runBlocking {
         assertNull(system.validate(payload).getOrThrow().notValidOrNull())
-        `when`(immediateExecution.isSupported(account)).thenReturn(false)
+        `when`(immediateExecution.support(account)).thenReturn(BittensorWalletSupport.DELAYED_EXECUTION)
         val failure = system.validate(payload.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()
         assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason)
         assertEquals(1, loads)
@@ -138,12 +154,13 @@ class BittensorStakePreflightValidationTest {
     }
 
     @Test
-    fun `revalidation reads current restrictions and balance even after warning acceptance`() = runBlocking {
+    fun `revalidation reads current restrictions and balance even after warning acceptance`() = runBlocking<Unit> {
         assertNull(system.validate(payload).getOrThrow().notValidOrNull())
         snapshot = snapshot.copy(safeModeActive = true)
         val failure = system.validate(payload.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()
         assertEquals(BittensorStakeValidationFailure.SAFE_MODE_ACTIVE, failure?.reason)
         assertEquals(2, loads)
+        verify(wallets, times(2)).assetFlow(7L, chainAsset)
     }
 
     @Test
@@ -164,7 +181,7 @@ class BittensorStakePreflightValidationTest {
             .getOrThrow()
             .notValidOrNull()
 
-        assertEquals(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED, failure?.reason)
+        assertEquals(BittensorStakeValidationFailure.SlippageExceeded(reviewedQuote, movedQuote), failure?.reason)
         assertEquals(BigInteger.valueOf(1_005_000_000), subnetPayload.quote?.limitPrice)
         assertEquals(2, loads)
     }
@@ -175,9 +192,21 @@ class BittensorStakePreflightValidationTest {
         val subnetPayload = payload.copy(netuid = quote.subnetId, quote = quote)
         `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks)).thenThrow(IllegalStateException("Market unavailable"))
 
-        val result = system.validate(subnetPayload)
+        val failure = system.validate(subnetPayload).getOrThrow().notValidOrNull()
 
-        assertEquals("Market unavailable", result.exceptionOrNull()?.message)
+        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, failure?.reason)
+    }
+
+    @Test
+    fun `market is reread at the chosen slippage`() = runBlocking<Unit> {
+        val quote = quote(System.currentTimeMillis())
+        val slippage = BittensorSlippage(BigDecimal("0.02"))
+        `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks, slippage)).thenReturn(quote)
+
+        val status = system.validate(payload.copy(netuid = quote.subnetId, quote = quote, slippage = slippage)).getOrThrow()
+
+        assertNull(status.notValidOrNull())
+        verify(subnetInteractor).quote(quote.subnetId, quote.totalTaoInPlanks, slippage)
     }
 
     @Test

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_marginHorizontal="4dp"
+    android:layout_weight="1"
+    android:background="@drawable/bg_slippage_preset"
+    android:gravity="center"
+    android:textColor="@color/slippage_preset_text" />

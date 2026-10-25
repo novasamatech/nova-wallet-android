@@ -40,5 +40,11 @@ fun BaseFragmentMixin<*>.displayDialogFor(payload: CustomDialogDisplayer.Payload
                 negativeAction.action()
             }
         }
+
+        payload.neutralAction?.let { neutralAction ->
+            setNeutralButton(neutralAction.title) { _, _ ->
+                neutralAction.action()
+            }
+        }
     }
 }

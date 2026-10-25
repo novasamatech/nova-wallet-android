@@ -16,6 +16,8 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
@@ -31,7 +33,9 @@ data class BittensorStakePreflightPayload(
     val quote: BittensorSubnetBuyQuote? = null,
     val priceImpactAccepted: Boolean = false,
     val existingPosition: Boolean = false,
-    val inactiveValidatorAccepted: Boolean = false
+    val inactiveValidatorAccepted: Boolean = false,
+    /** The tolerance the user chose; the market is re-read at it before staking. */
+    val slippage: BittensorSlippage? = null
 )
 
 typealias BittensorStakePreflightSystem = ValidationSystem<BittensorStakePreflightPayload, BittensorStakeValidationFailure>
@@ -49,13 +53,13 @@ class BittensorStakePreflightValidation(
 
     override suspend fun validate(value: BittensorStakePreflightPayload): ValidationStatus<BittensorStakeValidationFailure> = coroutineScope {
         val account = accountRepository.getMetaAccount(value.metaId)
-        val executionStatus = immediateValidation.validate(immediateExecution.isSupported(account))
+        val executionStatus = immediateValidation.validate(immediateExecution.support(account))
         if (executionStatus is ValidationStatus.NotValid) return@coroutineScope executionStatus
         val preflight = async {
             preflightRepository.load(value.chain.id, value.netuid, account.requireAccountIdIn(value.chain), value.hotkey)
         }
         val latestQuote = async {
-            value.quote?.let { bittensorSubnetInteractor.quote(it.subnetId, it.totalTaoInPlanks) }
+            value.quote?.let { latestQuote(it, value.slippage ?: bittensorSubnetInteractor.slippage) }
         }
         val inactiveValidator = async {
             val netuid = value.netuid
@@ -69,7 +73,6 @@ class BittensorStakePreflightValidation(
         }
         val asset = walletRepository.assetFlow(value.metaId, value.chain.utilityAsset)
             .first()
-        val currentQuote = latestQuote.await()
         val payload = BittensorStakeValidationPayload(
             asset = asset,
             amount = asset.token.amountFromPlanks(value.amount),
@@ -79,11 +82,18 @@ class BittensorStakePreflightValidation(
             netuid = value.netuid,
             priceImpactAccepted = value.priceImpactAccepted,
             checkedAtMillis = System.currentTimeMillis(),
-            latestQuote = currentQuote,
+            latestQuote = latestQuote.await(),
             inactiveValidator = inactiveValidator.await(),
             inactiveValidatorAccepted = value.inactiveValidatorAccepted
         )
-        stakeValidationSystem.validate(payload)
-            .getOrThrow()
+        stakeValidationSystem.validate(payload).getOrThrow()
+    }
+
+    // A market that cannot be re-read leaves no quote to stake against, which the validations report.
+    private suspend fun latestQuote(quote: BittensorSubnetBuyQuote, slippage: BittensorSlippage): BittensorSubnetBuyQuote? = try {
+        bittensorSubnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks, slippage)
+    } catch (cause: Exception) {
+        if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+        null
     }
 }

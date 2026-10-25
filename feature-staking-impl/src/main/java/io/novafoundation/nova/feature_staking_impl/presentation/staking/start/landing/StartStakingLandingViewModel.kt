@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -48,6 +49,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
@@ -68,6 +70,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
@@ -124,7 +127,8 @@ class StartStakingLandingViewModel(
     private val analyticsService: AnalyticsService,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val bittensorRecommendedYieldInteractor: BittensorRecommendedYieldInteractor,
-    private val bittensorRetryController: BittensorRetryController
+    private val bittensorRetryController: BittensorRetryController,
+    val walletGate: BittensorWalletGate
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
@@ -260,7 +264,19 @@ class StartStakingLandingViewModel(
         ) {
             validationInProgressFlow.value = false
 
-            if (isBittensor && allOptions) {
+            if (isBittensor) {
+                launch { continueToBittensorSetup(payload.metaAccount, allOptions) }
+            } else {
+                openStartStaking()
+            }
+        }
+    }
+
+    // Past the account check, an unsupported wallet gets the sheet instead of the setup,
+    // and the landing is then not reported as abandoned.
+    private suspend fun continueToBittensorSetup(wallet: MetaAccount, allOptions: Boolean) {
+        walletGate.checkingSupport(wallet, StakingFlow.STAKE, target = null, onRefusal = { flowContinued = true }) {
+            if (allOptions) {
                 flowContinued = true
                 stakingRouter.openBittensorChooseSubnet()
             } else {

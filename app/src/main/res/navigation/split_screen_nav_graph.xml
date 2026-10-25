@@ -67,11 +67,7 @@
 
     <action
         android:id="@+id/action_open_slippage_settings"
-        app:destination="@id/slippageSettingsFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
+        app:destination="@id/slippageSettingsFragment" />
 
     <action
         android:id="@+id/action_open_bittensor_root_staking"
@@ -84,6 +80,23 @@
     <action
         android:id="@+id/action_open_bittensor_portfolio"
         app:destination="@id/bittensorPortfolioFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_finish_bittensor_flow_to_portfolio"
+        app:destination="@id/bittensorPortfolioFragment"
+        app:popUpTo="@id/mainFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_bittensor_start_staking"
+        app:destination="@id/start_staking_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -132,6 +145,14 @@
     <action
         android:id="@+id/action_open_bittensor_subnet_details"
         app:destination="@id/bittensorSubnetDetails"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_bittensor_validator_info"
+        app:destination="@id/bittensorValidatorInfo"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -591,10 +612,10 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
-    <fragment
+    <dialog
         android:id="@+id/slippageSettingsFragment"
-        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
-        android:label="SwapOptionsFragment" />
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SlippageSettingsBottomSheet"
+        android:label="SlippageSettingsBottomSheet" />
 
     <fragment
         android:id="@+id/mainFragment"
@@ -1269,6 +1290,15 @@
     <fragment
         android:id="@+id/bittensorSelectValidator"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorFragment" />
+
+    <fragment
+        android:id="@+id/bittensorValidatorInfo"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoFragment">
+
+        <argument
+            android:name="payload"
+            app:argType="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload" />
+    </fragment>
 
     <fragment
         android:id="@+id/bittensorSubnetDetails"

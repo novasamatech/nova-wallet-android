@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.dashboard
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.Pool
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.RealStakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.RealStakingStatsDataSource
@@ -77,6 +79,7 @@ class StakingDashboardModule {
         balanceLocksRepository: BalanceLocksRepository,
         bittensorPositionRepository: BittensorPositionRepository,
         bittensorRootClaims: BittensorRootClaimSource,
+        bittensorSnapshots: BittensorDashboardSnapshotRepository,
         logger: Logger,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,
@@ -87,6 +90,7 @@ class StakingDashboardModule {
         balanceLocksRepository = balanceLocksRepository,
         bittensorPositionRepository = bittensorPositionRepository,
         bittensorRootClaims = bittensorRootClaims,
+        bittensorSnapshots = bittensorSnapshots,
         logger = logger
     )
 
@@ -122,7 +126,8 @@ class StakingDashboardModule {
         dAppMetadataRepository: DAppMetadataRepository,
         walletRepository: WalletRepository,
         totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
-        bittensorDetailsSource: BittensorDashboardDetailsSource
+        bittensorDetailsSource: BittensorDashboardDetailsSource,
+        computationalCache: ComputationalCache
     ): StakingDashboardInteractor = RealStakingDashboardInteractor(
         dashboardRepository = dashboardRepository,
         chainRegistry = chainRegistry,
@@ -131,6 +136,7 @@ class StakingDashboardModule {
         walletRepository = walletRepository,
         dAppMetadataRepository = dAppMetadataRepository,
         totalStakeChainComparatorProvider = totalStakeChainComparatorProvider,
-        bittensorDetailsSource = bittensorDetailsSource
+        bittensorDetailsSource = bittensorDetailsSource,
+        computationalCache = computationalCache
     )
 }

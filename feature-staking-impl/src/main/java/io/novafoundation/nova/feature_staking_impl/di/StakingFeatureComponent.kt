@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.di.BittensorRootClaimComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di.BittensorStakeConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di.BittensorDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.di.BittensorSelectUnstakePositionComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di.BittensorExitAmountComponent
@@ -45,6 +46,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetAmountComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.di.BittensorValidatorInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetReviewComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
@@ -159,6 +161,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun bittensorSelectUnstakePositionComponentFactory(): BittensorSelectUnstakePositionComponent.Factory
 
     fun bittensorSelectValidatorComponentFactory(): BittensorSelectValidatorComponent.Factory
+
+    fun bittensorValidatorInfoComponentFactory(): BittensorValidatorInfoComponent.Factory
 
     fun bittensorSubnetDetailsComponentFactory(): BittensorSubnetDetailsComponent.Factory
 
@@ -315,6 +319,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
         fun create(
             @BindsInstance unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
+            @BindsInstance portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
             @BindsInstance bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
             @BindsInstance slippageSettingsCommunicator: SlippageSettingsCommunicator,
             @BindsInstance router: StakingRouter,

@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRankedValidatorsRemote
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorsRemote
@@ -31,13 +33,15 @@ class BittensorValidatorPreviewTest {
 
     private val backend = mock(BittensorValidatorBackend::class.java)
 
+    private val subnetCatalogue = mock(BittensorSubnetCatalogueRepository::class.java)
+
     private val chain = mock(Chain::class.java)
 
     private val hotkey = AccountIdKey(ByteArray(32) { 1 })
 
     private val subnet = BittensorNetuid.Subnet(92)
 
-    private val interactor = BittensorValidatorInteractor(repository, chainRegistry, yields, backend)
+    private val interactor = BittensorValidatorInteractor(repository, chainRegistry, yields, backend, subnetCatalogue)
 
     @Before
     fun setup(): Unit = runBlocking {
@@ -60,12 +64,26 @@ class BittensorValidatorPreviewTest {
     @Test
     fun `recommended card can supply an amount preset without loading runtime eligibility`() = runBlocking {
         val row = BittensorRankedValidatorsRemote.Item(subnet.value, chain.addressOf(hotkey), "Recommended", true, "balanced", null)
-        `when`(backend.rankedValidators(subnet.value)).thenReturn(BittensorRankedValidatorsRemote(null, listOf(row)))
+        `when`(backend.rankedValidators(subnet.value)).thenReturn(BittensorRankedValidatorsRemote(recommendationMeta("FRESH"), listOf(row)))
         val result = interactor.previews(subnet, null).single()
         assertEquals("Recommended", result.validator.name)
         assertTrue(result.canPreselect)
         verifyNoInteractions(repository, yields)
     }
+
+    @Test
+    fun `stale recommendation generation still supplies the recommended card`() = runBlocking {
+        val row = BittensorRankedValidatorsRemote.Item(subnet.value, chain.addressOf(hotkey), "Recommended", true, "balanced", null)
+        `when`(backend.rankedValidators(subnet.value)).thenReturn(BittensorRankedValidatorsRemote(recommendationMeta("STALE"), listOf(row)))
+        val result = interactor.previews(subnet, null).single()
+        assertEquals("Recommended", result.validator.name)
+        assertTrue(result.canPreselect)
+    }
+
+    private fun recommendationMeta(freshness: String) = BittensorRecommendationsRemote.Meta(
+        BittensorRecommendationsRemote.Gates("0.18", true, true),
+        BittensorRecommendationsRemote.Components(BittensorRecommendationsRemote.Component("AVAILABLE", freshness, "2026-10-19T00:00:00Z"))
+    )
 
     @Test
     fun `explicit selection retains its hotkey and can be passed to amount entry`() = runBlocking {

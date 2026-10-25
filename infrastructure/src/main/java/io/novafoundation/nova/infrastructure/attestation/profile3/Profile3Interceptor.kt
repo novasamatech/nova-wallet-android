@@ -7,6 +7,7 @@ import io.novafoundation.nova.infrastructure.attestation.HEADER_CHALLENGE
 import io.novafoundation.nova.infrastructure.attestation.HEADER_CLIENT_ID
 import io.novafoundation.nova.infrastructure.attestation.HEADER_PROFILE
 import io.novafoundation.nova.infrastructure.attestation.HEADER_SIGNATURE
+import io.novafoundation.nova.infrastructure.attestation.peekErrorCode
 import java.io.IOException
 import java.io.InterruptedIOException
 import java.io.StringReader
@@ -22,6 +23,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.Buffer
+import retrofit2.HttpException
 
 class Profile3Interceptor(
     private val provider: Profile3AccessTokenProvider,
@@ -76,8 +78,7 @@ class Profile3Interceptor(
 
     private fun isRejected(response: Response, record: Profile3TokenRecord): Boolean {
         if (response.code != 401 || canonicalProfile3Origin(response.request.url) != record.scope.origin) return false
-        val challenges = response.headers.values("WWW-Authenticate")
-        if (challenges.size != 1 || !challenges.single().equals("Bearer error=\"invalid_token\"", ignoreCase = true)) return false
+        if (!response.headers.values("WWW-Authenticate").isBearerDenial()) return false
         return response.request.method == "HEAD" || errorCode(response) == "invalid_token"
     }
 
@@ -155,3 +156,15 @@ class Profile3NetworkAdmission(private val provider: Profile3AccessTokenProvider
         return chain.proceed(chain.request())
     }
 }
+
+/**
+ * Whether the backend denied the bearer token of this failed call. For a replayable request [Profile3Interceptor] returns
+ * that answer only after sending it again with a fresh token, so the backend keeps denying this client's tokens.
+ */
+internal fun HttpException.isProfile3BearerDenial(): Boolean {
+    val response = response() ?: return false
+    if (code() != 401 || !response.headers().values("WWW-Authenticate").isBearerDenial()) return false
+    return response.raw().request.method == "HEAD" || response.errorBody()?.contentType()?.subtype == "json" && peekErrorCode() == "invalid_token"
+}
+
+private fun List<String>.isBearerDenial() = size == 1 && single().equals("Bearer error=\"invalid_token\"", ignoreCase = true)

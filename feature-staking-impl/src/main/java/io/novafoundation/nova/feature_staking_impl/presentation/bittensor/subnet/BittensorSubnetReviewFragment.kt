@@ -56,12 +56,17 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             height = 18.dp(requireContext())
         }
         binder.done.setOnClickListener { viewModel.viewPositionClicked() }
-        binder.retryExecution.setOnClickListener { viewModel.retryClicked() }
+        binder.retryExecution.setOnClickListener { viewModel.failureActionClicked() }
         binder.execution.toolbar.setHomeButtonListener { viewModel.back() }
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
         binder.account.setOnClickListener { viewModel.accountClicked() }
+        // Only a new position explains the preset validator; an existing one opens its validator info.
         binder.validator.setOnClickListener {
-            showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
+            if (viewModel.existingPosition) {
+                viewModel.validatorClicked()
+            } else {
+                showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
+            }
         }
         binder.monthlyTokens.setOnClickListener {
             showDescription(R.string.bittensor_monthly_tokens, getString(R.string.bittensor_monthly_rewards_description))
@@ -71,9 +76,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             width = 18.dp(requireContext())
             height = 18.dp(requireContext())
         }
-        binder.execution.validator.setOnClickListener {
-            showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
-        }
+        binder.execution.validator.setOnClickListener { viewModel.validatorClicked() }
         binder.execution.slippage.setOnClickListener { showDescription(R.string.swap_slippage_title, viewModel.slippageDescription) }
         binder.toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
@@ -144,7 +147,8 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             val unconfirmed = result as? BittensorStakeResultUi.Unconfirmed
             val complete = result is BittensorStakeResultUi.Success
             done.isVisible = complete || unconfirmed != null
-            retryExecution.isVisible = failure?.canRetry == true
+            retryExecution.isVisible = failure != null
+            retryExecution.setText(if (failure?.canRetry == false) R.string.common_close else R.string.common_try_again)
             execution.root.setPadding(0, 0, 0, if (done.isVisible || failure != null) 84.dp(requireContext()) else 0)
             if (unconfirmed != null) {
                 execution.showUnconfirmed(unconfirmed)

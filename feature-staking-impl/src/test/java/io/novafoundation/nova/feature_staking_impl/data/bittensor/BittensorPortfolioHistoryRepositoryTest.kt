@@ -95,7 +95,7 @@ class BittensorPortfolioHistoryRepositoryTest {
     fun `request times out after twenty seconds and exposes a retryable error`() = kotlinx.coroutines.test.runTest {
         responseDelay = 20_001L
         val error = runCatching { repository.load(request, "account-one") }.exceptionOrNull()
-        assertTrue(error is IllegalStateException)
+        assertTrue(error is BittensorTimeoutException)
         assertTrue(error?.cause is kotlinx.coroutines.TimeoutCancellationException)
         assertEquals(20_000L, testScheduler.currentTime)
     }

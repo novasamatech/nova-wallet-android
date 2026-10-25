@@ -13,9 +13,34 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvents
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
+import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 
 val BittensorOperationResult.Failure.isSigningCancelled: Boolean
     get() = stage == BittensorFailureStage.NOT_SUBMITTED && cause is SigningCancelledException
+
+/**
+ * Whether Try again can succeed after a failed submission: a missing
+ * subnet, a disabled subnet token, an unregistered hotkey, a coldkey swap, safe mode, the staking hotkey cap and a too
+ * heavy root claim do not change on a retry.
+ */
+val BittensorOperationResult.Failure.isRetryable: Boolean
+    get() {
+        val error = cause as? DispatchError.Module ?: return true
+
+        return (error.module.name to error.error.name) !in NON_RETRYABLE_DISPATCH_ERRORS
+    }
+
+private val NON_RETRYABLE_DISPATCH_ERRORS = setOf(
+    "SubtensorModule" to "SubnetNotExists",
+    "SubtensorModule" to "SubtokenDisabled",
+    "Swap" to "SubtokenDisabled",
+    "SubtensorModule" to "HotKeyAccountNotExists",
+    "SubtensorModule" to "ColdkeySwapAnnounced",
+    "SubtensorModule" to "ColdkeySwapDisputed",
+    "SubtensorModule" to "TooManyStakingHotkeys",
+    "SubtensorModule" to "RootClaimTooHeavy",
+    "System" to "CallFiltered"
+)
 
 fun ExtrinsicExecutionResult.mapBittensorOperationResult(chain: Chain? = null): BittensorOperationResult = when (val dispatch = outcome) {
     is ExtrinsicDispatch.Failed -> BittensorOperationResult.Failure(dispatch.error, extrinsicHash, BittensorFailureStage.DISPATCHED)

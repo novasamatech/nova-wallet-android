@@ -11,7 +11,10 @@ class BittensorSubnetCatalogueRemote(
         val name: String? = null,
         val symbol: String? = null,
         val networkRegisteredAt: java.math.BigInteger? = null,
-        val taoReserve: String? = null
+        val taoReserve: String? = null,
+        val alphaReserve: String? = null,
+        val subnetUrl: String? = null,
+        val githubRepo: String? = null
     )
 
     class Meta(val components: Components?)

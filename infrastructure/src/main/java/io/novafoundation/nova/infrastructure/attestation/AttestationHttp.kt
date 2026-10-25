@@ -1,5 +1,6 @@
 package io.novafoundation.nova.infrastructure.attestation
 
+import io.novafoundation.nova.infrastructure.attestation.profile3.isProfile3BearerDenial
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.MediaType
@@ -41,6 +42,17 @@ internal fun errorCodeOf(body: String?): String? = body?.let { ERROR_CODE.find(i
 
 internal fun HttpException.errorCode(): String? = errorCodeOf(runCatching { response()?.errorBody()?.string() }.getOrNull())
 
+/** Like [errorCode], but leaves the error body unread, so the code can be checked more than once. */
+internal fun HttpException.peekErrorCode(): String? = try {
+    val source = response()?.errorBody()?.source()
+    source?.request(ERROR_PEEK_BYTES)
+    source?.buffer?.clone()?.let { errorCodeOf(it.readUtf8(minOf(it.size, ERROR_PEEK_BYTES))) }
+} catch (failure: Exception) {
+    null
+}
+
+private const val ERROR_PEEK_BYTES = 4_096L
+
 // The attestation contract's error codes, the same list the iOS client knows
 private val ATTESTATION_ERROR_CODES = setOf(
     "invalid_request", "unsupported_profile", "invalid_target", "unsupported_platform", "unsupported_attestation_type",
@@ -50,6 +62,59 @@ private val ATTESTATION_ERROR_CODES = setOf(
 
 /** The attestation error code of a failed call, or null when the backend answered without one it defines. Reads the error body. */
 fun HttpException.attestationErrorCode(): String? = errorCode()?.takeIf { it in ATTESTATION_ERROR_CODES }
+
+/** Why the backend will not serve a failed call on a later attempt. */
+enum class BackendRefusal {
+
+    /** This device cannot attest, or the backend does not trust it. */
+    DEVICE,
+
+    /** The backend does not accept the request, or refused this client for the rest of the process. */
+    REQUEST
+}
+
+/** The backend refusal behind this failure, or null when a later attempt may pass. */
+fun Throwable.backendRefusal(): BackendRefusal? {
+    val causes = causeChain().toList()
+    val refusal = causes.firstNotNullOfOrNull { it as? AttestationRefusedException }
+    // The backend's answer to the call itself; below an attestation failure it answered the client's bootstrap instead.
+    val responses = causes.takeWhile { it !is AttestationUnavailableException }.filterIsInstance<HttpException>()
+    val deviceBound = causes.any { it is AttestationUnsupportedException } || refusal?.isDeviceBound() == true ||
+        responses.any { it.isProfile3BearerDenial() }
+    return when {
+        deviceBound -> BackendRefusal.DEVICE
+        refusal != null || responses.any { it.isRejectedCall() } -> BackendRefusal.REQUEST
+        else -> null
+    }
+}
+
+/** How the backend refused a client bootstrap, or null when a bootstrap after the cooldown may pass. */
+internal fun bootstrapRefusal(status: Int, code: String?): BackendRefusal? = when (status) {
+    401 -> BackendRefusal.DEVICE.takeIf { code == "attestation_failed" }
+    403 -> when (code) {
+        "app_not_allowed", "binding_not_allowed" -> BackendRefusal.DEVICE
+        "insufficient_scope" -> BackendRefusal.REQUEST
+        else -> null
+    }
+    409 -> BackendRefusal.REQUEST.takeIf { code == "client_already_registered" }
+    else -> null
+}
+
+private fun AttestationRefusedException.isDeviceBound() = bootstrapRefusal(status, code) == BackendRefusal.DEVICE
+
+// The answers graded as rejected; any other error status may pass on a later attempt.
+private fun HttpException.isRejectedCall() = when (code()) {
+    400, 405, 413, 415, 422 -> true
+    403 -> peekErrorCode() == "insufficient_scope"
+    404 -> peekErrorCode() == "route_not_found"
+    409 -> peekErrorCode() == "client_already_registered"
+    else -> false
+}
+
+/** This failure followed by its causes. */
+fun Throwable.causeChain(): Sequence<Throwable> = generateSequence(this) { it.cause }.take(MAX_CAUSE_DEPTH)
+
+private const val MAX_CAUSE_DEPTH = 16
 
 /** Applies [normalizedForAttestation] to the backend's own bootstrap endpoints. */
 internal class ExactJsonContentTypeInterceptor : Interceptor {

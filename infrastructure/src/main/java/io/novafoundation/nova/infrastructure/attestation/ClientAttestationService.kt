@@ -48,7 +48,26 @@ class AttestationFailedException(message: String) : IOException(message)
  * key failed - so the request was not sent. Unlike [AttestationFailedException] it says nothing about
  * whether this client is accepted, so it is worth retrying later.
  */
-class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
+open class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
+
+/**
+ * This device cannot attest at all - it has no Play Store or Play services - so retrying will not help.
+ * Callers should explain the device limitation instead of offering a retry. A backend refusal is an [AttestationRefusedException].
+ */
+class AttestationUnsupportedException(message: String, cause: Throwable? = null) : AttestationUnavailableException(message, cause)
+
+/**
+ * The backend refused this client's bootstrap with [status] and [code]. It is not asked again for the rest of the process,
+ * so retrying will not help; the code tells a device the backend does not trust from a request it does not accept.
+ */
+class AttestationRefusedException(
+    val status: Int,
+    val code: String?,
+    message: String,
+    cause: Throwable? = null
+) : AttestationUnavailableException(message, cause)
+
+fun Throwable.isAttestationUnsupported(): Boolean = generateSequence(this) { it.cause }.any { it is AttestationUnsupportedException }
 
 /** Produces a Play Integrity token bound to [requestHash]. */
 fun interface IntegrityTokenSource {

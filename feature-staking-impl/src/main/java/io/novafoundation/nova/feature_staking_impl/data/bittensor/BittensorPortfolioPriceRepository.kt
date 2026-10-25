@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
-import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -14,7 +12,6 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeout
-import retrofit2.HttpException
 
 interface BittensorPortfolioPriceRepository {
 
@@ -22,15 +19,14 @@ interface BittensorPortfolioPriceRepository {
 }
 
 class RealBittensorPortfolioPriceRepository(
-    private val api: BittensorSubnetCatalogueApi,
-    private val infrastructureUrls: InfrastructureUrls,
+    private val catalogueRepository: BittensorSubnetCatalogueRepository,
     private val runtimePrices: BittensorRuntimePriceSource,
     private val logger: Logger
 ) : BittensorPortfolioPriceRepository {
 
     override suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
         if (heldSubnets.isEmpty()) return emptyMap()
-        val backend = loadPrices("backend") { backendPrices() }
+        val backend = loadPrices("backend") { mapBittensorPortfolioPrices(catalogueRepository.catalogue()) }
             .filterKeys { it in heldSubnets }
         val missing = heldSubnets - backend.keys
         if (missing.isEmpty()) return backend
@@ -38,16 +34,6 @@ class RealBittensorPortfolioPriceRepository(
         val fallback = loadPrices("runtime") { runtimePrices.prices(chainId) }
             .filterKeys { it in missing }
         return backend + fallback
-    }
-
-    private suspend fun backendPrices(): Map<BittensorNetuid.Subnet, BigInteger> {
-        val baseUrl = infrastructureUrls.baseUrl() ?: throw InfrastructureUrlMissingException()
-        require(baseUrl.isHttps) { "Infrastructure requires HTTPS" }
-        val url = requireNotNull(baseUrl.resolve("/v1/bittensor/subnets"))
-        val response = api.subnets(url.toString())
-        if (!response.isSuccessful) throw HttpException(response)
-
-        return mapBittensorPortfolioPrices(requireNotNull(response.body()))
     }
 
     private suspend fun loadPrices(
@@ -72,9 +58,14 @@ class RealBittensorPortfolioPriceRepository(
     }
 }
 
+/** Holdings are valued only at FRESH backend prices (iOS `freshTaoPerAlpha`); STALE ones yield to live runtime prices. */
 internal fun mapBittensorPortfolioPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
-    val component = requireNotNull(response.meta?.components?.alphaPrices)
-    require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Portfolio prices are unavailable or stale" }
+    val fresh = requireAvailableBittensorComponent(response.meta?.components?.alphaPrices, "Portfolio prices")
+    return if (fresh) mapBittensorSubnetPrices(response) else emptyMap()
+}
+
+/** Catalogue prices regardless of freshness - for listing, never for valuing holdings. */
+internal fun mapBittensorSubnetPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
     val subnets = requireNotNull(response.items)
     val seenSubnets = mutableSetOf<BittensorNetuid.Subnet>()
 

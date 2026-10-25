@@ -1,28 +1,46 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
-import io.novafoundation.nova.common.mixin.api.RetryPayload
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 
 /** Screen-local recovery for reads. Never retries a submitted transaction. */
-class BittensorRetryController(private val resources: ResourceManager, private val logger: Logger) {
+class BittensorRetryController(
+    private val resources: ResourceManager,
+    private val logger: Logger,
+    private val automaticInteractionGate: AutomaticInteractionGate
+) {
 
-    private val errors = Channel<RetryPayload>(Channel.BUFFERED)
+    // The failure awaiting the user is state, not a one-shot event: a dialog lost to a configuration change shows again,
+    // and failures raised while the screen is hidden wait as one dialog instead of a stack of them.
+    private val pending = MutableStateFlow<BittensorReadFailure?>(null)
 
-    val events = errors.receiveAsFlow()
+    // Sources that failed while the pending dialog was up; its Retry restarts them all.
+    private val pendingRetries = mutableListOf<() -> Unit>()
+
+    // Retryable reads that fail behind an OK-only dialog get their own dialog after it closes.
+    private var queuedRetryKind: BittensorReadFailureKind? = null
+
+    // A failure no retry can fix reads the same for every source, e.g. each attested read on a device that cannot
+    // attest: explain it once per screen.
+    private var finalFailureReported = false
+
+    val events: Flow<BittensorReadFailure> = pending.filterNotNull()
 
     fun <T, R> observe(
         step: String,
@@ -49,15 +67,73 @@ class BittensorRetryController(private val resources: ResourceManager, private v
         }
     }
 
+    /**
+     * Each attempt of a read whose failure raises no dialog. A failed read is requested again once the app returns from
+     * the background.
+     */
+    fun <T> observeQuietly(step: String, load: suspend () -> T): Flow<Result<T>> = flow {
+        while (true) {
+            val attempt = try {
+                Result.success(load())
+            } catch (cause: Exception) {
+                currentCoroutineContext().ensureActive()
+                if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+                logFailure(step, cause)
+                Result.failure(cause)
+            }
+            emit(attempt)
+            if (attempt.isSuccess) return@flow
+            automaticInteractionGate.isInteractionAllowedFlow.first { allowed -> !allowed }
+            automaticInteractionGate.awaitInteractionAllowed()
+        }
+    }
+
     private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
+        logFailure(step, cause)
+        val kind = cause.bittensorReadFailureKind()
+        synchronized(pendingRetries) {
+            val shown = pending.value
+            if (shown != null) {
+                if (kind.retryable) {
+                    pendingRetries += onRetry
+                    if (!shown.retryable && queuedRetryKind == null) queuedRetryKind = kind
+                }
+                return
+            }
+            if (kind.retryable) {
+                pendingRetries += onRetry
+            } else {
+                if (finalFailureReported) return
+                finalFailureReported = true
+            }
+            pending.value = createFailure(kind)
+        }
+    }
+
+    private fun createFailure(kind: BittensorReadFailureKind): BittensorReadFailure {
+        val (title, message) = when (kind) {
+            BittensorReadFailureKind.GENERIC -> R.string.common_error_general_title to R.string.bittensor_load_failed_message
+            BittensorReadFailureKind.SLOW_NETWORK -> R.string.bittensor_load_slow_title to R.string.bittensor_load_slow_message
+            BittensorReadFailureKind.DEVICE_UNSUPPORTED -> R.string.bittensor_load_device_title to R.string.bittensor_load_device_message
+            BittensorReadFailureKind.REJECTED -> R.string.common_error_general_title to R.string.bittensor_load_rejected_message
+        }
+        return BittensorReadFailure(kind, resources.getString(title), resources.getString(message), ::resolve)
+    }
+
+    private fun logFailure(step: String, cause: Throwable) {
         logger.log("[Bittensor] Failed to load $step")
         logger.log(cause)
-        errors.trySend(
-            RetryPayload(
-                title = resources.getString(R.string.common_error_general_title),
-                message = resources.getString(R.string.common_retry_message),
-                onRetry = onRetry
-            )
-        )
+    }
+
+    private fun resolve(failure: BittensorReadFailure, retry: Boolean) {
+        val retries = synchronized(pendingRetries) {
+            if (pending.value !== failure) return
+            val queued = queuedRetryKind
+            queuedRetryKind = null
+            pending.value = queued?.let(::createFailure)
+            if (queued != null) return@synchronized emptyList()
+            pendingRetries.toList().also { pendingRetries.clear() }
+        }
+        if (retry) retries.forEach { it() }
     }
 }

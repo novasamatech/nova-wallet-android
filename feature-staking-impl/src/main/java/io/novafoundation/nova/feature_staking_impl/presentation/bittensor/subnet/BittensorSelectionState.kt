@@ -14,7 +14,11 @@ data class BittensorSelectionState(
     val flowId: String = UUID.randomUUID().toString(),
     val rootFilters: BittensorValidatorFilters = BittensorValidatorFilters(),
     val subnetFilters: BittensorValidatorFilters = BittensorValidatorFilters(),
-    val browseState: BittensorSubnetBrowseState? = null
+    val browseState: BittensorSubnetBrowseState? = null,
+    /** The flow started from a Where to stake quick pick; kept when the target changes. */
+    val quickPick: Boolean = false,
+    /** The flow moved on to amount entry, so leaving the subnet picker is no abandonment. */
+    val flowContinued: Boolean = false
 ) : Parcelable {
 
     fun filtersFor(netuid: BittensorNetuid): BittensorValidatorFilters = if (netuid.isRoot()) rootFilters else subnetFilters

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingRewardsState
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
@@ -26,7 +27,6 @@ import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -42,9 +42,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -75,7 +77,8 @@ class BittensorRootDetailsViewModel(
     slippageSettings: BittensorSlippageSettings,
     private val rootValidatorSource: BittensorRootValidatorSource,
     private val rootHoldFormatter: BittensorRootHoldFormatter,
-    private val debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
+    private val debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings,
+    val walletGate: BittensorWalletGate
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private var isOpenedTracked = false
@@ -129,14 +132,14 @@ class BittensorRootDetailsViewModel(
     val canClaim = combine(claimState, debugSettings.observeBittensorClaimButton()) { state, debugEnabled ->
         state.dataOrNull?.let {
             val hasPreview = debugEnabled && it.copy(previewOnly = true).selectedPreview != null
-            it.supportsImmediateOperations && it.dataStatus is BittensorDataStatus.Fresh && (it.availableClaims.isNotEmpty() || hasPreview)
+            it.dataStatus is BittensorDataStatus.Fresh && (it.availableClaims.isNotEmpty() || hasPreview)
         } == true
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
+    // The actions are never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
     val canAddStake = portfolioState.map { portfolio ->
-        val data = portfolio.dataOrNull
-        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
+        portfolio.dataOrNull?.dataStatus is BittensorDataStatus.Fresh
     }
         .shareInBackground()
 
@@ -165,7 +168,7 @@ class BittensorRootDetailsViewModel(
             val rewards = when {
                 claim == null -> StakingRewardsState.UNAVAILABLE
                 claim.availableClaims.isNotEmpty() -> StakingRewardsState.CLAIMABLE
-                claim.claims.totalRedeemable.signum() > 0 -> StakingRewardsState.BELOW_MINIMUM
+                claim.claims.totalRedeemable.isPositive() -> StakingRewardsState.BELOW_MINIMUM
                 else -> StakingRewardsState.NONE
             }
             isOpenedTracked = true
@@ -173,8 +176,8 @@ class BittensorRootDetailsViewModel(
                 BittensorAnalyticsEvent.PositionOpened(
                     StakingAnalyticsTarget.ROOT,
                     0,
-                    withdrawal.holdDurationMillis.signum() > 0,
-                    withdrawal.locked.signum() > 0,
+                    withdrawal.holdDurationMillis.isPositive(),
+                    withdrawal.locked.isPositive(),
                     rewards
                 )
             )
@@ -251,7 +254,9 @@ class BittensorRootDetailsViewModel(
     fun claimClicked() = launchUnit {
         if (!canClaim.first()) return@launchUnit
         val claim = claimState.first().dataOrNull ?: return@launchUnit
-        router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId, previewOnly = debugSettings.bittensorClaimEnabled()))
+        walletGate.checkingSupport(claim.metaId, StakingFlow.CLAIM, StakingAnalyticsTarget.ROOT) {
+            router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId, previewOnly = debugSettings.bittensorClaimEnabled()))
+        }
     }
 
     fun unstakeRoot() = launchUnit {
@@ -275,7 +280,9 @@ class BittensorRootDetailsViewModel(
         }
 
         if (containsPosition) {
-            router.openBittensorExitAmount(position)
+            walletGate.checkingSupport(position.metaId, StakingFlow.UNSTAKE, StakingAnalyticsTarget.ROOT) {
+                router.openBittensorExitAmount(position)
+            }
         }
     }
 
@@ -283,17 +290,16 @@ class BittensorRootDetailsViewModel(
         if (!canAddStake.first()) return@launchUnit
         val currentPortfolio = portfolio.first()
         val payload = rootStakeAmountPayload(currentPortfolio)
-        router.openBittensorRootStaking(payload)
+        walletGate.checkingSupport(currentPortfolio.metaId, StakingFlow.STAKE, StakingAnalyticsTarget.ROOT) {
+            router.openBittensorRootStaking(payload)
+        }
     }
 
     fun back() = router.back()
 
-    fun positionClicked(position: BittensorPositionUi) = launchUnit {
-        val action = position.action as? BittensorPositionAction.ValidatorDetails ?: return@launchUnit
-        externalActions.showAddressActions(
-            action.address,
-            portfolio.first().chain
-        )
+    fun positionClicked(position: BittensorPositionUi) {
+        val action = position.action as? BittensorPositionAction.ValidatorDetails ?: return
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(BittensorNetuid.Root.value, action.address))
     }
 }
 

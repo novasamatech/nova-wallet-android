@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
-import android.os.Bundle
-import io.novafoundation.nova.analytics.StakingPortfolioSource
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -9,6 +8,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorPortfolioBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
@@ -16,16 +16,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
 
     companion object {
-        const val ANALYTICS_SOURCE = "bittensor_portfolio_analytics_source"
-        private const val ENTRY = "bittensor_portfolio_entry"
+        private const val PAYLOAD = "BittensorPortfolioFragment.Payload"
 
-        fun sourceBundle(source: StakingPortfolioSource, entry: BittensorPortfolioEntry) = Bundle().apply {
-            putString(ANALYTICS_SOURCE, source.name)
-            putString(ENTRY, entry.name)
-        }
-
-        fun entryFrom(arguments: Bundle?): BittensorPortfolioEntry = BittensorPortfolioEntry.entries
-            .firstOrNull { it.name == arguments?.getString(ENTRY) } ?: BittensorPortfolioEntry.PORTFOLIO
+        fun getBundle(payload: BittensorPortfolioPayload) = bundleOf(PAYLOAD to payload)
     }
 
     private val imageLoader by lazy {
@@ -40,7 +33,7 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
             .bittensorDetailsComponentFactory()
-            .create(this)
+            .create(this, argument(PAYLOAD))
             .inject(this)
     }
 
@@ -66,13 +59,8 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
     }
 
     override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
-        viewModel.entryResolution.observe { resolution ->
-            if (resolution != null) {
-                arguments?.remove(ENTRY)
-                viewModel.completeEntry(resolution)
-            }
-        }
         observeBittensorRetries(viewModel.retryEvents)
+        observeActionBottomSheet(viewModel.walletGate)
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
         viewModel.chartChangeFormatter.observe { it.format(chartChange) }
         viewModel.priceChartModels.observe(priceChart::setCharts)

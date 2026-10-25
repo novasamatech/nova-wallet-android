@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootC
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingClaims
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorClaimLease
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorClaimTarget
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
@@ -22,11 +24,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import kotlinx.coroutines.flow.first
 
@@ -39,7 +43,9 @@ class BittensorRootClaimInteractor(
     private val submissionExecutor: BittensorSubmissionExecutor,
     private val walletConstants: WalletConstants,
     private val immediateExecution: BittensorImmediateExecution,
-    private val pendingClaims: BittensorPendingClaims
+    private val pendingClaims: BittensorPendingClaims,
+    private val positionRepository: BittensorPositionRepository,
+    private val rootValidatorSource: BittensorRootValidatorSource
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
@@ -96,6 +102,13 @@ class BittensorRootClaimInteractor(
         requireWallet(state, immediate = false)
         return state
     }
+
+    /** The validators of the wallet's root positions; null while the positions are unknown. */
+    fun observeRootHotkeys(state: BittensorRootClaimState): Flow<Set<AccountIdKey>?> =
+        positionRepository.observePositions(state.chain.id, state.coldkey.value)
+            .map { positions -> positions.positions?.root?.mapTo(mutableSetOf()) { it.validatorHotkey } }
+
+    suspend fun validatorDetails(chain: Chain): Map<AccountIdKey, BittensorRootValidatorDetails> = rootValidatorSource.validatorDetails(chain)
 
     fun prepare(state: BittensorRootClaimState, fee: Fee): BittensorRootClaimDraft? {
         val preview = state.selectedPreview ?: return null

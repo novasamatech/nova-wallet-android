@@ -71,10 +71,11 @@ class BittensorEstimatedCostBasisTest {
                     "3"
                 ),
                 operation(
-                    "50",
                     "5",
+                    "50",
                     "0.1",
-                    "2"
+                    "2",
+                    event = "StakeRemoved"
                 ),
                 operation(
                     "10",
@@ -94,74 +95,43 @@ class BittensorEstimatedCostBasisTest {
         )
     }
 
-    @Test fun `ambiguous trade does not produce a confident average`() {
+    @Test
+    fun `event name sets the trade direction`() {
         val ledger = BittensorEstimatedCostBasis(
             listOf(
-                operation(
-                    "1",
-                    "1",
-                    "1",
-                    "2"
-                ),
-                operation(
-                    "10",
-                    "100",
-                    "0.1",
-                    "1"
-                )
+                operation("4.6", "4", "1.2", "2", event = "StakeRemoved"),
+                operation("10", "8", "1.2", "1")
             ),
             true
         )
-        assertFalse(ledger.canEstimate(64))
-        assertNull(ledger.forSubnet(64))
+
+        assertEquals(precision * BigInteger.valueOf(5), ledger.forSubnet(64)?.paidTao)
+        assertEquals(precision * BigInteger.valueOf(4), ledger.forSubnet(64)?.receivedAlpha)
     }
 
     @Test
-    fun `purchase labels disambiguate matching buy and sell prices`() {
-        for (label in listOf("addStake", "stake_added", "BUY", "bought", "TAOBought")) {
-            val purchase = operation("1", "1", "1", "1").copy(type = label)
-            val ledger = BittensorEstimatedCostBasis(listOf(purchase), true)
+    fun `unknown events are skipped even when malformed`() {
+        for (event in listOf("StakeMoved", "stakeAdded", "STAKE_REMOVED", "buy", "")) {
+            val ledger = BittensorEstimatedCostBasis(
+                listOf(operation("invalid", "invalid", "invalid", "2", event = event), operation("10", "100", "0.1", "1")),
+                true
+            )
 
-            assertTrue(label, ledger.canEstimate(64))
-            assertEquals(label, precision, ledger.forSubnet(64)?.paidTao)
-            assertEquals(label, precision, ledger.forSubnet(64)?.receivedAlpha)
+            assertTrue(event, ledger.canEstimate(64))
+            assertEquals(event, precision * BigInteger.TEN, ledger.forSubnet(64)?.paidTao)
         }
     }
 
     @Test
-    fun `sale labels disambiguate matching buy and sell prices`() {
-        val purchase = operation("10", "10", "1", "1").copy(type = "buy")
-        for (label in listOf("removeStake", "stake_removed", "unstake", "SELL", "sold", "TAOSold")) {
-            val sale = operation("1", "1", "1", "2").copy(type = label)
-            val ledger = BittensorEstimatedCostBasis(listOf(sale, purchase), true)
-
-            assertTrue(label, ledger.canEstimate(64))
-            assertEquals(label, precision * BigInteger.valueOf(9), ledger.forSubnet(64)?.paidTao)
-            assertEquals(label, precision * BigInteger.valueOf(9), ledger.forSubnet(64)?.receivedAlpha)
-        }
-    }
-
-    @Test
-    fun `conflicting and partial labels cannot disambiguate a trade`() {
-        for (label in listOf("buySell", "added_removed", "buyer", "reseller", "unstaked")) {
-            val trade = operation("1", "1", "1", "1").copy(type = label)
-            val ledger = BittensorEstimatedCostBasis(listOf(trade), true)
-
-            assertFalse(label, ledger.canEstimate(64))
-            assertNull(label, ledger.forSubnet(64))
-        }
-    }
-
-    @Test
-    fun `trade label cannot override an incompatible price`() {
-        val trade = operation("1", "1", "100", "1").copy(type = "buy")
-        val ledger = BittensorEstimatedCostBasis(listOf(trade), true)
+    fun `sale outside price tolerance is unclassified`() {
+        val sale = operation("1", "1", "100", "2", event = "StakeRemoved")
+        val ledger = BittensorEstimatedCostBasis(listOf(sale, operation("10", "100", "0.1", "1")), true)
 
         assertFalse(ledger.canEstimate(64))
     }
 
     @Test
-    fun `non trade label takes priority over trade labels and malformed amounts`() {
+    fun `non trade label takes priority over malformed amounts`() {
         val movement = operation("invalid", "invalid", "invalid", "1").copy(type = "stakeTransferredBuy")
         val ledger = BittensorEstimatedCostBasis(listOf(movement), true)
 
@@ -193,7 +163,7 @@ class BittensorEstimatedCostBasisTest {
             "1"
         )
         val ledger = BittensorEstimatedCostBasis(
-            listOf(buy.copy(eventId = "3", type = "transferStake"), buy.copy(eventId = "2", type = "move_stake"), buy),
+            listOf(buy.copy(reference = "3", type = "transferStake"), buy.copy(reference = "2", type = "move_stake"), buy),
             true
         )
         assertEquals(
@@ -203,7 +173,7 @@ class BittensorEstimatedCostBasisTest {
         )
     }
 
-    @Test fun `identical identified rows are counted once but unidentified rows are preserved`() {
+    @Test fun `identical rows are counted once`() {
         val buy = operation(
             "10",
             "100",
@@ -216,10 +186,9 @@ class BittensorEstimatedCostBasisTest {
                 .forSubnet(64)
                 ?.paidTao
         )
-        val unidentified = buy.copy(eventId = "")
         assertEquals(
             precision * BigInteger.valueOf(20),
-            BittensorEstimatedCostBasis(listOf(unidentified, unidentified), true)
+            BittensorEstimatedCostBasis(listOf(buy, buy.copy(reference = "2")), true)
                 .forSubnet(64)
                 ?.paidTao
         )
@@ -235,10 +204,11 @@ class BittensorEstimatedCostBasisTest {
                     "3"
                 ),
                 operation(
-                    "100",
                     "10",
+                    "100",
                     "0.1",
-                    "2"
+                    "2",
+                    event = "StakeRemoved"
                 ),
                 operation(
                     "10",
@@ -335,16 +305,17 @@ class BittensorEstimatedCostBasisTest {
         input: String,
         output: String,
         price: String,
-        id: String
+        reference: String,
+        event: String = "StakeAdded"
     ) = BittensorReportedOperation(
         64,
         "synthetic-hotkey",
         input,
         output,
         price,
-        id,
+        event,
         "2026-10-01T12:00:00Z",
-        "synthetic-reference",
-        null
+        reference,
+        "trade"
     )
 }

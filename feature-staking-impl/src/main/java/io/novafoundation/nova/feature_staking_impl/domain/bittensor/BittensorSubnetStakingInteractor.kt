@@ -19,6 +19,7 @@ import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.withTimeout
 
 data class BittensorSubnetStakeDraft(
@@ -39,10 +40,24 @@ class BittensorSubnetStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val beneficiaryAddress: String,
     private val submissionExecutor: BittensorSubmissionExecutor,
-    private val costBasisInteractor: BittensorCostBasisInteractor
+    private val costBasisInteractor: BittensorCostBasisInteractor,
+    private val blockRequotes: BittensorBlockRequotes
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+
+    /** The subnet stake setup and review re-quote on each block after the current one while [active], and on each of [immediate]. */
+    fun requotes(active: Flow<Boolean>, immediate: Flow<Unit>): Flow<Unit> = blockRequotes.requotes(active, immediate)
+
+    /** [draft] quoted again on each of [requotes]; a failed or timed-out re-quote is emitted as a failure. */
+    fun requoted(draft: BittensorSubnetStakeDraft, slippage: BittensorSlippage, requotes: Flow<Unit>): Flow<Result<BittensorSubnetStakeDraft>> =
+        requotes.mapLatest {
+            blockRequotes.requote {
+                val operation = draft.operation
+                val quote = bittensorSubnetInteractor.quote(operation.quote.subnetId, operation.quote.totalTaoInPlanks, slippage)
+                draft.copy(operation = BittensorSubnetStakeOperation(quote, operation.hotkey, operation.beneficiary))
+            }
+        }
 
     suspend fun validatorCount(subnetId: BittensorNetuid.Subnet): Int {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)

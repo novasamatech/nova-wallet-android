@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.core.storage.StorageCache
@@ -162,6 +163,8 @@ interface StakingFeatureDependencies {
     val getProxyRepository: GetProxyRepository
 
     val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+
+    val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
 
     val metaAccountGroupingInteractor: MetaAccountGroupingInteractor
 

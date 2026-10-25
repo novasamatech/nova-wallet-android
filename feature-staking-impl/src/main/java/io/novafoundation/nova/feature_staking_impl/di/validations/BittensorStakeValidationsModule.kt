@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorColdkeySwapValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorMinimumStakeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorOrderToleranceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteAvailabilityValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
@@ -36,6 +37,8 @@ class BittensorStakeValidationsModule {
 
         val quoteAvailability = BittensorQuoteAvailabilityValidation()
 
+        val orderTolerance = BittensorOrderToleranceValidation()
+
         val quoteFreshness = BittensorQuoteFreshnessValidation()
 
         val quoteTerms = BittensorQuoteTermsValidation()
@@ -46,20 +49,24 @@ class BittensorStakeValidationsModule {
 
         val inactiveValidator = BittensorInactiveValidatorValidation()
 
+        // Order matters: the same failure level shows the first listed failure.
         return bittensorStakeValidationSystem(
-            listOf(
+            quoteValidations = listOf(
+                quoteAvailability,
+                orderTolerance
+            ),
+            validations = listOf(
                 feeReserve,
                 minimumStake,
                 registeredValidator,
                 stakingEnabled,
                 coldkeySwap,
                 safeMode,
-                quoteAvailability,
-                quoteTerms,
-                quoteFreshness,
-                slippage,
+                inactiveValidator,
                 priceImpact,
-                inactiveValidator
+                slippage,
+                quoteTerms,
+                quoteFreshness
             )
         )
     }

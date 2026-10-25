@@ -30,9 +30,11 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
 
     override fun initViews() {
         binder.bittensorStakeConfirmButton.prepareForProgress(viewLifecycleOwner)
+        binder.bittensorStakeConfirmToolbar.setTitle(viewModel.titleRes)
         binder.bittensorStakeConfirmToolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         binder.bittensorStakeConfirmExtrinsicInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.bittensorStakeConfirmValidator.setOnClickListener { viewModel.validatorClicked() }
         binder.bittensorStakeConfirmButton.setOnClickListener { viewModel.confirmClicked() }
     }
 
@@ -59,12 +61,7 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         viewModel.stakeAfter.observe(binder.stakeAfter::showBittensorLoadingValue)
         viewModel.apy.observe(binder.bittensorStakeConfirmApy::showBittensorLoadingValue)
         viewModel.confirmButtonState.observe(binder.bittensorStakeConfirmButton::setState)
-        bindBittensorStakeResults(
-            results = viewModel.resultState,
-            onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::resultDismissed,
-            onViewPosition = viewModel::viewPositionClicked
-        )
+        bindBittensorStakeResults(viewModel.resultState, viewModel::resultActionClicked)
     }
 
     private fun showValidator(validator: BittensorValidatorUi) {

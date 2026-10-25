@@ -32,7 +32,9 @@ import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.withTimeout
@@ -41,6 +43,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertSame
 import org.junit.Test
@@ -61,6 +64,8 @@ class BittensorExitQuoteInteractorTest {
 
     private var cancelled = false
 
+    private var outputShortfall = BigInteger.ZERO
+
     private var quoteCalls = 0
 
     private val source = object : BittensorSwapSource {
@@ -80,7 +85,7 @@ class BittensorExitQuoteInteractorTest {
                 subnetId,
                 direction,
                 amountIn - BigInteger.TEN - if (partial) BigInteger.ONE else BigInteger.ZERO,
-                amountIn - BigInteger.TEN,
+                amountIn - BigInteger.TEN - outputShortfall,
                 BigInteger.ZERO,
                 BigInteger.TEN,
                 BigInteger.ZERO,
@@ -152,52 +157,39 @@ class BittensorExitQuoteInteractorTest {
 
     private val position = BittensorExitPosition(1, chain, hotkey, hotkey, "validator", subnet, asset, null, preflight, true, BigInteger.ONE)
 
+    private val observedAddress = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+
+    private var snapshot = preflight
+
     private val costBasis = mock(BittensorCostBasisInteractor::class.java)
 
     private val chainState = mock(io.novafoundation.nova.runtime.repository.ChainStateRepository::class.java)
 
     private val interactor = BittensorExitInteractor(
         registry, accounts, wallets, runtime, metadata, source, config, slippage, extrinsics, executor, constants,
-        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", logger, immediate, costBasis, chainState
+        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", logger, immediate, costBasis, chainState, BittensorBlockRequotes(chainState, logger)
     )
 
     @Test
     fun `exit observation refreshes holds collateral and balances without reopening`() = runBlocking {
-        val wallet = mock(MetaAccount::class.java)
-        val token = mock(Token::class.java)
-        val chainAsset = mock(Chain.Asset::class.java)
         val updatedAsset = mock(Asset::class.java)
         val blocks = MutableStateFlow(BigInteger.ONE)
         val assets = MutableStateFlow(asset)
-        val address = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
-        `when`(chain.id).thenReturn("bittensor")
-        `when`(chain.assets).thenReturn(listOf(chainAsset))
-        `when`(chainAsset.id).thenReturn(0)
-        `when`(asset.token).thenReturn(token)
-        `when`(token.configuration).thenReturn(chainAsset)
-        `when`(registry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
-        `when`(accounts.getMetaAccount(1)).thenReturn(wallet)
-        `when`(wallet.id).thenReturn(1L)
-        `when`(wallet.type).thenReturn(LightMetaAccount.Type.SECRETS)
-        `when`(wallet.accountIdIn(chain)).thenReturn(hotkey.value)
-        `when`(wallets.assetFlow(1, chainAsset)).thenReturn(assets)
-        `when`(constants.existentialDeposit(chain.id)).thenReturn(BigInteger.ONE)
-        `when`(chainState.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blocks)
-        val validator = AccountIdKey(chain.accountIdOf(address))
+        val validator = stubRootObservation(blocks, assets) { snapshot }
         val member = BittensorExitMember(amount, BigInteger.ZERO, false, BigInteger.ONE)
-        var snapshot = preflight.copy(
+        snapshot = preflight.copy(
             rootHoldRemaining = BigInteger.ONE,
             groupStakes = mapOf(validator to amount),
             groupMembers = mapOf(validator to member)
         )
-        `when`(runtime.preflight(chain.id, hotkey.value, validator.value, BittensorNetuid.Root)).thenAnswer { snapshot }
         val received = Channel<BittensorExitPosition>(Channel.UNLIMITED)
         val observation = launch {
-            interactor.observe(1, BittensorNetuid.Root, address).collect { received.send(it) }
+            interactor.observe(1, BittensorNetuid.Root, observedAddress).collect { received.send(it) }
         }
         try {
             val held = withTimeout(2_000) { received.receive() }
             assertEquals(BigInteger.ZERO, interactor.maximumAmount(held))
+            withTimeout(2_000) { blocks.subscriptionCount.first { it > 0 } }
             snapshot = snapshot.copy(
                 rootHoldRemaining = BigInteger.ZERO,
                 groupMembers = mapOf(validator to member.copy(holdRemaining = BigInteger.ZERO))
@@ -219,9 +211,34 @@ class BittensorExitQuoteInteractorTest {
     }
 
     @Test
+    fun `exit observation stops reading blocks while hidden and refreshes from the next block once shown`() = runBlocking {
+        val blocks = MutableStateFlow(BigInteger.ONE)
+        val shown = MutableStateFlow(true)
+        stubRootObservation(blocks, MutableStateFlow(asset)) { snapshot }
+        val received = Channel<BittensorExitPosition>(Channel.UNLIMITED)
+        val observation = launch {
+            interactor.observe(1, BittensorNetuid.Root, observedAddress, shown).collect { received.send(it) }
+        }
+        try {
+            withTimeout(2_000) { received.receive() }
+            withTimeout(2_000) { blocks.subscriptionCount.first { it > 0 } }
+            shown.value = false
+            withTimeout(2_000) { blocks.subscriptionCount.first { it == 0 } }
+            snapshot = preflight.copy(stake = amount)
+            blocks.value = BigInteger.TWO
+            shown.value = true
+            withTimeout(2_000) { blocks.subscriptionCount.first { it > 0 } }
+            blocks.value = BigInteger.valueOf(3)
+            assertEquals(amount, withTimeout(2_000) { received.receive() }.preflight.stake)
+        } finally {
+            observation.cancelAndJoin()
+        }
+    }
+
+    @Test
     fun `sell and explicit refresh use only pinned simulation and spot price`() = runBlocking {
         `when`(chain.id).thenReturn("bittensor")
-        val reviewed = interactor.quote(position, amount, false)
+        val reviewed = interactor.quote(position, amount)
         assertEquals(BigInteger.valueOf(995_000_000), reviewed.limitPrice)
         assertEquals(amount - BigInteger.TEN, reviewed.estimatedTaoOut)
         assertEquals(commission.feeFor(reviewed.estimatedTaoOut), reviewed.serviceFee)
@@ -233,24 +250,34 @@ class BittensorExitQuoteInteractorTest {
     }
 
     @Test
+    fun `sale that its own impact cannot fill at the limit is still quoted`() = runBlocking {
+        `when`(chain.id).thenReturn("bittensor")
+        outputShortfall = BigInteger.valueOf(10_000)
+        val quote = interactor.quote(position, amount)
+        assertEquals(amount - BigInteger.valueOf(10_010), quote.estimatedTaoOut)
+        assertTrue(quote.estimatedTaoOut < quote.minimumTaoOut)
+        assertFalse(quote.isFillable(atLimit = requireNotNull(quote.limitPrice)))
+    }
+
+    @Test
     fun `partial fill fails closed`() = runBlocking {
         `when`(chain.id).thenReturn("bittensor")
         partial = true
-        assertTrue(runCatching { interactor.quote(position, amount, false) }.exceptionOrNull() is IllegalArgumentException)
+        assertTrue(runCatching { interactor.quote(position, amount) }.exceptionOrNull() is IllegalArgumentException)
     }
 
     @Test
     fun `sell cancellation propagates`() = runBlocking {
         `when`(chain.id).thenReturn("bittensor")
         cancelled = true
-        assertTrue(runCatching { interactor.quote(position, amount, false) }.exceptionOrNull() is CancellationException)
+        assertTrue(runCatching { interactor.quote(position, amount) }.exceptionOrNull() is CancellationException)
     }
 
     @Test
     fun `captured slippage survives refresh and payload round trip`() = runBlocking {
         `when`(chain.id).thenReturn("bittensor")
         val fraction = BigDecimal("0.03")
-        val reviewed = interactor.quote(position, amount, false, fraction)
+        val reviewed = interactor.quote(position, amount, slippageFraction = fraction)
         assertEquals(BigInteger.valueOf(970_000_000), reviewed.limitPrice)
         assertEquals(fraction, interactor.refreshQuote(position, reviewed).slippageFraction)
         assertEquals(reviewed, reviewed.toPayload(BittensorExitPositionPayload(1, subnet.value, "validator")).quote())
@@ -268,14 +295,14 @@ class BittensorExitQuoteInteractorTest {
             withdrawalPrice = BittensorProtocolUnits.RAO_PER_TAO
         )
         val collateralPosition = position.copy(preflight = basis)
-        assertEquals(free, interactor.maximumAmount(collateralPosition, BigDecimal("0.005")))
-        assertEquals(BigInteger.ZERO, interactor.maximumAmount(collateralPosition, BigDecimal("0.03")))
+        assertEquals(free, interactor.maximumAmount(collateralPosition, slippageFraction = BigDecimal("0.005")))
+        assertEquals(BigInteger.ZERO, interactor.maximumAmount(collateralPosition, slippageFraction = BigDecimal("0.03")))
     }
 
     @Test
     fun `net receive deducts commission and network fee once after runtime fee`() = runBlocking {
         `when`(chain.id).thenReturn("bittensor")
-        val reviewed = interactor.quote(position, amount, false)
+        val reviewed = interactor.quote(position, amount)
         val token = mock(Token::class.java)
         val chainAsset = mock(Chain.Asset::class.java)
         val fee = mock(Fee::class.java)
@@ -291,7 +318,7 @@ class BittensorExitQuoteInteractorTest {
     fun `root partial estimates gross once then prepares requested minus loaded fee`() = runBlocking {
         configureLoadedFee()
         val root = position.copy(netuid = BittensorNetuid.Root)
-        val quote = interactor.quote(root, amount, false)
+        val quote = interactor.quote(root, amount)
         val estimated = estimateCalls(root, quote)
         assertEquals(amount, estimated.single().arguments["amount_unstaked"])
 
@@ -310,7 +337,7 @@ class BittensorExitQuoteInteractorTest {
         val module = BittensorExitValidationsModule()
         val validations = module.provideExitValidationSystem()
         for (requested in listOf(BigInteger.valueOf(499), BigInteger.valueOf(500))) {
-            val quote = interactor.quote(root, requested, false)
+            val quote = interactor.quote(root, requested)
             val draft = interactor.prepare(root, quote, loadedFee, feeFromStake = true)
             assertEquals(requested, draft.quote.amount)
             assertEquals(BigInteger.ZERO, draft.netReceive)
@@ -336,7 +363,7 @@ class BittensorExitQuoteInteractorTest {
         `when`(chain.id).thenReturn("bittensor")
         val second = AccountIdKey(ByteArray(32) { 2 })
         val selectedSlippage = BigDecimal("0.01")
-        val reviewed = interactor.quote(position, amount, false, selectedSlippage)
+        val reviewed = interactor.quote(position, amount, slippageFraction = selectedSlippage)
             .copy(groupHotkeys = setOf(hotkey, second))
         val refreshed = interactor.refreshQuote(position, reviewed)
         val restored = refreshed.toPayload(BittensorExitPositionPayload(1, subnet.value, "hotkey")).quote()
@@ -349,7 +376,7 @@ class BittensorExitQuoteInteractorTest {
     fun `root partial paid from free keeps gross estimated call amount`() = runBlocking {
         configureLoadedFee()
         val root = position.copy(netuid = BittensorNetuid.Root)
-        val quote = interactor.quote(root, amount, false)
+        val quote = interactor.quote(root, amount)
         val estimated = estimateCalls(root, quote)
         val draft = interactor.prepare(root, quote, loadedFee, feeFromStake = false)
         assertEquals(estimated.single().arguments, operationCalls(draft.operation).single().arguments)
@@ -360,7 +387,7 @@ class BittensorExitQuoteInteractorTest {
     fun `root full exit remains full in single estimate and prepared call`() = runBlocking {
         configureLoadedFee()
         val root = position.copy(netuid = BittensorNetuid.Root)
-        val quote = interactor.quote(root, amount, true)
+        val quote = interactor.quote(root, root.preflight.totalStake)
         val estimated = estimateCalls(root, quote)
         val draft = interactor.prepare(root, quote, loadedFee, feeFromStake = true)
         assertEquals("remove_stake_full_limit", estimated.single().function.name)
@@ -378,7 +405,7 @@ class BittensorExitQuoteInteractorTest {
         )
         val basis = preflight.copy(groupStakes = members.mapValues { it.value.stake }, groupMembers = members)
         val root = position.copy(netuid = BittensorNetuid.Root, preflight = basis)
-        val quote = interactor.quote(root, amount + amount / BigInteger.TWO, false)
+        val quote = interactor.quote(root, amount + amount / BigInteger.TWO)
         val estimated = estimateCalls(root, quote)
         val draft = interactor.prepare(root, quote, loadedFee, feeFromStake = false)
         val prepared = operationCalls(draft.operation)
@@ -386,6 +413,32 @@ class BittensorExitQuoteInteractorTest {
         assertEquals(estimated.map { it.arguments }, prepared.map { it.arguments })
         assertEquals(amount / BigInteger.TWO, prepared.last().arguments["amount_unstaked"])
         assertEquals(1, estimates.size)
+    }
+
+    private suspend fun stubRootObservation(
+        blocks: Flow<BigInteger>,
+        assets: Flow<Asset>,
+        currentPreflight: () -> BittensorExitPreflight
+    ): AccountIdKey {
+        val wallet = mock(MetaAccount::class.java)
+        val token = mock(Token::class.java)
+        val chainAsset = mock(Chain.Asset::class.java)
+        `when`(chain.id).thenReturn("bittensor")
+        `when`(chain.assets).thenReturn(listOf(chainAsset))
+        `when`(chainAsset.id).thenReturn(0)
+        `when`(asset.token).thenReturn(token)
+        `when`(token.configuration).thenReturn(chainAsset)
+        `when`(registry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
+        `when`(accounts.getMetaAccount(1)).thenReturn(wallet)
+        `when`(wallet.id).thenReturn(1L)
+        `when`(wallet.type).thenReturn(LightMetaAccount.Type.SECRETS)
+        `when`(wallet.accountIdIn(chain)).thenReturn(hotkey.value)
+        `when`(wallets.assetFlow(1, chainAsset)).thenReturn(assets)
+        `when`(constants.existentialDeposit(chain.id)).thenReturn(BigInteger.ONE)
+        `when`(chainState.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blocks)
+        val validator = AccountIdKey(chain.accountIdOf(observedAddress))
+        `when`(runtime.preflight(chain.id, hotkey.value, validator.value, BittensorNetuid.Root)).thenAnswer { currentPreflight() }
+        return validator
     }
 
     private fun configureLoadedFee() {

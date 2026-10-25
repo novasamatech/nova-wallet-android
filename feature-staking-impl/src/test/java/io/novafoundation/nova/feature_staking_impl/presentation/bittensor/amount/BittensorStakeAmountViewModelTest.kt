@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStake
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorImmediateExecution
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
@@ -80,6 +82,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
@@ -110,11 +114,6 @@ class BittensorStakeAmountViewModelTest {
     private val repository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = assets
 
-        override fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails> {
-            explicitWallets += metaId
-            return explicitAssets
-        }
-
         override fun observeRootAccountDetails(metaId: Long): Flow<BittensorRootStakingDetails> = flow {
             explicitWallets += metaId
             rawBalanceLoads++
@@ -132,12 +131,18 @@ class BittensorStakeAmountViewModelTest {
 
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
+    private val presets = mock(BittensorPresetValidatorInteractor::class.java)
+
+    private var defaultValidator: BittensorValidator? = null
+
     private val interactor = BittensorStakingInteractor(
         repository,
+        presets,
         extrinsics,
         wallets,
         validators,
-        submission
+        submission,
+        mock(Logger::class.java)
     )
 
     private val router = mock(StakingRouter::class.java)
@@ -154,7 +159,7 @@ class BittensorStakeAmountViewModelTest {
 
     private val logger = mock(Logger::class.java)
 
-    private val retryController = BittensorRetryController(resources, logger)
+    private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
 
     private val amountFormatter = BittensorAmountFormatter(tokenFormatter, fiatFormatter, resources)
 
@@ -238,11 +243,11 @@ class BittensorStakeAmountViewModelTest {
     @Before
     fun prepare() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        `when`(resources.getString(R.string.bittensor_select_validator)).thenReturn("Choose validator")
+        `when`(resources.getString(R.string.bittensor_select_validator_title)).thenReturn("Select validator")
         `when`(resources.getString(R.string.common_continue)).thenReturn("Continue")
         `when`(resources.getString(R.string.common_enter_amount)).thenReturn("Enter amount")
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
-        `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
+        `when`(resources.getString(R.string.bittensor_load_failed_message)).thenReturn("Retry")
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(chainAsset.precision).thenReturn(Precision(9))
         `when`(chainAsset.chainId).thenReturn("bittensor")
@@ -256,6 +261,7 @@ class BittensorStakeAmountViewModelTest {
                 addressIcons.createAddressIcon(estimateValidator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
             )
                 .thenReturn(estimateIcon)
+            `when`(presets.rootPreset(eq(chain) ?: chain, anyList())).thenAnswer { defaultValidator }
         }
         createViewModel()
     }
@@ -365,14 +371,15 @@ class BittensorStakeAmountViewModelTest {
     fun `add stake caption requires an existing positive stake`() = runBlocking<Unit> {
         createViewModel(BittensorStakeAmountPayload(1L, null))
         val position = BittensorRootPosition(estimateValidator.hotkey, BigInteger("10000000"))
-        val details = details(10).copy(validator = estimateValidator, position = position)
+        defaultValidator = estimateValidator
+        val details = details(10).copy(positions = listOf(position))
         `when`(resources.getString(R.string.bittensor_adds_to_position, "0.010000000", "Validator"))
             .thenReturn("Adds to your 0.01 staked with Validator")
 
         withTimeout(3_000L) {
             explicitAssets.emit(details)
             assertEquals("Adds to your 0.01 staked with Validator", viewModel.addStakeCaption.first { it != null })
-            explicitAssets.emit(details.copy(position = position.copy(stakeInPlanks = BigInteger.ZERO)))
+            explicitAssets.emit(details.copy(positions = listOf(position.copy(stakeInPlanks = BigInteger.ZERO))))
             assertEquals(null, viewModel.addStakeCaption.first { it == null })
         }
     }
@@ -381,7 +388,9 @@ class BittensorStakeAmountViewModelTest {
     fun `fresh staking does not show the add stake caption`() = runBlocking<Unit> {
         withTimeout(3_000L) {
             val position = BittensorRootPosition(estimateValidator.hotkey, BigInteger("10000000"))
-            assets.emit(details(10).copy(validator = estimateValidator, position = position))
+            defaultValidator = estimateValidator
+            assets.emit(details(10).copy(positions = listOf(position)))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             assertEquals(null, viewModel.addStakeCaption.first())
         }
@@ -390,7 +399,9 @@ class BittensorStakeAmountViewModelTest {
     @Test
     fun `zero input retains a placeholder fee without enabling continue`() = runBlocking<Unit> {
         withTimeout(3_000L) {
-            assets.emit(details(10).copy(validator = estimateValidator))
+            defaultValidator = estimateValidator
+            assets.emit(details(10))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("0")
             val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
@@ -407,7 +418,9 @@ class BittensorStakeAmountViewModelTest {
     @Test
     fun `cleared input retains a placeholder fee and a new amount invalidates it`() = runBlocking<Unit> {
         withTimeout(3_000L) {
-            assets.emit(details(10).copy(validator = estimateValidator))
+            defaultValidator = estimateValidator
+            assets.emit(details(10))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("")
             val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
@@ -425,9 +438,31 @@ class BittensorStakeAmountViewModelTest {
     }
 
     @Test
+    fun `setup opens with an empty amount even when the balance is below the old suggestion`() = runBlocking {
+        withTimeout(3_000L) {
+            assets.emit(details(1))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.99")) == 0 }
+
+            assertEquals("", viewModel.amount.first())
+        }
+    }
+
+    @Test
+    fun `add stake opens with an empty amount instead of the full transferable balance`() = runBlocking {
+        createViewModel(BittensorStakeAmountPayload(1L, null))
+        withTimeout(3_000L) {
+            explicitAssets.emit(details(1))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.99")) == 0 }
+
+            assertEquals("", viewModel.amount.first())
+        }
+    }
+
+    @Test
     fun `a balance refresh does not repopulate an amount cleared by the user`() = runBlocking {
         withTimeout(3_000L) {
             assets.emit(details(10))
+            viewModel.amountChanged("5")
             viewModel.amount.first { it == "5" }
             viewModel.amountChanged("")
             viewModel.amount.first { it.isEmpty() }

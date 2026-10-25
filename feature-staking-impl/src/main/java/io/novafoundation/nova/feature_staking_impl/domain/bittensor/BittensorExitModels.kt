@@ -9,6 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import java.math.BigDecimal
+import kotlin.time.Duration
 
 data class BittensorExitPosition(
     val metaId: Long,
@@ -54,6 +55,24 @@ data class BittensorExitQuote(
             return average * average / spot
         }
 
+    val priceImpact: BittensorPriceImpact?
+        get() {
+            val spot = spotPrice ?: return null
+            return postTradePrice?.let { BittensorPriceImpact(spot, it) }
+        }
+
+    /** The pool price the sale leaves stays above [atLimit]. */
+    fun isFillable(atLimit: BigInteger): Boolean = postTradePrice?.let { it > atLimit } ?: false
+
+    /** A sale keeps the higher of the two limit prices. */
+    fun tighterLimit(than: BigInteger): BigInteger = requireNotNull(limitPrice).max(than)
+
+    /** The quote signed at [limit]. */
+    fun signedAt(limit: BigInteger): BittensorExitQuote = copy(
+        limitPrice = limit,
+        minimumTaoOut = requireNotNull(simulatedInput) * limit / BittensorProtocolUnits.RAO_PER_TAO
+    )
+
     init {
         require(slippageFraction.isNonNegative && slippageFraction < BigDecimal.ONE)
         require(fullExit || exitHotkeys.isEmpty())
@@ -63,7 +82,6 @@ data class BittensorExitQuote(
         require(groupHotkeys.all { it.value.size == 32 })
         require(amount.isPositive() && amount.bitLength() <= 64)
         require(serviceFee.isNonNegative && minimumTaoOut > serviceFee)
-        require(estimatedTaoOut >= minimumTaoOut)
         if (netuid.isRoot()) {
             require(limitPrice == null && serviceFee == BigInteger.ZERO && estimatedTaoOut == amount)
         } else {
@@ -91,3 +109,6 @@ data class BittensorExitDraft(
 }
 
 data class BittensorExitRequest(val position: BittensorExitPosition, val quote: BittensorExitQuote)
+
+/** What the exit failure explanations name besides the validated payload: the selection's [maximum] and the root hold left. */
+data class BittensorExitFailureLimits(val maximum: BigInteger, val holdDuration: Duration?)

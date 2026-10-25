@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootC
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
 
 data class BittensorRootClaimState(
     val metaId: Long,
@@ -33,6 +34,9 @@ data class BittensorRootClaimState(
             }
             return if (selectedHotkey == null) candidates.firstOrNull() else candidates.singleOrNull { it.hotkey == selectedHotkey }
         }
+
+    /** The root stake once [claimed] rewards are restaked; an unknown root stake counts as none. */
+    fun stakeAfterClaim(claimed: BigInteger): BigInteger = (claims.rootStake ?: BigInteger.ZERO) + claimed
 }
 
 data class BittensorRootClaimDraft(

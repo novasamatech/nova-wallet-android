@@ -12,5 +12,12 @@ data class BittensorSubnetListState(
     val loading: Boolean
 )
 
-internal fun bittensorSubnetList(rootIcon: Icon, subnets: List<BittensorSubnetRowUi>): List<BittensorSubnetListItem> =
-    listOf(BittensorSubnetListItem.Root(rootIcon)) + subnets.map { BittensorSubnetListItem.Subnet(it) }
+/** A search with no matching subnet hides the root entry too, so the no-results state stands alone (as on iOS). */
+internal fun bittensorSubnetList(
+    rootIcon: Icon,
+    subnets: List<BittensorSubnetRowUi>,
+    searchHasNoMatches: Boolean = false
+): List<BittensorSubnetListItem> {
+    val root = if (searchHasNoMatches) emptyList() else listOf(BittensorSubnetListItem.Root(rootIcon))
+    return root + subnets.map { BittensorSubnetListItem.Subnet(it) }
+}

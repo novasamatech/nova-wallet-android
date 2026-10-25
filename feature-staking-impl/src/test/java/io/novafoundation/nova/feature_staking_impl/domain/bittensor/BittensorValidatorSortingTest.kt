@@ -107,20 +107,6 @@ class BittensorValidatorSortingTest {
     }
 
     @Test
-    fun `unavailable directory stays readable during recommendation recovery`() {
-        val row = validator("Unavailable", "10", selectable = false).copy(recommendationsAvailable = false)
-        val rows = sortBittensorValidators(
-            listOf(row),
-            BittensorValidatorSorting.APY,
-            null,
-            Locale.US,
-            hideUnusualApy = true,
-            includeUnavailable = true
-        )
-        assertEquals(listOf(row), rows)
-    }
-
-    @Test
     fun `inactive rows respect the unusual filter and return after removing it`() {
         val row = validator("Inactive", "10", selectable = false).copy(inactive = true)
         val filtered = sortBittensorValidators(

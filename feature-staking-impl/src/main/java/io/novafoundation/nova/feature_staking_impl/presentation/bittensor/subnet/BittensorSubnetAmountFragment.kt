@@ -62,6 +62,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         toolbar.setRightActionClickListener {
             viewModel.slippageClicked()
         }
+        toolbar.setRightIconVisible(viewModel.showsSlippageSettings)
+        subnetSectionTitle.text = viewModel.subnetSectionTitle
         onBackPressed { viewModel.back() }
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
         amount.setMaxActionAvailability(
@@ -126,6 +128,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         viewModel.monthlyEstimate.observe(monthlyTokens::showBittensorLoadingValue)
         projectedAveragePrice.isVisible = viewModel.existingPosition
         if (viewModel.existingPosition) {
+            viewModel.buyMoreTitle.observe(toolbar::setTitle)
             viewModel.averagePriceDescription.observe { description ->
                 projectedAveragePrice.setOnClickListener {
                     description?.let { showInfo(R.string.bittensor_exit_avg_buy_price, it) }
@@ -153,8 +156,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         viewModel.subnet.observe {
             selectedSubnetCard.isVisible = it != null || !viewModel.isQuickPick
             subnetName.text = it?.let {
-                val name = it.name.ifBlank { getString(R.string.bittensor_subnet_number, it.id.value) }
-                "\u200e" + it.displayName(name)
+                "\u200e" + it.displayName(requireContext())
             } ?: "—"
             subnetIcon.load(
                 it?.logoUrl,
@@ -181,5 +183,10 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
     ) {
         DescriptionBottomSheet(requireContext(), getString(title), message)
             .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onResume()
     }
 }

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorColdkeySwapValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorMinimumStakeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorOrderToleranceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteAvailabilityValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
@@ -119,7 +120,7 @@ class BittensorStakeValidationsTest {
     fun `fee reserve accepts exact maximum and rejects one rao above`() = runBlocking {
         val validation = BittensorStakeFeeReserveValidation()
         assertNull(validation.validate(payload.copy(amount = BigDecimal("0.989999990"))).notValidOrNull())
-        assertFailure(validation, payload.copy(amount = BigDecimal("0.989999991")), BittensorStakeValidationFailure.FEE_RESERVE)
+        assertFailure(validation, payload.copy(amount = BigDecimal("0.989999991")), BittensorStakeValidationFailure.FeeReserve(BigInteger.valueOf(989_999_990)))
     }
 
     @Test
@@ -128,7 +129,43 @@ class BittensorStakeValidationsTest {
         val quote = quote().copy(serviceFeeTaoInPlanks = BigInteger.TEN)
         val withPoolFee = quote.copy(simulation = quote.simulation.copy(taoFee = BigInteger.valueOf(20)))
         assertNull(validation.validate(payload.copy(amount = BigDecimal("0.000000130"), quote = withPoolFee)).notValidOrNull())
-        assertFailure(validation, payload.copy(amount = BigDecimal("0.000000129"), quote = withPoolFee), BittensorStakeValidationFailure.BELOW_MINIMUM_STAKE)
+        assertFailure(
+            validation,
+            payload.copy(amount = BigDecimal("0.000000129"), quote = withPoolFee),
+            BittensorStakeValidationFailure.BelowMinimumStake(BigInteger.valueOf(120))
+        )
+    }
+
+    @Test
+    fun `root minimum stake reports the bare network minimum`() = runBlocking {
+        val validation = BittensorMinimumStakeValidation()
+        assertNull(validation.validate(payload.copy(amount = BigDecimal("0.000000100"), quote = null)).notValidOrNull())
+        assertFailure(
+            validation,
+            payload.copy(amount = BigDecimal("0.000000099"), quote = null),
+            BittensorStakeValidationFailure.BelowMinimumStake(BigInteger.valueOf(100))
+        )
+    }
+
+    @Test
+    fun `subnet minimum stake is grossed up by the service fee and the reported amount passes`() = runBlocking {
+        val validation = BittensorMinimumStakeValidation()
+        val rate = BigDecimal("0.0085")
+        val commission = BittensorSubnetCommission(rate)
+        fun quoteFor(total: Long) = quote().let {
+            it.copy(
+                totalTaoInPlanks = BigInteger.valueOf(total),
+                serviceFeeTaoInPlanks = commission.feeFor(BigInteger.valueOf(total)),
+                serviceFeeRate = rate,
+                simulation = it.simulation.copy(taoFee = BigInteger.valueOf(20))
+            )
+        }
+        val failure = validation.validate(payload.copy(amount = BigDecimal("0.000000100"), quote = quoteFor(100))).notValidOrNull()?.reason
+        val required = (failure as BittensorStakeValidationFailure.BelowMinimumStake).requiredAmountInPlanks
+        assertEquals(BigInteger.valueOf(122), required)
+
+        val atRequired = payload.copy(amount = BigDecimal(required, 9), quote = quoteFor(required.toLong()))
+        assertNull(validation.validate(atRequired).notValidOrNull())
     }
 
     @Test
@@ -148,12 +185,41 @@ class BittensorStakeValidationsTest {
     }
 
     @Test
-    fun `slippage rejects equality with limit`() = runBlocking {
-        val validation = BittensorSlippageValidation()
+    fun `order that reaches its own limit is too large for the tolerance`() = runBlocking {
+        val validation = BittensorOrderToleranceValidation()
         val quote = quote()
         assertEquals(BigInteger.TEN.pow(9), quote.postTradePrice())
         assertNull(validation.validate(payload.copy(quote = quote)).notValidOrNull())
-        assertFailure(validation, payload.copy(quote = quote.copy(limitPrice = quote.postTradePrice())), BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED)
+        assertFailure(validation, payload.copy(quote = quote.copy(limitPrice = quote.postTradePrice())), BittensorStakeValidationFailure.SELF_IMPACT)
+    }
+
+    @Test
+    fun `market move past the limit is a warning`() = runBlocking {
+        val validation = BittensorSlippageValidation()
+        val quote = quote()
+        val moved = quote.copy(limitPrice = quote.postTradePrice())
+        assertNull(validation.validate(payload.copy(quote = quote, latestQuote = quote)).notValidOrNull())
+
+        val failure = validation.validate(payload.copy(quote = quote, latestQuote = moved)).notValidOrNull()
+
+        assertEquals(BittensorStakeValidationFailure.SlippageExceeded(quote, moved), failure?.reason)
+        assertEquals(DefaultFailureLevel.WARNING, failure?.level)
+    }
+
+    @Test
+    fun `unread market blocks a subnet stake`() = runBlocking {
+        val validation = BittensorSlippageValidation()
+        val failure = validation.validate(payload.copy(quote = quote(), latestQuote = null)).notValidOrNull()
+
+        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, failure?.reason)
+        assertEquals(DefaultFailureLevel.ERROR, failure?.level)
+    }
+
+    @Test
+    fun `self impacting order is reported before the balance`() = runBlocking {
+        val quote = quote()
+        val value = payload.copy(netuid = quote.subnetId, quote = quote.copy(limitPrice = quote.postTradePrice()), amount = BigDecimal("1.1"))
+        assertEquals(BittensorStakeValidationFailure.SELF_IMPACT, system.validate(value).getOrThrow().notValidOrNull()?.reason)
     }
 
     @Test
@@ -163,7 +229,7 @@ class BittensorStakeValidationsTest {
         val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
         val value = payload.copy(quote = highImpact)
         val failure = validation.validate(value).notValidOrNull()
-        assertEquals(BittensorStakeValidationFailure.HIGH_PRICE_IMPACT, failure?.reason)
+        assertEquals(BittensorStakeValidationFailure.HighPriceImpact(highImpact), failure?.reason)
         assertEquals(DefaultFailureLevel.WARNING, failure?.level)
         assertNull(validation.validate(value.copy(priceImpactAccepted = true)).notValidOrNull())
     }
@@ -174,6 +240,39 @@ class BittensorStakeValidationsTest {
         val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
         val value = payload.copy(quote = highImpact, preflight = snapshot.copy(safeModeActive = true))
         assertEquals(BittensorStakeValidationFailure.SAFE_MODE_ACTIVE, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+    }
+
+    @Test
+    fun `missing subnet quote is reported before the balance`() = runBlocking {
+        val value = payload.copy(netuid = BittensorNetuid.Subnet(1), amount = BigDecimal("1.1"))
+        assertEquals(BittensorStakeValidationFailure.QUOTE_UNAVAILABLE, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+    }
+
+    @Test
+    fun `inactive validator warning comes before price impact warning`() = runBlocking {
+        val quote = quote()
+        val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
+        val value = payload.copy(netuid = quote.subnetId, quote = highImpact, latestQuote = highImpact, inactiveValidator = true)
+
+        assertEquals(BittensorStakeValidationFailure.INACTIVE_VALIDATOR, system.validate(value).getOrThrow().notValidOrNull()?.reason)
+        assertEquals(
+            BittensorStakeValidationFailure.HighPriceImpact(highImpact),
+            system.validate(value.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull()?.reason
+        )
+    }
+
+    @Test
+    fun `market move warning comes after price impact warning`() = runBlocking {
+        val quote = quote()
+        val highImpact = quote.copy(simulation = quote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
+        val moved = highImpact.copy(limitPrice = highImpact.postTradePrice())
+        val value = payload.copy(netuid = quote.subnetId, quote = highImpact, latestQuote = moved)
+
+        assertEquals(BittensorStakeValidationFailure.HighPriceImpact(moved), system.validate(value).getOrThrow().notValidOrNull()?.reason)
+        assertEquals(
+            BittensorStakeValidationFailure.SlippageExceeded(highImpact, moved),
+            system.validate(value.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()?.reason
+        )
     }
 
     @Test
@@ -195,7 +294,7 @@ class BittensorStakeValidationsTest {
         assertEquals(BigInteger.valueOf(303), exactBoundary.postTradePrice())
         assertNull(validation.validate(payload.copy(quote = exactBoundary)).notValidOrNull())
         val aboveBoundary = exactBoundary.copy(simulation = exactBoundary.simulation.copy(amountIn = BigInteger.valueOf(302)))
-        assertFailure(validation, payload.copy(quote = aboveBoundary), BittensorStakeValidationFailure.HIGH_PRICE_IMPACT)
+        assertFailure(validation, payload.copy(quote = aboveBoundary), BittensorStakeValidationFailure.HighPriceImpact(aboveBoundary))
     }
 
     @Test
@@ -219,7 +318,7 @@ class BittensorStakeValidationsTest {
         assertFailure(
             validation,
             payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
-            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED
+            BittensorStakeValidationFailure.SlippageExceeded(reviewedQuote, latestQuote)
         )
     }
 
@@ -232,7 +331,7 @@ class BittensorStakeValidationsTest {
         assertFailure(
             validation,
             payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
-            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED
+            BittensorStakeValidationFailure.SlippageExceeded(reviewedQuote, latestQuote)
         )
     }
 
@@ -269,7 +368,7 @@ class BittensorStakeValidationsTest {
         assertFailure(
             validation,
             payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
-            BittensorStakeValidationFailure.HIGH_PRICE_IMPACT
+            BittensorStakeValidationFailure.HighPriceImpact(latestQuote)
         )
     }
 

@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.launchIn
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -9,7 +7,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.formatPercents
@@ -17,8 +14,6 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
-import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
@@ -27,13 +22,11 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -45,32 +38,22 @@ class SwapOptionsViewModel(
     private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
     private val swapInteractor: SwapInteractor,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val slippageAlertMixinFactory: SlippageAlertMixinFactory,
-    private val payload: SlippageSettingsPayload?,
-    private val slippageSettingsCommunicator: SlippageSettingsCommunicator
+    private val slippageAlertMixinFactory: SlippageAlertMixinFactory
 ) : BaseViewModel(), DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
-    val title = resourceManager.getString(if (payload == null) R.string.swap_settings_title else R.string.common_settings)
-
-    private val swapSettingState = async(start = CoroutineStart.LAZY) {
+    private val swapSettingState = async {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
     }
 
-    private val swapSettingsStateFlow = flowOfAll {
-        if (payload != null) flowOf(SwapSettings(slippage = payload.selected.fractions)) else swapSettingState.await().selectedOption
-    }
+    private val swapSettingsStateFlow = flowOfAll { swapSettingState.await().selectedOption }
         .shareInBackground()
 
-    private val slippageConfig = flowOfAll {
-        payload?.let { flowOf(it.config()) } ?: swapSettingsStateFlow
-            .mapNotNull { it.assetIn ?: it.assetOut }
-            .mapNotNull { swapInteractor.slippageConfig(it.chainId) }
-    }
+    private val slippageConfig = swapSettingsStateFlow
+        .mapNotNull { it.assetIn ?: it.assetOut }
+        .mapNotNull { swapInteractor.slippageConfig(it.chainId) }
         .shareInBackground()
 
     val slippageInput = MutableStateFlow("")
-
-    private var selectedMethod: Pair<String, SlippageSettingsCommunicator.Method>? = null
 
     private val slippageFieldValidator = slippageConfig.map { slippageFieldValidatorFactory.create(it) }
         .shareInBackground()
@@ -100,9 +83,6 @@ class SwapOptionsViewModel(
         .mapList { it.formatPercents() }
 
     init {
-        slippageInput.onEach { value ->
-            if (selectedMethod?.first != value) selectedMethod = null
-        }.launchIn(this)
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
@@ -119,9 +99,7 @@ class SwapOptionsViewModel(
     fun tipClicked(index: Int) {
         launch {
             val slippageTips = slippageConfig.first().slippageTips
-            val value = slippageTips[index].formatPercents(includeSymbol = false)
-            selectedMethod = value to SlippageSettingsCommunicator.Method.PRESET
-            slippageInput.value = value
+            slippageInput.value = slippageTips[index].formatPercents(includeSymbol = false)
         }
     }
 
@@ -130,18 +108,12 @@ class SwapOptionsViewModel(
             val slippage = slippageInput.value.formatToPercent() ?: return@launch
             val config = slippageConfig.first()
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
-            if (payload != null) {
-                val method = selectedMethod?.takeIf { it.first == slippageInput.value }?.second ?: SlippageSettingsCommunicator.Method.CUSTOM
-                slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method))
-            } else {
-                swapSettingState.await().setSlippage(slippage)
-            }
+            swapSettingState.await().setSlippage(slippage)
             swapRouter.back()
         }
     }
 
     fun resetClicked() {
-        selectedMethod = "" to SlippageSettingsCommunicator.Method.RESET
         slippageInput.value = ""
     }
 

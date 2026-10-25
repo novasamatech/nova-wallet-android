@@ -1,12 +1,13 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
-import androidx.navigation.NavOptions
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment
@@ -37,6 +38,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
@@ -73,10 +76,11 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class RelayStakingNavigator(
-    navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
     private val stakingDashboardRouter: StakingDashboardRouter,
-    private val dAppRouter: DAppRouter
+    private val dAppRouter: DAppRouter,
+    private val portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator
 ) : BaseNavigator(navigationHoldersRegistry), StakingRouter {
 
     override fun returnToStakingMain() {
@@ -314,6 +318,15 @@ class RelayStakingNavigator(
     }
 
     override fun openStakingDashboard(target: StakingDeepLinkTarget?) {
+        val splitScreen = navigationHoldersRegistry.splitScreenNavigationHolder.navController
+        if (splitScreen?.isShowingDialog() == true) return
+        val rootScreen = navigationHoldersRegistry.rootNavigationHolder.navController?.currentDestination?.id
+        if (!canPresentStakingDeepLink(rootScreen, splitScreen?.backStackIdsWithGraphs())) return
+
+        // Only browse screens are left above the main screen here; drop them as iOS pops the staking tab to its root.
+        navigationBuilder().action(R.id.back_to_main)
+            .navigateInFirstAttachedContext()
+
         if (currentDestination?.id != R.id.mainFragment) {
             navigationBuilder().action(R.id.action_open_split_screen)
                 .navigateInFirstAttachedContext()
@@ -371,6 +384,12 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openBittensorValidatorInfo(payload: BittensorValidatorInfoPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_validator_info)
+            .setArgs(BittensorValidatorInfoFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openBittensorSubnetPosition(
         payload: BittensorSubnetPositionPayload
     ) {
@@ -391,23 +410,36 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorPortfolio(
-        source: StakingPortfolioSource,
-        entry: BittensorPortfolioEntry
-    ) {
+    override fun openBittensorPortfolio(payload: BittensorPortfolioPayload) {
         navigationBuilder().action(R.id.action_open_bittensor_portfolio)
-            .setArgs(BittensorPortfolioFragment.sourceBundle(source, entry))
+            .setArgs(BittensorPortfolioFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 
-    override fun replaceBittensorPortfolioWithStart(
-        payload: StartStakingLandingPayload
-    ) {
-        val options = NavOptions.Builder().setPopUpTo(R.id.bittensorPortfolioFragment, true).build()
-        navigationBuilder().action(R.id.action_mainFragment_to_startStackingLanding)
+    override fun openBittensorStartStaking(payload: StartStakingLandingPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_start_staking)
             .setArgs(StartStakingLandingFragment.getBundle(payload))
-            .setNavOptions(options)
             .navigateInFirstAttachedContext()
+    }
+
+    override fun finishBittensorFlow(exit: BittensorFlowExit) {
+        val navController = navigationHoldersRegistry.splitScreenNavigationHolder.navController ?: return
+
+        when (val plan = planBittensorFlowExit(exit, navController.backStackDestinationIds())) {
+            is BittensorFlowExitPlan.PopTo -> {
+                navController.popBackStack(plan.destination, false)
+                if (plan.openWhereToStake) openBittensorWhereToStake()
+            }
+
+            BittensorFlowExitPlan.ReturnToPortfolio -> {
+                navController.popBackStack(R.id.bittensorPortfolioFragment, false)
+                portfolioReopenCommunicator.respond(BittensorPortfolioReopenCommunicator.Response(StakingPortfolioSource.RESULT))
+            }
+
+            BittensorFlowExitPlan.OpenPortfolioOverDashboard -> navigationBuilder().action(R.id.action_finish_bittensor_flow_to_portfolio)
+                .setArgs(BittensorPortfolioFragment.getBundle(BittensorPortfolioPayload(StakingPortfolioSource.RESULT)))
+                .navigateInFirstAttachedContext()
+        }
     }
 
     override fun openBittensorRootDetails() {

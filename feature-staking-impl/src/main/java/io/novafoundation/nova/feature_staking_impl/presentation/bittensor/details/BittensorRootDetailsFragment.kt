@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorRootDetailsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 
@@ -27,7 +28,7 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
             .bittensorDetailsComponentFactory()
-            .create(this)
+            .create(this, portfolioPayload = null)
             .inject(this)
     }
 
@@ -46,6 +47,7 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
 
     override fun subscribe(viewModel: BittensorRootDetailsViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
+        observeActionBottomSheet(viewModel.walletGate)
         setupExternalActions(viewModel)
         viewModel.isLoading.observe {
             loading.isVisible = it

@@ -1,11 +1,38 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import android.content.Context
 import coil.request.ImageRequest
+import io.novafoundation.nova.common.resources.ResourceManager
 import coil.transform.CircleCropTransformation
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
+
+/** The subnet name for any sentence or title; an unnamed subnet reads "Subnet <netuid>" (as on iOS), never blank. */
+fun BittensorSubnet.title(resources: ResourceManager): String = title { resources.getString(R.string.bittensor_subnet_number, it) }
+
+fun BittensorSubnet.title(context: Context): String = title { context.getString(R.string.bittensor_subnet_number, it) }
+
+internal inline fun BittensorSubnet.title(subnetNumber: (Int) -> String): String = name.ifBlank { subnetNumber(id.value) }
+
+/** The title of subnet [netuid], also while its metadata is unavailable. */
+fun BittensorSubnet?.title(netuid: Int, resources: ResourceManager): String {
+    return this?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, netuid)
+}
+
+/** The display name of subnet [netuid], also while its metadata is unavailable. */
+fun BittensorSubnet?.displayName(netuid: Int, resources: ResourceManager): String {
+    return this?.displayName(resources) ?: resources.getString(R.string.bittensor_subnet_number, netuid)
+}
+
+/** The alpha symbol of subnet [netuid], "SN<netuid>" when it has none, as iOS `SubtensorSubnetNaming.symbol`. */
+fun BittensorSubnet?.alphaSymbol(netuid: Int): String = this?.symbol?.takeIf { it.isNotBlank() } ?: "SN$netuid"
+
+/** Title followed by the alpha symbol, e.g. "Chutes ش" or "Subnet 42 ش". */
+fun BittensorSubnet.displayName(resources: ResourceManager): String = displayName(title(resources))
+
+fun BittensorSubnet.displayName(context: Context): String = displayName(title(context))
 
 fun BittensorSubnet.displayName(fallback: String): String {
     return listOf(name.ifBlank { fallback }, symbol).filter(String::isNotBlank).joinToString(" ")

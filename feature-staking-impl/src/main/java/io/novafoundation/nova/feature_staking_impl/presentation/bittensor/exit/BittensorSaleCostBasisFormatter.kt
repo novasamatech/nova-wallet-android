@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.isNegative
@@ -45,12 +46,34 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
             }
         }
         if (token == null) return AmountModel("—", null)
-        return AmountModel(
-            tokenFormatter.formatToken(totals.averagePrice, token.configuration.symbol),
-            alphaSymbol?.takeIf { it.isNotBlank() }
-                ?.let { resources.getString(R.string.bittensor_avg_buy_price_per, it) }
-        )
+        return averagePriceOf(totals, token, alphaSymbol)
     }
+
+    fun averagePrice(sale: BittensorSaleCostBasis, position: BittensorExitPosition?): AmountModel {
+        return averagePrice(sale, position?.asset?.token, position?.let { it.subnet.alphaSymbol(it.netuid.value) })
+    }
+
+    fun averagePrice(sale: BittensorSaleCostBasis, token: TokenBase?, alphaSymbol: String?): AmountModel = when (sale) {
+        is BittensorSaleCostBasis.Known -> token?.let { averagePriceOf(sale.totals, it, alphaSymbol) } ?: AmountModel("—", null)
+        BittensorSaleCostBasis.NoPurchases -> AmountModel(
+            resources.getString(R.string.common_not_available),
+            resources.getString(R.string.bittensor_no_purchases)
+        )
+        BittensorSaleCostBasis.Unknown -> AmountModel("—", null)
+    }
+
+    /** Earned needs settled totals: a still-settling history may miss the latest purchase. */
+    fun profit(sale: BittensorSaleCostBasis?, quote: BittensorExitQuote?, token: TokenBase?): BittensorSaleProfitUi {
+        val totals = (sale as? BittensorSaleCostBasis.Known)?.takeIf { it.settled }?.totals
+        if (totals == null || quote == null) return profit(null, null)
+        return profit(token?.amountFromPlanks(estimatedSaleProfit(totals, quote)), token)
+    }
+
+    private fun averagePriceOf(totals: BittensorEstimatedPurchaseTotals, token: TokenBase, alphaSymbol: String?) = AmountModel(
+        tokenFormatter.formatToken(totals.averagePrice, token.configuration.symbol),
+        alphaSymbol?.takeIf { it.isNotBlank() }
+            ?.let { resources.getString(R.string.bittensor_avg_buy_price_per, it) }
+    )
 
     fun projectedAveragePrice(
         basis: BittensorEstimatedCostBasis?,

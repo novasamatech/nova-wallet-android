@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
-import io.novafoundation.nova.analytics.StakingPortfolioSource
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
 import io.novafoundation.nova.analytics.AnalyticsService
 
 import androidx.fragment.app.Fragment
@@ -33,7 +31,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioRowMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
@@ -84,10 +85,10 @@ class BittensorDetailsModule {
     @IntoMap
     @ViewModelKey(BittensorDetailsViewModel::class)
     fun provideViewModel(
-        fragment: Fragment,
         analytics: AnalyticsService,
         bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
+        portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
         resources: ResourceManager,
         amountFormatter: BittensorAmountFormatter,
         rowMapper: BittensorPortfolioRowMapper,
@@ -96,10 +97,13 @@ class BittensorDetailsModule {
         retryController: BittensorRetryController,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
         rowInteractor: BittensorPortfolioRowInteractor,
-        rootClaimInteractor: BittensorRootClaimInteractor
+        rootClaimInteractor: BittensorRootClaimInteractor,
+        walletGate: BittensorWalletGate,
+        portfolioPayload: BittensorPortfolioPayload?
     ): ViewModel = BittensorDetailsViewModel(
         analytics, bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
+        portfolioReopenCommunicator = portfolioReopenCommunicator,
         resources = resources,
         amountFormatter = amountFormatter,
         rowMapper = rowMapper,
@@ -109,10 +113,8 @@ class BittensorDetailsModule {
         chartAxisFormatterFactory = chartAxisFormatterFactory,
         rowInteractor = rowInteractor,
         rootClaimInteractor = rootClaimInteractor,
-        analyticsSource = StakingPortfolioSource.entries.firstOrNull {
-            it.name == fragment.arguments?.getString(BittensorPortfolioFragment.ANALYTICS_SOURCE)
-        } ?: StakingPortfolioSource.DASHBOARD,
-        entry = BittensorPortfolioFragment.entryFrom(fragment.arguments)
+        walletGate = walletGate,
+        analyticsSource = requireNotNull(portfolioPayload).source
     )
 
     @Provides
@@ -134,7 +136,8 @@ class BittensorDetailsModule {
         slippageSettings: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings,
         rootValidatorSource: BittensorRootValidatorSource,
         rootHoldFormatter: BittensorRootHoldFormatter,
-        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
+        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings,
+        walletGate: BittensorWalletGate
     ): ViewModel = BittensorRootDetailsViewModel(
         analytics, interactor,
         router,
@@ -150,7 +153,8 @@ class BittensorDetailsModule {
         slippageSettings = slippageSettings,
         rootValidatorSource = rootValidatorSource,
         rootHoldFormatter = rootHoldFormatter,
-        debugSettings = debugSettings
+        debugSettings = debugSettings,
+        walletGate = walletGate
     )
 
     @Provides

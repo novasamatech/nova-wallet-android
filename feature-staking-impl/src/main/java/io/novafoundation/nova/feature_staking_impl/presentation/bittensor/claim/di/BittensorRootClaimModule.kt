@@ -29,7 +29,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 
 @Module(includes = [ViewModelModule::class])
@@ -61,7 +60,6 @@ class BittensorRootClaimModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         @Named("BittensorClaimDuration") durationFormatter: DurationFormatter,
         amountFormatter: BittensorAmountFormatter,
-        rootValidatorSource: BittensorRootValidatorSource,
         debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
     ): ViewModel =
         BittensorRootClaimViewModel(
@@ -81,7 +79,6 @@ class BittensorRootClaimModule {
             feeLoaderMixinFactory,
             durationFormatter,
             amountFormatter,
-            rootValidatorSource,
             debugSettings
         )
 

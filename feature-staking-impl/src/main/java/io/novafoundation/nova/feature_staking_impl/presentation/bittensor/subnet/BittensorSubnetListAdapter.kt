@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.images.setIcon
@@ -57,20 +55,19 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetRowUi) = with(binding) {
             val subnet = item.subnet
-            val name = subnet.name.ifBlank { root.context.getString(R.string.bittensor_subnet_number, subnet.id.value) }
-            title.text = "\u200e" + subnet.displayName(name)
+            title.text = "\u200e" + subnet.displayName(root.context)
             price.text = item.price
-            val summary = item.weeklySummary.dataOrNull
-            change.text = summary?.let {
-                root.context.getString(
+            val weeklyChange = item.weeklyChange
+            val summary = (weeklyChange as? BittensorSubnetWeeklyChange.Available)?.summary
+            change.text = when (weeklyChange) {
+                BittensorSubnetWeeklyChange.Loading -> null
+                BittensorSubnetWeeklyChange.NotListed -> root.context.getString(R.string.bittensor_no_price_history)
+                BittensorSubnetWeeklyChange.Unavailable -> "—"
+                is BittensorSubnetWeeklyChange.Available -> root.context.getString(
                     R.string.bittensor_weekly_change,
-                    it.changePercent.formatAsChange(),
+                    weeklyChange.summary.changePercent.formatAsChange(),
                     root.context.getString(R.string.bittensor_chart_week)
                 )
-            } ?: when (item.weeklySummary) {
-                ExtendedLoadingState.Loading -> null
-                is ExtendedLoadingState.Error -> root.context.getString(R.string.common_not_available)
-                is ExtendedLoadingState.Loaded -> root.context.getString(R.string.bittensor_no_price_history)
             }
             change.setTextColorRes(
                 when {

@@ -37,7 +37,12 @@ import kotlinx.coroutines.withTimeout
 
 data class BittensorPositionState(val positions: BittensorStakePositions?, val status: BittensorDataStatus)
 
-data class BittensorPortfolioState(val positions: BittensorPortfolioPositions?, val status: BittensorDataStatus)
+/** [pricesPending] stays true until a price request for the held subnets completes, even unsuccessfully. */
+data class BittensorPortfolioState(
+    val positions: BittensorPortfolioPositions?,
+    val status: BittensorDataStatus,
+    val pricesPending: Boolean = false
+)
 
 interface BittensorPositionRepository {
 
@@ -57,7 +62,8 @@ class RealBittensorPositionRepository(
 
     private data class PortfolioPrices(
         val heldSubnets: Set<BittensorNetuid.Subnet>,
-        val prices: Map<BittensorNetuid.Subnet, BigInteger>
+        val prices: Map<BittensorNetuid.Subnet, BigInteger>,
+        val loaded: Boolean
     )
 
     override fun observePositions(chainId: ChainId, coldKey: AccountId): Flow<BittensorPositionState> = flow {
@@ -143,7 +149,7 @@ class RealBittensorPositionRepository(
     private fun observePrices(chainId: ChainId, positions: Flow<BittensorPositionState>): Flow<PortfolioPrices> = channelFlow {
         var requestedSubnets = emptySet<BittensorNetuid.Subnet>()
         var priceJob: Job? = null
-        send(PortfolioPrices(emptySet(), emptyMap()))
+        send(PortfolioPrices(emptySet(), emptyMap(), loaded = false))
 
         positions.collect { state ->
             val heldSubnets = portfolioLoader.heldSubnets(state.positions)
@@ -151,27 +157,27 @@ class RealBittensorPositionRepository(
                 priceJob?.cancel()
                 priceJob = null
                 requestedSubnets = heldSubnets
-                send(PortfolioPrices(heldSubnets, emptyMap()))
+                send(PortfolioPrices(heldSubnets, emptyMap(), loaded = false))
             }
 
             // Keep an in-flight request for the same held set. Amount/status updates
             // reach the independent combine immediately, without waiting for prices.
             if (state.status is BittensorDataStatus.Fresh && heldSubnets.isNotEmpty() && priceJob?.isActive != true) {
                 priceJob = launch {
-                    val loaded = portfolioLoader.loadPrices(chainId, heldSubnets)
+                    val prices = portfolioLoader.loadPrices(chainId, heldSubnets)
                     ensureActive()
-                    send(PortfolioPrices(heldSubnets, loaded))
+                    send(PortfolioPrices(heldSubnets, prices, loaded = true))
                 }
             }
         }
     }
 
     private fun valueLatestPositions(state: BittensorPositionState, prices: PortfolioPrices): BittensorPortfolioState {
-        val positions = state.positions?.let {
-            val matchingPrices = if (portfolioLoader.heldSubnets(it) == prices.heldSubnets) prices.prices else emptyMap()
-            portfolioLoader.value(it, matchingPrices)
-        }
-        return BittensorPortfolioState(positions, state.status)
+        val heldSubnets = portfolioLoader.heldSubnets(state.positions)
+        val matching = heldSubnets == prices.heldSubnets
+        val positions = state.positions?.let { portfolioLoader.value(it, if (matching) prices.prices else emptyMap()) }
+        val pricesPending = heldSubnets.isNotEmpty() && !(matching && prices.loaded)
+        return BittensorPortfolioState(positions, state.status, pricesPending)
     }
 
     private companion object {

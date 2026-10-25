@@ -8,6 +8,10 @@ import kotlinx.parcelize.Parcelize
 class BittensorSubnetAmountPayload(
     val subnetId: Int? = null,
     val validatorAddress: String? = null,
+    /** True when [validatorAddress] is the automatic preset shown on subnet details rather than the user's choice. */
+    val validatorIsPreset: Boolean = false,
+    /** The automatic preset subnet details showed, also when the user picked another validator there. */
+    val recommendedAddress: String? = null,
     val existingPosition: Boolean = false,
     val replaceAmount: Boolean = false,
     val quickPickOrder: BittensorQuickPickOrder? = null,

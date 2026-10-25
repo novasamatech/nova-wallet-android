@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getSocket
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -18,6 +19,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
+import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlinx.coroutines.async
@@ -29,6 +31,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 interface BittensorRootClaimSource {
     suspend fun claims(chainId: String, coldkey: AccountId): BittensorRootClaims
+
+    /** Previews and the claim minimum only: the root claim reads made with every stake state. */
+    suspend fun claimPreviews(chainId: String, coldkey: AccountId): BittensorRootClaims
 
     fun observe(chainId: String, coldkey: AccountId): Flow<BittensorRootClaimSnapshot>
 }
@@ -54,15 +59,9 @@ class RealBittensorRootClaimSource(
         }
     }
 
-    override suspend fun claims(chainId: String, coldkey: AccountId): BittensorRootClaims = withTimeoutOrNull(25_000) {
+    override suspend fun claims(chainId: String, coldkey: AccountId): BittensorRootClaims {
         val readStartedAt = clock.nowMillis()
-        val hash = rpcCalls.getBlockHash(chainId)
-        val socket = chainRegistry.getSocket(chainId)
-        storage.query(
-            chainId,
-            at = hash,
-            applyStorageDefault = false
-        ) {
+        return queryAtLatestBlock(chainId) { socket, hash ->
             coroutineScope {
                 val pallet = runtime.metadata.module("SubtensorModule")
                 val coldkeySwap = async {
@@ -77,15 +76,7 @@ class RealBittensorRootClaimSource(
                         ?.storageOrNull("EnteredUntil")
                         ?.query(binding = { it })
                 }
-                val threshold = async {
-                    pallet.storage("RootClaimableThreshold")
-                        .query(
-                            BigInteger.ZERO,
-                            binding = { value ->
-                                value?.let { bindNumber(it.castToStruct()["bits"]) }
-                            }
-                        )
-                }
+                val threshold = async { rootClaimableThreshold() }
                 val rootStake = async {
                     val positions = callBittensorRuntimeApi(
                         socket = socket,
@@ -101,14 +92,7 @@ class RealBittensorRootClaimSource(
                         .query(binding = ::bindNumberOrZero)
                     blocks * chainStateRepository.expectedBlockTimeInMillis(chainId)
                 }
-                val decoded = callBittensorRuntimeApi(
-                    socket = socket,
-                    blockHash = hash,
-                    section = "BetaBasketRuntimeApi",
-                    method = "get_root_basket_claim_previews",
-                    arguments = listOf(coldkey)
-                )
-                val previews = bindBittensorRootClaimPreviews(decoded)
+                val previews = rootClaimPreviews(socket, hash, coldkey)
                 BittensorRootClaims(
                     previews = previews,
                     minimum = bittensorMinimumRootClaim(threshold.await()),
@@ -120,5 +104,44 @@ class RealBittensorRootClaimSource(
                 )
             }
         }
-    } ?: error("Root claim availability timed out")
+    }
+
+    override suspend fun claimPreviews(chainId: String, coldkey: AccountId): BittensorRootClaims = queryAtLatestBlock(chainId) { socket, hash ->
+        coroutineScope {
+            val threshold = async { rootClaimableThreshold() }
+            val previews = rootClaimPreviews(socket, hash, coldkey)
+            BittensorRootClaims(previews = previews, minimum = bittensorMinimumRootClaim(threshold.await()))
+        }
+    }
+
+    private suspend fun queryAtLatestBlock(
+        chainId: String,
+        query: suspend StorageQueryContext.(socket: SocketService, blockHash: String) -> BittensorRootClaims
+    ): BittensorRootClaims = withTimeoutOrNull(25_000) {
+        val hash = rpcCalls.getBlockHash(chainId)
+        val socket = chainRegistry.getSocket(chainId)
+        storage.query(chainId, at = hash, applyStorageDefault = false) { query(socket, hash) }
+    } ?: throw BittensorTimeoutException("Root claim availability")
+
+    private suspend fun StorageQueryContext.rootClaimableThreshold(): BigInteger? {
+        return runtime.metadata.module("SubtensorModule")
+            .storage("RootClaimableThreshold")
+            .query(
+                BigInteger.ZERO,
+                binding = { value ->
+                    value?.let { bindNumber(it.castToStruct()["bits"]) }
+                }
+            )
+    }
+
+    private suspend fun StorageQueryContext.rootClaimPreviews(socket: SocketService, blockHash: String, coldkey: AccountId): List<BittensorRootClaimPreview> {
+        val decoded = callBittensorRuntimeApi(
+            socket = socket,
+            blockHash = blockHash,
+            section = "BetaBasketRuntimeApi",
+            method = "get_root_basket_claim_previews",
+            arguments = listOf(coldkey)
+        )
+        return bindBittensorRootClaimPreviews(decoded)
+    }
 }

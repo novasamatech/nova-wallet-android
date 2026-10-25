@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.dp
@@ -23,7 +24,9 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetPositionBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
@@ -80,8 +83,9 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
     override fun subscribe(viewModel: BittensorSubnetPositionViewModel) = with(binder) {
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
+        observeActionBottomSheet(viewModel.walletGate)
         viewModel.subnet.observe { subnet ->
-            val name = subnet?.name?.ifBlank { subnet.symbol } ?: getString(R.string.bittensor_exit_position)
+            val name = subnet?.title(requireContext()) ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)
             subnetCaption.text = name
             subnetIcon.setIcon(
@@ -143,7 +147,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
                 sheet.setTitle(R.string.bittensor_exit_select_position)
                 choices.forEach { payload ->
                     val row = TableCellView.createTableCellView(requireContext())
-                    row.title.text = payload.hotkeyAddress
+                    row.title.text = payload.hotkeyAddress.ellipsizeAddress()
                     row.setOnClickListener {
                         sheet.dismiss()
                         viewModel.selectPosition(action, payload)

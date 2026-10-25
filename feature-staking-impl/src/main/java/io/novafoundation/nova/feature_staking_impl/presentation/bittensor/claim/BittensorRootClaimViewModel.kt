@@ -4,8 +4,7 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingPortfolioSource
-import io.novafoundation.nova.analytics.StakingResultAction
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -32,6 +31,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlin.time.Duration.Companion.milliseconds
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
@@ -47,19 +47,22 @@ import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
 import kotlinx.coroutines.TimeoutCancellationException
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.filterNotNull
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorClaimValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorPreSubmissionError
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorSubmissionError
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
@@ -71,7 +74,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
@@ -119,11 +125,19 @@ class BittensorRootClaimViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val durationFormatter: DurationFormatter,
     private val amountFormatter: BittensorAmountFormatter,
-    private val rootValidatorSource: BittensorRootValidatorSource,
     private val debugSettings: DebugSettings
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val confirmMutex = Mutex()
+
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.CLAIM,
+        StakingAnalyticsTarget.ROOT,
+        newPosition = false,
+        trackActions = !(BuildConfig.DEBUG && payload.previewOnly)
+    )
 
     private var isClaimInitiatedTracked = false
 
@@ -235,18 +249,21 @@ class BittensorRootClaimViewModel(
     private val validatorDetails = claimState.mapNotNull { it?.chain }
         .distinctUntilChanged()
         .flatMapLatest { chain ->
-            flowOf { rootValidatorSource.validatorDetails(chain) }.withSafeLoading()
+            flowOf { bittensorRootClaimInteractor.validatorDetails(chain) }.withSafeLoading()
         }
         .shareInBackground()
 
     val validator = combine(state, validatorDetails) { state, details ->
         state.map { claim ->
-            claim.selectedPreview?.let { preview ->
-                details.dataOrNull?.get(preview.hotkey)?.validator?.name?.takeIf { it.isNotBlank() }
-                    ?: claim.chain.addressOf(preview.hotkey.value).ellipsizeAddress()
-            } ?: "—"
+            claim.selectedPreview?.let { preview -> validatorName(claim, preview.hotkey, details.dataOrNull) } ?: "—"
         }
     }
+        .shareInBackground()
+
+    // Root validators of the account: the claim result names the validator when it is the only one.
+    private val rootHotkeys = claimState.filterNotNull()
+        .distinctUntilChangedBy { it.coldkey }
+        .flatMapLatest(bittensorRootClaimInteractor::observeRootHotkeys)
         .shareInBackground()
 
     val stakeAfterClaim = state.mapLoading { claim ->
@@ -255,8 +272,9 @@ class BittensorRootClaimViewModel(
         if (stake == null || preview == null) {
             null
         } else {
-            val before = tokenFormatter.formatToken(claim.asset.token.amountFromPlanks(stake), claim.asset.token.configuration.symbol)
-            val after = tokenFormatter.formatToken(claim.asset.token.amountFromPlanks(stake + preview.redeemable), claim.asset.token.configuration.symbol)
+            val token = claim.asset.token
+            val before = tokenFormatter.formatToken(token.amountFromPlanks(stake), token.configuration.symbol)
+            val after = tokenFormatter.formatToken(token.amountFromPlanks(claim.stakeAfterClaim(preview.redeemable)), token.configuration.symbol)
             "$before → ≈ $after"
         }
     }.shareInBackground()
@@ -472,7 +490,7 @@ class BittensorRootClaimViewModel(
             throw e
         } catch (e: Exception) {
             dismissed.value = false
-            execution.value = ClaimExecution.Result(e.mapBittensorPreSubmissionError().mapResult(resources))
+            execution.value = claimResult(e.mapBittensorPreSubmissionError().mapResult(resources))
         } finally {
             validating.value = false
             confirmMutex.unlock()
@@ -503,21 +521,13 @@ class BittensorRootClaimViewModel(
             val result = bittensorRootClaimInteractor.execute(draft, lease)
             operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.CLAIM)
             execution.value = when (result) {
-                is BittensorOperationResult.Success -> ClaimExecution.Result(
-                    BittensorStakeResultUi.Success(
-                        resources.getString(R.string.bittensor_claim_completed),
-                        resources.getString(R.string.bittensor_claim_completed_description),
-                        draft.state.chain.addressOf(draft.preview.hotkey.value),
-                        result.outcome.formatNetworkFee(draft.fee, draft.state.chain, resources, tokenFormatter),
-                        amount = formatBittensorNativeResult(result.outcome?.tao, draft.preview.redeemable, draft.state.chain, tokenFormatter)
-                    )
-                )
+                is BittensorOperationResult.Success -> ClaimExecution.Result(mapClaimed(draft, result.outcome))
                 is BittensorOperationResult.Failure -> if (result.isSigningCancelled) {
                     ClaimExecution.Idle
                 } else {
-                    ClaimExecution.Result(result.mapResult(resources))
+                    claimResult(result.mapResult(resources))
                 }
-                is BittensorOperationResult.Unknown -> ClaimExecution.Result(result.mapResult(resources))
+                is BittensorOperationResult.Unknown -> claimResult(result.mapResult(resources))
             }
         } catch (e: CancellationException) {
             throw e
@@ -526,38 +536,83 @@ class BittensorRootClaimViewModel(
             logger.log(e)
             val result = e.mapBittensorSubmissionError()
             operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.CLAIM)
-            execution.value = ClaimExecution.Result(result.mapResult(resources))
+            execution.value = claimResult(result.mapResult(resources))
         }
     }
 
-    fun resultDismissed() {
-        dismissed.value = true
-    }
-
-    fun done() {
-        resultDismissed()
-        if (!previewOnly) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.YOUR_BITTENSOR,
-                    StakingFlow.CLAIM,
-                    StakingAnalyticsTarget.ROOT
-                )
+    /** A claim that redeemed nothing only charged the fee and can only be closed. */
+    private suspend fun mapClaimed(draft: BittensorRootClaimDraft, outcome: BittensorOperationOutcome?): BittensorStakeResultUi {
+        val claim = draft.state
+        val fee = outcome.formatNetworkFee(draft.fee, claim.chain, resources, tokenFormatter)
+        val claimed = outcome?.tao
+        if (claimed != null && claimed.isZero) {
+            return BittensorStakeResultUi.Failure(
+                title = resources.getString(R.string.bittensor_claim_nothing_claimed),
+                description = resources.getString(R.string.bittensor_claim_fee_charged),
+                error = resources.getString(R.string.bittensor_claim_below_minimum_reason),
+                canRetry = false,
+                fee = fee
             )
         }
-        router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
+
+        val amount = formatBittensorNativeResult(claimed, draft.preview.redeemable, claim.chain, tokenFormatter).token
+        val stakeAfter = formatBittensorNativeResult(
+            claimed?.let(claim::stakeAfterClaim),
+            claim.stakeAfterClaim(draft.preview.redeemable),
+            claim.chain,
+            tokenFormatter
+        ).token.toString()
+        val groupHotkeys = rootHotkeys.replayCache.lastOrNull().orEmpty() + draft.preview.hotkey
+        val description = if (groupHotkeys.size == 1) {
+            val name = validatorName(claim, draft.preview.hotkey, validatorDetails.first().dataOrNull)
+            resources.getString(R.string.bittensor_claim_root_stake_now_with, stakeAfter, name)
+        } else {
+            resources.getString(R.string.bittensor_claim_root_stake_now, stakeAfter)
+        }
+
+        return BittensorStakeResultUi.Success(
+            title = resources.getString(R.string.bittensor_claim_success_title, amount),
+            description = description,
+            validator = null,
+            fee = fee,
+            outcome = outcome,
+            stakeAfter = stakeAfter,
+            actions = resultNavigation.landingActions()
+        )
     }
+
+    private fun claimResult(model: BittensorStakeResultUi): ClaimExecution.Result {
+        val landed = if (model is BittensorStakeResultUi.Unconfirmed) model.copy(actions = resultNavigation.landingActions()) else model
+        return ClaimExecution.Result(landed)
+    }
+
+    private fun validatorName(claim: BittensorRootClaimState, hotkey: AccountIdKey, details: Map<AccountIdKey, BittensorRootValidatorDetails>?): String =
+        details?.get(hotkey)?.validator?.name?.takeIf { it.isNotBlank() } ?: claim.chain.addressOf(hotkey.value).ellipsizeAddress()
+
+    /** A result sheet button; Try again hides the sheet so the claim can be confirmed again. */
+    fun resultActionClicked(action: BittensorResultAction) {
+        if (action !in resultModel()?.actions.orEmpty()) return
+
+        resultNavigation.activate(action) { dismissed.value = true }
+    }
+
+    private fun resultModel() = (execution.value as? ClaimExecution.Result)?.model
+
+    private fun isFinished() = resultModel().let { it is BittensorStakeResultUi.Success || it is BittensorStakeResultUi.Unconfirmed }
 
     fun validatorClicked() = launchUnit {
         prepared.first().dataOrNull?.let {
-            externalActions.showAddressActions(
-                it.state.chain.addressOf(it.preview.hotkey.value),
-                it.state.chain
+            router.openBittensorValidatorInfo(
+                BittensorValidatorInfoPayload(BittensorNetuid.Root.value, it.state.chain.addressOf(it.preview.hotkey.value))
             )
         }
     }
 
     fun back() {
-        if (execution.value !is ClaimExecution.Running && !dryRunRunning.value) router.back()
+        when {
+            execution.value is ClaimExecution.Running || dryRunRunning.value -> Unit
+            isFinished() -> resultNavigation.leave()
+            else -> router.back()
+        }
     }
 }

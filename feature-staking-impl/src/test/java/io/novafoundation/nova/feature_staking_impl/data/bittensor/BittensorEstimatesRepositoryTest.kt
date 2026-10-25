@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -33,7 +34,12 @@ class BittensorEstimatesRepositoryTest {
 
     private val computationalCache = mock(ComputationalCache::class.java)
 
-    private val historyRepository = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls, computationalCache)
+    private val historyRepository = BittensorOperationHistoryRepository(
+        remoteSource,
+        infrastructureUrls,
+        computationalCache,
+        mock(Preferences::class.java)
+    )
 
     private val yieldRepository = BittensorAlphaYieldRepository(remoteSource, infrastructureUrls)
 
@@ -94,13 +100,14 @@ class BittensorEstimatesRepositoryTest {
     }
 
     @Test
-    fun `stale history is rejected and never cached`() = runBlocking {
-        api.freshness = "STALE"
+    fun `unavailable history is rejected and never cached while stale history is served`() = runBlocking {
+        api.availability = "UNAVAILABLE"
         assertTrue(
             runCatching { history() }
                 .isFailure
         )
-        api.freshness = "FRESH"
+        api.availability = "AVAILABLE"
+        api.freshness = "STALE"
 
         assertTrue(
             history()
@@ -351,6 +358,8 @@ class BittensorEstimatesRepositoryTest {
 
         var freshness = "FRESH"
 
+        var availability = "AVAILABLE"
+
         var yieldCacheControl = "max-age=60"
 
         var failure: Exception? = null
@@ -359,7 +368,7 @@ class BittensorEstimatesRepositoryTest {
             historyPages += page
             beforeHistoryResponse()
             failure?.let { throw it }
-            val component = BittensorRecommendationsRemote.Component("AVAILABLE", freshness)
+            val component = BittensorRecommendationsRemote.Component(availability, freshness)
             val components = BittensorOperationsRemote.Components(component)
             val meta = BittensorOperationsRemote.Meta(components)
             val pageInfo = BittensorHistoryPageInfo(page, nextHistoryPage(page), historyPageSize)

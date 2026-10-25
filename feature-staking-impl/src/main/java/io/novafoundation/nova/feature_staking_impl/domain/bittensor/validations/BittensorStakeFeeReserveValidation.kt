@@ -13,6 +13,6 @@ class BittensorStakeFeeReserveValidation : BittensorStakeValidation {
     override suspend fun validate(value: BittensorStakeValidationPayload): ValidationStatus<BittensorStakeValidationFailure> {
         val networkFee = value.fee.maxAmountDeductionFor(value.asset.token.configuration)
         val maximumStake = maximumBittensorStake(value.asset.transferableInPlanks, networkFee)
-        return validOrError(value.asset.token.planksFromAmount(value.amount) <= maximumStake) { BittensorStakeValidationFailure.FEE_RESERVE }
+        return validOrError(value.asset.token.planksFromAmount(value.amount) <= maximumStake) { BittensorStakeValidationFailure.FeeReserve(maximumStake) }
     }
 }

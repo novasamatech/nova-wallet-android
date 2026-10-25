@@ -72,40 +72,40 @@ class StakingDeepLinkTargetTest {
         val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCING_ALL)
         val dashboard = StakingDashboard(emptyList(), listOf(option))
 
-        assertNull(resolveStakingDeepLink(target, dashboard))
+        assertNull(resolveStakingDeepLink(target, dashboard, waitingForSync = true))
     }
 
     @Test
-    fun `Bittensor without stake can navigate after primary synchronization`() {
+    fun `no stake waits only for primary synchronization`() {
         val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCING_SECONDARY)
         val dashboard = StakingDashboard(emptyList(), listOf(option))
 
-        assertSame(option, resolveStakingDeepLink(target, dashboard)?.option)
+        assertSame(option, resolveStakingDeepLink(target, dashboard, waitingForSync = true)?.option)
     }
 
     @Test
-    fun `Bittensor with stake can navigate after primary synchronization`() {
-        val option = AggregatedStakingDashboardOption(chain, token, hasStake, SyncingStage.SYNCING_SECONDARY)
-        val dashboard = StakingDashboard(listOf(option), emptyList())
-
-        assertSame(option, resolveStakingDeepLink(target, dashboard)?.option)
-    }
-
-    @Test
-    fun `other staking still waits for secondary synchronization`() {
+    fun `existing stake opens without waiting for synchronization`() {
         val state = HasStake(false, Chain.Asset.StakingType.RELAYCHAIN, null, ExtendedLoadingState.Loading)
-        val option = AggregatedStakingDashboardOption(chain, token, state, SyncingStage.SYNCING_SECONDARY)
+        val option = AggregatedStakingDashboardOption(chain, token, state, SyncingStage.SYNCING_ALL)
         val dashboard = StakingDashboard(listOf(option), emptyList())
 
-        assertNull(resolveStakingDeepLink(target, dashboard))
+        assertSame(option, resolveStakingDeepLink(target, dashboard, waitingForSync = true)?.option)
     }
 
     @Test
-    fun `existing stake takes the details route after sync`() {
-        val option = AggregatedStakingDashboardOption(chain, token, hasStake, SyncingStage.SYNCED)
-        val dashboard = StakingDashboard(listOf(option), emptyList())
+    fun `timed out link takes a still syncing no stake item`() {
+        val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCING_ALL)
+        val dashboard = StakingDashboard(emptyList(), listOf(option))
 
-        assertSame(option, resolveStakingDeepLink(target, dashboard)?.option)
+        assertSame(option, resolveStakingDeepLink(target, dashboard, waitingForSync = false)?.option)
+    }
+
+    @Test
+    fun `unresolved item never navigates`() {
+        val option = AggregatedStakingDashboardOption(chain, token, AggregatedStakingDashboardOption.NotYetResolved, SyncingStage.SYNCING_ALL)
+        val dashboard = StakingDashboard(emptyList(), listOf(option))
+
+        assertNull(resolveStakingDeepLink(target, dashboard, waitingForSync = false))
     }
 
     @Test
@@ -113,7 +113,7 @@ class StakingDeepLinkTargetTest {
         val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCED)
         val dashboard = StakingDashboard(emptyList(), listOf(option))
 
-        assertSame(option, resolveStakingDeepLink(target, dashboard)?.option)
+        assertSame(option, resolveStakingDeepLink(target, dashboard, waitingForSync = true)?.option)
     }
 
     @Test
@@ -121,7 +121,7 @@ class StakingDeepLinkTargetTest {
         val option = AggregatedStakingDashboardOption(chain, token, hasStake, SyncingStage.SYNCED)
         val dashboard = StakingDashboard(listOf(option), emptyList())
 
-        assertNull(resolveStakingDeepLink(target.copy(assetId = 1), dashboard))
-        assertNull(resolveStakingDeepLink(target.copy(chainId = "another"), dashboard))
+        assertNull(resolveStakingDeepLink(target.copy(assetId = 1), dashboard, waitingForSync = false))
+        assertNull(resolveStakingDeepLink(target.copy(chainId = "another"), dashboard, waitingForSync = false))
     }
 }

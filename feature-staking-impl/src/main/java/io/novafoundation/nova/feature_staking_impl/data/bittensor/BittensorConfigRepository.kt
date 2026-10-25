@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
-import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -30,8 +29,8 @@ class RemoteBittensorConfigRepository(
 
     override suspend fun config(): BittensorConfig {
         try {
-            return withTimeoutOrNull(15_000L) { cachedConfig() }
-                ?: throw IOException("Bittensor config request timed out")
+            return withTimeoutOrNull(CONFIG_TIMEOUT_MILLIS) { cachedConfig() }
+                ?: throw BittensorTimeoutException("Bittensor config request")
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -52,6 +51,8 @@ class RemoteBittensorConfigRepository(
         }
     }
 }
+
+private const val CONFIG_TIMEOUT_MILLIS = 30_000L
 
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())
 

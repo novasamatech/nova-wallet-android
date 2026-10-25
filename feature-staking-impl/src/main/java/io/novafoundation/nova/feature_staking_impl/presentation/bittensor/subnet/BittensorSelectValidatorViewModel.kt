@@ -10,8 +10,8 @@ import io.novafoundation.nova.analytics.AnalyticsService
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.address.AccountIdKey
 import java.math.BigDecimal
 import io.novafoundation.nova.common.domain.isLoading
@@ -27,15 +27,17 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectoryStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.toValidatorInfoDetail
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
@@ -43,11 +45,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import java.util.Locale
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 class BittensorSelectValidatorViewModel(
     private val analytics: AnalyticsService,
@@ -69,34 +74,54 @@ class BittensorSelectValidatorViewModel(
 
     val retryEvents = retryController.events
 
+    private var responded = false
+
     val filters = MutableStateFlow(request.selectionState.filtersFor(BittensorNetuid.from(request.subnetId)))
 
     private val query = MutableStateFlow("")
 
     private val netuid = BittensorNetuid.from(request.subnetId)
 
-    private val yields = retryController.observe(
-        step = "validator yields",
-        analytics = validatorsReads,
-        transform = { source ->
-            source.onStart { emit(emptyMap()) }.catch { cause ->
-                if (cause is CancellationException) throw cause
-                emit(emptyMap())
+    // Each filter state is its own read, so a failed read never stops a later filter change from reloading the yields.
+    // Null until a read succeeds; a failed read keeps the rates already shown.
+    private val yields = filters.map { it.hideUnusualApy }.distinctUntilChanged().flatMapLatest { hideUnusualApy ->
+        retryController.observe(
+            step = "validator yields",
+            analytics = validatorsReads,
+            transform = { source ->
+                source.catch { cause ->
+                    if (cause is CancellationException) throw cause
+                }
             }
-        }
-    ) {
-        filters.flatMapLatest { filter ->
-            flowOf { bittensorValidatorInteractor.yields(netuid, includeUnreliable = !filter.hideUnusualApy) }
+        ) {
+            flowOf<Map<AccountIdKey, BigDecimal>?> { bittensorValidatorInteractor.yields(netuid, includeUnreliable = !hideUnusualApy) }
         }
     }
+        .onStart { emit(null) }
         .shareInBackground()
 
-    private val validatorsState = observeBittensorValidatorDirectory(
+    private val directoryState = observeBittensorValidatorDirectory(
         retryController = retryController,
+        hideUnusualApy = filters.map { it.hideUnusualApy }.distinctUntilChanged(),
         loadDirectory = { bittensorValidatorInteractor.directory(netuid) },
         rankDirectory = { bittensorValidatorInteractor.rankDirectory(netuid, it) }
     )
-        .mapLoading { directory -> directory.validators.map { mapValidator(it) } }
+        .shareInBackground()
+
+    private val validatorsState = directoryState
+        .mapLoading { directory ->
+            BittensorValidatorRows(
+                rows = directory.validators.map { mapValidator(it) },
+                total = directory.validators.size,
+                partial = directory.status.completeness == BittensorValidatorDirectoryStatus.Completeness.PARTIAL
+            )
+        }
+        .shareInBackground()
+
+    // A STALE ranking still drives the quick picks, so the list says so instead of using it silently.
+    val staleRankingWarning = directoryState.map { state ->
+        if (state.dataOrNull?.staleRecommendations == true) resources.getString(R.string.bittensor_validators_ranking_stale) else null
+    }
         .shareInBackground()
 
     private val selectedValidatorAddress = MutableStateFlow(request.selectedAddress)
@@ -124,30 +149,50 @@ class BittensorSelectValidatorViewModel(
     }
         .shareInBackground()
 
-    private val filteredRows = combine(validatorsState, filters, selectedAddress, yields, stakeDisplay) { state, filters, address, yields, stake ->
-        mapValidatorRows(state, filters.sorting, address, yields, filters.hideUnusualApy, stake)
+    private val filteredList = combine(validatorsState, filters, selectedAddress, yields, stakeDisplay) { state, filters, address, yields, stake ->
+        val directory = state.dataOrNull ?: BittensorValidatorRows(rows = emptyList(), total = null)
+        directory.copy(rows = mapValidatorRows(directory.rows, filters.sorting, address, yields.orEmpty(), filters.hideUnusualApy, stake))
     }
         .shareInBackground()
 
-    val rows = combine(filteredRows, query) { rows, text -> rows.filter { matchesBittensorValidator(it.eligibility, text) } }
+    private val filteredRows = filteredList.map { it.rows }
         .shareInBackground()
 
-    val header = combine(rows, validatorsState, filters) { rows, state, filters ->
+    // Shown and total counts come from one directory snapshot, so the header can never read "more of fewer".
+    private val visibleList = combine(filteredList, query) { list, text ->
+        list.copy(rows = list.rows.filter { matchesBittensorValidator(it.eligibility, text) })
+    }
+        .shareInBackground()
+
+    val rows = visibleList.map { it.rows }
+        .shareInBackground()
+
+    val header = combine(visibleList, filters, yields) { list, filters, yields ->
+        val total = list.total
+        // The header names the rates only once they have loaded.
+        val sorting = if (yields != null) R.string.bittensor_validator_list_sort else R.string.bittensor_validator_list_sort_only
         BittensorValidatorListHeader(
-            resources.getString(R.string.bittensor_validator_list_count, rows.size, state.dataOrNull.orEmpty().size),
-            resources.getString(R.string.bittensor_validator_list_sort, sortingDisplay(filters.sorting).uppercase(Locale.getDefault()))
+            when {
+                total == null -> resources.getString(R.string.bittensor_validator_list_count_loading)
+                list.partial -> resources.getString(R.string.bittensor_validator_list_count_partial, list.rows.size)
+                else -> resources.getString(R.string.bittensor_validator_list_count, list.rows.size, total)
+            },
+            resources.getString(sorting, sortingDisplay(filters.sorting).uppercase(Locale.getDefault()))
         )
     }
         .shareInBackground()
 
+    private val _inactiveValidatorEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val inactiveValidatorEvents: SharedFlow<Unit> = _inactiveValidatorEvents
+
     val isLoading = validatorsState.map { it.isLoading() }
         .shareInBackground()
 
-    val isEmpty = combine(rows, isLoading) { rows, loading -> rows.isEmpty() && !loading }
+    val isEmpty = combine(rows, validatorsState) { rows, state -> rows.isEmpty() && state is ExtendedLoadingState.Loaded }
         .shareInBackground()
 
     val canRemoveFilters = combine(filteredRows, validatorsState, filters) { rows, state, filters ->
-        !state.isLoading() && !state.dataOrNull.isNullOrEmpty() && rows.isEmpty() && filters.hideUnusualApy
+        !state.isLoading() && !state.dataOrNull?.rows.isNullOrEmpty() && rows.isEmpty() && filters.hideUnusualApy
     }.shareInBackground()
 
     val emptyMessage = combine(canRemoveFilters, query) { filtered, query ->
@@ -167,7 +212,7 @@ class BittensorSelectValidatorViewModel(
         .shareInBackground()
 
     val buttonLabel = selectedValidator.map { row ->
-        if (row == null) return@map resources.getString(R.string.bittensor_select_validator)
+        if (row == null) return@map resources.getString(R.string.bittensor_select_validator_title)
 
         val name = bittensorValidatorDisplayName(row.eligibility)
         resources.getString(R.string.bittensor_select_named_validator, name)
@@ -175,14 +220,13 @@ class BittensorSelectValidatorViewModel(
         .shareInBackground()
 
     private fun mapValidatorRows(
-        state: ExtendedLoadingState<List<BittensorValidatorUi>>,
+        rows: List<BittensorValidatorUi>,
         sorting: BittensorValidatorSorting,
         address: String?,
         rates: Map<AccountIdKey, BigDecimal>,
         hideUnusual: Boolean,
         stake: BittensorValidatorStakeDisplay?
     ): List<BittensorValidatorUi> {
-        val rows = state.dataOrNull.orEmpty()
         val rowsByAddress = rows.associateBy { it.eligibility.address }
         return sortBittensorValidators(
             validators = rows.map { it.eligibility },
@@ -199,7 +243,12 @@ class BittensorSelectValidatorViewModel(
             val amount = nativeStake?.let { tokenFormatter.formatToken(it, requireNotNull(stake).symbol).toString() } ?: "—"
             val take = validator.commissionRate.movePointRight(2).setScale(2, java.math.RoundingMode.HALF_EVEN).toStripTrailingZerosString()
             val subtitle = resources.getString(R.string.bittensor_validator_list_subtitle, amount, take)
-            rowsByAddress.getValue(validator.address).copy(apy = rate?.formatAsPercentage(), apyColorRes = bittensorYieldColor(rate), subtitle = subtitle)
+            rowsByAddress.getValue(validator.address).copy(
+                apy = rate?.formatAsPercentage(),
+                apyColorRes = bittensorYieldColor(rate),
+                subtitle = subtitle,
+                annualYield = rate
+            )
         }
     }
 
@@ -216,35 +265,52 @@ class BittensorSelectValidatorViewModel(
     }
 
     fun select(row: BittensorValidatorUi) = launchUnit {
-        if (row.eligibility.canSelect && row in rows.first()) selectedValidatorAddress.value = row.eligibility.address
+        if (row !in rows.first()) return@launchUnit
+        when {
+            row.eligibility.inactive -> _inactiveValidatorEvents.tryEmit(Unit)
+            row.eligibility.canSelect -> selectedValidatorAddress.value = row.eligibility.address
+        }
     }
 
-    fun infoClicked(row: BittensorValidatorUi) = launchUnit {
-        try {
-            externalActions.showAddressActions(row.eligibility.address, bittensorValidatorInteractor.chain())
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            reportFailure(e)
-        }
+    fun infoClicked(row: BittensorValidatorUi) {
+        val validator = row.eligibility
+        router.openBittensorValidatorInfo(
+            BittensorValidatorInfoPayload(
+                subnetId = request.subnetId,
+                address = validator.address,
+                detail = validator.toValidatorInfoDetail()
+            )
+        )
     }
 
     fun confirmClicked() = launchUnit {
         val row = selectedValidator.first() ?: return@launchUnit
-        analytics.track(
-            BittensorAnalyticsEvent.ValidatorChanged(
-                if (request.subnetId == 0) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
-                if (query.value.isNotBlank()) ValidatorChangeSource.SEARCH else ValidatorChangeSource.LIST,
-                filters.value.hideUnusualApy
+        val address = row.eligibility.address
+        if (address != request.selectedAddress && address != request.recommendedAddress) {
+            analytics.track(
+                BittensorAnalyticsEvent.ValidatorChanged(
+                    if (request.subnetId == 0) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
+                    if (query.value.isEmpty()) ValidatorChangeSource.LIST else ValidatorChangeSource.SEARCH,
+                    filters.value.hideUnusualApy
+                )
             )
-        )
-        communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.eligibility.address, selectionState()))
+        }
+        responded = true
+        communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, address, selectionState()))
         router.back()
     }
 
     fun back() {
+        responded = true
         communicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState()))
         router.back()
+    }
+
+    override fun onCleared() {
+        if (request.tracksAbandonment && !responded && !request.selectionState.flowContinued) {
+            analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.VALIDATOR_SELECT, StakingAnalyticsTarget.SUBNET))
+        }
+        super.onCleared()
     }
 
     private fun selectionState(): BittensorSelectionState = request.selectionState.withFilters(netuid, filters.value)
@@ -264,11 +330,5 @@ class BittensorSelectValidatorViewModel(
             AddressIconGenerator.BACKGROUND_TRANSPARENT
         )
         return BittensorValidatorUi(validator, icon)
-    }
-
-    private fun reportFailure(cause: Throwable) {
-        logger.log("[BittensorSelectValidator] Failed to load validators or address actions")
-        logger.log(cause)
-        showError(resources.getString(R.string.common_retry_message))
     }
 }

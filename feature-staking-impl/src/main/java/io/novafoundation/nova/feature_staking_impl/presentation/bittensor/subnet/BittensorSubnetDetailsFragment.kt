@@ -64,7 +64,11 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         chart.setPlotHeight(208)
-        chart.onPeriodSelected = viewModel::selectPeriod
+        chart.onPeriodSelected = { index ->
+            viewModel.selectPeriod(index)
+            // Undoes the chip switch when the period is kept (an unlisted subnet).
+            chart.setSelectedPeriod(viewModel.selectedPeriodIndex)
+        }
         chart.selectionListener = PriceChartSelectionListener { selection ->
             viewModel.selectChartPoint(selection)
             chartDate.isVisible = selection != null
@@ -96,7 +100,7 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
         viewModel.nativeTokenSymbol.observe { tao.text = it }
         viewModel.subnet.observe { subnet ->
-            val name = subnet.displayName(getString(R.string.bittensor_subnet_number, subnet.id.value))
+            val name = subnet.displayName(requireContext())
             toolbar.setTitle("\u200e$name")
             priceTitle.text = getString(R.string.price_chart_title, name)
             subnetNumber.showValue(subnet.id.value.toString())

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import io.novafoundation.nova.common.utils.Identifiable
@@ -43,6 +44,8 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
         data: List<T>,
         selected: T? = null,
         @StringRes val titleRes: Int = R.string.staking_parachain_collator,
+        @StringRes val newStakeTargetTitleRes: Int? = R.string.staking_parachain_new_collator,
+        @DrawableRes val newStakeTargetIconRes: Int? = R.drawable.ic_add_circle
     ) : DynamicListBottomSheet.Payload<T>(data, selected)
 
     enum class SelectionStyle {
@@ -65,14 +68,16 @@ class ChooseStakedStakeTargetsBottomSheet<T : Identifiable>(
     }
 
     private fun maybeAddNewCollatorButton() {
-        if (newStakeTargetClicked != null) {
+        val newStakeTargetTitleRes = payload.newStakeTargetTitleRes
+
+        if (newStakeTargetClicked != null && newStakeTargetTitleRes != null) {
             val newCollatorAction = AccentActionView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
 
                 setDismissingClickListener { newStakeTargetClicked.invoke(this@ChooseStakedStakeTargetsBottomSheet, Unit) }
 
-                setText(R.string.staking_parachain_new_collator)
-                setIcon(R.drawable.ic_add_circle)
+                setText(newStakeTargetTitleRes)
+                payload.newStakeTargetIconRes?.let(::setIcon)
             }
 
             container.addAfter(headerView, newCollatorAction)

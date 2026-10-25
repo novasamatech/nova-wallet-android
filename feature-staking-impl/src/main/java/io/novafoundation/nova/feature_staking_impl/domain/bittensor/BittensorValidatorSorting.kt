@@ -31,6 +31,6 @@ internal fun sortBittensorValidators(
 
     return validators
         .filter { it.canSelect || includeUnavailable }
-        .filter { !hideUnusualApy || it.recommended || it.address == selectedAddress || it.address == preselectedAddress || !it.recommendationsAvailable }
+        .filter { !hideUnusualApy || it.recommended || it.address == selectedAddress || it.address == preselectedAddress }
         .sortedWith(comparator)
 }

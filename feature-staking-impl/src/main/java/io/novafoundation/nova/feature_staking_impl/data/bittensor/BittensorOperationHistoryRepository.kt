@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -35,7 +36,9 @@ class BittensorOperationHistoryRepository(
     private val remoteSource: BittensorEstimatesRemoteSource,
     private val infrastructureUrls: InfrastructureUrls,
     private val computationalCache: ComputationalCache,
-    private val nowNanos: () -> Long = System::nanoTime
+    private val preferences: Preferences,
+    private val nowNanos: () -> Long = System::nanoTime,
+    private val nowMillis: () -> Long = System::currentTimeMillis
 ) {
 
     private data class CachedHistory(val history: BittensorOperationHistory, val validUntilNanos: Long)
@@ -70,17 +73,20 @@ class BittensorOperationHistoryRepository(
     suspend fun request(address: String): BittensorHistoryRequest? {
         val origin = infrastructureUrls.baseUrl() ?: return null
         return synchronized(lock) {
-            val state = histories.getOrPut(HistoryKey(origin, address)) { AccountHistory() }
+            val state = accountHistory(HistoryKey(origin, address))
             BittensorHistoryRequest(address, origin, state.generation.value)
         }
     }
 
     /** Explicit cache command after a submitted own trade (success or unknown), never on signing. */
     fun ownTradeSubmitted(request: BittensorHistoryRequest) = synchronized(lock) {
-        val state = histories.getOrPut(HistoryKey(request.baseUrl, request.address)) { AccountHistory() }
-        cachedHistories.remove(HistoryKey(request.baseUrl, request.address))
+        val key = HistoryKey(request.baseUrl, request.address)
+        val state = accountHistory(key)
+        cachedHistories.remove(key)
         state.seedBlockedUntilNanos = nowNanos() + SETTLEMENT_NANOS
         state.generation.value += 1
+        // The indexer lag outlives the process, so a restart inside the window must still settle.
+        preferences.putLong(settlementField(key), nowMillis() + SETTLEMENT_MILLIS)
     }
 
     /** Shared while observed. Null means loading, never an unavailable or empty ledger. */
@@ -96,9 +102,7 @@ class BittensorOperationHistoryRepository(
             }
             coroutineScope {
                 // ComputationalCache logs keys. Neither the account nor the origin belongs in those logs.
-                val identity = (request.baseUrl.toString() + "|" + address).encodeToByteArray()
-                    .blake2b256()
-                    .toHexString()
+                val identity = identity(HistoryKey(request.baseUrl, address))
                 val shared = computationalCache.useSharedFlow("Bittensor.History.$identity", this) {
                     observeHistory(request)
                 }
@@ -197,6 +201,34 @@ class BittensorOperationHistoryRepository(
         }
     }
 
+    private fun accountHistory(key: HistoryKey): AccountHistory = histories.getOrPut(key) {
+        AccountHistory().apply {
+            val restoredDeadline = restoredSettlementDeadline(key) ?: return@apply
+            // Resume an own-trade window started before a restart exactly as ownTradeSubmitted opened it.
+            seedBlockedUntilNanos = restoredDeadline
+            generation.value += 1
+        }
+    }
+
+    private fun restoredSettlementDeadline(key: HistoryKey): Long? {
+        val field = settlementField(key)
+        if (!preferences.contains(field)) return null
+        // Wall clock survives a restart; the cap keeps a clock moved back from extending the window.
+        val remainingMillis = (preferences.getLong(field, 0L) - nowMillis()).coerceAtMost(SETTLEMENT_MILLIS)
+        if (remainingMillis <= 0) {
+            preferences.removeField(field)
+            return null
+        }
+        return nowNanos() + remainingMillis * NANOS_PER_MILLI
+    }
+
+    // Preferences are plain text on disk, so the field name carries only the hashed identity.
+    private fun settlementField(key: HistoryKey) = "bittensor_history_settlement_" + identity(key)
+
+    private fun identity(key: HistoryKey) = (key.baseUrl.toString() + "|" + key.address).encodeToByteArray()
+        .blake2b256()
+        .toHexString()
+
     private fun requireCurrent(key: HistoryKey, request: BittensorHistoryRequest): AccountHistory {
         val state = histories.getValue(key)
         check(state.generation.value == request.generation) { "Cost basis history was invalidated" }
@@ -211,7 +243,9 @@ class BittensorOperationHistoryRepository(
 
     private companion object {
         const val HISTORY_CACHE_LIMIT = 8
-        const val SETTLEMENT_NANOS = 300_000_000_000L
+        const val SETTLEMENT_MILLIS = 300_000L
+        const val NANOS_PER_MILLI = 1_000_000L
+        const val SETTLEMENT_NANOS = SETTLEMENT_MILLIS * NANOS_PER_MILLI
         const val REFRESH_INTERVAL_MILLIS = 60_000L
     }
 }

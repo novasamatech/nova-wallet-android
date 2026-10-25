@@ -21,6 +21,8 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
     companion object {
         private const val PAYLOAD_KEY = "payload"
 
+        private const val DISABLED_CONTROL_ALPHA = 0.48f
+
         fun getBundle(payload: BittensorChooseSubnetPayload) = Bundle().apply { putParcelable(PAYLOAD_KEY, payload) }
     }
 
@@ -90,6 +92,13 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
                 shimmeringAdapter.show(state.loading)
             }
         }
+        viewModel.controlsEnabled.observe { enabled ->
+            sorting.isEnabled = enabled
+            filters.isEnabled = enabled
+            sorting.alpha = if (enabled) 1f else DISABLED_CONTROL_ALPHA
+            filters.alpha = if (enabled) 1f else DISABLED_CONTROL_ALPHA
+        }
+        viewModel.controlsVisible.observe { controls.isVisible = it }
         viewModel.isEmpty.observe { empty.isVisible = it }
         viewModel.emptyMessage.observe { empty.text = it }
     }

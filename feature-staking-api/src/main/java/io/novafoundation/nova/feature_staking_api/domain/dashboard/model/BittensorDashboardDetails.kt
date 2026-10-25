@@ -14,7 +14,9 @@ data class BittensorDashboardDetails(
     val pricing: Pricing,
     val rootYieldLoading: Boolean = false,
     val subnetYieldLoading: Boolean = false,
-    val maximumYieldLoading: Boolean = false
+    val maximumYieldLoading: Boolean = false,
+    /** Root rewards meeting the claim minimum. */
+    val claimableRootRewardsInPlanks: BigInteger? = null
 ) {
 
     enum class Pricing { LOADING, KNOWN, UNKNOWN }
@@ -29,15 +31,31 @@ data class BittensorDashboardDetails(
             else -> Composition.NONE
         }
 
+    /** Nothing is staked, but root rewards are still claimable: the panel shows those rewards. */
+    val showsClaimableRewardsPanel: Boolean
+        get() = composition == Composition.NONE && claimableRootRewardsInPlanks?.signum() == 1
+
     val showsRootPanel: Boolean
         get() = rootStakeInPlanks != null || subnetCount == 0
 
     val panelStakeInPlanks: BigInteger?
-        get() = if (showsRootPanel) rootStakeInPlanks else totalStakeInPlanks
+        get() = when {
+            showsClaimableRewardsPanel -> claimableRootRewardsInPlanks
+            showsRootPanel -> rootStakeInPlanks
+            else -> totalStakeInPlanks
+        }
 
     val panelAnnualPercentageYield: BigDecimal?
-        get() = if (showsRootPanel) rootAnnualPercentageYield else subnetAnnualPercentageYield
+        get() = when {
+            showsClaimableRewardsPanel -> null
+            showsRootPanel -> rootAnnualPercentageYield
+            else -> subnetAnnualPercentageYield
+        }
 
     val panelYieldLoading: Boolean
-        get() = if (showsRootPanel) rootYieldLoading else subnetYieldLoading
+        get() = when {
+            showsClaimableRewardsPanel -> false
+            showsRootPanel -> rootYieldLoading
+            else -> subnetYieldLoading
+        }
 }

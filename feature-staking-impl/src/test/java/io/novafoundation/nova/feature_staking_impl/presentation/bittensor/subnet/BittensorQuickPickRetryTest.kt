@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.Dispatchers
@@ -42,11 +44,13 @@ class BittensorQuickPickRetryTest {
 
     private val logger = mock(Logger::class.java)
 
-    private val retryController = BittensorRetryController(resources, logger)
+    private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
 
     private val validatorCommunicator = mock(BittensorSelectValidatorCommunicator::class.java)
 
     private val responses = MutableSharedFlow<BittensorSelectValidatorCommunicator.Response>(extraBufferCapacity = 1)
+
+    private val quickPickRoot = BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true)
 
     private lateinit var viewModel: BittensorWhereToStakeViewModel
 
@@ -78,10 +82,10 @@ class BittensorQuickPickRetryTest {
     }
 
     @Test
-    fun `root opens directly without any quick pick work`() {
+    fun `root opens directly as the quick pick root without any quick pick work`() {
         viewModel.rootStaking()
         val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
-        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.eq(quickPickRoot), state.capture() ?: BittensorSelectionState())
         verifyNoMoreInteractions(router)
     }
 
@@ -102,7 +106,7 @@ class BittensorQuickPickRetryTest {
 
         viewModel.rootStaking()
         val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
-        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.eq(quickPickRoot), state.capture() ?: BittensorSelectionState())
         assertEquals(filters, state.value.subnetFilters)
         assertEquals(BittensorValidatorFilters(), state.value.rootFilters)
     }
@@ -118,7 +122,7 @@ class BittensorQuickPickRetryTest {
         viewModel.rootStaking()
 
         val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
-        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.eq(quickPickRoot), state.capture() ?: BittensorSelectionState())
         assertEquals(BittensorValidatorFilters(), state.value.rootFilters)
     }
 

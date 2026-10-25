@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
@@ -44,6 +45,7 @@ class StakingFeatureHolder @Inject constructor(
     private val selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
     private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
     private val unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
+    private val portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
     private val bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
 ) : FeatureApiHolder(featureContainer) {
@@ -77,6 +79,7 @@ class StakingFeatureHolder @Inject constructor(
                 selectMythosCollatorInterScreenCommunicator = selectMythosCollatorInterScreenCommunicator,
                 selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
                 unstakePositionCommunicator = unstakePositionCommunicator,
+                portfolioReopenCommunicator = portfolioReopenCommunicator,
                 bittensorValidatorCommunicator = bittensorValidatorCommunicator,
                 slippageSettingsCommunicator = slippageSettingsCommunicator,
                 deps = dependencies

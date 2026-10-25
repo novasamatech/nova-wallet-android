@@ -10,7 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/bittensor_select_validator"
+        app:titleText="@string/bittensor_select_validator_title"
         android:hint="@string/bittensor_validator_search_hint" />
 
     <LinearLayout
@@ -39,6 +39,14 @@
             android:ellipsize="end"
             android:textColor="@color/text_secondary" />
     </LinearLayout>
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/staleRankingWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:visibility="gone"
+        app:alertMode="warning" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -116,6 +124,6 @@
             android:layout_height="52dp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:text="@string/bittensor_select_validator" />
+            android:text="@string/bittensor_select_validator_title" />
     </FrameLayout>
 </LinearLayout>
