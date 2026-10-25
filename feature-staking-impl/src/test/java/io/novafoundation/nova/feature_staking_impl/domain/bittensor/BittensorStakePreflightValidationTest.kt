@@ -22,7 +22,12 @@ import java.math.BigInteger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.resume
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
@@ -74,9 +79,12 @@ class BittensorStakePreflightValidationTest {
 
     private var loads = 0
 
+    private var loadHangs = false
+
     private val repository = object : BittensorStakePreflightRepository {
         override suspend fun load(chainId: String, netuid: BittensorNetuid, coldKey: AccountId, hotkey: AccountId): BittensorStakePreflight {
             sourceFailure?.let { throw it }
+            if (loadHangs) awaitCancellation()
             loads += 1
             loadedColdKey = coldKey
             return snapshot
@@ -266,6 +274,34 @@ class BittensorStakePreflightValidationTest {
         val result = system.validate(payload)
         assertEquals(IOException::class.java, result.exceptionOrNull()?.javaClass)
         assertEquals(failure.message, result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `chain read that never answers ends as a slow network failure`() = runTest {
+        loadHangs = true
+
+        // The validation itself, not the system: the system moves to Dispatchers.Default, off the virtual clock.
+        val result = runCatching { validation.validate(payload) }
+
+        assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
+        assertTrue(currentTime in 1L..45_000L)
+    }
+
+    @Test
+    fun `balance read that never answers ends as a slow network failure`() = runTest {
+        `when`(wallets.assetFlow(7L, chainAsset)).thenReturn(flow { awaitCancellation() })
+
+        // The validation itself, not the system: the system moves to Dispatchers.Default, off the virtual clock.
+        val result = runCatching { validation.validate(payload) }
+
+        assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
+        assertTrue(currentTime in 1L..45_000L)
+    }
+
+    @Test
+    fun `answering reads pass without waiting for the time bound`() = runTest {
+        assertTrue(validation.validate(payload) is io.novafoundation.nova.common.validation.ValidationStatus.Valid)
+        assertEquals(0L, currentTime)
     }
 
     private fun quote(capturedAtMillis: Long): BittensorSubnetBuyQuote {
