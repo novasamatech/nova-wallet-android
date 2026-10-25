@@ -105,7 +105,7 @@ class BittensorStakingInteractor(
     }
 
     suspend fun executeRootStake(request: BittensorRootStakeRequest): BittensorOperationResult {
-        validatorRepository.validateRoot(request.chain, request.validator)
+        bittensorPreSubmissionCheck { validatorRepository.validateRoot(request.chain, request.validator) }?.let { return it }
         return submissionExecutor.execute(
             request.metaId,
             request.chain,

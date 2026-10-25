@@ -127,12 +127,14 @@ class BittensorSubnetStakingInteractor(
 
     suspend fun execute(draft: BittensorSubnetStakeDraft): BittensorOperationResult {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        if (draft.existingPosition) {
-            val row = validatorRepository.existingPositionValidator(chain, draft.operation.quote.subnetId, draft.validator)
-            require(!row.inactive || draft.inactiveValidatorAccepted) { "Inactive validator warning must be accepted" }
-        } else {
-            validatorRepository.validate(chain, draft.operation.quote.subnetId, draft.validator)
-        }
+        bittensorPreSubmissionCheck {
+            if (draft.existingPosition) {
+                val row = validatorRepository.existingPositionValidator(chain, draft.operation.quote.subnetId, draft.validator)
+                require(!row.inactive || draft.inactiveValidatorAccepted) { "Inactive validator warning must be accepted" }
+            } else {
+                validatorRepository.validate(chain, draft.operation.quote.subnetId, draft.validator)
+            }
+        }?.let { return it }
         val historyRequest = costBasisInteractor.ownTradeRequest(draft.metaId, chain)
         val result = submissionExecutor.execute(
             draft.metaId,
