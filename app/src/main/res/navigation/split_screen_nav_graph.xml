@@ -67,7 +67,11 @@
 
     <action
         android:id="@+id/action_open_slippage_settings"
-        app:destination="@id/slippageSettingsFragment" />
+        app:destination="@id/slippageSettingsFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_open_bittensor_root_staking"
@@ -630,10 +634,10 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
-    <dialog
+    <fragment
         android:id="@+id/slippageSettingsFragment"
-        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SlippageSettingsBottomSheet"
-        android:label="SlippageSettingsBottomSheet" />
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
+        android:label="SwapOptionsFragment" />
 
     <fragment
         android:id="@+id/mainFragment"
