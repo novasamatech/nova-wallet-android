@@ -73,17 +73,23 @@ class BittensorStakePreflightValidation(
         }
         val asset = walletRepository.assetFlow(value.metaId, value.chain.utilityAsset)
             .first()
+        val loadedPreflight = preflight.await()
+        val loadedLatestQuote = latestQuote.await()
+        val loadedInactiveValidator = inactiveValidator.await()
+        // Read the clock only after every read has finished: the re-read quote is stamped when it arrives,
+        // so an earlier check time would make it look as if it was captured in the future.
+        val checkedAtMillis = System.currentTimeMillis()
         val payload = BittensorStakeValidationPayload(
             asset = asset,
             amount = asset.token.amountFromPlanks(value.amount),
             fee = value.fee,
-            preflight = preflight.await(),
+            preflight = loadedPreflight,
             quote = value.quote,
             netuid = value.netuid,
             priceImpactAccepted = value.priceImpactAccepted,
-            checkedAtMillis = System.currentTimeMillis(),
-            latestQuote = latestQuote.await(),
-            inactiveValidator = inactiveValidator.await(),
+            checkedAtMillis = checkedAtMillis,
+            latestQuote = loadedLatestQuote,
+            inactiveValidator = loadedInactiveValidator,
             inactiveValidatorAccepted = value.inactiveValidatorAccepted
         )
         stakeValidationSystem.validate(payload).getOrThrow()

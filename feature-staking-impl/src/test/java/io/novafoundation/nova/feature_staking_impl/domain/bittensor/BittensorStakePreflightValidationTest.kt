@@ -19,11 +19,19 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.resume
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -31,6 +39,8 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+
+private const val REQUOTE_LATENCY_MILLIS = 50L
 
 class BittensorStakePreflightValidationTest {
 
@@ -207,6 +217,29 @@ class BittensorStakePreflightValidationTest {
 
         assertNull(status.notValidOrNull())
         verify(subnetInteractor).quote(quote.subnetId, quote.totalTaoInPlanks, slippage)
+    }
+
+    @Test
+    fun `market reread that finishes after the other reads is still fresh`() = runBlocking {
+        val reviewedQuote = quote(System.currentTimeMillis())
+        val slippage = BittensorSlippage(BigDecimal("0.005"))
+        val requoteStarted = CompletableDeferred<Unit>()
+        // The re-read is the slowest read, like the network quote on a device: it suspends and is stamped when it arrives.
+        `when`(subnetInteractor.quote(reviewedQuote.subnetId, reviewedQuote.totalTaoInPlanks, slippage)).thenAnswer { invocation ->
+            @Suppress("UNCHECKED_CAST")
+            val continuation = invocation.rawArguments.last() as Continuation<BittensorSubnetBuyQuote>
+            requoteStarted.complete(Unit)
+            launch(Dispatchers.Default) {
+                delay(REQUOTE_LATENCY_MILLIS)
+                continuation.resume(quote(System.currentTimeMillis()))
+            }
+            COROUTINE_SUSPENDED
+        }
+
+        val status = system.validate(payload.copy(netuid = reviewedQuote.subnetId, quote = reviewedQuote, slippage = slippage)).getOrThrow()
+
+        assertTrue(requoteStarted.isCompleted)
+        assertNull(status.notValidOrNull())
     }
 
     @Test
