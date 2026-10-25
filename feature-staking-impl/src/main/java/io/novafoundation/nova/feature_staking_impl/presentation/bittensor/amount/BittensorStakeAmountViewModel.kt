@@ -468,8 +468,10 @@ class BittensorStakeAmountViewModel(
             validationExecutor.requireValid(
                 validationSystem = stakeValidationSystem,
                 payload = payload,
+                errorDisplayer = ::showContinueError,
                 progressConsumer = preparing.progressConsumer(),
-                validationFailureTransformer = { failure ->
+                scope = this@BittensorStakeAmountViewModel,
+                validationFailureTransformerDefault = { failure ->
                     failure.analyticsKind()?.let { kind ->
                         analytics.track(
                             BittensorAnalyticsEvent.ValidationShown(
@@ -488,8 +490,13 @@ class BittensorStakeAmountViewModel(
             throw e
         } catch (e: Exception) {
             preparing.value = false
-            showError(e)
+            showContinueError(e)
         }
+    }
+
+    // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+    private fun showContinueError(error: Throwable) {
+        if (!retryController.reportSlowAction("root stake setup", error, ::continueClicked)) showError(error)
     }
 
     private fun observeStakingDetails(): Flow<BittensorRootStakingDetails> {

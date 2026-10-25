@@ -863,7 +863,9 @@ class BittensorSubnetAmountViewModel(
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
+                errorDisplayer = ::showContinueError,
                 progressConsumer = validating.progressConsumer(),
+                scope = this@BittensorSubnetAmountViewModel,
                 validationFailureTransformerCustom = { failure, actions ->
                     bittensorStakeValidationFailureUi(
                         failure,
@@ -890,10 +892,15 @@ class BittensorSubnetAmountViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            showContinueError(e)
         } finally {
             validating.value = false
         }
+    }
+
+    // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+    private fun showContinueError(error: Throwable) {
+        if (!retryController.reportSlowAction("subnet stake setup", error, ::continueClicked)) showError(error)
     }
 
     private fun openReview(request: QuoteRequest, inactiveValidatorAccepted: Boolean) = launchUnit {
