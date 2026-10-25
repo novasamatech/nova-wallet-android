@@ -112,6 +112,16 @@ class BittensorRetryController(
         }
     }
 
+    /**
+     * A user action (e.g. Continue) whose reads ran out of time: explained with the same slow-network dialog as a failed
+     * read, whose Retry runs [onRetry]. Returns false for any other failure, which the caller presents itself.
+     */
+    fun reportSlowAction(step: String, cause: Throwable, onRetry: () -> Unit): Boolean {
+        if (cause.bittensorReadFailureKind() != BittensorReadFailureKind.SLOW_NETWORK) return false
+        report(step, cause, onRetry)
+        return true
+    }
+
     private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
         logFailure(step, cause)
         val kind = cause.bittensorReadFailureKind()

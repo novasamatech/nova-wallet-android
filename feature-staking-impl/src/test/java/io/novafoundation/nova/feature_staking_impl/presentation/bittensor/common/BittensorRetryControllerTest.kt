@@ -85,6 +85,30 @@ class BittensorRetryControllerTest {
     }
 
     @Test
+    fun `timed out exit preflight on Continue is explained as a slow network and Retry repeats the action`() = runBlocking {
+        var retries = 0
+
+        val reported = controller.reportSlowAction("exit preflight", BittensorTimeoutException("Exit preflight")) { retries++ }
+        val failure = withTimeout(3_000L) { controller.events.first() }
+
+        assertTrue(reported)
+        assertEquals(BittensorReadFailureKind.SLOW_NETWORK, failure.kind)
+        assertEquals("Slow", failure.title)
+        assertEquals("Slow message", failure.message)
+        assertTrue(failure.retryable)
+        failure.onRetry()
+        assertEquals(1, retries)
+    }
+
+    @Test
+    fun `a Continue failure other than a timeout is left to the screen`() = runBlocking {
+        val reported = controller.reportSlowAction("exit preflight", IllegalStateException("Stake moved")) { error("must not retry") }
+
+        assertFalse(reported)
+        assertNull(withTimeoutOrNull(100L) { controller.events.first() })
+    }
+
+    @Test
     fun `device without attestation gets one non retryable explanation per screen`() = runBlocking {
         val unsupported = IOException("Profile-3 authentication failed", AttestationUnsupportedException("Play Integrity is unavailable"))
         val failure = firstFailure { throw unsupported }

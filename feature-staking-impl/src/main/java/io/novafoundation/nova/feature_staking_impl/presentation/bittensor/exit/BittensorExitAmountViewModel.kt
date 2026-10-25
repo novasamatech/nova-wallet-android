@@ -580,7 +580,8 @@ class BittensorExitAmountViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+            if (!retryController.reportSlowAction("exit setup", e, ::continueClicked)) showError(e)
         } finally {
             validating.value = false
         }
