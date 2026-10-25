@@ -18,10 +18,18 @@ class BittensorSubnetSafetyInteractor(
         val registration = subnet.registrationBlock ?: return null
         val header = rpcCalls.getBlockHeader(ChainGeneses.BITTENSOR)
         val latest = BigInteger.valueOf(header.number.toLong())
-        require(latest >= registration) { "Registration block is ahead of the chain" }
         val blockTime = chainStateRepository.expectedBlockTime(ChainGeneses.BITTENSOR)
-        require(blockTime.isPositive())
-        val elapsedMillis = (latest - registration) * blockTime.inWholeMilliseconds.toBigInteger()
-        return elapsedMillis.longValueExact().milliseconds
+        return bittensorSubnetAge(registration, latest, blockTime)
     }
+}
+
+internal fun bittensorSubnetAge(registration: BigInteger, latest: BigInteger, blockTime: Duration): Duration {
+    require(latest >= registration) { "Registration block is ahead of the chain" }
+    require(blockTime.isPositive())
+    val elapsedMillis = (latest - registration) * blockTime.inWholeMilliseconds.toBigInteger()
+    // BigInteger.longValueExact() exists only from API 31, so the overflow check is done by hand.
+    if (elapsedMillis.bitLength() >= Long.SIZE_BITS) {
+        throw ArithmeticException("Subnet age does not fit a Long: $elapsedMillis ms")
+    }
+    return elapsedMillis.toLong().milliseconds
 }
