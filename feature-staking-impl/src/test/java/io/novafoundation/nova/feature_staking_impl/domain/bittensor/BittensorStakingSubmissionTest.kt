@@ -33,6 +33,7 @@ import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import kotlinx.coroutines.runBlocking
@@ -269,16 +270,33 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
-    fun `submission error is unknown without a persistent lock`() = runBlocking {
+    fun `build error before send is a not submitted failure without a persistent lock`() = runBlocking {
         val failure = IOException("Connection lost")
         extrinsicService.result = Result.failure(failure)
 
-        assertEquals(BittensorOperationResult.Unknown(null), execute())
+        val result = execute() as BittensorOperationResult.Failure
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
+        assertSame(failure, result.cause)
         assertEquals(1, extrinsicService.submissions)
 
         extrinsicService.result = Result.success(successfulExecution)
         assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(2, extrinsicService.submissions)
+    }
+
+    @Test
+    fun `validator recheck failure before signing is a not submitted failure, not unknown`() = runBlocking {
+        val failure = IllegalStateException("Validator eligibility checks timed out")
+        when (stakingType) {
+            StakingType.ROOT -> `when`(rootValidators.validateRoot(chain, validator)).thenThrow(failure)
+            StakingType.SUBNET -> `when`(subnetValidators.validate(chain, subnetId, validator)).thenThrow(failure)
+        }
+
+        val result = execute() as BittensorOperationResult.Failure
+
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
+        assertSame(failure, result.cause)
+        assertEquals(0, extrinsicService.submissions)
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -314,8 +332,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     @Test
     fun `watch failure preserves hash and is not retryable failure`() = runTest {
         val status = ExtrinsicStatus.Dropped(successfulExecution.extrinsicHash)
-        val error = ExtrinsicWatchException(status)
-        extrinsicService.result = Result.failure(error)
+        // Raised while watching, after the extrinsic is sent: the real service fails inside the returned flow.
+        extrinsicService.watchError = ExtrinsicWatchException(status)
 
         assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
     }
@@ -445,8 +463,10 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         `when`(subnetValidators.existingPositionValidator(chain, subnetId, validator)).thenReturn(row)
         val existing = subnetDraft.copy(existingPosition = true)
 
-        val rejected = runCatching { subnetStakingInteractor.execute(existing) }
-        assertTrue(rejected.exceptionOrNull() is IllegalArgumentException)
+        val rejected = subnetStakingInteractor.execute(existing) as BittensorOperationResult.Failure
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, rejected.stage)
+        assertTrue(rejected.cause is IllegalArgumentException)
+        assertEquals(0, extrinsicService.submissions)
         verifyNoInteractions(costBasis)
 
         assertTrue(subnetStakingInteractor.execute(existing.copy(inactiveValidatorAccepted = true)) is BittensorOperationResult.Success)
@@ -486,6 +506,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         var feeOrigin: TransactionOrigin? = null
 
+        var watchError: Throwable? = null
+
         override suspend fun estimateFee(
             chain: Chain,
             origin: TransactionOrigin,
@@ -508,6 +530,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             submissionOrigin = origin
             submissionChain = chain
             this.submissionOptions = submissionOptions
+            watchError?.let { error -> return Result.success(flow { throw error }) }
             return result.map { execution ->
                 flowOf(ExtrinsicWatchResult(ExtrinsicStatus.InBlock(execution.blockHash, execution.extrinsicHash), execution.submissionHierarchy))
             }

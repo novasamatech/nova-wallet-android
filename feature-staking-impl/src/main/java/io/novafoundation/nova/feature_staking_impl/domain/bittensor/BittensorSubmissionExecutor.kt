@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
-import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,8 +50,13 @@ class BittensorSubmissionExecutor(
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
         try {
-            val watch = buildAndSign(metaId, chain, formExtrinsic)
-                ?: return@withLock BittensorBuildTimeoutException().mapBittensorPreSubmissionError()
+            // The watch flow is cold, so nothing has been sent if building or signing fails: a node error, the signer refusing
+            // (watch-only, cancelled) or the timeout. Only failures after the flow is collected leave the outcome unknown.
+            val watch = try {
+                buildAndSign(metaId, chain, formExtrinsic)
+            } catch (e: Exception) {
+                return@withLock e.mapBittensorPreSubmissionError()
+            } ?: return@withLock BittensorBuildTimeoutException().mapBittensorPreSubmissionError()
 
             var lastSeenHash: String? = null
             val execution = withTimeoutOrNull(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT) {
@@ -81,8 +85,6 @@ class BittensorSubmissionExecutor(
                 is BittensorOperationResult.Failure -> result.copy(outcome = outcome?.copy(tao = null, alpha = null, serviceFee = null))
                 is BittensorOperationResult.Unknown -> result
             }
-        } catch (e: SigningCancelledException) {
-            e.mapBittensorPreSubmissionError()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

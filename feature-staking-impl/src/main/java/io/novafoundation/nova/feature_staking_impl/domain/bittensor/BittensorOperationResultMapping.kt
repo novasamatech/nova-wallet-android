@@ -94,3 +94,14 @@ fun Throwable.mapBittensorPreSubmissionError(): BittensorOperationResult.Failure
 
     return BittensorOperationResult.Failure(this, stage = BittensorFailureStage.NOT_SUBMITTED)
 }
+
+/**
+ * Runs a check made before anything is signed (a validator recheck, a slow node included) and returns its failure as not
+ * submitted, or null when it passes. Such a failure is never an unknown outcome.
+ */
+inline fun bittensorPreSubmissionCheck(check: () -> Unit): BittensorOperationResult.Failure? = try {
+    check()
+    null
+} catch (e: Exception) {
+    e.mapBittensorPreSubmissionError()
+}

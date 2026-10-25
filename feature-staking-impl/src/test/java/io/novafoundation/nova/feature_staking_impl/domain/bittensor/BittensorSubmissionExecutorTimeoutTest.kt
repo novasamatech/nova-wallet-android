@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
@@ -27,10 +28,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorSubmissionExecutorTimeoutTest {
@@ -66,6 +69,34 @@ class BittensorSubmissionExecutorTimeoutTest {
         assertTrue(result.cause is BittensorBuildTimeoutException)
         assertTrue(result.isRetryable)
         assertFalse(result.isSigningCancelled)
+        assertLockReleased()
+    }
+
+    @Test
+    fun `build failure before send is a not submitted failure, not unknown`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        val failure = IOException("Nonce request failed")
+        extrinsics.build = { throw failure }
+
+        val result = executor.execute(METAID, chain) {} as BittensorOperationResult.Failure
+
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
+        assertSame(failure, result.cause)
+        assertTrue(result.isRetryable)
+        assertLockReleased()
+    }
+
+    @Test
+    fun `watch-only signing refusal is a cancelled not submitted failure`() = runTest {
+        useWallet(LightMetaAccount.Type.WATCH_ONLY)
+        val refusal = SigningCancelledException()
+        extrinsics.build = { throw refusal }
+
+        val result = executor.execute(METAID, chain) {} as BittensorOperationResult.Failure
+
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
+        assertSame(refusal, result.cause)
+        assertTrue(result.isSigningCancelled)
         assertLockReleased()
     }
 
