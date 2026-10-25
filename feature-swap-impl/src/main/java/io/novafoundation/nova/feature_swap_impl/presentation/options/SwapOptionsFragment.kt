@@ -34,6 +34,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptio
         binder.swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
         binder.swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
         binder.swapOptionsSlippageTitle.setOnClickListener { viewModel.slippageInfoClicked() }
+        if (viewModel.limitsInputPrecision) binder.swapOptionsSlippageInput.content.filters += SlippagePrecisionInputFilter()
     }
 
     override fun inject() {

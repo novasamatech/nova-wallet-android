@@ -121,7 +121,8 @@ class BittensorDetailsViewModel(
         when {
             portfolio == null || portfolio.dataStatus is BittensorDataStatus.Loading -> null
             portfolio.dataStatus is BittensorDataStatus.Stale -> resources.getString(R.string.bittensor_positions_stale)
-            // Missing subnet prices are explained by the rates banner in the header card (iOS).
+            // Missing subnet prices leave the total unknown: the footnote under the header says so.
+            portfolio.positions?.totalStake == null -> resources.getString(R.string.bittensor_valuation_unavailable)
             else -> null
         }
     }
@@ -438,7 +439,8 @@ private data class AccountRowValue<T>(val metaId: Long?, val state: ExtendedLoad
 
 /**
  * iOS `SubtensorPortfolioViewModelFactory`: balances stay live while rates are missing. Missing subnet rates hide the chart
- * (it is valued with them); a missing root rate only drops the APY subtitle.
+ * (it is valued with them) and the footnote under the header says the total cannot be calculated; a missing root rate only
+ * drops the APY subtitle.
  */
 enum class BittensorPortfolioRates(val showChart: Boolean) {
     AVAILABLE(showChart = true),
@@ -452,7 +454,7 @@ internal fun bittensorPortfolioRates(
     rootApy: ExtendedLoadingState<BigDecimal?>,
     isPortfolioLoading: Boolean = false
 ): BittensorPortfolioRates {
-    // Cached positions are still being refreshed: no banner flash on a cold start.
+    // Cached positions are still being refreshed: the chart is not hidden on a cold start.
     if (positions == null || isPortfolioLoading) return BittensorPortfolioRates.AVAILABLE
     val hasSubnets = positions.subnets.any { it.alphaInPlanks.signum() > 0 }
     val subnetsUnavailable = hasSubnets && (metadata is ExtendedLoadingState.Error || positions.totalStake == null)
