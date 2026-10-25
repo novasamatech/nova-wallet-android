@@ -43,6 +43,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRunti
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetTradingAvailabilityRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
@@ -86,6 +88,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.RealBittensorExtrinsicOutcomeResolver
+import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -236,6 +240,16 @@ class BittensorModule {
         swapSource: BittensorSwapSource,
         catalogueRepository: BittensorSubnetCatalogueRepository
     ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueRepository)
+
+    // Feature-scoped so a reopened picker can still show the catalogue it loaded last when a read fails.
+    @Provides
+    @FeatureScope
+    fun provideBittensorSubnetBrowseRepository(
+        catalogueRepository: BittensorSubnetCatalogueRepository,
+        repository: BittensorSubnetRepository,
+        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
+        logger: Logger
+    ) = BittensorSubnetBrowseRepository(catalogueRepository, repository, BittensorSubnetTradingAvailabilityRepository(storage), logger)
 
     @Provides
     @FeatureScope
@@ -485,8 +499,18 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService, positionUpdates: BittensorPositionUpdates) =
-        BittensorSubmissionExecutor(extrinsics, positionUpdates)
+    fun provideBittensorSubmissionExecutor(
+        extrinsics: ExtrinsicService,
+        accountRepository: AccountRepository,
+        positionUpdates: BittensorPositionUpdates,
+        eventsRepository: EventsRepository,
+        chainRegistry: ChainRegistry
+    ) = BittensorSubmissionExecutor(
+        extrinsics,
+        accountRepository,
+        positionUpdates,
+        RealBittensorExtrinsicOutcomeResolver(eventsRepository, chainRegistry)
+    )
 
     @Provides
     @FeatureScope

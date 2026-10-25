@@ -196,19 +196,11 @@
 
 
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/bittensor_validator"
-                android:textColor="@color/text_secondary" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/validators"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>

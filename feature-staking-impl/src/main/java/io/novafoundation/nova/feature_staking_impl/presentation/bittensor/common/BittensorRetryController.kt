@@ -88,6 +88,43 @@ class BittensorRetryController(
         }
     }
 
+    /**
+     * Like [observe], but the screen explains the failure itself (e.g. an inline warning with "Try again") instead of a dialog.
+     * [retry] reloads the source.
+     */
+    fun <T, R> observeInline(
+        step: String,
+        retry: BittensorInlineRetry,
+        analytics: BittensorReadAnalytics? = null,
+        transform: (Flow<T>) -> Flow<R>,
+        source: () -> Flow<T>
+    ): Flow<R> {
+        return retry.attempts.flatMapLatest { attempt ->
+            if (attempt > 0) analytics?.retry()
+            val read = flowOfAll { source() }
+                .catch { cause ->
+                    currentCoroutineContext().ensureActive()
+                    if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+                    analytics?.failed(cause)
+                    logFailure(step, cause)
+                    // The screen already explains a failure no retry can fix; later reads must not add a dialog for it.
+                    if (!cause.bittensorReadFailureKind().retryable) synchronized(pendingRetries) { finalFailureReported = true }
+                    throw cause
+                }
+            transform(read)
+        }
+    }
+
+    /**
+     * A user action (e.g. Continue) whose reads ran out of time: explained with the same slow-network dialog as a failed
+     * read, whose Retry runs [onRetry]. Returns false for any other failure, which the caller presents itself.
+     */
+    fun reportSlowAction(step: String, cause: Throwable, onRetry: () -> Unit): Boolean {
+        if (cause.bittensorReadFailureKind() != BittensorReadFailureKind.SLOW_NETWORK) return false
+        report(step, cause, onRetry)
+        return true
+    }
+
     private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
         logFailure(step, cause)
         val kind = cause.bittensorReadFailureKind()
@@ -135,5 +172,15 @@ class BittensorRetryController(
             pendingRetries.toList().also { pendingRetries.clear() }
         }
         if (retry) retries.forEach { it() }
+    }
+}
+
+/** Reload trigger for [BittensorRetryController.observeInline]. */
+class BittensorInlineRetry {
+
+    internal val attempts = MutableStateFlow(0L)
+
+    fun retry() {
+        attempts.update { it + 1 }
     }
 }

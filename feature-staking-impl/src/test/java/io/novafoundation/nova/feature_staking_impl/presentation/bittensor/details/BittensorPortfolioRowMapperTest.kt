@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -65,7 +66,8 @@ class BittensorPortfolioRowMapperTest {
         `when`(resources.getString(R.string.bittensor_root_staking)).thenReturn("Root")
         `when`(resources.getString(R.string.bittensor_subnet_number, 1)).thenReturn("Subnet 1")
         `when`(resources.getString(R.string.bittensor_chart_week)).thenReturn("7D")
-        `when`(resources.getString(R.string.bittensor_weekly_change, "+0%", "7D")).thenReturn("+0% 7D")
+        `when`(resources.getString(R.string.bittensor_weekly_change, "0%", "7D")).thenReturn("0% 7D")
+        `when`(resources.getString(R.string.bittensor_weekly_change, "−16.4%", "7D")).thenReturn("−16.4% 7D")
         `when`(resources.getString(R.string.bittensor_portfolio_root_apy, "0%")).thenReturn("APY 0% · 30 days")
         `when`(resources.getString(R.string.bittensor_portfolio_root_apy, "—")).thenReturn("APY — · 30 days")
         `when`(resources.getString(R.string.bittensor_portfolio_root_claimable, "0.000000001 NATIVE")).thenReturn("Claimable rewards: 0.000000001 NATIVE")
@@ -84,8 +86,11 @@ class BittensorPortfolioRowMapperTest {
         assertEquals("0 NATIVE", rows[0].amount.token)
         assertEquals("Claimable rewards: 0.000000001 NATIVE", rows[0].subtitle)
         assertFalse(rows[0].isSubtitleLoading)
-        assertEquals("2 ALPHA", rows[1].subtitle)
-        assertEquals("+0% 7D", rows[1].change?.text)
+        assertEquals("2 ALPHA".ltrIsolated(), rows[1].subtitle)
+        assertEquals("≈ 2 NATIVE", rows[1].amount.token)
+        assertNull(rows[1].amount.fiat)
+        assertEquals("0% 7D", rows[1].change?.text)
+        assertTrue(rows[1].change!!.isFlat)
         assertFalse(rows[1].isChangeLoading)
     }
 
@@ -118,7 +123,7 @@ class BittensorPortfolioRowMapperTest {
             ExtendedLoadingState.Loaded(null),
             ExtendedLoadingState.Loading
         ).single()
-        assertEquals("2 ALPHA", resolved.subtitle)
+        assertEquals("2 ALPHA".ltrIsolated(), resolved.subtitle)
         assertTrue(resolved.isChangeLoading)
         val failed = mapper.map(
             portfolio,
@@ -129,7 +134,57 @@ class BittensorPortfolioRowMapperTest {
         ).single()
         assertFalse(failed.isChangeLoading)
         assertNull(failed.change)
-        assertEquals("2 ALPHA", failed.subtitle)
+        assertEquals("2 ALPHA".ltrIsolated(), failed.subtitle)
+    }
+
+
+    @Test
+    fun `weekly change has one decimal and a negative change is falling`() {
+        val row = mapper.map(
+            portfolio,
+            ExtendedLoadingState.Loaded(mapOf(subnetId to subnet)),
+            null,
+            ExtendedLoadingState.Loaded(null),
+            ExtendedLoadingState.Loaded(mapOf(subnetId to BigDecimal("-16.43")))
+        ).single()
+        assertEquals("−16.4% 7D", row.change?.text)
+        assertFalse(row.change!!.isFlat)
+        assertFalse(row.change!!.isRising)
+    }
+
+    @Test
+    fun `subnet without a price keeps the dash without an approximation sign`() {
+        val unpriced = portfolio.copy(positions = holdings.copy(subnetPrices = emptyMap()))
+        val row = mapper.map(
+            unpriced,
+            ExtendedLoadingState.Loaded(mapOf(subnetId to subnet)),
+            null,
+            ExtendedLoadingState.Loaded(null),
+            ExtendedLoadingState.Loaded(mapOf(subnetId to BigDecimal.TEN))
+        ).single()
+        assertEquals("—", row.amount.token)
+        assertNull(row.change)
+        assertFalse(row.isChangeLoading)
+    }
+
+    @Test
+    fun `failed catalogue drops the weekly change`() {
+        val row = mapper.map(
+            portfolio,
+            ExtendedLoadingState.Error(IllegalStateException()),
+            null,
+            ExtendedLoadingState.Loaded(null),
+            ExtendedLoadingState.Loaded(mapOf(subnetId to BigDecimal.TEN))
+        ).single()
+        assertNull(row.change)
+    }
+
+    @Test
+    fun `single decimal change rounds tiny moves to a flat zero`() {
+        assertEquals("0%", BigDecimal("-0.04").formatAsSingleDecimalChange())
+        assertTrue(BigDecimal("-0.04").isFlatChange())
+        assertEquals("+16.4%", BigDecimal("16.43").formatAsSingleDecimalChange())
+        assertEquals("−0.1%", BigDecimal("-0.06").formatAsSingleDecimalChange())
     }
 
     private fun stakedRootSubtitle(apy: ExtendedLoadingState<BigDecimal?>): CharSequence? {

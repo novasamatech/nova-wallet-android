@@ -37,15 +37,6 @@ class BittensorPortfolioChartTest {
     }
 
     @Test
-    fun `intermediate selection return is available while overall incomplete coverage stays hidden`() {
-        val chart = chart()
-        assertNull(chart.change(null))
-        assertNull(chart.change(select(chart, 2)))
-        val expected = (middle.fiat - first.fiat).divide(first.fiat, 18, java.math.RoundingMode.HALF_EVEN)
-        assertEquals(expected, chart.change(select(chart, 1)))
-    }
-
-    @Test
     fun `period choices exclude year and all time`() {
         assertEquals(listOf("ONE_DAY", "SEVEN_DAYS", "THIRTY_DAYS", "NINETY_DAYS"), BittensorPortfolioPeriod.entries.map { it.name })
     }

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -23,6 +22,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.io.IOException
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -219,17 +221,17 @@ class BittensorRootClaimExecutionTest {
         configure()
         val cancellation = io.novafoundation.nova.common.base.errors.SigningCancelledException()
         val cancellingExtrinsics = object : ExtrinsicService by extrinsics {
-            override suspend fun submitExtrinsicAndAwaitExecution(
+            override suspend fun submitAndWatchExtrinsic(
                 chain: Chain,
                 origin: TransactionOrigin,
                 submissionOptions: ExtrinsicService.SubmissionOptions,
                 formExtrinsic: FormExtrinsicWithOrigin
-            ): Result<ExtrinsicExecutionResult> {
+            ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> {
                 return Result.failure(cancellation)
             }
         }
         val positionUpdates = BittensorPositionUpdates()
-        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, positionUpdates)
+        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, accounts, positionUpdates) { _, _ -> error("Not included") }
         val cancellingInteractor = BittensorRootClaimInteractor(
             chains, accounts, wallets, source, cancellingExtrinsics, realExecutor, constants, immediate, pending, positions, validators
         )

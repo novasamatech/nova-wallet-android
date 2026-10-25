@@ -41,6 +41,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.formatting.formatFractionAsPercentage
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.R
@@ -65,6 +66,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorSubnetAge
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.labelRes
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorChartChangeTextInjector
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -77,8 +80,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.f
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.runtime.ext.accountIdOf
@@ -116,7 +117,9 @@ class BittensorSubnetDetailsViewModel(
     private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val addressIconGenerator: AddressIconGenerator,
+    private val amountFormatter: BittensorAmountFormatter,
     private val replaceAmount: Boolean,
+    private val replaceOrigin: BittensorReplaceOrigin = BittensorReplaceOrigin.SUBNET_AMOUNT,
     initialValidatorAddress: String?,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
     private val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER
@@ -213,14 +216,12 @@ class BittensorSubnetDetailsViewModel(
             val asset = requireNotNull(assetState.dataOrNull)
             val nativeAmount = subnet.taoReserveInPlanks?.let(asset.token::amountFromPlanks)
             BittensorSubnetPoolSideUi(
-                title = resources.getString(R.string.bittensor_token_pool, asset.token.configuration.symbol.value),
-                amount = nativeAmount?.let { tokenFormatter.formatToken(it, asset.token.configuration.symbol) } ?: "—",
+                title = resources.getString(R.string.bittensor_token_in_pool, asset.token.configuration.symbol.value),
+                amount = nativeAmount?.let { amountFormatter.compactToken(it, asset.token.configuration.symbol) } ?: "—",
                 fiat = nativeAmount?.let(asset.token::toFiatOrNull)?.let { fiatFormatter.formatFiat(it, asset.token.currency) }
             )
         }
-        val alphaTitle = subnetState.dataOrNull?.symbol?.takeIf { it.isNotBlank() }
-            ?.let { resources.getString(R.string.bittensor_token_pool, it) }
-            ?: resources.getString(R.string.bittensor_alpha_pool)
+        val alphaTitle = resources.getString(R.string.bittensor_alpha_in_pool)
 
         BittensorSubnetParametersUi(
             split = poolSides.map { native ->
@@ -243,7 +244,7 @@ class BittensorSubnetDetailsViewModel(
                     ?.let(asset.token::amountFromPlanks)
                 BittensorSubnetPoolSideUi(
                     title = alphaTitle,
-                    amount = alphaAmount?.let { tokenFormatter.formatToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" })) } ?: "—",
+                    amount = alphaAmount?.let { amountFormatter.compactToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" })).ltrIsolated() } ?: "—",
                     fiat = nativeValue?.let(asset.token::toFiatOrNull)?.let { fiatFormatter.formatFiat(it, asset.token.currency) }
                 )
             },
@@ -273,6 +274,10 @@ class BittensorSubnetDetailsViewModel(
             tokenFormatter.formatToken(price, asset.token.configuration.symbol)
         }
     }
+        .shareInBackground()
+
+    // Known before the pool loads, so the native rows are titled while their values still show progress
+    val nativePoolTitle = asset.map { resources.getString(R.string.bittensor_token_in_pool, it.token.configuration.symbol.value) }
         .shareInBackground()
 
     val currencyLabel = asset.map { it.token.currency.code }
@@ -339,12 +344,7 @@ class BittensorSubnetDetailsViewModel(
         .shareInBackground()
 
     val age = ageState.mapLoading {
-        it?.let { age ->
-            resources.getString(
-                R.string.bittensor_safety_age_days,
-                formatAgeInDays(age)
-            )
-        } ?: "—"
+        it?.let(resources::formatBittensorSubnetAge) ?: "—"
     }
         .shareInBackground()
 
@@ -455,10 +455,6 @@ class BittensorSubnetDetailsViewModel(
 
     private fun periodLabel(period: BittensorSubnetChartPeriod): String = resources.getString(period.labelRes())
 
-    private fun formatAgeInDays(age: Duration): String = age.inWholeMilliseconds.toBigDecimal()
-        .divide(1.days.inWholeMilliseconds.toBigDecimal(), 0, RoundingMode.HALF_EVEN)
-        .toPlainString()
-
     private fun formatPoolShare(share: BigDecimal?): String = share
         ?.movePointRight(2)
         ?.setScale(1, RoundingMode.HALF_UP)
@@ -535,6 +531,7 @@ class BittensorSubnetDetailsViewModel(
                 validatorIsPreset = isPreset,
                 recommendedAddress = presetAddress(),
                 replaceAmount = replaceAmount,
+                replaceOrigin = replaceOrigin,
                 selectionState = selectionState
             )
         )

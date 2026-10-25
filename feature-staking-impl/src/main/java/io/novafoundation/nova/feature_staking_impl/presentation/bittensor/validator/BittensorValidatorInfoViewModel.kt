@@ -96,6 +96,17 @@ class BittensorValidatorInfoViewModel(
     val totalStake: Flow<AmountModel?> = loadedDetail.flatMapLatest { stakeAmounts(it.reportedStake) }
         .shareInBackground()
 
+    // Root stake is TAO itself; subnet stake is alpha valued in TAO at today's price (as on iOS)
+    val totalStakeDescription: String = resources.getString(
+        if (netuid == BittensorNetuid.Root) {
+            R.string.bittensor_validator_info_total_staked_root
+        } else {
+            R.string.bittensor_validator_info_total_staked_subnet
+        }
+    )
+
+    val takeDescription: String = resources.getString(R.string.bittensor_validator_info_take_description)
+
     val take = loadedDetail.map { detail ->
         resources.getString(
             R.string.bittensor_validator_info_take_value,
@@ -160,10 +171,10 @@ class BittensorValidatorInfoViewModel(
                 return@flow
             }
             val symbol = validatorInteractor.chain().utilityAsset.symbol
-            emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
+            emit(AmountModel(amountFormatter.compactToken(stake, symbol), null))
             emitAll(
                 subnetInteractor.observeAsset().map { asset ->
-                    amountFormatter.amount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
+                    amountFormatter.compactAmount(stake, asset.token.configuration.symbol, asset.token.toFiatOrNull(stake), asset.token.currency)
                 }
             )
         }
@@ -181,7 +192,7 @@ class BittensorValidatorInfoViewModel(
     }
 
     private fun formatReward(rate: BigDecimal?) = BittensorValidatorRewardUi(
-        value = rate?.formatAsPercentage() ?: "—",
+        value = rate?.let { resources.getString(R.string.staking_apy, it.formatAsPercentage()) } ?: "—",
         detail = rate?.let { resources.getString(R.string.bittensor_validator_info_reward_average) },
         style = if (rate != null) TableCellView.FieldStyle.POSITIVE else TableCellView.FieldStyle.SECONDARY
     )

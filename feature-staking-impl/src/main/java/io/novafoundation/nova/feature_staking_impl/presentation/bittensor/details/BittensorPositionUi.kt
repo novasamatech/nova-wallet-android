@@ -21,7 +21,7 @@ data class BittensorPositionUi(
     val amountColorRes: Int = R.color.text_primary
 )
 
-data class BittensorPositionChange(val text: String, val isRising: Boolean)
+data class BittensorPositionChange(val text: String, val isRising: Boolean, val isFlat: Boolean = false)
 
 sealed interface BittensorPositionAction {
     data object RootDetails : BittensorPositionAction

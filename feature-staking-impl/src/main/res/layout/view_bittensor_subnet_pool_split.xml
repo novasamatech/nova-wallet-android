@@ -1,33 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingBottom="12dp">
 
-    <LinearLayout
+    <!-- Figma: each share sits right after its title, the alpha pair at the end of the row.
+         At large font scales the alpha pair wraps to its own line instead of clipping a share. -->
+    <com.google.android.flexbox.FlexboxLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        app:alignItems="center"
+        app:flexWrap="wrap"
+        app:justifyContent="space_between">
 
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/nativeShare"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:gravity="center_vertical"
             android:layout_marginEnd="12dp"
-            app:title="@string/bittensor_native_pool"
-            app:primaryValue="—" />
+            android:minHeight="44dp"
+            android:orientation="horizontal">
 
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/alphaShare"
-            android:layout_width="0dp"
+            <TextView
+                android:id="@+id/nativeShareTitle"
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="@string/bittensor_native_pool"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/nativeShareValue"
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:text="—"
+                android:textColor="@color/text_primary"
+                tools:text="6.9%" />
+
+            <ProgressBar
+                android:id="@+id/nativeShareProgress"
+                style="@style/Widget.Nova.ProgressBar.Indeterminate"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="6dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:title="@string/bittensor_alpha_pool"
-            app:primaryValue="—" />
-    </LinearLayout>
+            android:gravity="center_vertical"
+            android:minHeight="44dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/alphaShareTitle"
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="@string/bittensor_alpha_in_pool"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/alphaShareValue"
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:maxLines="1"
+                android:text="—"
+                android:textColor="@color/text_primary"
+                tools:text="93.1%" />
+
+            <ProgressBar
+                android:id="@+id/alphaShareProgress"
+                style="@style/Widget.Nova.ProgressBar.Indeterminate"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="6dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+        </LinearLayout>
+    </com.google.android.flexbox.FlexboxLayout>
 
     <LinearLayout
         android:id="@+id/bars"

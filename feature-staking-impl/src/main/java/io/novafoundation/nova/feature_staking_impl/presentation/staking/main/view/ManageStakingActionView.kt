@@ -41,6 +41,11 @@ class ManageStakingActionView @kotlin.jvm.JvmOverloads constructor(
         binder.itemManageStakingActionImage.setImageResource(iconRes)
     }
 
+    /** Secondary value before the chevron, e.g. a claimable amount. Hidden when null. */
+    fun setDetail(content: CharSequence?) {
+        binder.itemManageStakingActionDetail.setTextOrHide(content)
+    }
+
     fun setBadge(content: String?) {
         binder.itemManageStakingActionBadge.setTextOrHide(content)
     }

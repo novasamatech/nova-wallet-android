@@ -211,10 +211,22 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    // A search without matches shows only its message: no root row, sorting, filters or count. A failed load is not one.
-    private val searchHasNoMatches = combine(subnets, isLoading, hasError, query) { subnets, loading, failed, query ->
-        !loading && !failed && query.isNotBlank() && subnets.isEmpty()
+    // Only a search that matches nothing in the whole catalogue hides the root row and the sort/filter/count row.
+    // When matches exist but the filters hide them, the controls stay so the user can turn the filters off.
+    private val emptyKind = combine(orderedCatalogue, subnets, isLoading, hasError, query) { catalogue, subnets, loading, failed, query ->
+        bittensorSubnetEmptyKind(
+            loading = loading,
+            failed = failed,
+            query = query,
+            catalogueSize = catalogue.size,
+            queryMatches = catalogue.count { it.matchesQuery(query) },
+            shown = subnets.size
+        )
     }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    private val searchHasNoMatches = emptyKind.map { it == BittensorSubnetEmptyKind.NO_SEARCH_MATCHES }
         .distinctUntilChanged()
         .shareInBackground()
 
@@ -247,14 +259,14 @@ class BittensorChooseSubnetViewModel(
     }
         .shareInBackground()
 
-    val isEmpty = combine(subnets, isLoading, hasError) { subnets, loading, failed -> subnets.isEmpty() && !loading && !failed }
+    val isEmpty = emptyKind.map { it != BittensorSubnetEmptyKind.NONE }
         .shareInBackground()
 
-    val emptyMessage = query.map { query ->
-        if (query.isEmpty()) {
-            resources.getString(R.string.bittensor_subnet_filter_empty)
-        } else {
-            resources.getString(R.string.bittensor_subnet_search_empty, query)
+    val emptyMessage = combine(emptyKind, query) { kind, query ->
+        when (kind) {
+            BittensorSubnetEmptyKind.NO_SEARCH_MATCHES -> resources.getString(R.string.bittensor_subnets_search_no_matches, query.trim())
+            BittensorSubnetEmptyKind.FILTERED_OUT -> resources.getString(R.string.bittensor_subnet_filter_empty)
+            BittensorSubnetEmptyKind.NONE, BittensorSubnetEmptyKind.NO_SUBNETS -> resources.getString(R.string.bittensor_no_subnets)
         }
     }
         .shareInBackground()
@@ -293,7 +305,12 @@ class BittensorChooseSubnetViewModel(
         rememberBrowseState()
         detailsOpen = true
         router.openBittensorSubnetDetails(
-            BittensorSubnetDetailsPayload(row.subnet.id.value, payload.replaceAmount, selectionState = selectionState)
+            BittensorSubnetDetailsPayload(
+                row.subnet.id.value,
+                payload.replaceAmount,
+                replaceOrigin = payload.replaceOrigin,
+                selectionState = selectionState
+            )
         )
     }
 
@@ -326,10 +343,17 @@ class BittensorChooseSubnetViewModel(
         )
         selectionState = selectionState.copy(flowContinued = true)
         rememberBrowseState()
-        if (payload.replaceAmount) {
-            router.replaceBittensorSubnetAmountWithRoot(selectionState)
-        } else {
-            router.openBittensorRootStaking(selectionState = selectionState)
+        when (bittensorPickerRootAction(payload)) {
+            // The picker sits on the root setup it was opened from: return to it instead of stacking another one.
+            BittensorPickerRootAction.RETURN -> {
+                validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
+                router.back()
+            }
+            BittensorPickerRootAction.REPLACE_SUBNET_AMOUNT -> router.replaceBittensorSubnetAmountWithRoot(
+                selectionState,
+                quickPick = payload.quickPick
+            )
+            BittensorPickerRootAction.OPEN -> router.openBittensorRootStaking(selectionState = selectionState)
         }
     }
 
@@ -460,3 +484,13 @@ private data class BrowseInput(
     val yields: Map<BittensorNetuid.Subnet, BigDecimal>,
     val weekly: Map<BittensorNetuid.Subnet, BigDecimal>
 )
+
+internal enum class BittensorPickerRootAction {
+    OPEN, REPLACE_SUBNET_AMOUNT, RETURN
+}
+
+internal fun bittensorPickerRootAction(payload: BittensorChooseSubnetPayload): BittensorPickerRootAction = when {
+    !payload.replaceAmount -> BittensorPickerRootAction.OPEN
+    payload.replaceOrigin == BittensorReplaceOrigin.ROOT_STAKE -> BittensorPickerRootAction.RETURN
+    else -> BittensorPickerRootAction.REPLACE_SUBNET_AMOUNT
+}

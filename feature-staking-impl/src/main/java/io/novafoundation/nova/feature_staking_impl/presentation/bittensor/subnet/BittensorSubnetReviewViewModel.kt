@@ -1,6 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
+import kotlinx.coroutines.flow.onStart
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorValidatorRowUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLeadingApy
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
@@ -84,6 +90,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
@@ -117,7 +124,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -144,6 +150,7 @@ class BittensorSubnetReviewViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
+    private val fiatFormatter: FiatFormatter,
     private val chainStateRepository: ChainStateRepository,
     private val selectedSlippage: BigDecimal,
     val existingPosition: Boolean = false,
@@ -303,10 +310,7 @@ class BittensorSubnetReviewViewModel(
                 "—"
             } else {
                 val alpha = bittensorMonthlyProjection(BigDecimal(quote.alphaOutInPlanks, BittensorProtocolUnits.ALPHA_PRECISION), annual)
-                "≈ " + tokenFormatter.formatToken(
-                    alpha,
-                    TokenSymbol(subnet.symbol.ifBlank { "—" })
-                )
+                ("≈ " + tokenFormatter.formatToken(alpha, TokenSymbol(subnet.symbol.ifBlank { "—" }))).ltrIsolated()
             }
         }
     }
@@ -391,23 +395,32 @@ class BittensorSubnetReviewViewModel(
     }
         .shareInBackground()
 
-    val executionAssets = combine(assets, submission, preparationState) { assets, state, preparation ->
+    val executionAssets = combine(assets, submission, preparationState, nativeToken) { assets, state, preparation, token ->
         val output = assets.assetOut
         val result = state.result as? BittensorStakeResultUi.Success
         val outcome = result?.outcome
-        val symbol = preparation.dataOrNull?.subnet?.symbol
-        val actualOutput = outcome?.alpha?.let { alpha ->
-            symbol?.let { tokenFormatter.formatToken(BigDecimal(alpha, BittensorProtocolUnits.ALPHA_PRECISION), TokenSymbol(it)) }
+        val subnet = preparation.dataOrNull?.subnet
+        val actualAlpha = outcome?.alpha?.let { BigDecimal(it, BittensorProtocolUnits.ALPHA_PRECISION) }
+        val actualOutput = actualAlpha?.let { alpha ->
+            subnet?.symbol?.let { tokenFormatter.formatToken(alpha, TokenSymbol(it)) }
+        }
+        // As on iOS, the done page keeps the fiat value under both amounts.
+        val paidIn = outcome?.actualBuyPay(preparation.dataOrNull?.draft?.operation?.quote?.serviceFeeTaoInPlanks ?: BigInteger.ZERO) ?: totalInPlanks
+        val inputFiat = formatFiat(token, token.toFiatOrNull(token.amountFromPlanks(paidIn)))
+        val outputFiat = if (actualAlpha == null) {
+            output.amount.fiat
+        } else {
+            formatFiat(token, subnet?.priceInRao?.let(token::amountFromPlanks)?.let { token.toFiatOrNull(actualAlpha * it) })
         }
         SwapAssetsView.Model(
             assetIn = SwapAssetView.Model(
                 assetIcon = assets.assetIn.assetIcon,
-                amount = result?.amount ?: formatBittensorNativeResult(null, totalInPlanks, chain.await(), tokenFormatter),
+                amount = (result?.amount ?: formatBittensorNativeResult(null, totalInPlanks, chain.await(), tokenFormatter)).copy(fiat = inputFiat),
                 iconSizeDp = assets.assetIn.iconSizeDp
             ),
             assetOut = SwapAssetView.Model(
                 assetIcon = output.assetIcon,
-                amount = output.amount.copy(token = actualOutput ?: "≈ \u200e${output.amount.token}", fiat = null),
+                amount = output.amount.copy(token = actualOutput?.ltrIsolated() ?: ("≈ " + output.amount.token).ltrIsolated(), fiat = outputFiat),
                 iconSizeDp = output.iconSizeDp,
                 clipIconToOutline = output.clipIconToOutline
             )
@@ -439,6 +452,23 @@ class BittensorSubnetReviewViewModel(
         prepared?.validator?.let {
             iconGenerator.createAddressIcon(it.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
         }
+    }
+        .shareInBackground()
+
+    private val validatorAnnualYield = combine(yieldState, walletContext) { state, walletContext ->
+        val key = runCatching { AccountIdKey(walletContext.chain.accountIdOf(validatorAddress)) }.getOrNull()
+        key?.let { state.dataOrNull?.get(it) }
+    }
+        .onStart { emit(null) }
+
+    /** As on iOS, the review shows the validator with "Est. 33.99% APY" under its name. */
+    val validatorRow = combine(validator, validatorIcon, validatorAnnualYield) { name, icon, annual ->
+        BittensorValidatorRowUi(
+            name = name,
+            icon = icon?.let(Icon::FromDrawable),
+            rate = resources.bittensorLeadingApy(annual),
+            rateColorRes = bittensorYieldColor(annual)
+        )
     }
         .shareInBackground()
 
@@ -506,7 +536,9 @@ class BittensorSubnetReviewViewModel(
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
+                errorDisplayer = ::showConfirmError,
                 progressConsumer = validating.progressConsumer(),
+                scope = this@BittensorSubnetReviewViewModel,
                 validationFailureTransformerCustom = { failure, actions ->
                     bittensorStakeValidationFailureUi(
                         failure,
@@ -602,7 +634,8 @@ class BittensorSubnetReviewViewModel(
     private suspend fun mapSuccess(draft: BittensorSubnetStakeDraft, fee: Fee, outcome: BittensorOperationOutcome?): BittensorStakeResultUi.Success {
         return BittensorStakeResultUi.Success(
             resources.getString(R.string.bittensor_subnet_staking_success, subnetId.value),
-            resources.getString(R.string.bittensor_subnet_staking_completed),
+            // The done-state pill reads "1 operation" as on iOS; the progress state keeps "1 of 1 operation".
+            resources.getString(R.string.bittensor_exit_completed_operation),
             draft.validator.name,
             outcome.formatNetworkFee(fee, chain.await(), resources, tokenFormatter),
             outcome,
@@ -648,12 +681,17 @@ class BittensorSubnetReviewViewModel(
         val alphaPrice = prepared.subnet.priceInRao?.let(token::amountFromPlanks)
         val outputFiat = alphaPrice?.let { token.toFiatOrNull(output * it) }
         val symbol = TokenSymbol(prepared.subnet.symbol.ifBlank { "—" })
-        return bittensorAmountFormatter.amount(
+        val amount = bittensorAmountFormatter.amount(
             output,
             symbol,
             outputFiat,
             token.currency
         )
+        return amount.copy(token = amount.token.ltrIsolated())
+    }
+
+    private fun formatFiat(token: TokenBase, fiat: BigDecimal?): CharSequence? {
+        return fiat?.let { fiatFormatter.formatFiat(it, token.currency) }
     }
 
     private fun formatRate(token: TokenBase, prepared: BittensorPreparedSubnetStake?): String {
@@ -667,6 +705,11 @@ class BittensorSubnetReviewViewModel(
             .onEach { requote -> requote.onFailure(chainRpcReads::failed) }
             .map { requote -> ExtendedLoadingState.Loaded(prepared.copy(draft = requote.getOrDefault(prepared.draft))) }
             .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
+
+    // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+    private fun showConfirmError(error: Throwable) {
+        if (!retryController.reportSlowAction("subnet stake review", error, ::confirmClicked)) showError(error)
+    }
 
     fun retryClicked() {
         val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return

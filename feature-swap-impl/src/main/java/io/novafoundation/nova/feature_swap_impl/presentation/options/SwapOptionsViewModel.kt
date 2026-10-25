@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Disable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState.Enabled
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.formatting.formatPercents
@@ -14,6 +15,8 @@ import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
@@ -22,11 +25,13 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -38,19 +43,30 @@ class SwapOptionsViewModel(
     private val slippageFieldValidatorFactory: SlippageFieldValidatorFactory,
     private val swapInteractor: SwapInteractor,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val slippageAlertMixinFactory: SlippageAlertMixinFactory
+    private val slippageAlertMixinFactory: SlippageAlertMixinFactory,
+    private val payload: SlippageSettingsPayload?,
+    private val slippageSettingsCommunicator: SlippageSettingsCommunicator
 ) : BaseViewModel(), DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
-    private val swapSettingState = async {
+    val title = resourceManager.getString(if (payload == null) R.string.swap_settings_title else R.string.common_settings)
+
+    /** Settings opened with a payload (Bittensor) cap a custom value at four decimals of a percent, as iOS does. */
+    val limitsInputPrecision = payload != null
+
+    private val swapSettingState = async(start = CoroutineStart.LAZY) {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
     }
 
-    private val swapSettingsStateFlow = flowOfAll { swapSettingState.await().selectedOption }
+    private val swapSettingsStateFlow = flowOfAll {
+        if (payload != null) flowOf(SwapSettings(slippage = payload.selected.fractions)) else swapSettingState.await().selectedOption
+    }
         .shareInBackground()
 
-    private val slippageConfig = swapSettingsStateFlow
-        .mapNotNull { it.assetIn ?: it.assetOut }
-        .mapNotNull { swapInteractor.slippageConfig(it.chainId) }
+    private val slippageConfig = flowOfAll {
+        payload?.let { flowOf(it.config()) } ?: swapSettingsStateFlow
+            .mapNotNull { it.assetIn ?: it.assetOut }
+            .mapNotNull { swapInteractor.slippageConfig(it.chainId) }
+    }
         .shareInBackground()
 
     val slippageInput = MutableStateFlow("")
@@ -86,8 +102,8 @@ class SwapOptionsViewModel(
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
-            if (selectedSlippage != defaultSlippage) {
-                slippageInput.value = selectedSlippage.formatPercents(includeSymbol = false)
+            if (!selectedSlippage.matches(defaultSlippage)) {
+                slippageInput.value = formatInput(selectedSlippage)
             }
         }
     }
@@ -99,7 +115,7 @@ class SwapOptionsViewModel(
     fun tipClicked(index: Int) {
         launch {
             val slippageTips = slippageConfig.first().slippageTips
-            slippageInput.value = slippageTips[index].formatPercents(includeSymbol = false)
+            slippageInput.value = formatInput(slippageTips[index])
         }
     }
 
@@ -108,7 +124,12 @@ class SwapOptionsViewModel(
             val slippage = slippageInput.value.formatToPercent() ?: return@launch
             val config = slippageConfig.first()
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
-            swapSettingState.await().setSlippage(slippage)
+            if (payload != null) {
+                val method = slippageChangeMethod(payload.selected.fractions, slippage, config)
+                slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method))
+            } else {
+                swapSettingState.await().setSlippage(slippage)
+            }
             swapRouter.back()
         }
     }
@@ -119,6 +140,14 @@ class SwapOptionsViewModel(
 
     fun backClicked() {
         swapRouter.back()
+    }
+
+    // Payload values went through typed-percent and configured-fraction paths, so they compare within an epsilon; the swap flow keeps exact equality.
+    private fun Fraction.matches(other: Fraction): Boolean = if (payload != null) sameAs(other) else this == other
+
+    // Payload settings save a locale-independent value the precision filter accepts; the swap flow keeps its format.
+    private fun formatInput(slippage: Fraction): String {
+        return if (payload != null) slippageInputText(slippage) else slippage.formatPercents(includeSymbol = false)
     }
 
     private suspend fun String.formatToPercent(): Fraction? {
@@ -140,12 +169,12 @@ class SwapOptionsViewModel(
         return when {
             slippage == null -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
             validationResult is FieldValidationResult.Error -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
-            slippage != settings.slippage -> Enabled(resourceManager.getString(R.string.common_apply))
+            !slippage.matches(settings.slippage) -> Enabled(resourceManager.getString(R.string.common_apply))
             else -> Disabled(resourceManager.getString(R.string.common_apply))
         }
     }
 
     private suspend fun formatResetButtonVisibility(slippageInput: String, slippageConfig: SlippageConfig): Boolean {
-        return slippageInput.formatToPercent() != slippageConfig.defaultSlippage
+        return slippageInput.formatToPercent()?.matches(slippageConfig.defaultSlippage) != true
     }
 }

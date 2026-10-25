@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorRateDisplayValue
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.common.utils.ltrIsolatedRate
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitFailureLimits
@@ -114,13 +116,13 @@ class BittensorExitFormatter @Inject constructor(
     }
 
     fun exchangeRate(position: BittensorExitPosition, quote: BittensorExitQuote): String {
-        return "1 ${alphaSymbol(position)} ≈ ${rate(position, quote)}"
+        return ltrIsolatedRate("1 ${alphaSymbol(position)}", rate(position, quote))
     }
 
     private fun rate(position: BittensorExitPosition, quote: BittensorExitQuote): String {
         val ratio = quote.estimatedTaoOut.toBigDecimal()
             .divide(quote.amount.toBigDecimal(), BittensorProtocolUnits.ALPHA_PRECISION, RoundingMode.DOWN)
-        return tokenFormatter.formatToken(ratio, position.asset.token.configuration.symbol).toString()
+        return tokenFormatter.formatToken(bittensorRateDisplayValue(ratio), position.asset.token.configuration.symbol).toString()
     }
 
     private fun alphaSymbol(position: BittensorExitPosition): String = position.subnet.alphaSymbol(position.netuid.value)

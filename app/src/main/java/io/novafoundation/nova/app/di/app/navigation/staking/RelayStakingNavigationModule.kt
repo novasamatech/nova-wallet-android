@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorSelectValidatorCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorValidatorFiltersCommunicatorImpl
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
 
 @Module
 class RelayStakingNavigationModule {
@@ -33,6 +35,11 @@ class RelayStakingNavigationModule {
     @ApplicationScope
     fun provideBittensorValidatorCommunicator(registry: NavigationHoldersRegistry): BittensorSelectValidatorCommunicator =
         BittensorSelectValidatorCommunicatorImpl(registry)
+
+    @Provides
+    @ApplicationScope
+    fun provideBittensorValidatorFiltersCommunicator(registry: NavigationHoldersRegistry): BittensorValidatorFiltersCommunicator =
+        BittensorValidatorFiltersCommunicatorImpl(registry)
 
     @Provides
     @ApplicationScope

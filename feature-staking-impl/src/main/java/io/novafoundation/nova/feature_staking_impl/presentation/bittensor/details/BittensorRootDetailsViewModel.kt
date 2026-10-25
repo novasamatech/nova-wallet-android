@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWithdrawalRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -53,6 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.isPositive
+import java.math.BigInteger
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -138,6 +140,24 @@ class BittensorRootDetailsViewModel(
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
     // The actions are never disabled by the wallet type: an unsupported wallet gets the sheet on tap.
+    /** iOS `createClaimDetails`: the amount the Claim rewards action would claim. */
+    val claimDetail = claimState.map { state ->
+        val claim = state.dataOrNull ?: return@map null
+        val target = rootClaimTarget(claim) ?: return@map null
+        val token = claim.asset.token
+        amountFormatter.amount(token.amountFromPlanks(target), token.configuration.symbol, null, token.currency).token
+    }
+        .shareInBackground(SharingStarted.WhileSubscribed(5_000))
+
+    /** iOS `createClaimMinimumCaption`: rewards accrued, but none reaches the per-validator minimum. */
+    val claimMinimum = claimState.map { state ->
+        val claim = state.dataOrNull?.takeIf { it.claims.hasRewardsBelowMinimum } ?: return@map null
+        val token = claim.asset.token
+        val minimum = amountFormatter.minimumAmount(token.amountFromPlanks(claim.claims.minimum), token.configuration.symbol)
+        resources.getString(R.string.bittensor_claim_minimum_per_validator, minimum)
+    }
+        .shareInBackground(SharingStarted.WhileSubscribed(5_000))
+
     val canAddStake = portfolioState.map { portfolio ->
         portfolio.dataOrNull?.dataStatus is BittensorDataStatus.Fresh
     }
@@ -318,3 +338,6 @@ internal fun List<BittensorRootPosition>?.primaryRootPosition(): BittensorRootPo
         .sortedBy { it.validatorHotkey.value.toHexString() }
         .maxByOrNull { it.stakeInPlanks }
 }
+
+/** The largest claim at or above the minimum that is not being claimed already (iOS `SubtensorPositionState.claimTarget`). */
+internal fun rootClaimTarget(state: BittensorRootClaimState): BigInteger? = state.availableClaims.firstOrNull()?.redeemable

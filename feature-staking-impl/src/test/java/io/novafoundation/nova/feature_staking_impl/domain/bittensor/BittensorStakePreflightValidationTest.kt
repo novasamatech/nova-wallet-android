@@ -19,11 +19,26 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.resume
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -31,6 +46,8 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+
+private const val REQUOTE_LATENCY_MILLIS = 50L
 
 class BittensorStakePreflightValidationTest {
 
@@ -64,9 +81,12 @@ class BittensorStakePreflightValidationTest {
 
     private var loads = 0
 
+    private var loadHangs = false
+
     private val repository = object : BittensorStakePreflightRepository {
         override suspend fun load(chainId: String, netuid: BittensorNetuid, coldKey: AccountId, hotkey: AccountId): BittensorStakePreflight {
             sourceFailure?.let { throw it }
+            if (loadHangs) awaitCancellation()
             loads += 1
             loadedColdKey = coldKey
             return snapshot
@@ -210,6 +230,29 @@ class BittensorStakePreflightValidationTest {
     }
 
     @Test
+    fun `market reread that finishes after the other reads is still fresh`() = runBlocking {
+        val reviewedQuote = quote(System.currentTimeMillis())
+        val slippage = BittensorSlippage(BigDecimal("0.005"))
+        val requoteStarted = CompletableDeferred<Unit>()
+        // The re-read is the slowest read, like the network quote on a device: it suspends and is stamped when it arrives.
+        `when`(subnetInteractor.quote(reviewedQuote.subnetId, reviewedQuote.totalTaoInPlanks, slippage)).thenAnswer { invocation ->
+            @Suppress("UNCHECKED_CAST")
+            val continuation = invocation.rawArguments.last() as Continuation<BittensorSubnetBuyQuote>
+            requoteStarted.complete(Unit)
+            launch(Dispatchers.Default) {
+                delay(REQUOTE_LATENCY_MILLIS)
+                continuation.resume(quote(System.currentTimeMillis()))
+            }
+            COROUTINE_SUSPENDED
+        }
+
+        val status = system.validate(payload.copy(netuid = reviewedQuote.subnetId, quote = reviewedQuote, slippage = slippage)).getOrThrow()
+
+        assertTrue(requoteStarted.isCompleted)
+        assertNull(status.notValidOrNull())
+    }
+
+    @Test
     fun `existing inactive validator warns and rereads status after acceptance`() = runBlocking {
         val quote = quote(System.currentTimeMillis())
         val validator = BittensorValidator(io.novafoundation.nova.common.address.AccountIdKey(hotkey), chain.addressOf(hotkey))
@@ -233,6 +276,46 @@ class BittensorStakePreflightValidationTest {
         val result = system.validate(payload)
         assertEquals(IOException::class.java, result.exceptionOrNull()?.javaClass)
         assertEquals(failure.message, result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `chain read that never answers ends as a slow network failure`() = runTest {
+        loadHangs = true
+
+        // The validation itself, not the system: the system moves to Dispatchers.Default, off the virtual clock.
+        val result = runCatching { validation.validate(payload) }
+
+        assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
+        assertEquals(BITTENSOR_REQUEST_TIMEOUT, currentTime)
+    }
+
+    @Test
+    fun `balance read that never answers ends as a slow network failure`() = runTest {
+        `when`(wallets.assetFlow(7L, chainAsset)).thenReturn(flow { awaitCancellation() })
+
+        // The validation itself, not the system: the system moves to Dispatchers.Default, off the virtual clock.
+        val result = runCatching { validation.validate(payload) }
+
+        assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
+        assertEquals(BITTENSOR_REQUEST_TIMEOUT, currentTime)
+    }
+
+    @Test
+    fun `answering reads pass without waiting for the time bound`() = runTest {
+        assertTrue(validation.validate(payload) is io.novafoundation.nova.common.validation.ValidationStatus.Valid)
+        assertEquals(0L, currentTime)
+    }
+
+    @Test
+    fun `market reread that times out is a slow network failure, not missing liquidity`() = runBlocking {
+        val quote = quote(System.currentTimeMillis())
+        val slippage = BittensorSlippage(BigDecimal("0.005"))
+        val timeout = runCatching { withTimeout(1) { awaitCancellation() } }.exceptionOrNull()
+        `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks, slippage)).thenThrow(timeout)
+
+        val result = system.validate(payload.copy(netuid = quote.subnetId, quote = quote, slippage = slippage))
+
+        assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
     }
 
     private fun quote(capturedAtMillis: Long): BittensorSubnetBuyQuote {

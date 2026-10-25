@@ -85,8 +85,19 @@ class BittensorValidatorInfoViewModelTest {
 
         val reward = withTimeout(5_000) { viewModel.reward.first() }
 
+        assertEquals("${R.string.staking_apy}|5.11%", reward.value)
         assertEquals("${R.string.bittensor_validator_info_reward_average}", reward.detail)
         assertEquals(TableCellView.FieldStyle.POSITIVE, reward.style)
+    }
+
+    @Test
+    fun `info sheets explain root and subnet stake differently`() {
+        val subnet = createViewModel(payload(inactive = false))
+        assertEquals("${R.string.bittensor_validator_info_total_staked_subnet}", subnet.totalStakeDescription)
+        assertEquals("${R.string.bittensor_validator_info_take_description}", subnet.takeDescription)
+
+        val root = createViewModel(payload(inactive = false, subnetId = 0))
+        assertEquals("${R.string.bittensor_validator_info_total_staked_root}", root.totalStakeDescription)
     }
 
     @Test
@@ -113,8 +124,8 @@ class BittensorValidatorInfoViewModelTest {
         assertNull(withTimeout(5_000) { viewModel.totalStake.first() })
     }
 
-    private fun payload(inactive: Boolean, stake: BigDecimal? = null, address: String = "address") = BittensorValidatorInfoPayload(
-        subnetId = 5,
+    private fun payload(inactive: Boolean, stake: BigDecimal? = null, address: String = "address", subnetId: Int = 5) = BittensorValidatorInfoPayload(
+        subnetId = subnetId,
         address = address,
         detail = BittensorValidatorInfoPayload.Detail(
             name = "Validator",

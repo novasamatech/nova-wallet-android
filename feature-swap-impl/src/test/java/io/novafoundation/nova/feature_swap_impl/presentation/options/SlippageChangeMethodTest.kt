@@ -9,7 +9,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class SlippageSettingsSheetTest {
+class SlippageChangeMethodTest {
 
     private val config = SlippageSettingsPayload(
         selected = 0.005,

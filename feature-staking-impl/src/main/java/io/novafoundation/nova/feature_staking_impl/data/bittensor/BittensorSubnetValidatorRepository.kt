@@ -248,11 +248,11 @@ class RealBittensorSubnetValidatorRepository(
         chain: Chain,
         netuid: BittensorNetuid.Subnet,
         validator: BittensorValidator
-    ): BittensorSubnetValidator = withTimeout(REQUEST_TIMEOUT_MILLIS) {
+    ): BittensorSubnetValidator = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
         val directory = backend.validators(netuid.value)
         val identifiedValidator = mapCandidates(chain, directory).firstOrNull { it.hotkey == validator.hotkey } ?: validator
         enrich(chain, netuid, listOf(identifiedValidator)).single()
-    }
+    } ?: throw BittensorTimeoutException("Validator eligibility checks")
 
     private suspend fun enrich(
         chain: Chain,

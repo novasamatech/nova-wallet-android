@@ -46,6 +46,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
@@ -71,6 +73,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
@@ -280,17 +283,18 @@ class BittensorExitReviewViewModel(
             val actualAlpha = outcome?.alpha
             val inIcon = draft.position.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
             val outIcon = assetIconProvider.getAssetIconOrFallback(draft.position.asset.token.configuration)
-            val output = formatBittensorNativeResult(
-                outcome?.actualSellReceive(draft.quote.serviceFee),
-                draft.netReceive,
-                draft.position.chain,
-                tokenFormatter
+            val actualReceive = outcome?.actualSellReceive(draft.quote.serviceFee)
+            val token = draft.position.asset.token
+            // Fiat under both sides, as on the iOS done page: received TAO at the current TAO price.
+            val output = formatBittensorNativeResult(actualReceive, draft.netReceive, draft.position.chain, tokenFormatter).copy(
+                fiat = token.toFiatOrNull(token.amountFromPlanks(actualReceive ?: draft.netReceive))?.let { fiatFormatter.formatFiat(it, token.currency) }
             )
             SwapAssetsView.Model(
                 SwapAssetView.Model(
                     inIcon,
                     exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true, draft.quote).let {
-                        if (actualAlpha == null) it.copy(token = "≈ " + it.token) else it.copy(fiat = null)
+                        val amount = it.token.ltrIsolated()
+                        if (actualAlpha == null) it.copy(token = "≈ $amount".ltrIsolated()) else it.copy(token = amount, fiat = null)
                     },
                     iconSizeDp = 48,
                     clipIconToOutline = true
@@ -346,6 +350,17 @@ class BittensorExitReviewViewModel(
             val exit = request.dataOrNull
             saleCostBasisFormatter.profit(state.dataOrNull, exit?.let { reviewed.displayed }, exit?.position?.asset?.token)
         }
+    }
+        .shareInBackground()
+
+    // The settled totals behind "You will earn" at confirm time: after a full sale the live history may settle again or drop the subnet.
+    private var confirmedPurchaseTotals: BittensorEstimatedPurchaseTotals? = null
+
+    /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
+    val completedEarned = execution.map { state ->
+        val success = state as? ExitExecution.Success
+        if (isRoot || success == null) return@map null
+        saleCostBasisFormatter.completedProfit(confirmedPurchaseTotals, success.draft.quote, success.outcome, success.draft.position.asset.token)
     }
         .shareInBackground()
 
@@ -504,21 +519,7 @@ class BittensorExitReviewViewModel(
                 null
             }
             is ExitExecution.Success -> if (isRoot) {
-                state.draft.let { draft ->
-                    BittensorStakeResultUi.Success(
-                        resources.getString(R.string.bittensor_exit_root_completed),
-                        resources.getString(R.string.bittensor_exit_root_completed_description),
-                        validator,
-                        state.outcome.formatNetworkFee(draft.fee, draft.position.chain, resources, tokenFormatter),
-                        amount = formatBittensorNativeResult(
-                            state.outcome?.actualRootStakeMoved(),
-                            draft.quote.amount,
-                            draft.position.chain,
-                            tokenFormatter
-                        ),
-                        actions = resultNavigation.landingActions(draft.quote.fullExit)
-                    )
-                }
+                rootUnstakeSuccess(state.draft, state.outcome)
             } else {
                 null
             }
@@ -526,6 +527,30 @@ class BittensorExitReviewViewModel(
         }
     }
         .shareInBackground()
+
+    /** iOS done sheet: "You unstaked X", the root stake left after it, and the fee. */
+    private fun rootUnstakeSuccess(draft: BittensorExitDraft, outcome: BittensorOperationOutcome?): BittensorStakeResultUi.Success {
+        val token = draft.position.asset.token
+        val moved = outcome?.actualRootStakeMoved() ?: draft.quote.amount
+        val after = if (draft.quote.fullExit) BigInteger.ZERO else (draft.position.preflight.totalStake - moved).max(BigInteger.ZERO)
+        val stakeAfter = tokenFormatter.formatToken(token.amountFromPlanks(after), token.configuration.symbol).toString()
+        val description = if (after.signum() == 0) {
+            resources.getString(R.string.bittensor_exit_root_unstaked_all_description)
+        } else {
+            resources.getString(R.string.bittensor_exit_root_unstaked_description, stakeAfter)
+        }
+        return BittensorStakeResultUi.Success(
+            title = resources.getString(
+                R.string.bittensor_exit_root_unstaked_title,
+                formatBittensorNativeResult(outcome?.actualRootStakeMoved(), draft.quote.amount, draft.position.chain, tokenFormatter).token
+            ),
+            description = description,
+            validator = null,
+            fee = outcome.formatNetworkFee(draft.fee, draft.position.chain, resources, tokenFormatter),
+            stakeAfter = stakeAfter,
+            actions = resultNavigation.landingActions(draft.quote.fullExit)
+        )
+    }
 
     init {
         feeLoaderMixin.connectWith(request) { _, request -> bittensorExitInteractor.feeEstimate(request) }
@@ -623,6 +648,7 @@ class BittensorExitReviewViewModel(
                 // Hand off only while no block re-quote has moved the price past the acknowledged limit since the tap.
                 if (current.acknowledged == acknowledged && !current.isPriceMoved && !handedOff) {
                     priceMoveBanner.takeAcknowledgement()
+                    confirmedPurchaseTotals = settledPurchaseTotals(saleCostBasis.replayCache.lastOrNull()?.dataOrNull)
                     execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
                     launchUnit { submit(signedDraft(draft, validated)) }
                 }
@@ -630,7 +656,8 @@ class BittensorExitReviewViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+            if (!retryController.reportSlowAction("exit review", e, ::confirmClicked)) showError(e)
         } finally {
             validating.value = false
             confirmMutex.unlock()

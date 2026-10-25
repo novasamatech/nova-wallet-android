@@ -12,7 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:iconRight="@drawable/ic_settings_outline"
+        app:homeButtonIcon="@drawable/ic_close"
         app:dividerVisible="false" />
 
     <ScrollView

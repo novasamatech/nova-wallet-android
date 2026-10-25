@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import kotlinx.coroutines.CompletableDeferred
@@ -26,6 +26,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -64,9 +65,10 @@ class BittensorSelectValidatorViewModelTest {
     private val icon = mock(Drawable::class.java)
     private val router = mock(StakingRouter::class.java)
     private val externalActions = mock(ExternalActions.Presentation::class.java)
-    private val tokenFormatter = mock(TokenFormatter::class.java)
+    private val amountFormatter = mock(BittensorAmountFormatter::class.java)
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
     private val communicator = RecordingCommunicator()
+    private val filtersCommunicator = RecordingFiltersCommunicator()
     private val models = mutableListOf<BittensorSelectValidatorViewModel>()
     private val directoryReady = CompletableDeferred<BittensorValidatorDirectory>()
 
@@ -231,10 +233,76 @@ class BittensorSelectValidatorViewModelTest {
         assertNull(communicator.responses.tryReceive().getOrNull())
     }
 
+    @Test
+    fun `a failed directory shows an inline warning and Try again reloads it`() = runBlocking<Unit> {
+        val directory = directory(listOf(validator(1, "Alpha")))
+        var attempts = 0
+        `when`(interactor.directory(BittensorNetuid.Root)).thenAnswer {
+            attempts++
+            if (attempts == 1) throw IllegalStateException("Validators unavailable") else directory
+        }
+        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
+
+        val failure = withTimeout(5_000) { viewModel.listFailure.first { it != null } }
+        assertEquals(label(arrayOf(R.string.bittensor_validators_fetch_failed_title)), failure?.title)
+        assertEquals(label(arrayOf(R.string.bittensor_validators_fetch_failed_message)), failure?.message)
+        assertEquals(false, viewModel.isEmpty.first())
+        assertEquals(ButtonState.DISABLED, viewModel.buttonState.first())
+
+        viewModel.retryList()
+
+        withTimeout(5_000) { viewModel.rows.first { it.size == 1 } }
+        assertNull(viewModel.listFailure.first())
+    }
+
+    @Test
+    fun `filters open with the current filters and applied filters come back to the list`() = runBlocking<Unit> {
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
+
+        viewModel.filtersClicked()
+        assertEquals(BittensorValidatorFilters(), filtersCommunicator.requests.single().filters)
+
+        val applied = BittensorValidatorFilters(BittensorValidatorSorting.NAME, hideUnusualApy = false)
+        filtersCommunicator.responses.emit(BittensorValidatorFiltersCommunicator.Response(applied))
+        withTimeout(5_000) { viewModel.filters.first { it == applied } }
+    }
+
+    @Test
+    fun `system back closes an open search before leaving`() {
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
+
+        viewModel.searchClicked()
+        viewModel.backPressed()
+
+        assertEquals(false, viewModel.searchVisible.value)
+        Mockito.verify(router, Mockito.never()).back()
+        viewModel.backPressed()
+        Mockito.verify(router).back()
+    }
+
+    @Test
+    fun `closing the search clears the query`() = runBlocking<Unit> {
+        val directory = directory(listOf(validator(1, "Alpha"), validator(2, "Beta")))
+        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(directory)
+        `when`(interactor.rankDirectory(BittensorNetuid.Root, directory)).thenReturn(directory)
+        val viewModel = createViewModel(BittensorSelectValidatorCommunicator.Request(0, null, BittensorSelectionState()))
+        viewModel.applyFilters(BittensorValidatorFilters(BittensorValidatorSorting.NAME, hideUnusualApy = false))
+
+        viewModel.searchClicked()
+        assertEquals(true, viewModel.searchVisible.value)
+        viewModel.search("Alpha")
+        withTimeout(5_000) { viewModel.rows.first { it.size == 1 } }
+        viewModel.searchClicked()
+
+        assertEquals(false, viewModel.searchVisible.value)
+        withTimeout(5_000) { viewModel.rows.first { it.size == 2 } }
+    }
+
     private fun createViewModel(request: BittensorSelectValidatorCommunicator.Request): BittensorSelectValidatorViewModel {
         return BittensorSelectValidatorViewModel(
             analytics, request, communicator, interactor, icons, router, externalActions, resources, logger,
-            retryController, tokenFormatter, subnetInteractor
+            retryController, amountFormatter, subnetInteractor, filtersCommunicator
         ).also { models += it }
     }
 
@@ -250,6 +318,19 @@ class BittensorSelectValidatorViewModelTest {
         BittensorValidatorDirectory(rows, mock(BittensorValidatorDirectoryStatus::class.java), null)
 
     private val placeholderPayload = BittensorValidatorInfoPayload(0, "")
+
+    private class RecordingFiltersCommunicator : BittensorValidatorFiltersCommunicator {
+        val requests = mutableListOf<BittensorValidatorFiltersCommunicator.Request>()
+        val responses = kotlinx.coroutines.flow.MutableSharedFlow<BittensorValidatorFiltersCommunicator.Response>(extraBufferCapacity = 1)
+        override val responseFlow: Flow<BittensorValidatorFiltersCommunicator.Response> = responses
+        override val latestResponse: BittensorValidatorFiltersCommunicator.Response? = null
+        override val lastState: BittensorValidatorFiltersCommunicator.Response? = null
+        override val lastInput: BittensorValidatorFiltersCommunicator.Request? = null
+        override fun openRequest(request: BittensorValidatorFiltersCommunicator.Request) {
+            requests += request
+        }
+        override fun respond(response: BittensorValidatorFiltersCommunicator.Response) = Unit
+    }
 
     private class RecordingCommunicator : BittensorSelectValidatorCommunicator {
         val responses = Channel<BittensorSelectValidatorCommunicator.Response>(Channel.UNLIMITED)

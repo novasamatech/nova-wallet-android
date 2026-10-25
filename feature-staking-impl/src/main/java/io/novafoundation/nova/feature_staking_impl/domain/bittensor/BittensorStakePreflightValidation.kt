@@ -9,7 +9,9 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakePreflightRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -21,6 +23,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
 
 data class BittensorStakePreflightPayload(
@@ -55,8 +58,11 @@ class BittensorStakePreflightValidation(
         val account = accountRepository.getMetaAccount(value.metaId)
         val executionStatus = immediateValidation.validate(immediateExecution.support(account))
         if (executionStatus is ValidationStatus.NotValid) return@coroutineScope executionStatus
+        // An unreachable node must end as a slow-network failure the screen can offer to retry, not an endless spinner.
         val preflight = async {
-            preflightRepository.load(value.chain.id, value.netuid, account.requireAccountIdIn(value.chain), value.hotkey)
+            withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
+                preflightRepository.load(value.chain.id, value.netuid, account.requireAccountIdIn(value.chain), value.hotkey)
+            } ?: throw BittensorTimeoutException("Stake preflight")
         }
         val latestQuote = async {
             value.quote?.let { latestQuote(it, value.slippage ?: bittensorSubnetInteractor.slippage) }
@@ -71,29 +77,39 @@ class BittensorStakePreflightValidation(
                 false
             }
         }
-        val asset = walletRepository.assetFlow(value.metaId, value.chain.utilityAsset)
-            .first()
+        val asset = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
+            walletRepository.assetFlow(value.metaId, value.chain.utilityAsset).first()
+        } ?: throw BittensorTimeoutException("Stake balance")
+        val loadedPreflight = preflight.await()
+        val loadedLatestQuote = latestQuote.await()
+        val loadedInactiveValidator = inactiveValidator.await()
+        // Read the clock only after every read has finished: the re-read quote is stamped when it arrives,
+        // so an earlier check time would make it look as if it was captured in the future.
+        val checkedAtMillis = System.currentTimeMillis()
         val payload = BittensorStakeValidationPayload(
             asset = asset,
             amount = asset.token.amountFromPlanks(value.amount),
             fee = value.fee,
-            preflight = preflight.await(),
+            preflight = loadedPreflight,
             quote = value.quote,
             netuid = value.netuid,
             priceImpactAccepted = value.priceImpactAccepted,
-            checkedAtMillis = System.currentTimeMillis(),
-            latestQuote = latestQuote.await(),
-            inactiveValidator = inactiveValidator.await(),
+            checkedAtMillis = checkedAtMillis,
+            latestQuote = loadedLatestQuote,
+            inactiveValidator = loadedInactiveValidator,
             inactiveValidatorAccepted = value.inactiveValidatorAccepted
         )
         stakeValidationSystem.validate(payload).getOrThrow()
     }
 
     // A market that cannot be re-read leaves no quote to stake against, which the validations report.
+    // A re-read that ran out of time is a slow node, not a pool without liquidity, so it goes to the slow-network dialog.
     private suspend fun latestQuote(quote: BittensorSubnetBuyQuote, slippage: BittensorSlippage): BittensorSubnetBuyQuote? = try {
         bittensorSubnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks, slippage)
+    } catch (cause: TimeoutCancellationException) {
+        throw BittensorTimeoutException("Stake quote", cause)
     } catch (cause: Exception) {
-        if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+        if (cause is CancellationException) throw cause
         null
     }
 }

@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="wrap_content"
+    android:minHeight="64dp"
     android:layout_marginBottom="8dp"
     android:background="@drawable/bg_primary_list_item_corner_12_solid"
-    android:gravity="center_vertical"
     android:paddingHorizontal="12dp"
-    android:orientation="horizontal">
+    android:paddingVertical="10dp">
+
     <ImageView
         android:id="@+id/positionIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- The amount column measures first; the title keeps at least its widest word (BittensorPositionAdapter),
+         so it wraps between words onto a second line, and at large font scales the amount wraps before its symbol. -->
 
     <LinearLayout
+        android:id="@+id/positionTexts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginHorizontal="12dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/positionValues"
+        app:layout_constraintStart_toEndOf="@id/positionIcon"
+        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:id="@+id/positionTitle"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:maxLines="2"
             android:ellipsize="end" />
         <ProgressBar
             android:id="@+id/positionTitleProgress"
@@ -42,6 +54,7 @@
             android:textColor="@color/text_secondary"
             android:maxLines="1"
             android:ellipsize="end" />
+
         <ProgressBar
             android:id="@+id/positionSubtitleProgress"
             android:layout_width="16dp"
@@ -50,27 +63,46 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/positionValues"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
         android:gravity="end"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/positionAmountProgress"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/positionTexts"
+        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:id="@+id/positionAmount"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
         <TextView
             android:id="@+id/positionFiat"
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="end"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="@color/text_secondary" />
+
         <TextView
             android:id="@+id/positionChange"
             style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="end"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:visibility="gone" />
 
         <ProgressBar
@@ -84,13 +116,19 @@
         android:id="@+id/positionAmountProgress"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:visibility="gone" />
+        android:layout_marginEnd="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/positionChevron"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/positionChevron"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginStart="12dp"
         android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/icon_secondary" />
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

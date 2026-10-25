@@ -8,17 +8,13 @@ import androidx.core.view.isVisible
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.view.TableCellView
-import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -26,7 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensor
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
@@ -48,7 +44,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
 
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::validatorClicked) }
 
-    private var choiceSheet: FixedListBottomSheet<BottomSheeetFixedListBinding>? = null
+    private var choiceSheet: BittensorPositionChoiceBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorSubnetPositionBinding.inflate(layoutInflater)
 
@@ -85,7 +81,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         observeBittensorRetries(viewModel.retryEvents)
         observeActionBottomSheet(viewModel.walletGate)
         viewModel.subnet.observe { subnet ->
-            val name = subnet?.title(requireContext()) ?: getString(R.string.bittensor_exit_position)
+            val name = subnet?.displayName(requireContext()) ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)
             subnetCaption.text = name
             subnetIcon.setIcon(
@@ -115,9 +111,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
             chart.setCharts(charts)
         }
-        viewModel.averageChartPrice.observe { value ->
-            chart.setReferencePrice(value?.toFloat(), getString(R.string.bittensor_exit_avg_buy_price))
-        }
+        viewModel.averageChartLine.observe { line -> chart.setReferencePrice(line?.value, line?.label.orEmpty()) }
         viewModel.holding.observe { holding.text = it }
         viewModel.hasStake.observe { activeStatus.isVisible = it }
         viewModel.worth.observe(worth::showBittensorLoadingAmount)
@@ -141,19 +135,10 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             viewLifecycleOwner,
             EventObserver { (action, choices) ->
                 choiceSheet?.dismiss()
-                val configuration = FixedListBottomSheet.ViewConfiguration.default(requireContext())
-                val sheet = object : FixedListBottomSheet<BottomSheeetFixedListBinding>(requireContext(), configuration) {}
-                choiceSheet = sheet
-                sheet.setTitle(R.string.bittensor_exit_select_position)
-                choices.forEach { payload ->
-                    val row = TableCellView.createTableCellView(requireContext())
-                    row.title.text = payload.hotkeyAddress.ellipsizeAddress()
-                    row.setOnClickListener {
-                        sheet.dismiss()
-                        viewModel.selectPosition(action, payload)
-                    }
-                    sheet.addItem(row)
+                val sheet = BittensorPositionChoiceBottomSheet(requireContext(), choices) { _, row ->
+                    viewModel.selectPosition(action, row.choice.position)
                 }
+                choiceSheet = sheet
                 sheet.show()
             }
         )

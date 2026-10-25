@@ -2,9 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.resolvedValidatorNames
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
@@ -70,7 +70,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitExceedsAvailable
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
@@ -88,6 +87,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -163,7 +163,6 @@ class BittensorExitAmountViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val exitFormatter: BittensorExitFormatter,
     private val slippageSettings: BittensorSlippageSettings,
-    private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
     private val costBasisFormatter: BittensorSaleCostBasisFormatter,
     precisionValidator: BittensorExitPrecisionValidator,
     private val validatorInteractor: BittensorValidatorInteractor,
@@ -335,8 +334,9 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
+    // The Max of the selected validators, so it always passes validation.
     val maxAmount = maximumAmount.map { maximum ->
-        maximum?.display?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString() }
+        maximum?.display?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString().ltrIsolated() }
     }
         .shareInBackground()
 
@@ -346,15 +346,15 @@ class BittensorExitAmountViewModel(
         requestState
     ) { position, text, state ->
         position ?: return@combine null
-        val input = text.toBigDecimalOrNull() ?: return@combine null
+        // iOS shows the fiat of an empty field as zero.
+        val input = text.toBigDecimalOrNull() ?: BigDecimal.ZERO
         val tao = if (isRoot) {
             input
         } else {
             val spot = bittensorAlphaSpotPrice(position, state.dataOrNull?.exit?.quote) ?: return@combine null
             input * position.asset.token.amountFromPlanks(spot)
         }
-        val fiat = position.asset.token.toFiatOrNull(tao) ?: return@combine null
-        fiatFormatter.formatFiat(fiat, position.asset.token.currency)
+        formatTaoFiat(position.asset.token, tao)
     }
         .shareInBackground()
 
@@ -421,9 +421,10 @@ class BittensorExitAmountViewModel(
 
     val received = prepared.mapLoading {
         it?.let { draft ->
-            val received = draft.netReceive
-            "≈ " + tokenFormatter.formatToken(draft.position.asset.token.amountFromPlanks(received), draft.position.asset.token.configuration.symbol)
-        } ?: "—"
+            val token = draft.position.asset.token
+            val received = token.amountFromPlanks(draft.netReceive)
+            AmountModel("≈ " + tokenFormatter.formatToken(received, token.configuration.symbol), formatTaoFiat(token, received))
+        } ?: AmountModel("—", null)
     }
         .shareInBackground()
 
@@ -435,10 +436,13 @@ class BittensorExitAmountViewModel(
 
     val fee = combine(positionState, requestState, feeStatus) { position, quote, status ->
         val estimate = status.loadedFeeOrNull()
+        val token = position.dataOrNull?.asset?.token
         when {
             position.isLoading() || quote.isLoading() || status is FeeStatus.Loading -> ExtendedLoadingState.Loading
             else -> ExtendedLoadingState.Loaded(
-                estimate?.let { tokenFormatter.formatToken(it.decimalAmount, it.asset.symbol).toString() } ?: "—"
+                estimate?.let {
+                    AmountModel(tokenFormatter.formatToken(it.decimalAmount, it.asset.symbol), token?.let { token -> formatTaoFiat(token, it.decimalAmount) })
+                } ?: AmountModel("—", null)
             )
         }
     }
@@ -487,15 +491,6 @@ class BittensorExitAmountViewModel(
             .onEach { maximum -> input.update { it.updateMax(maximum?.fill) } }
             .launchIn(this)
 
-        if (!isRoot) {
-            slippageSettingsCommunicator.responseFlow
-                .onEach {
-                    slippageSettings.set(BigDecimal.valueOf(it.fraction))
-                    analytics.track(it.bittensorAnalyticsEvent())
-                }
-                .launchIn(this)
-        }
-
         feeLoaderMixin.connectWith(feeRequest) { _, request -> bittensorExitInteractor.feeEstimate(request) }
     }
 
@@ -509,10 +504,6 @@ class BittensorExitAmountViewModel(
 
     fun amountChanged(value: String) {
         input.update { it.edit(value) }
-    }
-
-    fun openSlippageSettings() {
-        if (!isRoot) slippageSettingsCommunicator.openRequest(slippageSettings.payload())
     }
 
     fun maxClicked() = launchUnit {
@@ -589,7 +580,8 @@ class BittensorExitAmountViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+            if (!retryController.reportSlowAction("exit setup", e, ::continueClicked)) showError(e)
         } finally {
             validating.value = false
         }
@@ -786,4 +778,8 @@ class BittensorExitAmountViewModel(
             ExtendedLoadingState.Loaded(request.copy(exit = quote?.let { BittensorExitRequest(position, it) }))
         }
         .onStart { emit(ExtendedLoadingState.Loaded(request)) }
+
+    private fun formatTaoFiat(token: Token, amount: BigDecimal): CharSequence? {
+        return token.toFiatOrNull(amount)?.let { fiatFormatter.formatFiat(it, token.currency) }
+    }
 }

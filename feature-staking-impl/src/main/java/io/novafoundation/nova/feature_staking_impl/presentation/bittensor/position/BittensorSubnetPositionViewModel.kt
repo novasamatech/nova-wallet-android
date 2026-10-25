@@ -38,6 +38,8 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.common.utils.ltrIsolated
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawal
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -72,6 +74,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -95,8 +98,6 @@ enum class BittensorPositionTradeAction { BUY, SELL }
 /** iOS `SubtensorPortfolioBuilder.isMemberOrderedBefore`: largest stake first, then hotkey; the first is the primary. */
 internal fun List<BittensorSubnetPosition>.inPrimaryOrder(): List<BittensorSubnetPosition> =
     sortedWith(compareByDescending<BittensorSubnetPosition> { it.alphaInPlanks }.thenBy { it.validatorHotkey.value.toHexString() })
-
-data class BittensorPositionChoiceRequest(val action: BittensorPositionTradeAction, val positions: List<BittensorExitPositionPayload>)
 
 class BittensorSubnetPositionViewModel(
     private val analytics: AnalyticsService,
@@ -225,7 +226,8 @@ class BittensorSubnetPositionViewModel(
     }.map { it.isLoading() }.shareInBackground()
 
     val withdrawalHint = combine(withdrawalState, subnet) { state, subnet ->
-        val withdrawal = state.dataOrNull ?: return@combine null
+        // iOS shows no withdrawal caption while the whole stake is free to sell.
+        val withdrawal = state.dataOrNull?.takeIf { it.hasWithdrawalRestriction() } ?: return@combine null
         val symbol = subnet?.symbol?.takeIf { it.isNotBlank() } ?: return@combine null
         withdrawalFormatter.format(withdrawal, BittensorProtocolUnits.ALPHA_PRECISION, TokenSymbol(symbol))
     }.shareInBackground()
@@ -253,9 +255,17 @@ class BittensorSubnetPositionViewModel(
     )
         .shareInBackground()
 
-    val averageChartPrice = costBasisState.map {
+    private val averageChartPrice = costBasisState.map {
         it.dataOrNull?.forSubnet(subnetId.value)
             ?.averagePrice
+    }
+
+    /** iOS `ui.avg.buy.chart.format`: "Avg buy 0.0055", the TAO price without the ticker. */
+    val averageChartLine = averageChartPrice.map { price ->
+        price?.let {
+            val value = tokenFormatter.formatToken(it, TokenSymbol(""), TokenConfig(includeAssetTicker = false)).toString().trim()
+            BittensorChartReferenceLine(it.toFloat(), resources.getString(R.string.bittensor_avg_buy_chart, value))
+        }
     }
         .shareInBackground()
 
@@ -317,7 +327,7 @@ class BittensorSubnetPositionViewModel(
         tokenFormatter.formatToken(
             BigDecimal(amount, BittensorProtocolUnits.ALPHA_PRECISION),
             TokenSymbol(subnet.alphaSymbol(subnetId.value))
-        ).toString()
+        ).toString().ltrIsolated()
     }
         .shareInBackground()
 
@@ -486,13 +496,25 @@ class BittensorSubnetPositionViewModel(
     private fun choose(action: BittensorPositionTradeAction) = launchUnit {
         if (!canAct.first()) return@launchUnit
         val data = portfolio.first() ?: return@launchUnit
-        val options = held.first().map { BittensorExitPositionPayload(data.metaId, subnetId.value, data.chain.addressOf(it.validatorHotkey.value)) }
+        val symbol = TokenSymbol(subnet.first().alphaSymbol(subnetId.value))
+        val options = bittensorPositionChoices(
+            held = held.first(),
+            metaId = data.metaId,
+            names = validatorNames.first().orEmpty(),
+            addressOf = { data.chain.addressOf(it) },
+            formatStaked = { tokenFormatter.formatToken(BigDecimal(it, BittensorProtocolUnits.ALPHA_PRECISION), symbol) }
+        )
+        val rows = if (options.size > 1) {
+            options.map { BittensorPositionChoiceUi(it, addressIconGenerator.createAddressIcon(it.hotkey.value, 32)) }
+        } else {
+            emptyList()
+        }
         val flow = if (action == BittensorPositionTradeAction.BUY) StakingFlow.STAKE else StakingFlow.UNSTAKE
         walletGate.checkingSupport(data.metaId, flow, StakingAnalyticsTarget.SUBNET) {
             if (options.size == 1) {
-                selectPosition(action, options.single())
+                selectPosition(action, options.single().position)
             } else {
-                choices.value = BittensorPositionChoiceRequest(action, options).event()
+                choices.value = BittensorPositionChoiceRequest(action, rows).event()
             }
         }
     }
@@ -538,3 +560,7 @@ class BittensorSubnetPositionViewModel(
 
     fun back() = router.back()
 }
+
+internal fun BittensorPositionWithdrawal.hasWithdrawalRestriction(): Boolean = locked.signum() > 0 || holdDurationMillis.signum() > 0
+
+data class BittensorChartReferenceLine(val value: Float, val label: String)
