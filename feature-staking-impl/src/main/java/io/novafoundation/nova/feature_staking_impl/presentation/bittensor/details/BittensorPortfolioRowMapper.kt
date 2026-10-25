@@ -91,7 +91,7 @@ class BittensorPortfolioRowMapper(
             ).token.ltrIsolated()
         }
         // iOS drops the weekly change while subnet rates are unavailable; the valuation footnote under the header explains it.
-        val ratesUnavailable = metadata is ExtendedLoadingState.Error || portfolio.positions?.totalStake == null
+        val ratesUnavailable = bittensorSubnetRatesUnavailable(portfolio.positions, metadata)
         val change = if (subnet == null || ratesUnavailable) {
             null
         } else {

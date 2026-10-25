@@ -102,7 +102,7 @@ class SwapOptionsViewModel(
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
-            if (selectedSlippage != defaultSlippage) {
+            if (!selectedSlippage.matches(defaultSlippage)) {
                 slippageInput.value = formatInput(selectedSlippage)
             }
         }
@@ -142,6 +142,9 @@ class SwapOptionsViewModel(
         swapRouter.back()
     }
 
+    // Payload values went through typed-percent and configured-fraction paths, so they compare within an epsilon; the swap flow keeps exact equality.
+    private fun Fraction.matches(other: Fraction): Boolean = if (payload != null) sameAs(other) else this == other
+
     // Payload settings save a locale-independent value the precision filter accepts; the swap flow keeps its format.
     private fun formatInput(slippage: Fraction): String {
         return if (payload != null) slippageInputText(slippage) else slippage.formatPercents(includeSymbol = false)
@@ -166,12 +169,12 @@ class SwapOptionsViewModel(
         return when {
             slippage == null -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
             validationResult is FieldValidationResult.Error -> Disabled(resourceManager.getString(R.string.swap_slippage_disabled_button_state))
-            slippage != settings.slippage -> Enabled(resourceManager.getString(R.string.common_apply))
+            !slippage.matches(settings.slippage) -> Enabled(resourceManager.getString(R.string.common_apply))
             else -> Disabled(resourceManager.getString(R.string.common_apply))
         }
     }
 
     private suspend fun formatResetButtonVisibility(slippageInput: String, slippageConfig: SlippageConfig): Boolean {
-        return slippageInput.formatToPercent() != slippageConfig.defaultSlippage
+        return slippageInput.formatToPercent()?.matches(slippageConfig.defaultSlippage) != true
     }
 }

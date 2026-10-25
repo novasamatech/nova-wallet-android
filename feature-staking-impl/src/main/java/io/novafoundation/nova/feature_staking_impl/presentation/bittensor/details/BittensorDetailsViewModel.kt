@@ -122,7 +122,7 @@ class BittensorDetailsViewModel(
             portfolio == null || portfolio.dataStatus is BittensorDataStatus.Loading -> null
             portfolio.dataStatus is BittensorDataStatus.Stale -> resources.getString(R.string.bittensor_positions_stale)
             // Missing subnet prices leave the total unknown: the footnote under the header says so.
-            portfolio.positions?.totalStake == null -> resources.getString(R.string.bittensor_valuation_unavailable)
+            bittensorSubnetRatesUnavailable(portfolio.positions) -> resources.getString(R.string.bittensor_valuation_unavailable)
             else -> null
         }
     }
@@ -448,6 +448,11 @@ enum class BittensorPortfolioRates(val showChart: Boolean) {
     SUBNETS_UNAVAILABLE(showChart = false)
 }
 
+/** Subnet rates are missing when the catalogue failed or a held subnet has no price, so the total stake is unknown. */
+internal fun bittensorSubnetRatesUnavailable(positions: BittensorPortfolioPositions?, metadata: ExtendedLoadingState<*>? = null): Boolean {
+    return metadata is ExtendedLoadingState.Error || positions?.totalStake == null
+}
+
 internal fun bittensorPortfolioRates(
     positions: BittensorPortfolioPositions?,
     metadata: ExtendedLoadingState<*>,
@@ -457,7 +462,7 @@ internal fun bittensorPortfolioRates(
     // Cached positions are still being refreshed: the chart is not hidden on a cold start.
     if (positions == null || isPortfolioLoading) return BittensorPortfolioRates.AVAILABLE
     val hasSubnets = positions.subnets.any { it.alphaInPlanks.signum() > 0 }
-    val subnetsUnavailable = hasSubnets && (metadata is ExtendedLoadingState.Error || positions.totalStake == null)
+    val subnetsUnavailable = hasSubnets && bittensorSubnetRatesUnavailable(positions, metadata)
     val rootUnavailable = positions.rootStake.signum() > 0 &&
         (rootApy is ExtendedLoadingState.Error || rootApy is ExtendedLoadingState.Loaded && rootApy.data == null)
     return when {

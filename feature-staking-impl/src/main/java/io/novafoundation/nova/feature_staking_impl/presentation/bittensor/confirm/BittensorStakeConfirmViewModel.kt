@@ -167,7 +167,7 @@ class BittensorStakeConfirmViewModel(
     }
         .shareInBackground()
 
-    /** The root stake before this operation, taken from the first fresh positions so a refresh after the stake lands does not count it twice. */
+    /** The root stake before this operation, taken when Confirm hands it off, so a refresh after the stake lands does not count it twice. */
     private var stakeBeforeSnapshot: BigInteger? = null
 
     /** Null hides "Stake after": it is shown only when adding to a position whose positions are fresh (iOS `createStakeChange`). */
@@ -177,8 +177,7 @@ class BittensorStakeConfirmViewModel(
     ) { state, request ->
         state.map { details ->
             if (!bittensorShowsRootStakeAfter(payload.existingPosition, details.dataStatus)) return@map null
-            val before = stakeBeforeSnapshot
-                ?: bittensorRootStakeChange(details.positions, request.validator.hotkey, request.amountInPlanks).before.also { stakeBeforeSnapshot = it }
+            val before = stakeBeforeSnapshot ?: bittensorRootStakeChange(details.positions, request.validator.hotkey, request.amountInPlanks).before
             val token = details.asset.token
             formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
                 formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
@@ -314,6 +313,7 @@ class BittensorStakeConfirmViewModel(
         if (!submission.value.canSubmit) return@launchUnit
         try {
             val details = stakingDetails.first()
+            stakeBeforeSnapshot = bittensorRootStakeChange(details.positions, request.validator.hotkey, request.amountInPlanks).before
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
             operationAnalytics.startOperation()
             flowContinued = true

@@ -334,7 +334,7 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    // Root: the Max of the validator the unstake is for, so it always passes validation.
+    // The Max of the selected validators, so it always passes validation.
     val maxAmount = maximumAmount.map { maximum ->
         maximum?.display?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString().ltrIsolated() }
     }

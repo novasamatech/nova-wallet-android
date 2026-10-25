@@ -353,10 +353,10 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
     // The settled totals behind "You will earn" at confirm time: after a full sale the live history may settle again or drop the subnet.
     private var confirmedPurchaseTotals: BittensorEstimatedPurchaseTotals? = null
 
+    /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
     val completedEarned = execution.map { state ->
         val success = state as? ExitExecution.Success
         if (isRoot || success == null) return@map null
