@@ -4,17 +4,51 @@ import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withTimeoutOrNull
 
-/** Manual buy catalogue only; held positions must never be filtered through this repository. */
+/**
+ * Manual buy catalogue only; held positions must never be filtered through this repository.
+ *
+ * Feature-scoped so the picker can be reopened offline: a failed or slow read serves the catalogue loaded last, and only
+ * without one does the failure reach the screen. The whole read is bounded, since the chain availability read waits
+ * for a reconnecting node indefinitely.
+ */
 class BittensorSubnetBrowseRepository(
     private val catalogueRepository: BittensorSubnetCatalogueRepository,
     private val subnets: BittensorSubnetRepository,
-    private val availability: BittensorSubnetTradingAvailabilityRepository
+    private val availability: BittensorSubnetTradingAvailabilityRepository,
+    private val logger: Logger,
+    private val timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT
 ) {
 
-    suspend fun subnets(): List<BittensorSubnet> = coroutineScope {
+    @Volatile
+    private var lastLoaded: List<BittensorSubnet>? = null
+
+    suspend fun subnets(): List<BittensorSubnet> {
+        val loaded = try {
+            withTimeoutOrNull(timeoutMillis) { load() } ?: throw BittensorTimeoutException("Subnet browse catalogue")
+        } catch (e: Exception) {
+            // A child request timing out is a failed read; cancellation of the caller is not.
+            currentCoroutineContext().ensureActive()
+            if (e is CancellationException && e !is TimeoutCancellationException) throw e
+            val cached = lastLoaded ?: throw if (e is TimeoutCancellationException) BittensorTimeoutException("Subnet catalogue", e) else e
+            // Not silent: an online rejection or malformed answer must stay visible in the logs behind the cached list.
+            logger.log("[Bittensor] Subnet browse catalogue read failed; serving the catalogue loaded last")
+            logger.log(e)
+            return cached
+        }
+        lastLoaded = loaded
+        return loaded
+    }
+
+    private suspend fun load(): List<BittensorSubnet> = coroutineScope {
         val runtime = async { subnets.catalogue() }
         val response = catalogueRepository.catalogue()
         val catalogue = runtime.await()

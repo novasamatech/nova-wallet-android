@@ -43,6 +43,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRunti
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetTradingAvailabilityRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
@@ -238,6 +240,16 @@ class BittensorModule {
         swapSource: BittensorSwapSource,
         catalogueRepository: BittensorSubnetCatalogueRepository
     ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueRepository)
+
+    // Feature-scoped so a reopened picker can still show the catalogue it loaded last when a read fails.
+    @Provides
+    @FeatureScope
+    fun provideBittensorSubnetBrowseRepository(
+        catalogueRepository: BittensorSubnetCatalogueRepository,
+        repository: BittensorSubnetRepository,
+        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
+        logger: Logger
+    ) = BittensorSubnetBrowseRepository(catalogueRepository, repository, BittensorSubnetTradingAvailabilityRepository(storage), logger)
 
     @Provides
     @FeatureScope

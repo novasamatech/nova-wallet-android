@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioRowInteractor
@@ -23,8 +22,6 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetTradingAvailabilityRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRecommendedYieldInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -35,13 +32,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 
 @Module(includes = [ViewModelModule::class, BittensorQuickPickModule::class])
 class BittensorSubnetModule {
-
-    @Provides
-    fun browseRepository(
-        catalogueRepository: BittensorSubnetCatalogueRepository,
-        repository: BittensorSubnetRepository,
-        availability: BittensorSubnetTradingAvailabilityRepository
-    ) = BittensorSubnetBrowseRepository(catalogueRepository, repository, availability)
 
     @Provides
     fun browseRowInteractor(
