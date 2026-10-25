@@ -262,9 +262,6 @@ class BittensorChooseSubnetViewModel(
     val isEmpty = emptyKind.map { it != BittensorSubnetEmptyKind.NONE }
         .shareInBackground()
 
-    val controlsVisible = searchHasNoMatches.map { !it }
-        .shareInBackground()
-
     val emptyMessage = combine(emptyKind, query) { kind, query ->
         when (kind) {
             BittensorSubnetEmptyKind.NO_SEARCH_MATCHES -> resources.getString(R.string.bittensor_subnets_search_no_matches, query.trim())

@@ -136,5 +136,4 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.onHidden()
         super.onPause()
     }
-
 }

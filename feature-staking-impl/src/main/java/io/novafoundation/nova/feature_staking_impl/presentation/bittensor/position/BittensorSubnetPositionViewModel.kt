@@ -500,16 +500,20 @@ class BittensorSubnetPositionViewModel(
         val options = bittensorPositionChoices(
             held = held.first(),
             metaId = data.metaId,
-            names = validatorNames.first(),
+            names = validatorNames.first().orEmpty(),
             addressOf = { data.chain.addressOf(it) },
             formatStaked = { tokenFormatter.formatToken(BigDecimal(it, BittensorProtocolUnits.ALPHA_PRECISION), symbol) }
         )
+        val rows = if (options.size > 1) {
+            options.map { BittensorPositionChoiceUi(it, addressIconGenerator.createAddressIcon(it.hotkey.value, 32)) }
+        } else {
+            emptyList()
+        }
         val flow = if (action == BittensorPositionTradeAction.BUY) StakingFlow.STAKE else StakingFlow.UNSTAKE
         walletGate.checkingSupport(data.metaId, flow, StakingAnalyticsTarget.SUBNET) {
             if (options.size == 1) {
                 selectPosition(action, options.single().position)
             } else {
-                val rows = options.map { BittensorPositionChoiceUi(it, addressIconGenerator.createAddressIcon(it.hotkey.value, 32)) }
                 choices.value = BittensorPositionChoiceRequest(action, rows).event()
             }
         }

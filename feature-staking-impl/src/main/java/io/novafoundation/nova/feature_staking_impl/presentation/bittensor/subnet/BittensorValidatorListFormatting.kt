@@ -39,7 +39,9 @@ data class BittensorValidatorListFailure(val title: String, val message: String)
 internal fun bittensorValidatorListFailure(cause: Throwable, resources: ResourceManager): BittensorValidatorListFailure {
     val message = when (cause.bittensorReadFailureKind()) {
         BittensorReadFailureKind.DEVICE_UNSUPPORTED -> R.string.bittensor_validators_fetch_failed_device_message
-        BittensorReadFailureKind.GENERIC, BittensorReadFailureKind.SLOW_NETWORK -> R.string.bittensor_validators_fetch_failed_message
+        BittensorReadFailureKind.GENERIC,
+        BittensorReadFailureKind.SLOW_NETWORK,
+        BittensorReadFailureKind.REJECTED -> R.string.bittensor_validators_fetch_failed_message
     }
     return BittensorValidatorListFailure(
         title = resources.getString(R.string.bittensor_validators_fetch_failed_title),

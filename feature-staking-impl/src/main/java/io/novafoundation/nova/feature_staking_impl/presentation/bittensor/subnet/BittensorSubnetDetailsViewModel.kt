@@ -80,8 +80,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.f
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.runtime.ext.accountIdOf

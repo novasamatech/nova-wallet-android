@@ -86,7 +86,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import java.math.BigDecimal
