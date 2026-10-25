@@ -103,10 +103,13 @@ class BittensorStakePreflightValidation(
     }
 
     // A market that cannot be re-read leaves no quote to stake against, which the validations report.
+    // A re-read that ran out of time is a slow node, not a pool without liquidity, so it goes to the slow-network dialog.
     private suspend fun latestQuote(quote: BittensorSubnetBuyQuote, slippage: BittensorSlippage): BittensorSubnetBuyQuote? = try {
         bittensorSubnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks, slippage)
+    } catch (cause: TimeoutCancellationException) {
+        throw BittensorTimeoutException("Stake quote", cause)
     } catch (cause: Exception) {
-        if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+        if (cause is CancellationException) throw cause
         null
     }
 }

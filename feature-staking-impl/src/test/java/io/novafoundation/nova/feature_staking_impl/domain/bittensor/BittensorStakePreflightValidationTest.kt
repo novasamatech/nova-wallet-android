@@ -28,6 +28,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
@@ -302,6 +303,18 @@ class BittensorStakePreflightValidationTest {
     fun `answering reads pass without waiting for the time bound`() = runTest {
         assertTrue(validation.validate(payload) is io.novafoundation.nova.common.validation.ValidationStatus.Valid)
         assertEquals(0L, currentTime)
+    }
+
+    @Test
+    fun `market reread that times out is a slow network failure, not missing liquidity`() = runBlocking {
+        val quote = quote(System.currentTimeMillis())
+        val slippage = BittensorSlippage(BigDecimal("0.005"))
+        val timeout = runCatching { withTimeout(1) { awaitCancellation() } }.exceptionOrNull()
+        `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks, slippage)).thenThrow(timeout)
+
+        val result = system.validate(payload.copy(netuid = quote.subnetId, quote = quote, slippage = slippage))
+
+        assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
     }
 
     private fun quote(capturedAtMillis: Long): BittensorSubnetBuyQuote {
