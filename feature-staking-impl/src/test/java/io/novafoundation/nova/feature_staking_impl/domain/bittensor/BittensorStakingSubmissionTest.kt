@@ -32,7 +32,9 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
@@ -54,6 +56,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     enum class StakingType { ROOT, SUBNET }
 
     private val accounts = mock(AccountRepository::class.java)
+
+    // Read only by the executor to pick the build timeout; kept apart so `accounts` interactions stay meaningful.
+    private val signingWallets = mock(AccountRepository::class.java)
 
     private val wallets = mock(WalletRepository::class.java)
 
@@ -86,7 +91,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val positionUpdates = BittensorPositionUpdates()
 
-    private val submission = BittensorSubmissionExecutor(extrinsicService, positionUpdates)
+    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates) { _, _ -> extrinsicService.result.getOrThrow() }
 
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
@@ -172,6 +177,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun prepare(): Unit = runBlocking {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(selectedAccount.id).thenReturn(1L)
+        `when`(signingWallets.getMetaAccount(1L)).thenReturn(selectedAccount)
+        `when`(signingWallets.getMetaAccount(2L)).thenReturn(selectedAccount)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selectedAccount)
         `when`(chainRegistry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
         `when`(chain.assets).thenReturn(listOf(chainAsset))
@@ -491,17 +498,19 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             return fee
         }
 
-        override suspend fun submitExtrinsicAndAwaitExecution(
+        override suspend fun submitAndWatchExtrinsic(
             chain: Chain,
             origin: TransactionOrigin,
             submissionOptions: ExtrinsicService.SubmissionOptions,
             formExtrinsic: FormExtrinsicWithOrigin
-        ): Result<ExtrinsicExecutionResult> {
+        ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> {
             submissions++
             submissionOrigin = origin
             submissionChain = chain
             this.submissionOptions = submissionOptions
-            return result
+            return result.map { execution ->
+                flowOf(ExtrinsicWatchResult(ExtrinsicStatus.InBlock(execution.blockHash, execution.extrinsicHash), execution.submissionHierarchy))
+            }
         }
     }
 
