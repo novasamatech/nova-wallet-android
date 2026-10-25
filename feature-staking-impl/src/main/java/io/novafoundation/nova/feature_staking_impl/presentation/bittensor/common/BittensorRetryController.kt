@@ -33,6 +33,9 @@ class BittensorRetryController(
     // Sources that failed while the pending dialog was up; its Retry restarts them all.
     private val pendingRetries = mutableListOf<() -> Unit>()
 
+    // Retryable reads that fail behind an OK-only dialog get their own dialog after it closes.
+    private var queuedRetryKind: BittensorReadFailureKind? = null
+
     // A failure no retry can fix reads the same for every source, e.g. each attested read on a device that cannot
     // attest: explain it once per screen.
     private var finalFailureReported = false
@@ -91,8 +94,10 @@ class BittensorRetryController(
         synchronized(pendingRetries) {
             val shown = pending.value
             if (shown != null) {
-                // One dialog at a time: a later failure adds no dialog of its own.
-                if (shown.retryable && kind.retryable) pendingRetries += onRetry
+                if (kind.retryable) {
+                    pendingRetries += onRetry
+                    if (!shown.retryable && queuedRetryKind == null) queuedRetryKind = kind
+                }
                 return
             }
             if (kind.retryable) {
@@ -123,7 +128,10 @@ class BittensorRetryController(
     private fun resolve(failure: BittensorReadFailure, retry: Boolean) {
         val retries = synchronized(pendingRetries) {
             if (pending.value !== failure) return
-            pending.value = null
+            val queued = queuedRetryKind
+            queuedRetryKind = null
+            pending.value = queued?.let(::createFailure)
+            if (queued != null) return@synchronized emptyList()
             pendingRetries.toList().also { pendingRetries.clear() }
         }
         if (retry) retries.forEach { it() }

@@ -27,21 +27,29 @@ data class BittensorExitDustRemainder(val remainderTao: BigInteger, val minimumT
 fun BittensorExitValidationPayload.dustRemainders(): List<BittensorExitDustRemainder> {
     val minimum = preflight.minNominatorStake
     val price = (latestQuote ?: quote).postTradePrice ?: quote.limitPrice
-    val dustOf = { position: BigInteger, amount: BigInteger ->
+    fun dustOf(position: BigInteger, amount: BigInteger, available: BigInteger): BittensorExitDustRemainder? {
         val remainder = position - amount
         val value = if (quote.netuid.isRoot()) remainder else remainder * requireNotNull(price) / BittensorProtocolUnits.RAO_PER_TAO
-        BittensorExitDustRemainder(value, minimum, returned = preflight.availability.available >= position)
+        return BittensorExitDustRemainder(value, minimum, returned = available >= position)
             .takeIf { remainder.isPositive() && value < minimum }
     }
-    val partials = quote.plan?.slices?.filterNot { it.fullExit }
-    if (partials != null) {
-        return partials.mapNotNull { slice ->
-            val member = preflight.groupMembers[slice.hotkey] ?: return@mapNotNull null
-            if (member.isOwnHotkey) null else dustOf(member.stake, slice.amount)
+    val plan = quote.plan
+    if (plan != null) {
+        return buildList {
+            var available = preflight.availability.available
+            for (slice in plan.slices) {
+                val member = preflight.groupMembers[slice.hotkey] ?: continue
+                val dust = if (slice.fullExit || member.isOwnHotkey) null else dustOf(member.stake, slice.amount, available)
+                if (dust != null) add(dust)
+
+                // Full exits use the fresh stake; a returned sweep also spends the entire position.
+                val withdrawn = if (slice.fullExit || dust?.returned == true) member.stake else slice.amount
+                available = (available - withdrawn).max(BigInteger.ZERO)
+            }
         }
     }
     if (quote.fullExit || preflight.isOwnHotkey) return emptyList()
-    return listOfNotNull(dustOf(preflight.stake, quote.amount))
+    return listOfNotNull(dustOf(preflight.stake, quote.amount, preflight.availability.available))
 }
 
 /** The remainder validation stops at: slices are checked in plan order and an accepted sweep lets the next one through. */

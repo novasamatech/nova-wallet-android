@@ -137,6 +137,72 @@ class BittensorRetryControllerTest {
     }
 
     @Test
+    fun `temporary failures behind an unsupported device dialog remain retryable`() = runBlocking {
+        val unsupported = AttestationUnsupportedException("Play Integrity is unavailable")
+        val deviceFailure = firstFailure { throw unsupported }
+        val attempts = List(2) { AtomicInteger() }
+        val reported = List(2) { CompletableDeferred<Unit>() }
+        val values = mutableListOf<Int>()
+        val collections = attempts.mapIndexed { index, sourceAttempts ->
+            launch {
+                controller.observe(
+                    step = "RPC $index",
+                    transform = { source -> source.catch { reported[index].complete(Unit) } }
+                ) {
+                    flow {
+                        if (sourceAttempts.incrementAndGet() == 1) throw SocketTimeoutException()
+                        emit(index)
+                    }
+                }.take(1).toList(values)
+            }
+        }
+        withTimeout(3_000L) { reported.forEach { it.await() } }
+        assertSame(deviceFailure, controller.events.first())
+
+        deviceFailure.onDismiss()
+        val retryFailure = withTimeout(3_000L) { controller.events.first() }
+        assertEquals(BittensorReadFailureKind.SLOW_NETWORK, retryFailure.kind)
+        assertTrue(retryFailure.retryable)
+        assertEquals(listOf(1, 1), attempts.map { it.get() })
+        // A late dismissal from the old dialog must not clear the newly pending retry.
+        deviceFailure.onDismiss()
+        assertSame(retryFailure, controller.events.first())
+
+        retryFailure.onRetry()
+        withTimeout(3_000L) { collections.joinAll() }
+        assertEquals(setOf(0, 1), values.toSet())
+        assertEquals(listOf(2, 2), attempts.map { it.get() })
+        assertNull(withTimeoutOrNull(100L) { controller.events.first() })
+    }
+
+    @Test
+    fun `queued retry can be skipped without reloading the failed source`() = runBlocking {
+        val deviceFailure = firstFailure { throw AttestationUnsupportedException("Unsupported") }
+        val reported = CompletableDeferred<Unit>()
+        var attempts = 0
+        val collection = launch {
+            controller.observe(
+                step = "RPC",
+                transform = { source -> source.catch { reported.complete(Unit) } }
+            ) {
+                flow<Int> {
+                    attempts++
+                    throw SocketTimeoutException()
+                }
+            }.collect {}
+        }
+        withTimeout(3_000L) { reported.await() }
+        deviceFailure.onDismiss()
+        val retryFailure = withTimeout(3_000L) { controller.events.first() }
+        assertTrue(retryFailure.retryable)
+
+        retryFailure.onDismiss()
+        assertNull(withTimeoutOrNull(100L) { controller.events.first() })
+        assertEquals(1, attempts)
+        collection.cancelAndJoin()
+    }
+
+    @Test
     fun `pending failure is shown again to a recreated screen until it is dismissed`() = runBlocking {
         val failure = firstFailure { error("RPC unavailable") }
 

@@ -7,6 +7,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitA
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitDustRemainder
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitRemainderValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitQuoteValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitSelfImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.dustRemainder
 import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
@@ -113,6 +115,95 @@ class BittensorExitRemainderTest {
         val stake = rao(19_990_000)
         val group = rootPreflight(stake).exitGroup(hotkey)
         assertNull(group.basis(group.resolve(null)).plan(stake + BigInteger.ONE, group.floors))
+    }
+
+    @Test
+    fun `grouped sale blocks a locked remainder after acknowledging a lower price`() = runBlocking {
+        val otherHotkey = AccountIdKey(ByteArray(32) { 2 })
+        val stakes = linkedMapOf(hotkey to rao(1_000_000_000), otherHotkey to rao(500_000_000))
+        val available = rao(1_495_000_000)
+        val basisPositions = stakes.map { (key, stake) -> BittensorExitBasisPosition(key, stake, BigInteger.ZERO, false, false) }
+        val basis = BittensorExitBasis(stakes.values.sumOf { it }, available, basisPositions)
+        val originalLimit = rao(995_000_000)
+        val floors = BittensorExitFloors(
+            bittensorWithdrawalFloor(initialMinStake, originalLimit, BigInteger.ZERO),
+            bittensorWithdrawalFloor(nominatorMinimum, originalLimit, BigInteger.ZERO)
+        )
+        val plan = requireNotNull(basis.plan(available, floors))
+        val original = groupedPayload(stakes, available, plan, originalLimit)
+        // Review keeps the plan when the user acknowledges a lower rate. Its former safe remainder is now dust.
+        val latest = original.quote.copy(
+            limitPrice = rao(945_000_000),
+            spotPrice = rao(951_000_000),
+            simulatedInput = plan.amount,
+            estimatedTaoOut = plan.amount * rao(950_500_000) / BittensorProtocolUnits.RAO_PER_TAO,
+            minimumTaoOut = plan.amount * rao(945_000_000) / BittensorProtocolUnits.RAO_PER_TAO
+        )
+        val accepted = original.copy(quote = latest, latestQuote = latest, acknowledgedLimit = latest.limitPrice, remainderSweepAccepted = true)
+        val selfImpactValidation = BittensorExitSelfImpactValidation()
+        val quoteValidation = BittensorExitQuoteValidation()
+
+        assertTrue(selfImpactValidation.validate(accepted) is ValidationStatus.Valid)
+        assertTrue(quoteValidation.validate(accepted) is ValidationStatus.Valid)
+        val status = validation.validate(accepted) as ValidationStatus.NotValid
+        assertEquals(BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM, status.reason)
+        assertEquals(DefaultFailureLevel.ERROR, status.level)
+
+        val unlocked = accepted.copy(
+            preflight = accepted.preflight.copy(
+                availability = BittensorExitAvailability(rao(1_500_000_000), BigInteger.ZERO, rao(1_500_000_000))
+            )
+        )
+        assertTrue(validation.validate(unlocked) is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `full leg spends its current stake before checking the next remainder`() = runBlocking {
+        val otherHotkey = AccountIdKey(ByteArray(32) { 2 })
+        val plan = BittensorExitPlan(
+            listOf(
+                BittensorExitSlice(otherHotkey, rao(500_000_000), fullExit = true),
+                BittensorExitSlice(hotkey, rao(995_000_000), fullExit = false)
+            )
+        )
+        // The first position grew within the allowed 1 percent drift after the plan was frozen.
+        val stakes = linkedMapOf(hotkey to rao(1_000_000_000), otherHotkey to rao(504_000_000))
+        val accepted = groupedPayload(stakes, rao(1_500_000_000), plan).copy(remainderSweepAccepted = true)
+
+        assertEquals(BittensorExitDustRemainder(rao(5_000_000), nominatorMinimum, returned = false), accepted.dustRemainder())
+        assertEquals(BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM, (validation.validate(accepted) as ValidationStatus.NotValid).reason)
+    }
+
+    @Test
+    fun `returned dust also consumes availability before the next partial leg`() = runBlocking {
+        val otherHotkey = AccountIdKey(ByteArray(32) { 2 })
+        val plan = BittensorExitPlan(
+            listOf(
+                BittensorExitSlice(hotkey, rao(995_000_000), fullExit = false),
+                BittensorExitSlice(otherHotkey, rao(990_000_000), fullExit = false)
+            )
+        )
+        val stakes = linkedMapOf(hotkey to rao(1_000_000_000), otherHotkey to rao(1_000_000_000))
+        val accepted = groupedPayload(stakes, rao(1_995_000_000), plan).copy(remainderSweepAccepted = true)
+
+        assertEquals(BittensorExitDustRemainder(rao(10_000_000), nominatorMinimum, returned = false), accepted.dustRemainder())
+        assertEquals(BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM, (validation.validate(accepted) as ValidationStatus.NotValid).reason)
+    }
+
+    private fun groupedPayload(
+        stakes: Map<AccountIdKey, BigInteger>,
+        available: BigInteger,
+        plan: BittensorExitPlan,
+        limitPrice: BigInteger? = null
+    ): BittensorExitValidationPayload {
+        val total = stakes.values.sumOf { it }
+        val preflight = rootPreflight(stakes.getValue(hotkey)).copy(
+            availability = BittensorExitAvailability(total, total - available, available),
+            groupStakes = stakes,
+            groupMembers = stakes.mapValues { (_, stake) -> BittensorExitMember(stake, BigInteger.ZERO, false, BigInteger.ZERO) }
+        )
+        val quote = if (limitPrice == null) rootQuote(plan.amount, total) else subnetQuote(plan.amount, total, limitPrice)
+        return payload(preflight, quote.copy(plan = plan, groupHotkeys = stakes.keys))
     }
 
     private fun rao(value: Long) = BigInteger.valueOf(value)
