@@ -536,7 +536,9 @@ class BittensorSubnetReviewViewModel(
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
+                errorDisplayer = ::showConfirmError,
                 progressConsumer = validating.progressConsumer(),
+                scope = this@BittensorSubnetReviewViewModel,
                 validationFailureTransformerCustom = { failure, actions ->
                     bittensorStakeValidationFailureUi(
                         failure,
@@ -703,6 +705,11 @@ class BittensorSubnetReviewViewModel(
             .onEach { requote -> requote.onFailure(chainRpcReads::failed) }
             .map { requote -> ExtendedLoadingState.Loaded(prepared.copy(draft = requote.getOrDefault(prepared.draft))) }
             .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
+
+    // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+    private fun showConfirmError(error: Throwable) {
+        if (!retryController.reportSlowAction("subnet stake review", error, ::confirmClicked)) showError(error)
+    }
 
     fun retryClicked() {
         val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return

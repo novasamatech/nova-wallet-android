@@ -22,6 +22,7 @@ import java.math.BigInteger
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
 import kotlin.coroutines.resume
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
@@ -285,7 +286,7 @@ class BittensorStakePreflightValidationTest {
         val result = runCatching { validation.validate(payload) }
 
         assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
-        assertTrue(currentTime in 1L..45_000L)
+        assertEquals(BITTENSOR_REQUEST_TIMEOUT, currentTime)
     }
 
     @Test
@@ -296,7 +297,7 @@ class BittensorStakePreflightValidationTest {
         val result = runCatching { validation.validate(payload) }
 
         assertEquals(BittensorTimeoutException::class.java, result.exceptionOrNull()?.javaClass)
-        assertTrue(currentTime in 1L..45_000L)
+        assertEquals(BITTENSOR_REQUEST_TIMEOUT, currentTime)
     }
 
     @Test

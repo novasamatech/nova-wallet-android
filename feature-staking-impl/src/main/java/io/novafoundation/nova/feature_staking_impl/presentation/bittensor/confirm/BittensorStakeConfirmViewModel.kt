@@ -274,8 +274,10 @@ class BittensorStakeConfirmViewModel(
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
+                errorDisplayer = ::showConfirmError,
                 progressConsumer = validating.progressConsumer(),
-                validationFailureTransformer = { failure ->
+                scope = this@BittensorStakeConfirmViewModel,
+                validationFailureTransformerDefault = { failure ->
                     failure.analyticsKind()?.let { kind ->
                         analytics.track(
                             BittensorAnalyticsEvent.ValidationShown(
@@ -297,6 +299,11 @@ class BittensorStakeConfirmViewModel(
         } finally {
             validating.value = false
         }
+    }
+
+    // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+    private fun showConfirmError(error: Throwable) {
+        if (!retryController.reportSlowAction("root stake confirm", error, ::confirmClicked)) showError(error)
     }
 
     private val resultNavigation = BittensorResultNavigation(
