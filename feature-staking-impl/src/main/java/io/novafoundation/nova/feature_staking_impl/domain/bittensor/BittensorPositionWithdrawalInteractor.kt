@@ -62,7 +62,13 @@ internal fun BittensorExitPreflight.positionWithdrawal(
     slippageFraction: BigDecimal,
     blockMillis: BigInteger
 ): BittensorPositionWithdrawal {
-    val maximum = withWithdrawalFloors(netuid, slippageFraction).maximumAmount
+    // Subnet details show network availability, like iOS. The exit floor belongs to Sell's
+    // Max and plan: a positive dust position is not a network lock and must not block entry.
+    val maximum = if (netuid.isRoot()) {
+        withWithdrawalFloors(netuid, slippageFraction).maximumAmount
+    } else {
+        totalStake.min(availability.available).max(BigInteger.ZERO)
+    }
     return BittensorPositionWithdrawal(
         available = maximum,
         locked = (totalStake - maximum).max(BigInteger.ZERO),

@@ -3137,6 +3137,9 @@
     <string name="bittensor_claim_stale">Rewards could not be refreshed. Claiming is unavailable until fresh data is loaded.</string>
     <string name="bittensor_position_withdrawable">Available to withdraw: %1$s</string>
     <string name="bittensor_position_locked">Locked or held: %1$s. Only the available amount can be withdrawn.</string>
+    <string name="bittensor_withdrawal_locked_title">Locked or held: %1$s</string>
+    <string name="bittensor_withdrawal_partial">Only the available amount can be withdrawn.</string>
+    <string name="bittensor_withdrawal_unavailable">Nothing is currently available to withdraw.</string>
     <string name="bittensor_position_hold">Longest current withdrawal hold: approximately %1$s.</string>
     <string name="bittensor_estimated_apy">Est. APY</string>
     <string name="bittensor_root_hold_title">Root stake locked</string>

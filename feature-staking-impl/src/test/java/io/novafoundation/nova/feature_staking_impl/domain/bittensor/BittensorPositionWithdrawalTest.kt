@@ -33,7 +33,7 @@ class BittensorPositionWithdrawalTest {
     )
 
     @Test
-    fun `subnet availability and sell maximum both exclude zero payout positions`() {
+    fun `subnet details allow dust while sell maximum excludes it`() {
         val real = BittensorExitMember(number(1437781835), BigInteger.ZERO, false, BigInteger.ZERO)
         val dust = real.copy(stake = BigInteger.ONE)
         val total = real.stake + dust.stake
@@ -49,14 +49,35 @@ class BittensorPositionWithdrawalTest {
         val sellMaximum = snapshot.withWithdrawalFloors(netuid, BigDecimal.ZERO).exitGroup(held)
             .maximumFill(BittensorExitSelection.All)
 
-        assertEquals(real.stake, result.available)
-        assertEquals(sellMaximum, result.available)
+        assertEquals(total, result.available)
+        assertEquals(BigInteger.ZERO, result.locked)
+        assertEquals(real.stake, sellMaximum)
         assertTrue(result.canWithdraw)
 
-        val onlyDust = snapshot.copy(groupMembers = mapOf(owner to dust), groupStakes = mapOf(owner to dust.stake))
-            .positionWithdrawal(netuid, BigDecimal.ZERO, number(12000))
-        assertEquals(BigInteger.ZERO, onlyDust.available)
-        assertFalse(onlyDust.canWithdraw)
+        val dustSnapshot = snapshot.copy(
+            availability = BittensorExitAvailability(BigInteger.ONE, BigInteger.ZERO, BigInteger.ONE),
+            groupMembers = mapOf(owner to dust),
+            groupStakes = mapOf(owner to dust.stake)
+        )
+        val onlyDust = dustSnapshot.positionWithdrawal(netuid, BigDecimal.ZERO, number(12000))
+        assertEquals(BigInteger.ONE, onlyDust.available)
+        assertEquals(BigInteger.ZERO, onlyDust.locked)
+        assertTrue(onlyDust.canWithdraw)
+        assertEquals(
+            BigInteger.ZERO,
+            dustSnapshot.withWithdrawalFloors(netuid, BigDecimal.ZERO).exitGroup(owner)
+                .maximum(BittensorExitSelection.Validator(owner))
+        )
+    }
+
+    @Test
+    fun `subnet network lock still disables sell and supplies notice amount`() {
+        val snapshot = preflight.copy(availability = BittensorExitAvailability(number(200), number(200), BigInteger.ZERO))
+        val result = snapshot.positionWithdrawal(BittensorNetuid.Subnet(9), BigDecimal.ZERO, number(12000))
+
+        assertEquals(BigInteger.ZERO, result.available)
+        assertEquals(number(200), result.locked)
+        assertFalse(result.canWithdraw)
     }
 
     @Test
