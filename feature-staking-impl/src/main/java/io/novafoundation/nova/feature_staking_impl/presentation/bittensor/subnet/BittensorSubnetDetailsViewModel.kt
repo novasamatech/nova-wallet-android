@@ -86,7 +86,6 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -122,7 +121,8 @@ class BittensorSubnetDetailsViewModel(
     private val replaceOrigin: BittensorReplaceOrigin = BittensorReplaceOrigin.SUBNET_AMOUNT,
     initialValidatorAddress: String?,
     initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
-    private val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER
+    private val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER,
+    val isViewOnly: Boolean = false
 ) : BaseViewModel(), Browserable.Presentation by Browserable() {
 
     private var selectionState = initialSelectionState
@@ -158,10 +158,6 @@ class BittensorSubnetDetailsViewModel(
     val subnet = subnetState.mapNotNull { it.dataOrNull }
         .shareInBackground()
 
-    private val _isFiatMode = MutableStateFlow(false)
-
-    val isFiatMode = _isFiatMode.asStateFlow()
-
     private val period = MutableStateFlow(BittensorSubnetChartPeriod.WEEK)
 
     val selectedChartIndex = period.map { BittensorSubnetChartPeriod.entries.indexOf(it) }
@@ -175,9 +171,6 @@ class BittensorSubnetDetailsViewModel(
         .shareInBackground()
 
     private val asset = assetState.mapNotNull { it.dataOrNull }
-        .shareInBackground()
-
-    val nativeTokenSymbol = asset.map { it.token.configuration.symbol.value }
         .shareInBackground()
 
     val favorite = combine(subnet, bittensorSubnetInteractor.observeFavorites()) { subnet, favorites -> subnet in favorites }
@@ -253,25 +246,20 @@ class BittensorSubnetDetailsViewModel(
     }
         .shareInBackground()
 
+    /** The TAO price with its fiat value, for the selected chart point or the current pool price. */
     val price = combine(
         subnet,
         asset,
-        isFiatMode,
         chartSelection
-    ) { subnet, asset, fiat, selection ->
-        if (selection != null) {
-            return@combine if (fiat) {
-                fiatFormatter.formatFiat(selection.point.price, asset.token.currency)
-            } else {
-                tokenFormatter.formatToken(selection.point.price, asset.token.configuration.symbol)
-            }
-        }
-        val price = subnet.priceInRao?.let(asset.token::amountFromPlanks) ?: return@combine "—"
-        if (fiat) {
-            val fiatPrice = asset.token.toFiatOrNull(price) ?: return@combine "—"
-            fiatFormatter.formatFiat(fiatPrice, asset.token.currency)
+    ) { subnet, asset, selection ->
+        val price = selection?.point?.price ?: subnet.priceInRao?.let(asset.token::amountFromPlanks)
+        if (price == null) {
+            AmountModel("—", null)
         } else {
-            tokenFormatter.formatToken(price, asset.token.configuration.symbol)
+            AmountModel(
+                tokenFormatter.formatToken(price, asset.token.configuration.symbol),
+                asset.token.toFiatOrNull(price)?.let { fiatFormatter.formatFiat(it, asset.token.currency) }
+            )
         }
     }
         .shareInBackground()
@@ -280,15 +268,7 @@ class BittensorSubnetDetailsViewModel(
     val nativePoolTitle = asset.map { resources.getString(R.string.bittensor_token_in_pool, it.token.configuration.symbol.value) }
         .shareInBackground()
 
-    val currencyLabel = asset.map { it.token.currency.code }
-        .shareInBackground()
-
-    val axisFormatter = combine(
-        asset,
-        isFiatMode
-    ) { asset, isFiatMode ->
-        chartAxisFormatterFactory.create(asset.token, isFiatMode)
-    }
+    val axisFormatter = asset.map { chartAxisFormatterFactory.create(it.token, isFiatMode = false) }
         .shareInBackground()
 
     private val chartPeriods = BittensorSubnetChartPeriod.entries
@@ -333,7 +313,7 @@ class BittensorSubnetDetailsViewModel(
     private val visibleChart = combine(chartData, registrationEpochSeconds) { data, registration -> data.clipped(registration) }
         .shareInBackground()
 
-    val charts = combine(visibleChart, isFiatMode, ::mapCharts)
+    val charts = visibleChart.map(::mapCharts)
         .shareInBackground()
 
     val priceChangeFormatter = combine(visibleChart, period) { chart, selected ->
@@ -475,11 +455,6 @@ class BittensorSubnetDetailsViewModel(
         }
     }
 
-    fun showFiat(value: Boolean) {
-        chartSelection.value = null
-        _isFiatMode.value = value
-    }
-
     fun selectChartPoint(selection: PriceChartSelection?) {
         chartSelection.value = selection
     }
@@ -600,11 +575,9 @@ class BittensorSubnetDetailsViewModel(
         }
     }
 
-    private fun mapCharts(data: SubnetChartData, isFiatMode: Boolean): List<PriceChartModel> = chartPeriods.map { period ->
-        mapChart(data, period, isFiatMode)
-    }
+    private fun mapCharts(data: SubnetChartData): List<PriceChartModel> = chartPeriods.map { period -> mapChart(data, period) }
 
-    private fun mapChart(data: SubnetChartData, period: BittensorSubnetChartPeriod, isFiatMode: Boolean): PriceChartModel {
+    private fun mapChart(data: SubnetChartData, period: BittensorSubnetChartPeriod): PriceChartModel {
         val label = periodLabel(period)
         if (period != data.period) return PriceChartModel.Loading(label)
 
@@ -615,7 +588,7 @@ class BittensorSubnetDetailsViewModel(
                 // Unlisted subnets and windows with fewer than two points show the empty state; the spot price still comes from the pool.
                 if (state.data.size < 2) return PriceChartModel.Empty(label, unavailableChartMessage())
 
-                val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, if (isFiatMode) it.fiat else it.tao) }
+                val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, it.tao) }
                 PriceChartModel.Chart(
                     buttonText = label,
                     periodName = label,

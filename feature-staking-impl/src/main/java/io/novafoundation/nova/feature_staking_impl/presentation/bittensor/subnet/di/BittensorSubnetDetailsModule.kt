@@ -80,7 +80,8 @@ class BittensorSubnetDetailsModule {
         replaceOrigin = payload.replaceOrigin,
         initialValidatorAddress = payload.validatorAddress,
         initialSelectionState = payload.selectionState,
-        analyticsSource = payload.analyticsSource
+        analyticsSource = payload.analyticsSource,
+        isViewOnly = payload.viewOnly
     )
 
     @Provides

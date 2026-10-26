@@ -54,6 +54,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         amount.setAssetIconRounded(!viewModel.isRoot)
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
         amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
+        if (!viewModel.isRoot) amount.setAssetClickListener { viewModel.subnetClicked() }
         receive.isVisible = !viewModel.isRoot
         rate.isVisible = !viewModel.isRoot
         averagePrice.isVisible = !viewModel.isRoot
