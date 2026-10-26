@@ -13,28 +13,92 @@
         app:titleText="@string/bittensor_choose_subnet"
         android:hint="@string/bittensor_subnet_search_hint" />
 
-    <ProgressBar
-        android:id="@+id/loading"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/empty"
-        style="@style/TextAppearance.NovaFoundation.Regular.Body"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/bittensor_no_subnets"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/subnets"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingHorizontal="16dp"
-        android:clipToPadding="false"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/controls"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/sorting"
+                    style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="8dp"
+                    android:textColor="@color/button_text_accent"
+                    android:background="@drawable/bg_chip_6" />
+
+                <ImageButton
+                    android:id="@+id/filters"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:padding="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_filter"
+                    android:contentDescription="@string/common_filters"
+                    app:tint="@color/icon_secondary" />
+
+                <TextView
+                    android:id="@+id/subnetCount"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/subnets"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+
+        <!-- Low enough to clear the root row, which stays when filters (not the search) hide every subnet, as on iOS -->
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="148dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_placeholder"
+                app:tint="@color/icon_secondary" />
+
+            <TextView
+                android:id="@+id/empty"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                android:text="@string/bittensor_no_subnets" />
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

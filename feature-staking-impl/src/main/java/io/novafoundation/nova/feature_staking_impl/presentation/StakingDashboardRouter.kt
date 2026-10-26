@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
+
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.utils.Event
 
@@ -13,5 +15,5 @@ interface StakingDashboardRouter {
 
     fun returnToStakingDashboard()
 
-    fun openStakingDashboard()
+    fun openStakingDashboard(target: StakingDeepLinkTarget? = null)
 }

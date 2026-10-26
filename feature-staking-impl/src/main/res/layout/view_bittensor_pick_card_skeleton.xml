@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder pick card while a quick pick resolves or after it failed (iOS SubtensorPickCardSkeletonView). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item_corner_12_solid"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="48dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_shimmering_circle" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <View
+                        android:layout_width="140dp"
+                        android:layout_height="12dp"
+                        android:background="@drawable/bg_shimmering" />
+
+                    <View
+                        android:layout_width="90dp"
+                        android:layout_height="10dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_shimmering" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/icon_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="96dp"
+                    android:layout_height="26dp"
+                    android:background="@drawable/bg_shimmering" />
+
+                <View
+                    android:layout_width="72dp"
+                    android:layout_height="26dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_shimmering" />
+
+                <View
+                    android:layout_width="110dp"
+                    android:layout_height="26dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_shimmering" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+    <io.novafoundation.nova.common.view.TableView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:childrenPaddingBottom="0dp"
+        app:childrenPaddingEnd="0dp"
+        app:childrenPaddingStart="0dp"
+        app:childrenPaddingTop="0dp"
+        app:drawDividers="true"
+        app:showBackground="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/bittensor_you_receive"
+                android:textColor="@color/text_secondary" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_shimmering" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/bittensor_exchange_rate"
+                android:textColor="@color/text_secondary"
+                app:drawableEndCompat="@drawable/ic_info"
+                android:drawablePadding="4dp" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_shimmering" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/network_fee"
+                android:textColor="@color/text_secondary" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="120dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_shimmering" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
+        </LinearLayout>
+
+    </io.novafoundation.nova.common.view.TableView>
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/bittensor_quick_selection_loading"
+        android:textColor="@color/text_secondary" />
+</LinearLayout>

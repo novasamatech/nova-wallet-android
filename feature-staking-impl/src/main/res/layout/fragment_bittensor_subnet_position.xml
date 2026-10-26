@@ -6,17 +6,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/secondary_screen_background">
+    android:background="@drawable/drawable_background_image">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false" />
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,11 +100,21 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/divider" />
+
                 <io.novafoundation.nova.common.view.TableView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:showBackground="false"
-                    android:layout_marginTop="12dp">
+                    app:drawDividers="true"
+                    app:childrenPaddingStart="0dp"
+                    app:childrenPaddingEnd="0dp"
+                    app:childrenPaddingTop="0dp"
+                    app:childrenPaddingBottom="0dp">
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/averagePrice"
@@ -117,10 +134,25 @@
                         android:id="@+id/earned"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="@string/bittensor_estimated_profit"
+                        app:title="@string/bittensor_exit_earned"
                         app:primaryValue="—" />
                 </io.novafoundation.nova.common.view.TableView>
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/withdrawalLoading"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/withdrawalHint"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/positionError"
@@ -138,12 +170,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp" />
 
-            <TextView
-                android:id="@+id/price"
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            <!-- The fiat follows the price and wraps under it when both do not fit (large font scales). -->
+            <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="—" />
+                app:alignItems="baseline"
+                app:flexWrap="wrap">
+
+                <TextView
+                    android:id="@+id/price"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="—" />
+
+                <TextView
+                    android:id="@+id/priceFiat"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone" />
+            </com.google.android.flexbox.FlexboxLayout>
 
             <TextView
                 android:id="@+id/change"
@@ -153,6 +202,14 @@
                 android:text="—"
                 android:textColor="@color/text_secondary" />
 
+            <TextView
+                android:id="@+id/chartDate"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+
             <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
@@ -161,28 +218,22 @@
 
 
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/bittensor_validator"
-                android:textColor="@color/text_secondary" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/validators"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
+        android:background="@drawable/bg_bittensor_bottom_button_container"
         android:orientation="horizontal">
 
         <io.novafoundation.nova.common.view.PrimaryButton

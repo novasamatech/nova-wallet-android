@@ -24,6 +24,6 @@ data class BittensorSwapSimulation(
     val amountOut: BigInteger,
     val taoFee: BigInteger,
     val alphaFee: BigInteger,
-    val taoSlippage: BigInteger,
-    val alphaSlippage: BigInteger
+    val taoSlippage: BigInteger? = null,
+    val alphaSlippage: BigInteger? = null
 )

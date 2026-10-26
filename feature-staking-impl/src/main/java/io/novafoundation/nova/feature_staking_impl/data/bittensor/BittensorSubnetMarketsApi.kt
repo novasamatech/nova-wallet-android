@@ -9,6 +9,8 @@ interface BittensorSubnetMarketsApi {
     suspend fun markets(
         @Query("category") category: String = "bittensor-subnets",
         @Query("vs_currency") currency: String = "usd",
+        @Query("price_change_percentage") priceChangePercentage: String = "7d",
+        @Query("sparkline") sparkline: Boolean = true,
         @Query("per_page") perPage: Int,
         @Query("page") page: Int
     ): List<BittensorSubnetMarketRemote>

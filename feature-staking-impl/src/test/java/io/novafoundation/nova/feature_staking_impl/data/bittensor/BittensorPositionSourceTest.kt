@@ -47,6 +47,14 @@ class BittensorPositionSourceTest {
 
         override fun isSupported(section: String, method: String) = true
 
+        override suspend fun <R> callAt(
+            blockHash: String,
+            section: String,
+            method: String,
+            arguments: Map<String, Any?>,
+            returnBinding: (Any?) -> R
+        ): R = error("Unexpected block-pinned request")
+
         override suspend fun <R> call(
             section: String,
             method: String,

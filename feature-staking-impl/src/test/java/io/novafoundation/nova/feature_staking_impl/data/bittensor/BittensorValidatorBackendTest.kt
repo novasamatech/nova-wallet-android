@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -34,15 +35,13 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `stale recommendations or missing generation cannot select a root validator`() = runBlocking {
+    fun `stale recommendations still select a root validator but a missing generation cannot`() = runBlocking {
         val api = Api("no-store")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
         api.recommendationsDocument = recommendations("STALE")
-        assertTrue(
-            runCatching { backend.recommendedHotkeys(0) }
-                .isFailure
-        )
+        assertEquals(listOf("stable-root", "balanced-root", "higher-root"), backend.recommendedHotkeys(0))
+        assertEquals(4, backend.recommendedValidators().size)
         api.recommendationsDocument = policy("FRESH")
         assertTrue(
             runCatching { backend.recommendedHotkeys(0) }
@@ -152,14 +151,22 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `missing or stale server policy cannot enable validator selection`() {
+    fun `missing or unavailable server policy cannot enable validator selection but a stale one still applies`() {
         assertTrue(
             runCatching { mapBittensorValidatorGates(BittensorRecommendationsRemote(null)) }
                 .isFailure
         )
         assertTrue(
-            runCatching { mapBittensorValidatorGates(policy("STALE")) }
+            runCatching { mapBittensorValidatorGates(policy("STALE", availability = "UNAVAILABLE")) }
                 .isFailure
+        )
+        assertTrue(
+            runCatching { mapBittensorValidatorGates(policy("UNKNOWN")) }
+                .isFailure
+        )
+        assertEquals(
+            BigDecimal("0.18"),
+            mapBittensorValidatorGates(policy("STALE")).maxCommissionRate
         )
         assertEquals(
             BigDecimal("0.18"),
@@ -187,7 +194,7 @@ class BittensorValidatorBackendTest {
         val api = Api("max-age=60")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        api.recommendationsDocument = policy("STALE")
+        api.recommendationsDocument = policy("FRESH", availability = "UNAVAILABLE")
         assertTrue(
             runCatching { backend.gates() }
                 .isFailure
@@ -195,7 +202,7 @@ class BittensorValidatorBackendTest {
         api.recommendationsDocument = policy("FRESH")
         backend.gates()
 
-        api.recommendationsDocument = recommendations("STALE")
+        api.recommendationsDocument = policy("FRESH")
         assertTrue(
             runCatching { backend.recommendedHotkeys(0) }
                 .isFailure
@@ -216,28 +223,24 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `a stale ranking cannot supply recommendation or selection gates`() = runBlocking {
+    fun `a stale ranking reads as not fresh and still supplies selection gates`() = runBlocking {
         val api = Api("max-age=60")
         api.rankedFreshness = "STALE"
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        assertTrue(
-            runCatching { backend.rankedValidators(64) }
-                .isFailure
-        )
+        val ranking = backend.rankedValidators(64)
+        assertFalse(hasFreshBittensorRecommendations(ranking.meta))
+        assertEquals(BigDecimal("0.18"), mapBittensorValidatorGates(BittensorRecommendationsRemote(ranking.meta)).maxCommissionRate)
     }
 
     @Test
-    fun `root metrics must describe the requested hotkey`() = runBlocking {
-        val address = "5".repeat(48)
+    fun `root metrics use the collection endpoint`() = runBlocking {
         val api = Api("max-age=60")
-        api.root = BittensorRootValidatorRemote(BittensorRootValidatorRemote.Validator("6".repeat(48), "Other", null), rootMeta())
+        api.root = BittensorRootValidatorRemote(emptyList(), rootMeta())
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        assertTrue(
-            runCatching { backend.rootValidator(address) }
-                .isFailure
-        )
+        assertTrue(backend.rootValidators().items!!.isEmpty())
+        assertEquals(listOf("https://infra.test/v1/bittensor/root/validators"), api.requests)
     }
 
     @Test
@@ -245,100 +248,342 @@ class BittensorValidatorBackendTest {
         val address = "5".repeat(48)
         val api = Api("max-age=60")
         api.root = BittensorRootValidatorRemote(
-            BittensorRootValidatorRemote.Validator(
-                address,
-                "Synthetic",
-                BittensorRootValidatorRemote.Yield(
-                    BittensorRootValidatorRemote.Window("7.25", "FULL", "REPORTED")
+            listOf(
+                BittensorRootValidatorRemote.Validator(
+                    address,
+                    "Synthetic",
+                    BittensorRootValidatorRemote.Yield(
+                        BittensorRootValidatorRemote.Window("7.25")
+                    ),
+                    "100"
                 )
             ),
             rootMeta()
         )
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        val validators = org.mockito.Mockito.mock(BittensorSubnetValidatorRepository::class.java)
         val logger = org.mockito.Mockito.mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
         val chain = org.mockito.Mockito.mock(io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain::class.java)
         org.mockito.Mockito.`when`(chain.addressPrefix).thenReturn(42)
         val hotkey = io.novafoundation.nova.common.address.AccountIdKey(ByteArray(32) { 1 })
         val validator = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator(hotkey, "Synthetic")
         api.root = BittensorRootValidatorRemote(
-            BittensorRootValidatorRemote.Validator(chain.addressOf(hotkey.value), "Synthetic", api.root!!.validator!!.stakeYield),
+            listOf(BittensorRootValidatorRemote.Validator(chain.addressOf(hotkey.value), "Synthetic", api.root!!.items!!.single().stakeYield, "100")),
             rootMeta()
         )
-        val source = RemoteBittensorRootValidatorSource(backend, validators, logger)
+        val source = RemoteBittensorRootValidatorSource(backend, logger)
         assertEquals(BigDecimal("7.25"), source.annualPercentageYield(chain, validator))
     }
 
     @Test
-    fun `reported root rewards sum TAO payouts without duplicating an event`() = runBlocking {
-        val api = Api("no-store")
-        val first = BittensorRootClaimsRemote.Item(
-            100,
-            1,
-            2,
-            "synthetic",
-            "0.125"
-        )
-        api.claims = BittensorRootClaimsRemote(
-            listOf(
-                first,
-                first,
-                BittensorRootClaimsRemote.Item(
-                    101,
-                    1,
-                    2,
-                    "synthetic",
-                    "0.375"
-                )
-            ),
-            "TAO_APP_PARTIAL",
-            BittensorRootClaimsRemote.Meta(
-                BittensorRootClaimsRemote.Components(
-                    BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
-                )
-            )
-        )
+    fun `invalid ranked payload cannot poison cache or advance generation`() = runBlocking {
+        val api = Api("max-age=60")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        assertEquals(BigDecimal("0.500"), backend.receivedRootRewards("synthetic-subject"))
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 200).meta, null)
+
+        assertTrue(runCatching { backend.rankedValidators(64) }.isFailure)
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 100).meta, emptyList())
+        assertTrue(backend.rankedValidators(64).items!!.isEmpty())
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `malformed ranked gates cannot be cached`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val validMeta = requireNotNull(policy("FRESH").meta)
+        val invalidGates = BittensorRecommendationsRemote.Gates("invalid", true, true)
+        val invalidMeta = BittensorRecommendationsRemote.Meta(invalidGates, validMeta.components, validMeta.generation)
+        api.rankedDocument = BittensorRankedValidatorsRemote(invalidMeta, emptyList())
+
+        assertTrue(runCatching { backend.rankedValidators(64) }.isFailure)
+        api.rankedDocument = BittensorRankedValidatorsRemote(validMeta, emptyList())
+        backend.rankedValidators(64)
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `invalid root payload can recover before TTL`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val address = "5".repeat(48)
+        api.root = BittensorRootValidatorRemote(null, rootMeta())
+
+        assertTrue(runCatching { backend.rootValidators() }.isFailure)
+        api.root = BittensorRootValidatorRemote(listOf(BittensorRootValidatorRemote.Validator(address, "Correct", null, "100")), rootMeta())
+        assertEquals(address, backend.rootValidators().items?.single()?.hotkey)
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `newer cross route generation invalidates ranked cache and rejects regression`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 100).meta, emptyList())
+        backend.rankedValidators(64)
+        api.recommendationsDocument = policy("FRESH", block = 101)
+        backend.gates()
+
+        assertTrue(runCatching { backend.rankedValidators(64) }.isFailure)
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 101).meta, emptyList())
+        backend.rankedValidators(64)
+        assertEquals(4, api.requests.size)
+    }
+
+    @Test
+    fun `newer ranking invalidates global recommendations and policy`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.recommendationsDocument = recommendations("FRESH")
+        backend.recommendedValidators()
+        backend.gates()
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 124).meta, emptyList())
+        backend.rankedValidators(64)
+
+        assertTrue(runCatching { backend.recommendedValidators() }.isFailure)
+        assertTrue(runCatching { backend.gates() }.isFailure)
+        assertEquals(5, api.requests.size)
+    }
+
+    @Test
+    fun `generation compares timestamps first and resets on origin change`() = runBlocking {
+        val api = Api("no-store")
+        var base = "https://infra.test/".toHttpUrl()
+        val urls = InfrastructureUrls { base }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.recommendationsDocument = policy("FRESH", block = 200, asOf = "2026-10-19T00:00:00.100001Z")
+        backend.gates()
+        api.recommendationsDocument = policy("FRESH", block = 201, asOf = "2026-10-19T00:00:00.100000Z")
+        assertTrue(runCatching { backend.gates() }.isFailure)
+        base = "https://other.test/".toHttpUrl()
+        backend.gates()
+        assertEquals(3, api.requests.size)
+    }
+
+    @Test
+    fun `missing or invalid generation timestamp cannot be cached`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.recommendationsDocument = policy("FRESH", asOf = "2026-02-30T00:00:00Z")
+        assertTrue(runCatching { backend.gates() }.isFailure)
+        val metadata = BittensorRecommendationsRemote.Meta(
+            BittensorRecommendationsRemote.Gates("0.18", true, true),
+            BittensorRecommendationsRemote.Components(BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")),
+            BittensorRecommendationsRemote.Generation(BigInteger.ONE)
+        )
+        api.rankedDocument = BittensorRankedValidatorsRemote(metadata, emptyList())
+        assertTrue(runCatching { backend.rankedValidators(1) }.isFailure)
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH").meta, emptyList())
+        backend.rankedValidators(1)
+        assertEquals(3, api.requests.size)
+    }
+
+    @Test
+    fun `validator cache deadline includes time spent fetching`() = runBlocking {
+        var now = 0L
+        val clock = { now }
+        val api = Api("max-age=30")
+        api.beforeResponse = { now += 20_000_000_000L }
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls, clock)
+
+        backend.validators(1)
+        now = 29_000_000_000L
+        backend.validators(1)
+        assertEquals(1, api.requests.size)
+        now = 30_000_000_000L
+        backend.validators(1)
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `ranked root and policy caches use request start deadlines`() = runBlocking {
+        var now = 0L
+        val clock = { now }
+        val api = Api("max-age=30")
+        api.beforeResponse = { now += 31_000_000_000L }
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls, clock)
+        val address = "5".repeat(48)
+        api.root = BittensorRootValidatorRemote(listOf(BittensorRootValidatorRemote.Validator(address, null, null, "100")), rootMeta())
+        api.recommendationsDocument = recommendations("FRESH")
+
+        repeat(2) { backend.rankedValidators(1) }
+        repeat(2) { backend.rootValidators() }
+        repeat(2) { backend.gates() }
+        repeat(2) { backend.recommendedValidators() }
+        assertEquals(8, api.requests.size)
+    }
+
+    @Test
+    fun `root yield ignores legacy h24 and validators without positive root stake`() = runBlocking {
+        val api = Api("no-store")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val logger = org.mockito.Mockito.mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
+        val chain = org.mockito.Mockito.mock(io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain::class.java)
+        org.mockito.Mockito.`when`(chain.addressPrefix).thenReturn(42)
+        val hotkey = io.novafoundation.nova.common.address.AccountIdKey(ByteArray(32) { 1 })
+        val validator = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator(hotkey, "Validator")
+        val source = RemoteBittensorRootValidatorSource(backend, logger)
+        val address = chain.addressOf(hotkey.value)
+        val yield = gson.fromJson("""{"h24":{"apy":"99"},"d30":{"apy":"7.25"}}""", BittensorRootValidatorRemote.Yield::class.java)
+        for (stake in listOf(null, "0", "-1", "100")) {
+            val row = BittensorRootValidatorRemote.Validator(address, null, yield, stake)
+            api.root = BittensorRootValidatorRemote(listOf(row), rootMeta())
+            assertEquals(if (stake == "100") BigDecimal("7.25") else null, source.annualPercentageYield(chain, validator))
+        }
+        val legacyYield = gson.fromJson("""{"h24":{"apy":"99"}}""", BittensorRootValidatorRemote.Yield::class.java)
+        val row = BittensorRootValidatorRemote.Validator(address, null, legacyYield, "100")
+        api.root = BittensorRootValidatorRemote(listOf(row), rootMeta())
+        assertEquals(null, source.annualPercentageYield(chain, validator))
+    }
+
+    @Test
+    fun `network root rate accepts stale d30 yields but rejects malformed data before cache`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.overview = overview("FRESH", "invalid")
+        assertTrue(runCatching { backend.networkRootRate() }.isFailure)
+        api.overview = overview("STALE", "8.5")
+        assertEquals(BigDecimal("0.085"), backend.networkRootRate())
+        assertEquals(BigDecimal("0.085"), backend.networkRootRate())
+        assertEquals(List(2) { "https://infra.test/v1/bittensor/root/overview" }, api.requests)
+    }
+
+    @Test
+    fun `root overview deadline includes fetch latency and resets with origin`() = runBlocking {
+        val api = Api("max-age=30")
+        var now = 0L
+        var base = "https://infra.test/".toHttpUrl()
+        val urls = InfrastructureUrls { base }
+        val backend = BittensorValidatorBackend(api, urls) { now }
+        api.overview = overview("FRESH", "8.5")
+        api.beforeResponse = { now += 31_000_000_000L }
+        repeat(2) { backend.networkRootRate() }
+        assertEquals(2, api.requests.size)
+        api.beforeResponse = {}
+        backend.networkRootRate()
+        base = "https://other.test/".toHttpUrl()
+        backend.networkRootRate()
+        assertEquals("https://other.test/v1/bittensor/root/overview", api.requests.last())
+    }
+
+    private fun overview(freshness: String, apy: String): BittensorRootOverviewRemote {
+        val window = BittensorRootValidatorRemote.Window(apy)
+        val yield = BittensorRootValidatorRemote.Yield(window)
+        val stakeIndex = BittensorRootOverviewRemote.StakeIndex(yield)
+        val component = BittensorRecommendationsRemote.Component("AVAILABLE", freshness, "2026-10-19T00:00:00Z")
+        val components = BittensorRootOverviewRemote.Components(component)
+        val meta = BittensorRootOverviewRemote.Meta(components)
+        return BittensorRootOverviewRemote(stakeIndex, meta)
+    }
+
+    @Test
+    fun `available stale root yield windows remain displayable`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val fresh = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH", "2026-10-19T00:00:00Z")
+        val stale = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE", "2026-10-19T00:00:00Z")
+        val components = BittensorRootValidatorRemote.Components(fresh, stale)
+        val meta = BittensorRootValidatorRemote.Meta(components)
+        api.root = BittensorRootValidatorRemote(emptyList(), meta)
+        assertTrue(backend.rootValidators().items!!.isEmpty())
+        assertEquals(1, api.requests.size)
+    }
+
+    @Test
+    fun `network rate rejects negative yield and preserves missing index as unavailable`() = runBlocking {
+        val api = Api("no-store")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.overview = overview("FRESH", "-1")
+        assertEquals(null, backend.networkRootRate())
+        api.overview = BittensorRootOverviewRemote(null, api.overview!!.meta)
+        assertEquals(null, backend.networkRootRate())
+        api.overview = overview("FRESH", "0")
+        assertEquals(BigDecimal("0.00"), backend.networkRootRate())
     }
 
     private fun rootMeta() = BittensorRootValidatorRemote.Meta(
         BittensorRootValidatorRemote.Components(
-            BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
+            BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH", "2026-10-19T00:00:00Z"),
+            BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH", "2026-10-19T00:00:00Z")
         )
     )
+
+    @Test
+    fun `subnet facts reuse fresh policy response and select exact subnet`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val row = BittensorSubnetRankingRemote(1, "26000", 1000.toBigInteger(), null)
+        api.recommendationsDocument = BittensorRecommendationsRemote(policy("FRESH").meta, items = listOf(row))
+        backend.gates()
+        assertEquals(row, backend.rankedSubnet(io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(1), 1.toBigInteger()))
+        assertEquals(null, backend.rankedSubnet(io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(2), 1.toBigInteger()))
+        assertEquals(1, api.requests.size)
+    }
+
+    @Test
+    fun `subnet facts reject stale and previous incarnation data`() = runBlocking {
+        val api = Api("no-store")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val subnet = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(1)
+        api.recommendationsDocument = BittensorRecommendationsRemote(policy("STALE", availability = "UNAVAILABLE").meta, items = emptyList())
+        assertTrue(runCatching { backend.rankedSubnet(subnet, 1.toBigInteger()) }.isFailure)
+        api.recommendationsDocument = BittensorRecommendationsRemote(policy("STALE").meta, items = emptyList())
+        assertEquals(null, backend.rankedSubnet(subnet, 1.toBigInteger()))
+        api.recommendationsDocument = BittensorRecommendationsRemote(policy("FRESH").meta, items = emptyList())
+        assertTrue(runCatching { backend.rankedSubnet(subnet, 124.toBigInteger()) }.isFailure)
+        assertEquals(null, backend.rankedSubnet(subnet, 123.toBigInteger()))
+    }
 
     private class Api(private val cacheControl: String) : BittensorValidatorsApi {
 
         val requests = mutableListOf<String>()
         var rankedFreshness = "FRESH"
+        var rankedDocument: BittensorRankedValidatorsRemote? = null
+        var beforeResponse: () -> Unit = {}
         var root: BittensorRootValidatorRemote? = null
-        var claims: BittensorRootClaimsRemote? = null
+        var overview: BittensorRootOverviewRemote? = null
 
         var recommendationsDocument = policy("FRESH")
 
         override suspend fun validators(url: String): Response<BittensorValidatorsRemote> {
             requests += url
+            beforeResponse()
             return Response.success(BittensorValidatorsRemote(emptyList()), headers())
         }
         override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> {
             requests += url
+            beforeResponse()
             return Response.success(recommendationsDocument, headers())
         }
-        override suspend fun rootClaims(url: String): Response<BittensorRootClaimsRemote> {
+        override suspend fun rootValidators(url: String): Response<BittensorRootValidatorRemote> {
             requests += url
-            return claims?.let { Response.success(it, headers()) } ?: Response.error(503, okhttp3.ResponseBody.create(null, ""))
+            beforeResponse()
+            return root?.let { Response.success(it, headers()) } ?: Response.error(503, "".toResponseBody())
         }
-        override suspend fun rootValidator(url: String): Response<BittensorRootValidatorRemote> {
+        override suspend fun rootOverview(url: String): Response<BittensorRootOverviewRemote> {
             requests += url
-            return root?.let { Response.success(it, headers()) } ?: Response.error(503, okhttp3.ResponseBody.create(null, ""))
+            beforeResponse()
+            return overview?.let { Response.success(it, headers()) } ?: Response.error(503, "".toResponseBody())
         }
         override suspend fun rankedValidators(url: String): Response<BittensorRankedValidatorsRemote> {
             requests += url
+            beforeResponse()
             return Response.success(
-                BittensorRankedValidatorsRemote(
+                rankedDocument ?: BittensorRankedValidatorsRemote(
                     policy(rankedFreshness).meta,
                     emptyList()
                 ),
@@ -353,7 +598,7 @@ class BittensorValidatorBackendTest {
     private fun recommendations(freshness: String): BittensorRecommendationsRemote = gson.fromJson(
         """{
             "meta":{
-                "components":{"recommendations":{"availability":"AVAILABLE","freshness":"$freshness"}},
+                "components":{"recommendations":{"availability":"AVAILABLE","freshness":"$freshness","asOf":"2026-10-19T00:00:00Z"}},
                 "generation":{"sourceBlockNumber":123},
                 "clientGates":{"maxTake":"0.18","requirePermit":true,"requireActiveWithinCutoff":true}
             },
@@ -367,10 +612,16 @@ class BittensorValidatorBackendTest {
     )
 
     companion object {
-        private fun policy(freshness: String) = BittensorRecommendationsRemote(
+        private fun policy(
+            freshness: String,
+            block: Long = 123,
+            asOf: String = "2026-10-19T00:00:00Z",
+            availability: String = "AVAILABLE"
+        ) = BittensorRecommendationsRemote(
             BittensorRecommendationsRemote.Meta(
                 BittensorRecommendationsRemote.Gates("0.18", true, true),
-                BittensorRecommendationsRemote.Components(BittensorRecommendationsRemote.Component("AVAILABLE", freshness))
+                BittensorRecommendationsRemote.Components(BittensorRecommendationsRemote.Component(availability, freshness, asOf)),
+                BittensorRecommendationsRemote.Generation(block.toBigInteger())
             )
         )
     }

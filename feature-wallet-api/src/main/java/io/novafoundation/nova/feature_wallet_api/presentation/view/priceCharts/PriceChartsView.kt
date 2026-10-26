@@ -11,6 +11,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.children
 import androidx.core.view.isGone
+import androidx.core.view.marginEnd
+import androidx.core.view.updateLayoutParams
+import com.facebook.shimmer.ShimmerFrameLayout
 import com.github.mikephil.charting.data.Entry
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.inflater
@@ -99,6 +102,8 @@ class PriceChartsView @JvmOverloads constructor(
 
     var onPriceChange: ((Float, Float) -> Unit)? = null
 
+    var selectionListener: PriceChartSelectionListener? = null
+
     var onContentVisibilityChanged: ((Boolean) -> Unit)? = null
 
     fun setSelectedPeriod(index: Int) {
@@ -111,6 +116,21 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     fun setReferencePrice(value: Float?, label: String) = controller.setReferencePrice(value, label)
+
+    /** The width the loading skeleton reserves for axis labels, so it can be given back when the axis is hidden. */
+    private val plotShimmeringAxisMargin = binder.priceChartPlotShimmering.marginEnd
+
+    /**
+     * Shows or hides the right-hand amount labels together with the dashed grid, in the chart and in its loading
+     * skeleton. Hidden, the plot stretches across the full view width; a reference line keeps its own label.
+     */
+    fun setAxisVisible(visible: Boolean) {
+        controller.setAxisVisible(visible)
+        binder.priceChartShimmering.children.filterIsInstance<ShimmerFrameLayout>().forEach { it.isGone = !visible }
+        binder.priceChartPlotShimmering.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            marginEnd = if (visible) plotShimmeringAxisMargin else 0
+        }
+    }
 
     fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = controller.setAxisLabelFormatter(formatter)
 
@@ -132,6 +152,7 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     fun setCharts(charts: List<PriceChartModel>) {
+        selectionListener?.onSelectionChanged(null)
         val periodLabelsChanged = this.charts.map { it.buttonText } != charts.map { it.buttonText }
         this.charts = charts
 
@@ -169,6 +190,10 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean) {
+        val chart = charts.getOrNull(selectedChartIndex)
+        val point = selectedEntry.data as? PriceChartModel.Chart.Price
+        val selection = PriceChartSelection.from(chart, point, isEntrySelected)
+        selectionListener?.onSelectionChanged(selection)
         onPriceChange?.invoke(startEntry.y, selectedEntry.y)
         if (presentation == Presentation.FULL) {
             priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, binder.priceChartPriceChange)
@@ -212,6 +237,7 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun selectChart(index: Int) {
+        selectionListener?.onSelectionChanged(null)
         selectedChartIndex = index
 
         getButtons().forEachIndexed { i, view ->
@@ -266,6 +292,11 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun PriceChartModel.Chart.asEntries() = priceChart.map {
-        Entry(it.timestamp.toFloat(), it.price.toFloat())
+        Entry(it.timestamp.toFloat(), it.price.toFloat(), it)
+    }
+
+    override fun onDetachedFromWindow() {
+        selectionListener?.onSelectionChanged(null)
+        super.onDetachedFromWindow()
     }
 }

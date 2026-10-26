@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getSocket
@@ -7,7 +8,7 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 
 interface BittensorExitRuntimeSource {
 
@@ -22,7 +23,8 @@ interface BittensorExitRuntimeSource {
 class RealBittensorExitRuntimeSource(
     private val storage: StorageDataSource,
     private val rpcCalls: RpcCalls,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val bulkRetriever: BulkRetriever
 ) : BittensorExitRuntimeSource {
 
     override suspend fun preflight(
@@ -30,7 +32,7 @@ class RealBittensorExitRuntimeSource(
         coldkey: AccountId,
         hotkey: AccountId,
         netuid: BittensorNetuid
-    ): BittensorExitPreflight = withTimeout(
+    ): BittensorExitPreflight = withTimeoutOrNull(
         25_000
     ) {
         val hash = rpcCalls.getBlockHash(chainId)
@@ -38,15 +40,16 @@ class RealBittensorExitRuntimeSource(
         storage.query(
             chainId,
             at = hash,
-            applyStorageDefault = true
+            applyStorageDefault = false
         ) {
             loadBittensorExitSnapshot(
                 coldkey,
                 hotkey,
                 netuid,
                 socket,
-                hash
+                hash,
+                bulkRetriever
             )
         }
-    }
+    } ?: throw BittensorTimeoutException("Exit preflight")
 }

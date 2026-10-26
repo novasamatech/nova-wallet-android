@@ -6,12 +6,21 @@ import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
+import io.novasama.substrate_sdk_android.hash.isPositive
+import java.math.BigInteger
+
+/** Blocks left on the root hold that refuses the withdrawal, of the first held validator of the plan. */
+fun BittensorExitValidationPayload.rootHoldBlocks(): BigInteger {
+    val holds = quote.plan?.slices?.mapNotNull { preflight.groupMembers[it.hotkey]?.holdRemaining }
+    return holds?.firstOrNull { it.isPositive() } ?: holds?.maxOrNull()
+        ?: if (quote.fullExit) preflight.groupRootHoldRemaining else preflight.rootHoldRemaining
+}
 
 class BittensorExitHoldValidation : BittensorExitValidation {
 
     override suspend fun validate(value: BittensorExitValidationPayload): ValidationStatus<BittensorExitValidationFailure> {
         return validOrError(
-            value.preflight.rootHoldRemaining.isZero
+            value.rootHoldBlocks().isZero
         ) { BittensorExitValidationFailure.ROOT_LOCKED }
     }
 }

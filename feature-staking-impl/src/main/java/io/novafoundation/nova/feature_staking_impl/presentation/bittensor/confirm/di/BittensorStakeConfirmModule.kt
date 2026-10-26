@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +36,8 @@ class BittensorStakeConfirmModule {
     @IntoMap
     @ViewModelKey(BittensorStakeConfirmViewModel::class)
     fun provideViewModel(
+        analytics: AnalyticsService,
+        operationAnalytics: BittensorOperationAnalytics,
         payload: BittensorStakeConfirmPayload,
         resourceManager: ResourceManager,
         router: StakingRouter,
@@ -51,7 +56,7 @@ class BittensorStakeConfirmModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
-            payload = payload,
+            analytics, operationAnalytics, payload = payload,
             resourceManager = resourceManager,
             router = router,
             externalActions = externalActions,

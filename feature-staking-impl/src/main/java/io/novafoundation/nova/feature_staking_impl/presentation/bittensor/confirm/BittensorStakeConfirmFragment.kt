@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import androidx.core.view.isVisible
 import android.os.Bundle
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseFragment
@@ -30,9 +32,11 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
 
     override fun initViews() {
         binder.bittensorStakeConfirmButton.prepareForProgress(viewLifecycleOwner)
+        binder.bittensorStakeConfirmToolbar.setTitle(viewModel.titleRes)
         binder.bittensorStakeConfirmToolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         binder.bittensorStakeConfirmExtrinsicInformation.setOnAccountClickedListener { viewModel.accountClicked() }
+        binder.bittensorStakeConfirmValidator.setOnClickListener { viewModel.validatorClicked() }
         binder.bittensorStakeConfirmButton.setOnClickListener { viewModel.confirmClicked() }
     }
 
@@ -56,15 +60,13 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         viewModel.fee.observe(binder.bittensorStakeConfirmExtrinsicInformation::setFeeStatus)
         binder.bittensorStakeConfirmStakingType.showValue(viewModel.stakingType)
         viewModel.validator.observe(::showValidator)
-        viewModel.stakeAfter.observe(binder.stakeAfter::showBittensorLoadingValue)
+        viewModel.stakeAfter.observe {
+            binder.stakeAfter.isVisible = it !is ExtendedLoadingState.Loaded || it.data != null
+            binder.stakeAfter.showBittensorLoadingValue(it)
+        }
         viewModel.apy.observe(binder.bittensorStakeConfirmApy::showBittensorLoadingValue)
         viewModel.confirmButtonState.observe(binder.bittensorStakeConfirmButton::setState)
-        bindBittensorStakeResults(
-            results = viewModel.resultState,
-            onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::confirmClicked,
-            onViewPosition = viewModel::viewPositionClicked
-        )
+        bindBittensorStakeResults(viewModel.resultState, viewModel::resultActionClicked)
     }
 
     private fun showValidator(validator: BittensorValidatorUi) {

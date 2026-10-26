@@ -11,12 +11,16 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorClaimForfeitureValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorClaimRewardsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorClaimSafeModeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorClaimProfitValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorClaimPendingValidation
 
 @Module
 class BittensorClaimValidationsModule {
 
     @Provides
     fun provideClaimValidationSystem(): BittensorClaimValidationSystem {
+        val claimPendingValidation = BittensorClaimPendingValidation()
+
         val claimAvailabilityValidation = BittensorClaimAvailabilityValidation()
 
         val claimRewardsValidation = BittensorClaimRewardsValidation()
@@ -24,18 +28,23 @@ class BittensorClaimValidationsModule {
         val claimForfeitureValidation = BittensorClaimForfeitureValidation()
 
         val claimFeeValidation = BittensorClaimFeeValidation()
+
         val claimColdkeySwapValidation = BittensorClaimColdkeySwapValidation()
 
         val claimSafeModeValidation = BittensorClaimSafeModeValidation()
 
+        val claimProfitValidation = BittensorClaimProfitValidation()
+
         return ValidationSystem.from(
             listOf(
+                claimPendingValidation,
                 claimColdkeySwapValidation,
                 claimSafeModeValidation,
                 claimAvailabilityValidation,
                 claimRewardsValidation,
                 claimForfeitureValidation,
-                claimFeeValidation
+                claimFeeValidation,
+                claimProfitValidation
             )
         )
     }

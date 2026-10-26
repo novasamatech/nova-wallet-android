@@ -1,10 +1,34 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
+import kotlinx.coroutines.flow.onStart
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorValidatorRowUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLeadingApy
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
+import io.novafoundation.nova.common.utils.ltrIsolated
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.reportWatchOnlyStake
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingMode
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
+
 import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSlippage
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isError
@@ -20,12 +44,14 @@ import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -36,10 +62,17 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_AL
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPreparedSubnetStake
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.actualBuyPay
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorPreSubmissionError
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorSubmissionError
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPreparedSubnetStake
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
@@ -49,13 +82,20 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.mapDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
@@ -73,19 +113,27 @@ import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 
 class BittensorSubnetReviewViewModel(
+    private val analytics: AnalyticsService,
+    private val operationAnalytics: BittensorOperationAnalytics,
     private val subnetId: BittensorNetuid.Subnet,
     private val totalInPlanks: BigInteger,
     private val metaId: Long,
     private val validatorAddress: String,
-    private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
     chainRegistry: ChainRegistry,
     walletUiUseCase: WalletUiUseCase,
@@ -102,8 +150,17 @@ class BittensorSubnetReviewViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
-    private val chainStateRepository: ChainStateRepository
+    private val fiatFormatter: FiatFormatter,
+    private val chainStateRepository: ChainStateRepository,
+    private val selectedSlippage: BigDecimal,
+    val existingPosition: Boolean = false,
+    private val inactiveValidatorAccepted: Boolean = false
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
+
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.CONFIRM)
+
+    /** Set once the stake is confirmed, also when it then fails. */
+    private var flowContinued = false
 
     val retryEvents = retryController.events
 
@@ -117,9 +174,7 @@ class BittensorSubnetReviewViewModel(
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
 
-    val executionFailure = submission.map { state ->
-        state.result as? BittensorStakeResultUi.Failure
-    }
+    val executionResult = submission.map { it.result }
         .shareInBackground()
 
     private val walletState = retryController.observe(
@@ -139,8 +194,19 @@ class BittensorSubnetReviewViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    private val preparationState = retryController.observe(
+    private val retryRequotes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    // Every new block re-quotes until the stake is handed to submission, and a retry re-quotes at once.
+    private val requotes = bittensorSubnetStakingInteractor.requotes(
+        active = submission.map { it is BittensorSubmissionState.Ready },
+        immediate = retryRequotes
+    )
+        .inBackground()
+        .shareIn(this, SharingStarted.Eagerly)
+
+    private val preparedStake = retryController.observe(
         step = "stake preparation",
+        analytics = chainRpcReads,
         transform = { it.withSafeLoading() }
     ) {
         preparationRefresh.flatMapLatest {
@@ -149,14 +215,27 @@ class BittensorSubnetReviewViewModel(
                     metaId,
                     subnetId,
                     totalInPlanks,
-                    validatorAddress
+                    validatorAddress,
+                    BittensorSlippage(selectedSlippage),
+                    existingPosition = existingPosition
                 )
             }
         }
     }
         .shareInBackground()
 
+    private val preparationState = preparedStake.flatMapLatest { state ->
+        state.dataOrNull?.let(::requotedEachBlock) ?: flowOf { state }
+    }
+        .shareInBackground()
+
     private val draft = preparationState.map { it.dataOrNull?.draft }
+        .shareInBackground()
+
+    // Block re-quotes only update what is shown. The fee and the confirm check keep the prepared (acknowledged) quote,
+    // so a price move past its limit asks for the updated quote before anything is signed.
+    private val acknowledgedDraft = preparedStake.map { it.dataOrNull?.draft }
+        .distinctUntilChanged()
         .shareInBackground()
 
     private val quote = draft.map { it?.operation?.quote }
@@ -166,6 +245,33 @@ class BittensorSubnetReviewViewModel(
         val serviceFeeRate = quote?.serviceFeeRate ?: return@map ""
         val percentage = serviceFeeRate.movePointRight(2).toStripTrailingZerosString()
         resources.getString(R.string.bittensor_subnet_fee_caption, percentage)
+    }
+        .shareInBackground()
+
+    val swapRateDescription = combine(
+        preparationState,
+        walletContext
+    ) { preparation, wallet ->
+        preparation.dataOrNull?.let { prepared ->
+            resources.getString(
+                R.string.bittensor_swap_rate_buy_description,
+                prepared.subnet.title(resources),
+                wallet.asset.token.configuration.symbol.value,
+                prepared.draft.operation.quote.serviceFeeRate.movePointRight(2).toStripTrailingZerosString()
+            )
+        }
+    }
+        .shareInBackground()
+
+    val networkFeeDescription = walletContext.map { wallet ->
+        resources.getString(R.string.bittensor_network_fee_buy_description, wallet.asset.token.configuration.symbol.value)
+    }
+        .shareInBackground()
+
+    val averagePriceDescription = preparationState.map { preparation ->
+        preparation.dataOrNull?.subnet?.let { subnet ->
+            resources.getString(R.string.bittensor_average_price_description, subnet.symbol, subnet.title(resources))
+        }
     }
         .shareInBackground()
 
@@ -181,9 +287,9 @@ class BittensorSubnetReviewViewModel(
     )
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
+    private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map {
-            it.takeIf { it.metaId == metaId }
+            it.takeIf { existingPosition && it.metaId == metaId }
                 ?.let { BittensorEstimateContext(metaId, it.chain) }
         }
     )
@@ -204,10 +310,7 @@ class BittensorSubnetReviewViewModel(
                 "—"
             } else {
                 val alpha = bittensorMonthlyProjection(BigDecimal(quote.alphaOutInPlanks, BittensorProtocolUnits.ALPHA_PRECISION), annual)
-                "≈ " + tokenFormatter.formatToken(
-                    alpha,
-                    TokenSymbol(subnet.symbol.ifBlank { "—" })
-                )
+                ("≈ " + tokenFormatter.formatToken(alpha, TokenSymbol(subnet.symbol.ifBlank { "—" }))).ltrIsolated()
             }
         }
     }
@@ -218,7 +321,8 @@ class BittensorSubnetReviewViewModel(
         draft.map { it?.operation?.quote },
         walletContext,
         preparationState
-    ) { state, quote, walletContext, quoteLoading ->
+    ) { costBasis, quote, walletContext, quoteLoading ->
+        val state = costBasis.buyMoreCostBasis(subnetId.value)
         bittensorLoadingValue(state, quoteLoading) {
             val basis = state.dataOrNull
             val current = basis?.forSubnet(subnetId.value)
@@ -242,7 +346,7 @@ class BittensorSubnetReviewViewModel(
     )
 
     val fee = combine(
-        draft,
+        acknowledgedDraft,
         feeLoaderMixin.fee
     ) { draft, status ->
         status.forRequest(draft)
@@ -272,9 +376,6 @@ class BittensorSubnetReviewViewModel(
     val isExecuting = submission.map { it is BittensorSubmissionState.Submitting }
         .shareInBackground()
 
-    val isCompleted = submission.map { it is BittensorSubmissionState.Completed }
-        .shareInBackground()
-
     val showExecution = submission.map { it !is BittensorSubmissionState.Ready }
         .shareInBackground()
 
@@ -282,29 +383,58 @@ class BittensorSubnetReviewViewModel(
         preparationState,
         submission
     ) { prepared, state ->
-        if (state is BittensorSubmissionState.Completed || state is BittensorSubmissionState.Failed || state is BittensorSubmissionState.Unresolved) {
+        if (state is BittensorSubmissionState.Completed || state is BittensorSubmissionState.Failed || state is BittensorSubmissionState.Unconfirmed) {
             resources.formatDateTime(executionCompletedAt)
         } else {
             resources.getString(
                 R.string.bittensor_subnet_execution_buying,
-                prepared.dataOrNull?.subnet?.name.orEmpty(),
+                prepared.dataOrNull?.subnet.title(subnetId.value, resources),
                 prepared.dataOrNull?.subnet?.symbol.orEmpty()
             )
         }
     }
         .shareInBackground()
 
-    val executionAssets = assets.map { assets ->
+    val executionAssets = combine(assets, submission, preparationState, nativeToken) { assets, state, preparation, token ->
         val output = assets.assetOut
+        val result = state.result as? BittensorStakeResultUi.Success
+        val outcome = result?.outcome
+        val subnet = preparation.dataOrNull?.subnet
+        val actualAlpha = outcome?.alpha?.let { BigDecimal(it, BittensorProtocolUnits.ALPHA_PRECISION) }
+        val actualOutput = actualAlpha?.let { alpha ->
+            subnet?.symbol?.let { tokenFormatter.formatToken(alpha, TokenSymbol(it)) }
+        }
+        // As on iOS, the done page keeps the fiat value under both amounts.
+        val paidIn = outcome?.actualBuyPay(preparation.dataOrNull?.draft?.operation?.quote?.serviceFeeTaoInPlanks ?: BigInteger.ZERO) ?: totalInPlanks
+        val inputFiat = formatFiat(token, token.toFiatOrNull(token.amountFromPlanks(paidIn)))
+        val outputFiat = if (actualAlpha == null) {
+            output.amount.fiat
+        } else {
+            formatFiat(token, subnet?.priceInRao?.let(token::amountFromPlanks)?.let { token.toFiatOrNull(actualAlpha * it) })
+        }
         SwapAssetsView.Model(
-            assetIn = assets.assetIn,
+            assetIn = SwapAssetView.Model(
+                assetIcon = assets.assetIn.assetIcon,
+                amount = (result?.amount ?: formatBittensorNativeResult(null, totalInPlanks, chain.await(), tokenFormatter)).copy(fiat = inputFiat),
+                iconSizeDp = assets.assetIn.iconSizeDp
+            ),
             assetOut = SwapAssetView.Model(
                 assetIcon = output.assetIcon,
-                amount = output.amount.copy(token = "≈ \u200e${output.amount.token}"),
+                amount = output.amount.copy(token = actualOutput?.ltrIsolated() ?: ("≈ " + output.amount.token).ltrIsolated(), fiat = outputFiat),
                 iconSizeDp = output.iconSizeDp,
                 clipIconToOutline = output.clipIconToOutline
             )
         )
+    }
+        .shareInBackground()
+
+    val executionFee = combine(fee, submission) { status, state ->
+        val result = state.result as? BittensorStakeResultUi.Success
+        if (result != null) {
+            FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(result.fee.amount, result.fee.fiatAmount)))
+        } else {
+            status.mapDisplay { display -> FeeDisplay("≈ " + display.title, null) }
+        }
     }
         .shareInBackground()
 
@@ -314,12 +444,31 @@ class BittensorSubnetReviewViewModel(
     ) { token, preparation -> preparation.map { formatRate(token, it) } }
         .shareInBackground()
 
-    val slippage = bittensorSubnetInteractor.slippage.fraction.multiply(BigDecimal(100)).toStripTrailingZerosString() + "%"
+    val slippage = selectedSlippage.multiply(BigDecimal(100)).toStripTrailingZerosString() + "%"
+
+    val slippageDescription = resources.getString(R.string.bittensor_slippage_description, slippage)
 
     val validatorIcon = draft.map { prepared ->
         prepared?.validator?.let {
             iconGenerator.createAddressIcon(it.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
         }
+    }
+        .shareInBackground()
+
+    private val validatorAnnualYield = combine(yieldState, walletContext) { state, walletContext ->
+        val key = runCatching { AccountIdKey(walletContext.chain.accountIdOf(validatorAddress)) }.getOrNull()
+        key?.let { state.dataOrNull?.get(it) }
+    }
+        .onStart { emit(null) }
+
+    /** As on iOS, the review shows the validator with "Est. 33.99% APY" under its name. */
+    val validatorRow = combine(validator, validatorIcon, validatorAnnualYield) { name, icon, annual ->
+        BittensorValidatorRowUi(
+            name = name,
+            icon = icon?.let(Icon::FromDrawable),
+            rate = resources.bittensorLeadingApy(annual),
+            rateColorRes = bittensorYieldColor(annual)
+        )
     }
         .shareInBackground()
 
@@ -331,30 +480,26 @@ class BittensorSubnetReviewViewModel(
         fee
     ) { draft, validating, submission, failed, fee ->
         val label = resources.getString(R.string.common_confirm)
-        val canConfirm = draft != null && !validating && submission.canSubmit && !failed && fee.loadedFeeOrNull()
-            ?.request == draft
+        val canConfirm = draft != null && !validating && submission.canSubmit && !failed && fee.loadedFeeOrNull() != null
         if (canConfirm) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
     }
         .shareInBackground()
 
     init {
-        feeLoaderMixin.connectWith(draft) { _, draft ->
+        feeLoaderMixin.connectWith(acknowledgedDraft) { _, draft ->
             draft?.let {
                 val fee = bittensorSubnetStakingInteractor.estimateFee(it)
                 BittensorFeeEstimate(it, fee)
             }
         }
+        launch {
+            // A watch-only wallet is reported blocked once the review opens, and leaving it is not an abandonment.
+            if (accountRepository.getMetaAccount(metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
+                flowContinued = true
+                analytics.reportWatchOnlyStake(StakingAnalyticsTarget.SUBNET)
+            }
+        }
     }
-
-    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
-        hash,
-        BittensorStakeResultUi.Failure(
-            resources.getString(R.string.bittensor_submission_unknown_title),
-            resources.getString(R.string.bittensor_submission_unknown_description),
-            hash,
-            canRetry = false
-        )
-    )
 
     fun remainingExecutionTime(): Duration = (
         (duration.replayCache.lastOrNull() ?: Duration.ZERO) -
@@ -369,57 +514,113 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
+    fun validatorClicked() {
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(subnetId.value, validatorAddress))
+    }
+
     fun confirmClicked() = launchUnit {
         if (!submission.value.canSubmit || hasError.first() || validating.value) return@launchUnit
-        val prepared = draft.first() ?: return@launchUnit
+        val prepared = acknowledgedDraft.first() ?: return@launchUnit
         val fee = fee.first()
             .loadedFeeOrNull()
             ?.takeIf { it.request == prepared } ?: return@launchUnit
+        val token = walletContext.first().asset.token
+        val subnet = preparedStake.first().dataOrNull?.subnet
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
+                .copy(inactiveValidatorAccepted = inactiveValidatorAccepted, slippage = BittensorSlippage(selectedSlippage))
+            val alertFormat = tokenFormatter.bittensorStakeAlertFormat(token) { quote ->
+                subnet?.let { bittensorAmountFormatter.exchangeRate(quote, it, token) } ?: "—"
+            }
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
+                errorDisplayer = ::showConfirmError,
                 progressConsumer = validating.progressConsumer(),
+                scope = this@BittensorSubnetReviewViewModel,
                 validationFailureTransformerCustom = { failure, actions ->
                     bittensorStakeValidationFailureUi(
                         failure,
                         actions,
-                        resources
+                        resources,
+                        alertFormat,
+                        onOutcome = { outcome ->
+                            failure.reason.analyticsKind()?.let { kind ->
+                                analytics.track(
+                                    BittensorAnalyticsEvent.ValidationShown(
+                                        StakingFlow.STAKE,
+                                        kind,
+                                        StakingValidationStage.CONFIRM,
+                                        outcome,
+                                        StakingAnalyticsTarget.SUBNET
+                                    )
+                                )
+                            }
+                        },
+                        // A moved price is acknowledged before anything is signed: Confirm prepares the stake at the new rate.
+                        acceptRate = { preparationRefresh.value += 1 }
                     ) { preparationRefresh.value += 1 }
                 }
-            ) { executeStake(prepared, fee.fee) }
+            ) { validated ->
+                executeStake(prepared.copy(inactiveValidatorAccepted = validated.inactiveValidatorAccepted), fee.fee)
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            executionCompletedAt = System.currentTimeMillis()
+            submission.value = e.mapBittensorPreSubmissionError().mapResult(resources).toSubmissionState()
         } finally {
             validating.value = false
         }
     }
+
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.STAKE,
+        StakingAnalyticsTarget.SUBNET,
+        newPosition = !existingPosition
+    )
+
+    private val analyticsMode get() = if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION
 
     private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
         executionStartedAt = SystemClock.elapsedRealtime()
         submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
+            operationAnalytics.startOperation()
+            flowContinued = true
+            analytics.track(
+                BittensorAnalyticsEvent.Confirmed(
+                    BittensorAnalyticsEvent.NETWORK,
+                    StakingAnalyticsTarget.SUBNET,
+                    analyticsMode,
+                    false,
+                    null
+                )
+            )
             val result = bittensorSubnetStakingInteractor.execute(prepared)
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.SUBNET, StakingFlow.STAKE, mode = analyticsMode)
             executionCompletedAt = System.currentTimeMillis()
             when (result) {
                 is BittensorOperationResult.Success -> {
                     executionCompletedAt = System.currentTimeMillis()
-                    submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee))
+                    submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    showFailure(result.cause)
+                    submission.value = result.toSubmissionState(resources)
                 }
-                is BittensorOperationResult.Unknown -> submission.value = unresolved(result.transactionHash)
+                is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resources).toSubmissionState()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showFailure(e)
+            executionCompletedAt = System.currentTimeMillis()
+            val result = e.mapBittensorSubmissionError()
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.SUBNET, StakingFlow.STAKE, mode = analyticsMode)
+            submission.value = result.mapResult(resources).toSubmissionState()
         } finally {
             validating.value = false
         }
@@ -430,23 +631,19 @@ class BittensorSubnetReviewViewModel(
         resources.getString(R.string.bittensor_subnet_staking_progress, subnetId.value)
     )
 
-    private suspend fun mapSuccess(draft: BittensorSubnetStakeDraft, fee: Fee): BittensorStakeResultUi.Success {
-        val token = walletContext.first().asset.token
+    private suspend fun mapSuccess(draft: BittensorSubnetStakeDraft, fee: Fee, outcome: BittensorOperationOutcome?): BittensorStakeResultUi.Success {
         return BittensorStakeResultUi.Success(
             resources.getString(R.string.bittensor_subnet_staking_success, subnetId.value),
-            resources.getString(R.string.bittensor_subnet_staking_completed),
+            // The done-state pill reads "1 operation" as on iOS; the progress state keeps "1 of 1 operation".
+            resources.getString(R.string.bittensor_exit_completed_operation),
             draft.validator.name,
-            bittensorAmountFormatter.fee(fee, token)
-        )
-    }
-
-    private fun showFailure(cause: Throwable) {
-        executionCompletedAt = System.currentTimeMillis()
-        submission.value = BittensorSubmissionState.Failed(
-            BittensorStakeResultUi.Failure(
-                resources.getString(R.string.bittensor_staking_failed_title),
-                resources.getString(R.string.bittensor_staking_failed_description),
-                cause.message ?: resources.getString(R.string.common_error_general_title)
+            outcome.formatNetworkFee(fee, chain.await(), resources, tokenFormatter),
+            outcome,
+            amount = formatBittensorNativeResult(
+                outcome?.actualBuyPay(draft.operation.quote.serviceFeeTaoInPlanks),
+                draft.operation.quote.totalTaoInPlanks,
+                chain.await(),
+                tokenFormatter
             )
         )
     }
@@ -484,12 +681,17 @@ class BittensorSubnetReviewViewModel(
         val alphaPrice = prepared.subnet.priceInRao?.let(token::amountFromPlanks)
         val outputFiat = alphaPrice?.let { token.toFiatOrNull(output * it) }
         val symbol = TokenSymbol(prepared.subnet.symbol.ifBlank { "—" })
-        return bittensorAmountFormatter.amount(
+        val amount = bittensorAmountFormatter.amount(
             output,
             symbol,
             outputFiat,
             token.currency
         )
+        return amount.copy(token = amount.token.ltrIsolated())
+    }
+
+    private fun formatFiat(token: TokenBase, fiat: BigDecimal?): CharSequence? {
+        return fiat?.let { fiatFormatter.formatFiat(it, token.currency) }
     }
 
     private fun formatRate(token: TokenBase, prepared: BittensorPreparedSubnetStake?): String {
@@ -497,19 +699,47 @@ class BittensorSubnetReviewViewModel(
         return bittensorAmountFormatter.exchangeRate(prepared.draft.operation.quote, prepared.subnet, token)
     }
 
+    /** A failed re-quote falls back to the prepared stake, so the acknowledged quote stays shown. */
+    private fun requotedEachBlock(prepared: BittensorPreparedSubnetStake): Flow<ExtendedLoadingState<BittensorPreparedSubnetStake>> =
+        bittensorSubnetStakingInteractor.requoted(prepared.draft, BittensorSlippage(selectedSlippage), requotes)
+            .onEach { requote -> requote.onFailure(chainRpcReads::failed) }
+            .map { requote -> ExtendedLoadingState.Loaded(prepared.copy(draft = requote.getOrDefault(prepared.draft))) }
+            .onStart { emit(ExtendedLoadingState.Loaded(prepared)) }
+
+    // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+    private fun showConfirmError(error: Throwable) {
+        if (!retryController.reportSlowAction("subnet stake review", error, ::confirmClicked)) showError(error)
+    }
+
     fun retryClicked() {
         val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return
         if (!failure.canRetry) return
         submission.value = BittensorSubmissionState.Ready
+        retryRequotes.tryEmit(Unit)
+    }
+
+    fun failureActionClicked() {
+        val failure = submission.value.result as? BittensorStakeResultUi.Failure ?: return
+        val action = if (failure.canRetry) BittensorResultAction.TRY_AGAIN else BittensorResultAction.CLOSE
+
+        resultNavigation.activate(action) { retryClicked() }
     }
 
     fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) {
-            router.openBittensorPortfolio()
-        }
+        if (submission.value.isFinished) resultNavigation.done()
     }
 
     fun back() {
-        if (submission.value !is BittensorSubmissionState.Submitting) router.back()
+        when {
+            submission.value is BittensorSubmissionState.Submitting -> Unit
+            submission.value.isFinished -> resultNavigation.leave()
+            else -> {
+                // Leaving the review of a new position before confirming reports it abandoned.
+                if (!flowContinued && !existingPosition) {
+                    analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.CONFIRM, StakingAnalyticsTarget.SUBNET))
+                }
+                router.back()
+            }
+        }
     }
 }

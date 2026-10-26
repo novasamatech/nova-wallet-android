@@ -14,7 +14,8 @@ class BittensorStakeConfirmPayload(
     val metaId: Long,
     val amountInPlanks: BigInteger,
     val validatorAddress: String,
-    val validatorName: String
+    val validatorName: String,
+    val existingPosition: Boolean = false
 ) : Parcelable
 
 fun BittensorStakeConfirmPayload.toStakeRequest(chain: Chain): BittensorRootStakeRequest {

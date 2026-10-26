@@ -74,7 +74,8 @@ fun mapRemoteChainToLocal(
             disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
             sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull(),
             sessionsPerEra = it[SESSIONS_PER_ERA].asGsonParsedIntOrNull(),
-            timelineChain = it[TIMELINE_CHAIN] as? ChainId
+            timelineChain = it[TIMELINE_CHAIN] as? ChainId,
+            newFeatures = mapNewChainFeatures(it["newFeatures"])
         )
     }
 

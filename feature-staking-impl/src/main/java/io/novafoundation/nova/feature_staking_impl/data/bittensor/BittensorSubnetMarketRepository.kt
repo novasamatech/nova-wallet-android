@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 
 private const val MARKET_PAGE_SIZE = 250
 
@@ -23,17 +23,35 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
 
     private var cached = emptyMap<BittensorNetuid.Subnet, String>()
 
+    private var cachedMarkets = emptyMap<BittensorNetuid.Subnet, BittensorSubnetMarketRemote>()
+
     private var loadedAt = 0L
 
     suspend fun priceId(subnetId: BittensorNetuid.Subnet): String? = mutex.withLock {
-        if (loadedAt == 0L || System.nanoTime() - loadedAt > MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
-            cached = mapBittensorMarketIds(loadMarkets())
-            loadedAt = System.nanoTime()
-        }
+        refreshMarkets()
         cached[subnetId]
     }
 
-    private suspend fun loadMarkets(): List<BittensorSubnetMarketRemote> = withTimeout(20_000L) {
+    suspend fun weeklyMarkets(): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> = mutex.withLock {
+        refreshMarkets()
+        cachedMarkets
+    }
+
+    private suspend fun refreshMarkets() {
+        if (loadedAt == 0L || System.nanoTime() - loadedAt > MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
+            val requestStartedAt = System.nanoTime()
+            val markets = loadMarkets()
+            val ids = mapBittensorMarketIds(markets)
+            // No listed subnet is a degraded response, not every subnet unlisted, so the read fails.
+            require(ids.isNotEmpty()) { "Empty subnet markets" }
+            cached = ids
+            val byId = markets.associateBy { it.id }
+            cachedMarkets = cached.mapValues { (_, id) -> requireNotNull(byId[id]) }
+            loadedAt = requestStartedAt
+        }
+    }
+
+    private suspend fun loadMarkets(): List<BittensorSubnetMarketRemote> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         buildList {
             for (page in 1..MAX_MARKET_PAGES) {
                 val markets = api.markets(perPage = MARKET_PAGE_SIZE, page = page)
@@ -41,7 +59,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
                 if (markets.size < MARKET_PAGE_SIZE) break
             }
         }
-    }
+    } ?: throw BittensorTimeoutException("Subnet markets")
 }
 
 internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {

@@ -16,10 +16,18 @@ import kotlinx.coroutines.coroutineScope
 
 internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
     netuid: BittensorNetuid,
-    validators: List<BittensorValidator>
+    validators: List<BittensorValidator>,
+    includeRegistration: Boolean = false
 ): BittensorValidatorSnapshot = coroutineScope {
     val pallet = runtime.metadata.module("SubtensorModule")
     val storageNetuid = netuid.value.toBigInteger()
+    val registeredAt = async {
+        if (includeRegistration && !netuid.isRoot()) {
+            pallet.storage("NetworkRegisteredAt").query(storageNetuid, binding = ::bindBittensorU64)
+        } else {
+            null
+        }
+    }
     val permits = async {
         if (!netuid.isRoot()) {
             pallet.storage("ValidatorPermit")
@@ -61,7 +69,8 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
         commissionsInU16 = commissionsInU16.await(),
         permits = permits.await(),
         lastUpdates = updates.await(),
-        activeThreshold = activeThreshold.await()
+        activeThreshold = activeThreshold.await(),
+        registeredAt = registeredAt.await()
     )
 }
 

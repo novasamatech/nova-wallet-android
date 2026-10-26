@@ -53,10 +53,22 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/item_dashboard_no_stake_token_name_container"
-        app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeEarningsContainer"
+        app:layout_constraintEnd_toStartOf="@+id/newFeature"
         app:layout_constraintStart_toEndOf="@+id/item_dashboard_no_stake_token_name_container"
         app:layout_constraintTop_toTopOf="@+id/item_dashboard_no_stake_token_name_container"
         tools:text="@string/nomination_pools_direct" />
+
+    <io.novafoundation.nova.common.view.ChipLabelView
+        android:id="@+id/newFeature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/staking_new_feature"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/item_dashboard_no_stake_token_name_container"
+        app:layout_constraintEnd_toStartOf="@id/itemDashboardNoStakeEarningsContainer"
+        app:layout_constraintStart_toEndOf="@id/itemDashboardNoStakeStakingType"
+        app:layout_constraintTop_toTopOf="@id/item_dashboard_no_stake_token_name_container" />
 
     <TextView
         android:id="@+id/itemDashboardNoStakeChainAvailableBalance"

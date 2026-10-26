@@ -52,6 +52,18 @@ class BittensorValidatorSnapshotLoaderTest {
     }
 
     @Test
+    fun `directory snapshot includes the subnet registration block`() = runBlocking {
+        val context = RecordingQueryContext(runtime, delegate, expectedReads = 8)
+
+        val snapshot = withTimeout(5_000) {
+            context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator), includeRegistration = true)
+        }
+
+        assertEquals(90.toBigInteger(), snapshot.registeredAt)
+        assertTrue("NetworkRegisteredAt" in context.requests)
+    }
+
+    @Test
     fun `root only loads registration and take`() = runBlocking {
         val context = RecordingQueryContext(runtime, delegate, expectedReads = 2)
 
@@ -85,7 +97,7 @@ class BittensorValidatorSnapshotLoaderTest {
     private fun createRuntime(): RuntimeSnapshot {
         val subtensorModule = createModule(
             "SubtensorModule",
-            listOf("ValidatorPermit", "LastUpdate", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates")
+            listOf("ValidatorPermit", "LastUpdate", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates", "NetworkRegisteredAt")
         )
         val systemModule = createModule("System", listOf("Number"))
         val modules = mapOf(
@@ -130,6 +142,7 @@ class BittensorValidatorSnapshotLoaderTest {
                 "Number" -> 110.toBigInteger()
                 "Tempo" -> BigInteger.TEN
                 "ActivityCutoffFactorMilli" -> 1000.toBigInteger()
+                "NetworkRegisteredAt" -> 90.toBigInteger()
                 else -> error("Unexpected storage $name")
             }
             return binding(value)

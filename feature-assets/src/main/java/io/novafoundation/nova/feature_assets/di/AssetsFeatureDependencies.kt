@@ -66,6 +66,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.configuring.Link
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
+import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.BittensorBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_swap_api.data.history.SwapTransferFilterFactory
@@ -189,6 +190,8 @@ interface AssetsFeatureDependencies {
     val externalBalanceRepository: ExternalBalanceRepository
 
     val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory
+
+    val bittensorBalanceUpdaterFactory: BittensorBalanceUpdaterFactory
 
     val paymentUpdaterFactory: PaymentUpdaterFactory
 

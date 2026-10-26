@@ -6,18 +6,22 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import java.math.BigDecimal
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.CacheControl
 import okhttp3.HttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.HttpException
 import retrofit2.Response
 
-/** Only HTTP-fresh data is reused; stale data never supplies a fallback eligibility policy. */
+/**
+ * Only HTTP-fresh responses are reused. A backend-STALE policy still gates selection, and a STALE recommendation
+ * generation still recommends: the recommendations contract makes it usable data.
+ */
 class BittensorValidatorBackend(
     private val api: BittensorValidatorsApi,
-    private val infrastructureUrls: InfrastructureUrls
+    private val infrastructureUrls: InfrastructureUrls,
+    private val nanoTime: () -> Long = System::nanoTime
 ) {
 
     private class Cached<T>(val data: T, val deadlineNanos: Long)
@@ -28,7 +32,9 @@ class BittensorValidatorBackend(
 
     private val lists = mutableMapOf<Int, Cached<BittensorValidatorsRemote>>()
 
-    private val rootValidators = mutableMapOf<String, Cached<BittensorRootValidatorRemote>>()
+    private var rootValidators: Cached<BittensorRootValidatorRemote>? = null
+
+    private var rootOverview: Cached<BittensorRootOverviewRemote>? = null
 
     private val ranked = mutableMapOf<Int, Cached<BittensorRankedValidatorsRemote>>()
 
@@ -36,115 +42,157 @@ class BittensorValidatorBackend(
 
     private var validatorRecommendations: Cached<BittensorRecommendationsRemote>? = null
 
+    private var newestGeneration: BittensorRecommendationGeneration? = null
+
     suspend fun validators(netuid: Int): BittensorValidatorsRemote = mutex.withLock {
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "subnets/$netuid/validators")
-        val freshEntry = lists[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }
+        val freshEntry = lists[netuid]?.takeIf { nanoTime() < it.deadlineNanos }
         if (freshEntry != null) return@withLock freshEntry.data
+        val startedAt = nanoTime()
         val response = api.validators(url)
-        val cached = readCacheEntry(response)
+        val cached = readCacheEntry(response, startedAt)
         requireNotNull(cached.data.items) { "Missing validator directory" }
         if (lists.size >= 64) lists.clear()
         lists[netuid] = cached
         cached.data
     }
 
-    private data class ClaimEventId(val block: Long, val extrinsic: Int, val event: Int)
-
-    suspend fun receivedRootRewards(accountSubject: String): BigDecimal = mutex.withLock {
+    suspend fun rootValidators(): BittensorRootValidatorRemote = mutex.withLock {
         val baseUrl = refreshInfrastructure()
-        val target = requireNotNull(
-            endpoint(baseUrl, "root/claims/search")
-                .toHttpUrlOrNull()
-        )
-            .newBuilder()
-            .addQueryParameter("accountSubject", accountSubject)
-            .addQueryParameter("page", "1")
-            .build()
-        val response = api.rootClaims(target.toString())
-        if (!response.isSuccessful) throw HttpException(response)
-        val body = requireNotNull(response.body())
-        require(body.historyScope == "TAO_APP_PARTIAL")
-        val component = requireNotNull(body.meta?.components?.rootClaims)
-        require(component.availability == "AVAILABLE" && component.freshness == "FRESH")
-        val items = requireNotNull(body.items)
-        sumReceivedRewards(items)
-    }
-
-    private fun sumReceivedRewards(items: List<BittensorRootClaimsRemote.Item>): BigDecimal {
-        val seen = mutableSetOf<ClaimEventId>()
-        return items.fold(BigDecimal.ZERO) { total, row ->
-            val block = requireNotNull(row.block)
-            val extrinsic = requireNotNull(row.extrinsicIndex)
-            val event = requireNotNull(row.eventIndex)
-            require(block >= 0 && extrinsic >= 0 && event >= 0)
-            val amount = requireNotNull(row.payoutTao).toBigDecimal()
-            require(amount.isNonNegative)
-            if (seen.add(ClaimEventId(block, extrinsic, event))) total + amount else total
+        val freshEntry = rootValidators?.takeIf { nanoTime() < it.deadlineNanos }
+        if (freshEntry != null) return@withLock freshEntry.data
+        val startedAt = nanoTime()
+        val response = try {
+            api.rootValidators(endpoint(baseUrl, "root/validators"))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return@withLock rootValidators?.data ?: throw e
         }
+        val cached = readCacheEntry(response, startedAt)
+        // stakeYieldWindows is optional: the root list stays usable without it, only its yield consumers need it.
+        requireAvailableRootComponent(cached.data.meta?.components?.rootValidators)
+        requireNotNull(cached.data.items).forEach { row ->
+            row.rootStakeTao?.toBigDecimal()
+            row.stakeYield?.d30?.let { requireNotNull(it.apy).toBigDecimal() }
+        }
+        rootValidators = cached
+        cached.data
     }
 
-    suspend fun rootValidator(hotkey: String): BittensorRootValidatorRemote = mutex.withLock {
+    /** Annual fraction (8.5 reported percent becomes 0.085), matching the network-rate consumer contract. */
+    suspend fun networkRootRate(): BigDecimal? = mutex.withLock {
         val baseUrl = refreshInfrastructure()
-        require(hotkey.length == 48 && hotkey.all { it in "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" })
-        val cached = rootValidators[hotkey]?.takeIf { System.nanoTime() < it.deadlineNanos }
-            ?: readCacheEntry(api.rootValidator(endpoint(baseUrl, "root/validators/$hotkey"))).also {
-                if (rootValidators.size >= 64) rootValidators.clear()
-                rootValidators[hotkey] = it
+        val cached = rootOverview?.takeIf { nanoTime() < it.deadlineNanos } ?: run {
+            val startedAt = nanoTime()
+            try {
+                val response = api.rootOverview(endpoint(baseUrl, "root/overview"))
+                readCacheEntry(response, startedAt)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                rootOverview ?: throw e
             }
-        val component = requireNotNull(cached.data.meta?.components?.rootValidator)
-        require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Root validator data is unavailable or stale" }
-        require(cached.data.validator?.hotkey == hotkey)
-        cached.data
+        }
+        requireAvailableRootComponent(cached.data.meta?.components?.indexes)
+        val rate = cached.data.stakeIndex?.stakeYield?.d30?.let { requireNotNull(it.apy).toBigDecimal() }
+        rootOverview = cached
+        rate?.takeIf { it.isNonNegative }?.movePointLeft(2)
+    }
+
+    private fun requireAvailableRootComponent(component: BittensorRecommendationsRemote.Component?) {
+        requireAvailableBittensorComponent(component, "Root yield data")
+        parseBittensorTimestamp(requireNotNull(component?.asOf))
     }
 
     suspend fun rankedValidators(netuid: Int): BittensorRankedValidatorsRemote = mutex.withLock {
         val baseUrl = refreshInfrastructure()
         BittensorNetuid.from(netuid)
-        val cached = ranked[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }
-            ?: readCacheEntry(api.rankedValidators(endpoint(baseUrl, "recommendations/subnets/$netuid/validators"))).also {
-                if (ranked.size >= 64) ranked.clear()
-                ranked[netuid] = it
-            }
+        val freshEntry = ranked[netuid]?.takeIf { nanoTime() < it.deadlineNanos }
+        if (freshEntry != null) return@withLock freshEntry.data
+        val startedAt = nanoTime()
+        val response = api.rankedValidators(endpoint(baseUrl, "recommendations/subnets/$netuid/validators"))
+        val cached = readCacheEntry(response, startedAt)
         mapBittensorValidatorGates(BittensorRecommendationsRemote(cached.data.meta))
         requireNotNull(cached.data.items)
+        admitGeneration(cached.data.meta)
+        if (ranked.size >= 64) ranked.clear()
+        ranked[netuid] = cached
         cached.data
     }
 
     suspend fun gates(): BittensorValidatorGates = mutex.withLock {
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "recommendations/subnets")
-        val cached = recommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
+        val cached = recommendations?.takeIf { nanoTime() < it.deadlineNanos }
             ?: loadRecommendations(url)
         val gates = mapBittensorValidatorGates(cached.data)
+        admitGeneration(cached.data.meta)
         recommendations = cached
         gates
     }
 
-    suspend fun recommendedHotkeys(netuid: Int): List<String> = mutex.withLock {
+    suspend fun rankedSubnet(subnet: BittensorNetuid.Subnet, registrationBlock: java.math.BigInteger?): BittensorSubnetRankingRemote? = mutex.withLock {
+        val baseUrl = refreshInfrastructure()
+        val cached = recommendations?.takeIf { nanoTime() < it.deadlineNanos }
+            ?: loadRecommendations(endpoint(baseUrl, "recommendations/subnets"))
+        requireUsableBittensorRecommendations(cached.data)
+        val sourceBlock = requireNotNull(cached.data.meta?.generation?.sourceBlockNumber)
+        require(registrationBlock == null || sourceBlock >= registrationBlock) { "Subnet ranking predates registration" }
+        val items = requireNotNull(cached.data.items) { "Missing subnet rankings" }
+        require(items.map { it.netuid }.distinct().size == items.size) { "Duplicate subnet rankings" }
+        admitGeneration(cached.data.meta)
+        recommendations = cached
+        items.singleOrNull { it.netuid == subnet.value }
+    }
+
+    suspend fun recommendedHotkeys(netuid: Int): List<String> {
+        return mapRecommendedValidators(recommendationsDocument())
+            .filter { it.netuid == netuid }
+            .mapNotNull { it.hotkey }
+            .distinct()
+    }
+
+    suspend fun recommendedValidators(): List<BittensorRecommendationsRemote.Item> = mapRecommendedValidators(recommendationsDocument())
+
+    private suspend fun recommendationsDocument(): BittensorRecommendationsRemote = mutex.withLock {
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "recommendations")
-        val cached = validatorRecommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
+        val cached = validatorRecommendations?.takeIf { nanoTime() < it.deadlineNanos }
             ?: loadRecommendations(url)
-        val hotkeys = mapRecommendedHotkeys(cached.data, netuid)
+        mapRecommendedValidators(cached.data)
+        admitGeneration(cached.data.meta)
         validatorRecommendations = cached
-        hotkeys
+        cached.data
     }
 
     private suspend fun loadRecommendations(url: String): Cached<BittensorRecommendationsRemote> {
+        val startedAt = nanoTime()
         val response = api.recommendations(url)
-        return readCacheEntry(response)
+        return readCacheEntry(response, startedAt)
     }
 
-    private fun mapRecommendedHotkeys(response: BittensorRecommendationsRemote, netuid: Int): List<String> {
+    // Called under mutex, only after the response has passed semantic validation.
+    private fun admitGeneration(meta: BittensorRecommendationsRemote.Meta?) {
+        val generation = mapBittensorRecommendationGeneration(meta)
+        val newest = newestGeneration
+        require(newest == null || generation >= newest) { "Recommendation generation is stale" }
+        if (newest != null && generation > newest) {
+            ranked.clear()
+            recommendations = null
+            validatorRecommendations = null
+        }
+        newestGeneration = generation
+    }
+
+    private fun mapRecommendedValidators(response: BittensorRecommendationsRemote): List<BittensorRecommendationsRemote.Item> {
         requireUsableBittensorRecommendations(response)
         val sourceBlock = requireNotNull(response.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
         require(sourceBlock.isNonNegative) { "Invalid recommendation block" }
         val classes = requireNotNull(response.classes) { "Missing validator recommendations" }
-        return listOf(classes.stable, classes.balanced, classes.higherUpside).flatMap { it.orEmpty() }
-            .filter { it.netuid == netuid }
-            .mapNotNull { it.hotkey }
-            .distinct()
+        return listOf(classes.stable, classes.balanced, classes.higherUpside)
+            .flatMap { it.orEmpty() }
     }
 
     private suspend fun refreshInfrastructure(): HttpUrl {
@@ -152,33 +200,35 @@ class BittensorValidatorBackend(
         require(base.isHttps) { "Infrastructure requires HTTPS" }
         if (base != cachedBaseUrl) {
             lists.clear()
-            rootValidators.clear()
+            rootValidators = null
+            rootOverview = null
             ranked.clear()
             recommendations = null
             validatorRecommendations = null
+            newestGeneration = null
             cachedBaseUrl = base
         }
         return base
     }
 
-    private fun endpoint(baseUrl: HttpUrl, path: String): String = requireNotNull(baseUrl.resolve("/v1/bittensor/$path")).toString()
+    private fun endpoint(baseUrl: HttpUrl, path: String): String = bittensorBackendUrl(baseUrl, path)
 
-    private fun <T> readCacheEntry(response: Response<T>): Cached<T> {
+    private fun <T> readCacheEntry(response: Response<T>, startedAt: Long): Cached<T> {
         if (!response.isSuccessful) throw HttpException(response)
-        val lifetimeNanos = cacheLifetimeNanos(response)
+        val lifetimeNanos = bittensorCacheLifetimeNanos(response)
         return Cached(
             requireNotNull(response.body()) { "Empty Bittensor response" },
-            System.nanoTime() + lifetimeNanos
+            startedAt + lifetimeNanos
         )
     }
+}
 
-    private fun cacheLifetimeNanos(response: Response<*>): Long {
-        val control = CacheControl.parse(response.headers())
-        val maxAge = if (control.noStore || control.noCache) 0 else control.maxAgeSeconds.coerceIn(0, 300)
-        val age = response.headers()["Age"]
-            ?.toIntOrNull()
-            ?.coerceAtLeast(0) ?: 0
-        return (maxAge - age)
-            .coerceAtLeast(0) * 1_000_000_000L
-    }
+internal fun bittensorCacheLifetimeNanos(response: Response<*>): Long {
+    val control = CacheControl.parse(response.headers())
+    val maxAge = if (control.noStore || control.noCache) 0 else control.maxAgeSeconds.coerceIn(0, 300)
+    val age = response.headers()["Age"]
+        ?.toIntOrNull()
+        ?.coerceAtLeast(0) ?: 0
+    return (maxAge - age)
+        .coerceAtLeast(0) * 1_000_000_000L
 }

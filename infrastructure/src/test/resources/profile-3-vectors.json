@@ -1,0 +1,106 @@
+{
+  "profile": 3,
+  "fixture_notice": "Synthetic Nova contract data only; Android key scalar 1, the iOS key ID and the codec root are public test values with no authority. No live provider verdict, mobile implementation or deployed keyring is asserted. Production never uses a fixed salt or nonce.",
+  "android_public_key_base64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaxfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54WK84zV2sxXs7LtkBoN79R9Q==",
+  "vectors": [
+    {
+      "name": "android_registration",
+      "purpose": "register",
+      "platform": "android",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "nova-infra.novasama-tech.org",
+        "port": "443",
+        "path": "/v1/attestation/profile-3/register",
+        "content_type": "application/json"
+      },
+      "binding": {
+        "platform": "android",
+        "app_id": "io.novafoundation.nova.market",
+        "attestation_type": "play_integrity",
+        "key_reference": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaxfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54WK84zV2sxXs7LtkBoN79R9Q==",
+        "app_attest_environment": ""
+      },
+      "registration_preimage_hex": "4e4f56412d524547495354524154494f4e00000300000007616e64726f69640000001d696f2e6e6f7661666f756e646174696f6e2e6e6f76612e6d61726b65740000000e706c61795f696e746567726974790000007c4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741456178665238754573516b6634764f626c59365241386e634466594574367a4f67394b45355264695977705a5034304c692f68702f6d34376e36307038443534574b38347a563273785873374c746b426f4e37395239513d3d00000000",
+      "body_sha256": "1f51666fc4a71a9c9ad7f9ed1775d1a1cd404856f27259240fb3e5179289e126",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000003010000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f53540000000568747470730000001c6e6f76612d696e6672612e6e6f766173616d612d746563682e6f726700000003343433000000222f76312f6174746573746174696f6e2f70726f66696c652d332f7265676973746572000000106170706c69636174696f6e2f6a736f6e1f51666fc4a71a9c9ad7f9ed1775d1a1cd404856f27259240fb3e5179289e126",
+      "context_sha256": "ef12ffa336759e1c2df892d5911cb11df04d772bc04a4f4a24afd22e3001fcc7",
+      "ecdsa_message_sha256": "57c0ca929dc9da6534d450165b5a548755fd65678ec095c1ef48d9f0125be187",
+      "signature_base64": "MEUCIDEI1lLBJ/qqMbrkUS56j6tEDa+6NzMkbbczG3aFsBB1AiEA2gilfny2U+D5l+wv76eJ435nmLktulCr83gudP0IARs=",
+      "request_hash": "7xL_ozZ1nhwt-JLVkRyxHfBNdyvASk9KJK_SLjAB_Mc"
+    },
+    {
+      "name": "ios_registration",
+      "purpose": "register",
+      "platform": "ios",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "nova-infra.novasama-tech.org",
+        "port": "443",
+        "path": "/v1/attestation/profile-3/register",
+        "content_type": "application/json; charset=utf-8"
+      },
+      "binding": {
+        "platform": "ios",
+        "app_id": "ABCDEFGHIJ.io.novafoundation.novawallet",
+        "attestation_type": "app_attest",
+        "key_reference": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+        "app_attest_environment": "production"
+      },
+      "registration_preimage_hex": "4e4f56412d524547495354524154494f4e00000300000003696f73000000274142434445464748494a2e696f2e6e6f7661666f756e646174696f6e2e6e6f766177616c6c65740000000a6170705f6174746573740000002c41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868383d0000000a70726f64756374696f6e",
+      "body_sha256": "9d7c699733c2f43773fca64b5eeb254136d1588f830924fd89c88d44e7e7b917",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000003010000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f53540000000568747470730000001c6e6f76612d696e6672612e6e6f766173616d612d746563682e6f726700000003343433000000222f76312f6174746573746174696f6e2f70726f66696c652d332f72656769737465720000001f6170706c69636174696f6e2f6a736f6e3b20636861727365743d7574662d389d7c699733c2f43773fca64b5eeb254136d1588f830924fd89c88d44e7e7b917",
+      "context_sha256": "5989b4eadf7cd0542eeb74722eed041686b2911f0cf9bf1b822750e1465c2936",
+      "client_data_hash_base64": "WYm06t980FQu63RyLu0EFoaykR8M+b8bgidQ4UZcKTY="
+    },
+    {
+      "name": "android_issuance",
+      "purpose": "token",
+      "platform": "android",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "nova-infra.novasama-tech.org",
+        "port": "443",
+        "path": "/v1/attestation/profile-3/tokens",
+        "content_type": "application/json"
+      },
+      "public_origin": "https://nova-infra.novasama-tech.org",
+      "issuance_preimage_hex": "4e4f56412d544f4b454e2d49535355414e434500000300010000002468747470733a2f2f6e6f76612d696e6672612e6e6f766173616d612d746563682e6f7267",
+      "body_sha256": "7f377b3def0c0bab2c4a62f5e9aa572cd414841479d11c8a8dc6ec5f6b1454aa",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000003030000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f53540000000568747470730000001c6e6f76612d696e6672612e6e6f766173616d612d746563682e6f726700000003343433000000202f76312f6174746573746174696f6e2f70726f66696c652d332f746f6b656e73000000106170706c69636174696f6e2f6a736f6e7f377b3def0c0bab2c4a62f5e9aa572cd414841479d11c8a8dc6ec5f6b1454aa",
+      "context_sha256": "5b9e3cf60c67797ec4d1c4546bb56a6c17677eabe157a826a3fcd36228d3c057",
+      "ecdsa_message_sha256": "0e4cda4f316af414216cded5570ffcf59512c9f757e9f431b67ed26e13572c7b",
+      "signature_base64": "MEUCICdEKfEutw1hmz4sZMp6DTFldN51M2NNPJYpLhL7tWFNAiEArxAkqHgzuJgY59y83pE0FaF4lbTBtPNqR3aju1aH3i4="
+    },
+    {
+      "name": "ios_issuance",
+      "purpose": "token",
+      "platform": "ios",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "nova-infra.novasama-tech.org",
+        "port": "443",
+        "path": "/v1/attestation/profile-3/tokens",
+        "content_type": "application/json"
+      },
+      "public_origin": "https://nova-infra.novasama-tech.org",
+      "issuance_preimage_hex": "4e4f56412d544f4b454e2d49535355414e434500000300010000002468747470733a2f2f6e6f76612d696e6672612e6e6f766173616d612d746563682e6f7267",
+      "body_sha256": "7f377b3def0c0bab2c4a62f5e9aa572cd414841479d11c8a8dc6ec5f6b1454aa",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000003030000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f53540000000568747470730000001c6e6f76612d696e6672612e6e6f766173616d612d746563682e6f726700000003343433000000202f76312f6174746573746174696f6e2f70726f66696c652d332f746f6b656e73000000106170706c69636174696f6e2f6a736f6e7f377b3def0c0bab2c4a62f5e9aa572cd414841479d11c8a8dc6ec5f6b1454aa",
+      "context_sha256": "5b9e3cf60c67797ec4d1c4546bb56a6c17677eabe157a826a3fcd36228d3c057",
+      "client_data_hash_base64": "W5489gxneX7E0cRUa7VqbBdnfqvhV6gmo/zTYijTwFc="
+    }
+  ]
+}

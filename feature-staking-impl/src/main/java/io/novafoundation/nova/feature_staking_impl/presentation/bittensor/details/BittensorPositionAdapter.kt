@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.DiffUtil
@@ -11,8 +12,10 @@ import coil.ImageLoader
 import coil.transform.CircleCropTransformation
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorPositionBinding
+import kotlin.math.ceil
 
 class BittensorPositionAdapter(
     private val imageLoader: ImageLoader,
@@ -37,14 +40,63 @@ class BittensorPositionAdapter(
                 error(R.drawable.ic_fallback_network_icon)
             }
             positionTitle.text = item.title
+            positionTitle.isVisible = !item.isTitleLoading
+            positionTitleProgress.isVisible = item.isTitleLoading
+            val isValidator = item.action is BittensorPositionAction.ValidatorDetails
+            positionTitle.setTextAppearance(
+                if (isValidator) R.style.TextAppearance_NovaFoundation_SemiBold_SubHeadline else R.style.TextAppearance_NovaFoundation_SemiBold_Body
+            )
+            positionAmount.setTextAppearance(
+                if (isValidator) R.style.TextAppearance_NovaFoundation_SemiBold_SubHeadline else R.style.TextAppearance_NovaFoundation_SemiBold_Body
+            )
+            positionSubtitle.setTextAppearance(
+                if (isValidator) {
+                    R.style.TextAppearance_NovaFoundation_Regular_Caption1_Secondary
+                } else {
+                    R.style.TextAppearance_NovaFoundation_Regular_Footnote_Secondary
+                }
+            )
+            positionFiat.setTextAppearance(
+                if (isValidator) {
+                    R.style.TextAppearance_NovaFoundation_Regular_Caption1_Secondary
+                } else {
+                    R.style.TextAppearance_NovaFoundation_Regular_Footnote_Secondary
+                }
+            )
+            keepWidestTitleWord(item.title)
             positionSubtitle.text = item.subtitle
+            positionSubtitle.isVisible = !item.isSubtitleLoading && item.subtitle != null
+            positionSubtitleProgress.isVisible = item.isSubtitleLoading
             positionAmount.text = item.amount.token
+            positionAmount.setTextColorRes(item.amountColorRes)
             positionFiat.text = item.amount.fiat
             positionAmount.isVisible = !item.isAmountLoading && item.amount.token.isNotEmpty()
             positionAmountProgress.isVisible = item.isAmountLoading
             positionFiat.isVisible = !item.isAmountLoading && item.amount.token.isNotEmpty() && item.amount.fiat != null
+            positionChange.text = item.change?.text
+            positionChange.isVisible = !item.isChangeLoading && item.change != null
+            positionChange.setTextColorRes(
+                when {
+                    item.change?.isFlat == true -> R.color.text_secondary
+                    item.change?.isRising == false -> R.color.text_negative
+                    else -> R.color.text_positive
+                }
+            )
+            positionChangeProgress.isVisible = item.isChangeLoading
             positionChevron.isVisible = true
             root.setOnClickListener { onClick(item) }
+        }
+
+        /**
+         * The amount column measures first, so a large amount at a large font scale would squeeze the title until a word breaks
+         * mid-way. The title column keeps at least its widest word (at most half the row), so it wraps between words instead.
+         */
+        private fun keepWidestTitleWord(title: String) = with(binding) {
+            val widestWord = title.split(' ').maxOfOrNull { positionTitle.paint.measureText(it) } ?: 0f
+            val limit = root.resources.displayMetrics.widthPixels / 2
+            positionTexts.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                matchConstraintMinWidth = ceil(widestWord).toInt().coerceAtMost(limit)
+            }
         }
     }
 

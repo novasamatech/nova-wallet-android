@@ -9,6 +9,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -34,16 +35,20 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.di.BittensorRootClaimComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di.BittensorStakeConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di.BittensorDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.di.BittensorSelectUnstakePositionComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di.BittensorExitAmountComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di.BittensorExitReviewComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.di.BittensorSubnetPositionComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.di.BittensorSelectUnstakePositionComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSelectValidatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetAmountComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.di.BittensorValidatorInfoComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.di.BittensorValidatorFiltersComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetReviewComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
@@ -114,6 +119,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.start.di.StartChangeValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.current.di.CurrentValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.di.ValidatorDetailsComponent
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.infrastructure.di.InfrastructureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -157,6 +163,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun bittensorSelectUnstakePositionComponentFactory(): BittensorSelectUnstakePositionComponent.Factory
 
     fun bittensorSelectValidatorComponentFactory(): BittensorSelectValidatorComponent.Factory
+
+    fun bittensorValidatorInfoComponentFactory(): BittensorValidatorInfoComponent.Factory
+
+    fun bittensorValidatorFiltersComponentFactory(): BittensorValidatorFiltersComponent.Factory
 
     fun bittensorSubnetDetailsComponentFactory(): BittensorSubnetDetailsComponent.Factory
 
@@ -313,7 +323,10 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
         fun create(
             @BindsInstance unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
+            @BindsInstance portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
             @BindsInstance bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
+            @BindsInstance bittensorValidatorFiltersCommunicator: BittensorValidatorFiltersCommunicator,
+            @BindsInstance slippageSettingsCommunicator: SlippageSettingsCommunicator,
             @BindsInstance router: StakingRouter,
 
             @BindsInstance parachainStaking: ParachainStakingRouter,
@@ -344,6 +357,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
             AccountFeatureApi::class,
             ProxyFeatureApi::class,
             WalletFeatureApi::class,
+            CurrencyFeatureApi::class,
             DAppFeatureApi::class,
             ChainMigrationFeatureApi::class
         ]

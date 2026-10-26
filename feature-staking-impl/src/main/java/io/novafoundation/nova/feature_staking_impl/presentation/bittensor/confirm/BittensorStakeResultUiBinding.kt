@@ -3,50 +3,41 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confi
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.novafoundation.nova.common.base.BaseFragmentMixin
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import kotlinx.coroutines.flow.Flow
 
 fun BaseFragmentMixin<*>.bindBittensorStakeResults(
     results: Flow<BittensorStakeResultUi?>,
-    onDismiss: () -> Unit,
-    onTryAgain: () -> Unit,
-    onViewPosition: () -> Unit,
-    onDiscoverSubnets: () -> Unit = {}
+    onAction: (BittensorResultAction) -> Unit
 ) {
     var resultSheet: BittensorStakeResultBottomSheet? = null
     lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
         override fun onDestroy(owner: LifecycleOwner) {
-            resultSheet?.setOnDismissListener(null)
-            resultSheet?.dismiss()
-            resultSheet = null
+            resultSheet = resultSheet.dismissWithoutResultCallback()
         }
     })
     results.observeWhenVisible { state ->
-        if (state != null) {
-            val sheet = resultSheet ?: BittensorStakeResultBottomSheet(
-                context = fragment.requireContext(),
-                onClose = { resultSheet?.dismiss() },
-                onTryAgain = {
-                    resultSheet?.dismiss()
-                    onTryAgain()
-                },
-                onDiscoverSubnets = {
-                    resultSheet?.dismiss()
-                    onDiscoverSubnets()
-                },
-                onViewPosition = {
-                    resultSheet?.dismiss()
-                    onViewPosition()
-                }
-            ).also { sheet ->
+        if (state == null) {
+            resultSheet = resultSheet.dismissWithoutResultCallback()
+        } else {
+            val sheet = resultSheet ?: BittensorStakeResultBottomSheet(fragment.requireContext()) { action ->
+                resultSheet = resultSheet.dismissWithoutResultCallback()
+                onAction(action)
+            }.also { sheet ->
                 resultSheet = sheet
-                sheet.setOnDismissListener {
-                    resultSheet = null
-                    onDismiss()
-                }
+                // Only the app closes it without a button (before the PIN check); the screen shows it again when it is back.
+                sheet.setOnDismissListener { if (resultSheet === sheet) resultSheet = null }
             }
             sheet.setState(state)
             if (!sheet.isShowing) sheet.show()
         }
     }
+}
+
+internal fun BittensorStakeResultBottomSheet?.dismissWithoutResultCallback(): BittensorStakeResultBottomSheet? {
+    // The dismiss listener runs later; a model-driven reset or a button must not let it forget a sheet shown after this one.
+    this?.setOnDismissListener(null)
+    this?.dismiss()
+    return null
 }

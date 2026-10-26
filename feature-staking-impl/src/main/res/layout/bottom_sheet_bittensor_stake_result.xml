@@ -92,11 +92,26 @@
             app:childrenPaddingTop="0dp"
             app:drawDividers="true">
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/common_amount" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/bittensorStakeResultValidator"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 app:title="@string/bittensor_validator"
                 tools:primaryValue="Nova Wallet" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultStakeAfter"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:visibility="gone"
+                app:title="@string/bittensor_claim_stake_after"
+                tools:primaryValue="12.5 TOKEN"
+                tools:visibility="visible" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/bittensorStakeResultFee"
@@ -107,31 +122,6 @@
                 tools:primaryValue="0.0015 TOKEN"
                 tools:secondaryValue="$0.51" />
         </io.novafoundation.nova.common.view.TableView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
-            android:orientation="horizontal">
-            <io.novafoundation.nova.common.view.PrimaryButton
-                android:id="@+id/bittensorStakeResultDiscoverSubnets"
-                style="@style/Widget.Nova.Button.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:text="@string/bittensor_discover_subnets" />
-
-            <io.novafoundation.nova.common.view.PrimaryButton
-                android:id="@+id/bittensorStakeResultViewPosition"
-                style="@style/Widget.Nova.Button.Primary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="@string/bittensor_view_position" />
-        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -146,6 +136,7 @@
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_marginTop="20dp"
+            android:id="@+id/bittensorStakeResultStatusIcon"
             android:src="@drawable/ic_bittensor_staking_error" />
 
         <TextView
@@ -168,6 +159,28 @@
             android:textColor="@color/text_secondary"
             tools:text="The transaction did not go through. Nothing was spent — you can try again." />
 
+        <io.novafoundation.nova.common.view.TableView
+            android:id="@+id/bittensorStakeResultFailureFees"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            app:childrenPaddingBottom="0dp"
+            app:childrenPaddingEnd="16dp"
+            app:childrenPaddingStart="16dp"
+            app:childrenPaddingTop="0dp"
+            app:drawDividers="true"
+            tools:visibility="visible">
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultFailureFee"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                app:shouldDrawDivider="false"
+                app:title="@string/network_fee"
+                tools:primaryValue="0.0015 TOKEN"
+                tools:secondaryValue="$0.51" />
+        </io.novafoundation.nova.common.view.TableView>
+
         <io.novafoundation.nova.common.view.AlertView
             android:id="@+id/bittensorStakeResultError"
             android:layout_width="match_parent"
@@ -177,30 +190,33 @@
             app:styleBackgroundColor="@color/error_block_background"
             app:styleIcon="@drawable/ic_bittensor_x_clear_filled"
             tools:text="RootStakeLocked — the root stake is still locked after the last stake change. Try again in 2 d 4 h." />
+    </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/bittensorStakeResultActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/bittensorStakeResultSecondaryAction"
+            style="@style/Widget.Nova.Button.Secondary"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="16dp"
-            android:orientation="horizontal">
-            <io.novafoundation.nova.common.view.PrimaryButton
-                android:id="@+id/bittensorStakeResultClose"
-                style="@style/Widget.Nova.Button.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:text="@string/common_close" />
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            tools:text="@string/bittensor_discover_subnets" />
 
-            <io.novafoundation.nova.common.view.PrimaryButton
-                android:id="@+id/bittensorStakeResultTryAgain"
-                style="@style/Widget.Nova.Button.Primary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="@string/common_try_again" />
-        </LinearLayout>
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/bittensorStakeResultPrimaryAction"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            tools:text="@string/bittensor_view_position" />
     </LinearLayout>
 </LinearLayout>

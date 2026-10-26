@@ -5,19 +5,35 @@ import com.google.android.play.core.integrity.StandardIntegrityManager
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenProvider
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
 import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.INTEGRITY_TOKEN_PROVIDER_INVALID
+import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.PLAY_SERVICES_NOT_FOUND
+import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.PLAY_STORE_NOT_FOUND
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 private const val RECEIVING_PROVIDER_MAX_RETRY = 3
+private const val INTEGRITY_TIMEOUT_MILLIS = 100_000L
+
+// Codes that say this device has no Play Store or Play services. Outdated Play, a Play Console setup problem or a
+// transient fault can be fixed, so those stay ordinary failures.
+private val DEVICE_UNSUPPORTED_CODES = setOf(
+    PLAY_STORE_NOT_FOUND,
+    PLAY_SERVICES_NOT_FOUND
+)
+
+/** Whether Play Integrity failed because this device cannot provide it, so a retry cannot succeed. */
+fun Throwable.isIntegrityUnsupportedOnDevice(): Boolean = generateSequence(this) { it.cause }
+    .any { it is StandardIntegrityException && it.statusCode in DEVICE_UNSUPPORTED_CODES }
 
 private sealed interface ProviderState {
     data object Preparing : ProviderState
-    data object ReceivingError : ProviderState
+    class ReceivingError(val cause: Throwable?) : ProviderState
     class Ready(val provider: StandardIntegrityTokenProvider) : ProviderState
 }
 
@@ -34,10 +50,10 @@ class IntegrityService(
         rootScope.launch { ensureProviderIsReady() }
     }
 
-    suspend fun getIntegrityToken(requestHash: String): String {
+    suspend fun getIntegrityToken(requestHash: String): String = withTimeout(INTEGRITY_TIMEOUT_MILLIS) {
         ensureProviderIsReady()
 
-        return try {
+        try {
             requestIntegrityToken(requestHash)
         } catch (e: StandardIntegrityException) {
             if (e.statusCode == INTEGRITY_TOKEN_PROVIDER_INVALID) {
@@ -58,7 +74,7 @@ class IntegrityService(
 
             repeat(RECEIVING_PROVIDER_MAX_RETRY) {
                 providerState = prepareTokenProvider()
-                if (providerState is ProviderState.Ready) return@repeat
+                if (providerState is ProviderState.Ready) return@withLock
             }
         }
     }
@@ -67,21 +83,25 @@ class IntegrityService(
         providerState = ProviderState.Preparing
     }
 
-    private suspend fun prepareTokenProvider() = suspendCoroutine { continuation ->
-        standardIntegrityManager.prepareIntegrityToken(providerRequest())
-            .addOnSuccessListener { continuation.resume(ProviderState.Ready(it)) }
-            .addOnFailureListener { continuation.resume(ProviderState.ReceivingError) }
-            .addOnCanceledListener { continuation.resume(ProviderState.ReceivingError) }
+    private suspend fun prepareTokenProvider(): ProviderState = withTimeout(INTEGRITY_TIMEOUT_MILLIS) {
+        suspendCancellableCoroutine { continuation ->
+            standardIntegrityManager.prepareIntegrityToken(providerRequest())
+                .addOnSuccessListener { continuation.resume(ProviderState.Ready(it)) }
+                .addOnFailureListener { continuation.resume(ProviderState.ReceivingError(it)) }
+                .addOnCanceledListener { continuation.resume(ProviderState.ReceivingError(null)) }
+        }
     }
 
     private fun getIntegrityTokenProvider() = (providerState as? ProviderState.Ready)?.provider
 
     private suspend fun requestIntegrityToken(requestHash: String): String {
-        val provider = getIntegrityTokenProvider() ?: throw IllegalStateException("Token provider is not initialized")
-        return suspendCoroutine { continuation ->
+        val provider = getIntegrityTokenProvider()
+            ?: throw IllegalStateException("Token provider is not initialized", (providerState as? ProviderState.ReceivingError)?.cause)
+        return suspendCancellableCoroutine { continuation ->
             provider.request(integrityTokenRequest(requestHash))
                 .addOnSuccessListener { continuation.resume(it.token()) }
                 .addOnFailureListener { continuation.resumeWithException(it) }
+                .addOnCanceledListener { continuation.cancel(CancellationException("Integrity token request cancelled")) }
         }
     }
 

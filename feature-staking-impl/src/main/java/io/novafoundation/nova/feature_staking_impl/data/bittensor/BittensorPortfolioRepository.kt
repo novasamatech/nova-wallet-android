@@ -2,7 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.isImmediate
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
@@ -34,7 +35,8 @@ class RealBittensorPortfolioRepository(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
-    private val positionRepository: BittensorPositionRepository
+    private val positionRepository: BittensorPositionRepository,
+    private val signerProvider: SignerProvider
 ) : BittensorPortfolioRepository {
 
     override fun observeAsset(): Flow<Asset> = observeWallet().map { it.asset }
@@ -63,7 +65,7 @@ class RealBittensorPortfolioRepository(
                     asset,
                     positionState.positions,
                     positionState.status,
-                    supportsImmediateOperations = account.type != LightMetaAccount.Type.MULTISIG
+                    supportsImmediateOperations = signerProvider.rootSignerFor(account).callExecutionType().isImmediate()
                 )
             }
         }

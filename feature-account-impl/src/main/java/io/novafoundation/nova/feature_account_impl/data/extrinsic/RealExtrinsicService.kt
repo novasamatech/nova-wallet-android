@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitStatus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
@@ -45,6 +46,8 @@ import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.wi
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
+import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -61,8 +64,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class RealExtrinsicService(
@@ -77,6 +78,18 @@ class RealExtrinsicService(
     private val signingContextFactory: SigningContext.Factory,
     private val coroutineScope: CoroutineScope? // TODO: Make it non-nullable
 ) : ExtrinsicService {
+
+    override suspend fun dryRunExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        submissionOptions: SubmissionOptions,
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): ExtrinsicDryRunResult {
+        check(BuildConfig.DEBUG) { "Dry run is debug-only" }
+        rpcCalls.requireDryRunSupported(chain.id)
+        val submission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        return rpcCalls.dryRunExtrinsic(chain.id, submission.extrinsic)
+    }
 
     override suspend fun submitExtrinsic(
         chain: Chain,
@@ -103,9 +116,9 @@ class RealExtrinsicService(
                 submission.extrinsics.map { it to submission }
             },
             listProcessing = { (extrinsic, submission) ->
-                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic).filterIsInstance<ExtrinsicStatus.InBlock>()
+                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
                     .map { ExtrinsicWatchResult(it, submission.submissionHierarchy) }
-                    .first()
+                    .awaitStatus<ExtrinsicStatus.InBlock>()
             }
         )
     }
@@ -234,7 +247,7 @@ class RealExtrinsicService(
             val errorEvent = events.findExtrinsicFailureOrThrow()
             val dispatchError = parseErrorEvent(errorEvent, runtimeSnapshot)
 
-            ExtrinsicDispatch.Failed(dispatchError)
+            ExtrinsicDispatch.Failed(dispatchError, events)
         }
     }
 

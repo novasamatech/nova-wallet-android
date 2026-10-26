@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,8 +20,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -33,7 +36,7 @@ class BittensorPositionRepositoryTest {
 
     private val positionSource = mock(BittensorPositionSource::class.java)
 
-    private val swapSource = mock(BittensorSwapSource::class.java)
+    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
 
     private val chainStateRepository = mock(ChainStateRepository::class.java)
 
@@ -43,9 +46,11 @@ class BittensorPositionRepositoryTest {
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
-    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger)
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
+
+    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger, positionUpdates)
 
     private val blocks = MutableStateFlow(BigInteger.ONE)
 
@@ -61,7 +66,30 @@ class BittensorPositionRepositoryTest {
     )
 
     @Test
-    fun `root and portfolio consumers share requests and prices on every block`() = runBlocking<Unit> {
+    fun `confirmed operation refreshes positions without waiting for a block`() = runBlocking<Unit> {
+        prepare()
+        val states = Channel<BittensorPositionState>(Channel.UNLIMITED)
+        val observer = launch {
+            repository.observePositions("chain", coldKey)
+                .filter { it.status is BittensorDataStatus.Fresh }
+                .collect { states.send(it) }
+        }
+        try {
+            withTimeout(3_000L) {
+                states.receive()
+                positionUpdates.confirmed(1L, "other-chain", AccountIdKey(coldKey))
+                positionUpdates.confirmed(1L, "chain", AccountIdKey(ByteArray(32) { 1 }))
+                positionUpdates.confirmed(1L, "chain", AccountIdKey(coldKey))
+                states.receive()
+                verify(positionSource, times(2)).positions("chain", coldKey)
+            }
+        } finally {
+            observer.cancelAndJoin()
+        }
+    }
+
+    @Test
+    fun `root and portfolio consumers share requests and independent priced state`() = runBlocking<Unit> {
         prepare()
         val rootUpdates = Channel<BittensorPositionState>(Channel.UNLIMITED)
         val portfolioUpdates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
@@ -73,12 +101,12 @@ class BittensorPositionRepositoryTest {
         }
         val portfolioJob = launch {
             repository.observePortfolio("chain", coldKey.copyOf())
-                .filter { it.status is BittensorDataStatus.Fresh }
+                .filter { it.status is BittensorDataStatus.Fresh && it.positions?.subnetPrices?.isNotEmpty() == true }
                 .collect { portfolioUpdates.send(it) }
         }
         val dashboardJob = launch {
             repository.observePortfolio("chain", coldKey.copyOf())
-                .filter { it.status is BittensorDataStatus.Fresh }
+                .filter { it.status is BittensorDataStatus.Fresh && it.positions?.subnetPrices?.isNotEmpty() == true }
                 .collect { dashboardUpdates.send(it) }
         }
         try {
@@ -86,13 +114,17 @@ class BittensorPositionRepositoryTest {
                 assertEquals(positions, rootUpdates.receive().positions)
                 assertEquals(portfolioUpdates.receive(), dashboardUpdates.receive())
                 verify(positionSource).positions("chain", coldKey)
-                verify(swapSource).currentAlphaPrice("chain", subnetId)
+                verify(priceRepository).prices("chain", setOf(subnetId))
 
                 rootJob.cancelAndJoin()
+                val changed = positions.copy(root = listOf(positions.root.single().copy(stakeInPlanks = BigInteger.valueOf(20))))
+                `when`(positionSource.positions("chain", coldKey)).thenReturn(changed)
                 blocks.value += BigInteger.ONE
-                assertEquals(portfolioUpdates.receive(), dashboardUpdates.receive())
+                val portfolio = portfolioUpdates.next { it.positions?.root == changed.root }
+                val dashboard = dashboardUpdates.next { it.positions?.root == changed.root }
+                assertEquals(portfolio, dashboard)
                 verify(positionSource, times(2)).positions("chain", coldKey)
-                verify(swapSource, times(2)).currentAlphaPrice("chain", subnetId)
+
                 assertEquals(1, blocks.subscriptionCount.value)
             }
         } finally {
@@ -108,14 +140,21 @@ class BittensorPositionRepositoryTest {
         prepare()
         val priceRequested = CompletableDeferred<Unit>()
         val price = CompletableDeferred<BigInteger>()
-        val slowSwapSource = object : BittensorSwapSource by swapSource {
-            override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger {
+        val slowPriceRepository = object : BittensorPortfolioPriceRepository by priceRepository {
+            override suspend fun prices(chainId: String, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
                 priceRequested.complete(Unit)
-                return price.await()
+                return mapOf(subnetId to price.await())
             }
         }
-        val slowPortfolioLoader = BittensorPortfolioLoader(slowSwapSource, logger)
-        val sharedPositions = RealBittensorPositionRepository(positionSource, slowPortfolioLoader, chainStateRepository, computationalCache, logger)
+        val slowPortfolioLoader = BittensorPortfolioLoader(slowPriceRepository, logger)
+        val sharedPositions = RealBittensorPositionRepository(
+            positionSource,
+            slowPortfolioLoader,
+            chainStateRepository,
+            computationalCache,
+            logger,
+            positionUpdates
+        )
         val portfolioJob = launch { sharedPositions.observePortfolio("chain", coldKey).collect {} }
         try {
             withTimeout(3_000L) {
@@ -132,19 +171,120 @@ class BittensorPositionRepositoryTest {
     }
 
     @Test
-    fun `failed account does not receive another account positions`() = runBlocking {
+    fun `failed portfolio account does not receive another account positions or prices`() = runBlocking {
         prepare()
         val otherColdKey = ByteArray(32) { 2 }
         `when`(positionSource.positions("chain", otherColdKey)).thenThrow(IllegalStateException("Unavailable"))
-        val firstWallet = launch { repository.observePositions("chain", coldKey).collect {} }
+        val firstWallet = launch { repository.observePortfolio("chain", coldKey).collect {} }
         try {
             withTimeout(3_000L) {
-                val state = repository.observePositions("chain", otherColdKey)
+                val state = repository.observePortfolio("chain", otherColdKey)
                     .first { it.status is BittensorDataStatus.Stale }
                 assertNull(state.positions)
             }
         } finally {
             firstWallet.cancelAndJoin()
+        }
+    }
+
+    @Test
+    fun `portfolio publishes latest holdings and stale status while same-set prices remain in flight`() = runBlocking<Unit> {
+        prepare()
+        val requested = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        var priceCalls = 0
+        val slowPrices = object : BittensorPortfolioPriceRepository {
+            override suspend fun prices(chainId: String, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
+                priceCalls++
+                requested.complete(Unit)
+                release.await()
+                return mapOf(subnetId to BigInteger.TEN)
+            }
+        }
+        val loader = BittensorPortfolioLoader(slowPrices, logger)
+        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates)
+        val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
+        val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
+        try {
+            withTimeout(3_000L) {
+                requested.await()
+                val initial = updates.next { it.status is BittensorDataStatus.Fresh }
+                assertEquals(positions.subnets, initial.positions?.subnets)
+                assertNull(initial.positions?.totalStake)
+                assertTrue(initial.pricesPending)
+
+                val changed = positions.copy(subnets = listOf(positions.subnets.single().copy(alphaInPlanks = BigInteger.TEN)))
+                `when`(positionSource.positions("chain", coldKey)).thenReturn(changed)
+                blocks.value += BigInteger.ONE
+                val changedState = updates.next { it.positions?.subnets == changed.subnets }
+                assertTrue(changedState.status is BittensorDataStatus.Fresh)
+                assertEquals(1, priceCalls)
+
+                `when`(positionSource.positions("chain", coldKey)).thenThrow(IllegalStateException("RPC unavailable"))
+                blocks.value += BigInteger.ONE
+                val stale = updates.next { it.status is BittensorDataStatus.Stale }
+                assertEquals(changed.subnets, stale.positions?.subnets)
+
+                release.complete(Unit)
+                val priced = updates.next { it.positions?.subnetPrices?.isNotEmpty() == true }
+                assertTrue(priced.status is BittensorDataStatus.Stale)
+                assertEquals(changed.subnets, priced.positions?.subnets)
+                assertFalse(priced.pricesPending)
+                assertEquals(1, priceCalls)
+            }
+        } finally {
+            observer.cancelAndJoin()
+        }
+    }
+
+    @Test
+    fun `changed held set starts new pricing and late cancelled response cannot replace it`() = runBlocking<Unit> {
+        prepare()
+        val firstStarted = CompletableDeferred<Unit>()
+        val releaseFirst = CompletableDeferred<Unit>()
+        val firstFinished = CompletableDeferred<Unit>()
+        val otherSubnet = BittensorNetuid.Subnet(2)
+        val changed = positions.copy(subnets = listOf(positions.subnets.single().copy(subnetId = otherSubnet)))
+        val slowPrices = object : BittensorPortfolioPriceRepository {
+            override suspend fun prices(chainId: String, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
+                if (subnetId in heldSubnets) {
+                    firstStarted.complete(Unit)
+                    withContext(NonCancellable) { releaseFirst.await() }
+                    firstFinished.complete(Unit)
+                    return mapOf(subnetId to BigInteger.ONE)
+                }
+                return mapOf(otherSubnet to BigInteger.TEN)
+            }
+        }
+        val loader = BittensorPortfolioLoader(slowPrices, logger)
+        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates)
+        val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
+        val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
+        try {
+            withTimeout(3_000L) {
+                firstStarted.await()
+                `when`(positionSource.positions("chain", coldKey)).thenReturn(changed)
+                blocks.value += BigInteger.ONE
+                val priced = updates.next { it.positions?.subnetPrices?.get(otherSubnet) == BigInteger.TEN }
+                assertEquals(changed.subnets, priced.positions?.subnets)
+                releaseFirst.complete(Unit)
+                firstFinished.await()
+
+                // An active second subscriber gets the shared latest state, not old prices.
+                val replayed = repository.observePortfolio("chain", coldKey)
+                    .first { it.positions?.subnetPrices?.isNotEmpty() == true }
+                assertEquals(mapOf(otherSubnet to BigInteger.TEN), replayed.positions?.subnetPrices)
+            }
+        } finally {
+            releaseFirst.complete(Unit)
+            observer.cancelAndJoin()
+        }
+    }
+
+    private suspend fun Channel<BittensorPortfolioState>.next(predicate: (BittensorPortfolioState) -> Boolean): BittensorPortfolioState {
+        while (true) {
+            val state = receive()
+            if (predicate(state)) return state
         }
     }
 
@@ -224,6 +364,6 @@ class BittensorPositionRepositoryTest {
     private suspend fun prepare() {
         `when`(chainStateRepository.currentRemoteBlockNumberFlow("chain")).thenReturn(blocks)
         `when`(positionSource.positions("chain", coldKey)).thenReturn(positions)
-        `when`(swapSource.currentAlphaPrice("chain", subnetId)).thenReturn(BigInteger.TEN)
+        `when`(priceRepository.prices("chain", setOf(subnetId))).thenReturn(mapOf(subnetId to BigInteger.TEN))
     }
 }

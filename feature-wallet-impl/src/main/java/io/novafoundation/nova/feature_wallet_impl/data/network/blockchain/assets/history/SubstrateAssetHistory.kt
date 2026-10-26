@@ -48,7 +48,8 @@ abstract class SubstrateAssetHistory(
         val sources = realtimeFetcherSources(chain)
         val realtimeOperationFetcher = realtimeOperationFetcherFactory.create(sources)
 
-        return realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)
+        val updates = realtimeOperationFetcher.extractRealtimeHistoryUpdates(chain, chainAsset, blockHash)
+        return filterBittensorTechnicalRealtimeTransfers(updates, chain, chainAsset)
     }
 
     override suspend fun additionalFirstPageSync(
@@ -147,7 +148,8 @@ abstract class SubstrateAssetHistory(
 
         val assetsBySubQueryId = chain.assetsBySubQueryId()
 
-        val operations = subqueryResponse.historyElements.nodes.mapNotNull { node ->
+        val visibleNodes = filterBittensorTechnicalTransfers(subqueryResponse.historyElements.nodes.toList(), chain, chainAsset)
+        val operations = visibleNodes.mapNotNull { node ->
             val coinRate = priceHistory.findNearestCoinRate(node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset, assetsBySubQueryId)
         }

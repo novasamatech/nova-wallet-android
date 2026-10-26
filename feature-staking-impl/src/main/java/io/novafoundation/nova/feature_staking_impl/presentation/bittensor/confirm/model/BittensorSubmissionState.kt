@@ -10,7 +10,11 @@ sealed class BittensorSubmissionState(val result: BittensorStakeResultUi?) {
 
     class Failed(result: BittensorStakeResultUi.Failure? = null) : BittensorSubmissionState(result)
 
-    class Unresolved(val hash: String, result: BittensorStakeResultUi.Failure? = null) : BittensorSubmissionState(result)
+    class Unconfirmed(val hash: String?, result: BittensorStakeResultUi.Unconfirmed? = null) : BittensorSubmissionState(result)
+
+    /** The operation was executed or may have been: the screen can only be left, never resubmitted. */
+    val isFinished: Boolean
+        get() = this is Completed || this is Unconfirmed
 
     val canSubmit: Boolean
         get() = this is Ready || this is Failed
@@ -18,7 +22,7 @@ sealed class BittensorSubmissionState(val result: BittensorStakeResultUi?) {
     fun dismissResult(): BittensorSubmissionState = when (this) {
         is Completed -> Completed()
         is Failed -> Failed()
-        is Unresolved -> Unresolved(hash)
+        is Unconfirmed -> Unconfirmed(hash)
         else -> this
     }
 }

@@ -15,7 +15,10 @@ data class BittensorSubnet(
     val logoUrl: String?,
     val priceInRao: BigInteger? = null,
     val taoReserveInPlanks: BigInteger? = null,
-    val registrationBlock: BigInteger? = null
+    val registrationBlock: BigInteger? = null,
+    val alphaReserveInPlanks: BigInteger? = null,
+    val websiteUrl: String? = null,
+    val githubUrl: String? = null
 )
 
 class BittensorSubnetInteractor(
@@ -42,9 +45,12 @@ class BittensorSubnetInteractor(
 
     fun observeFavorites() = favorites.observeFavorites()
 
-    suspend fun toggleFavorite(metaId: Long, subnetId: BittensorNetuid.Subnet) = favorites.toggle(metaId, subnetId)
+    suspend fun toggleFavorite(metaId: Long, subnet: BittensorSubnet) {
+        val registrationBlock = requireNotNull(subnet.registrationBlock) { "Subnet registration is unavailable" }
+        favorites.toggle(metaId, BittensorSubnetReference(subnet.id, registrationBlock))
+    }
 
-    suspend fun quote(subnetId: BittensorNetuid.Subnet, amount: BigInteger): BittensorSubnetBuyQuote =
+    suspend fun quote(subnetId: BittensorNetuid.Subnet, amount: BigInteger, slippage: BittensorSlippage = this.slippage): BittensorSubnetBuyQuote =
         bittensorSubnetQuoteInteractor.quoteBuy(
             ChainGeneses.BITTENSOR,
             subnetId,

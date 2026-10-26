@@ -2,17 +2,19 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import coil.ImageLoader
 import coil.load
-import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
-import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.isNegative
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorRootChoiceBinding
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorSubnetBinding
-import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorSubnetGroupBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetIcon
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 
@@ -21,38 +23,23 @@ class BittensorSubnetListAdapter(
     private val onRootClick: () -> Unit,
     private val onClick: (BittensorSubnetRowUi) -> Unit,
     private val onFavorite: (BittensorSubnetRowUi) -> Unit
-) : GroupedListAdapter<BittensorSubnetGroup, BittensorSubnetListItem>(Diff) {
+) : ListAdapter<BittensorSubnetListItem, GroupedListHolder>(Diff) {
 
     override fun getItemViewType(position: Int): Int =
-        if (getItem(position) is BittensorSubnetListItem.Root) TYPE_ROOT else super.getItemViewType(position)
+        if (getItem(position) is BittensorSubnetListItem.Root) TYPE_ROOT else TYPE_SUBNET
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupedListHolder =
         if (viewType == TYPE_ROOT) {
             RootHolder(ItemBittensorRootChoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         } else {
-            super.onCreateViewHolder(parent, viewType)
+            SubnetHolder(ItemBittensorSubnetBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         }
 
-    override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder =
-        GroupHolder(ItemBittensorSubnetGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-
-    override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder =
-        SubnetHolder(ItemBittensorSubnetBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-
-    override fun bindGroup(holder: GroupedListHolder, group: BittensorSubnetGroup) = (holder as GroupHolder).bind(group)
-
-    override fun bindChild(holder: GroupedListHolder, child: BittensorSubnetListItem) {
+    override fun onBindViewHolder(holder: GroupedListHolder, position: Int) {
+        val child = getItem(position)
         when (child) {
             is BittensorSubnetListItem.Root -> (holder as RootHolder).bind(child)
             is BittensorSubnetListItem.Subnet -> (holder as SubnetHolder).bind(child.row)
-        }
-    }
-
-    private class GroupHolder(private val binding: ItemBittensorSubnetGroupBinding) : GroupedListHolder(binding.root) {
-
-        fun bind(group: BittensorSubnetGroup) = with(binding) {
-            val isRoot = group == BittensorSubnetGroup.ROOT
-            title.setText(if (isRoot) R.string.bittensor_root_staking else R.string.bittensor_subnets_section)
         }
     }
 
@@ -60,7 +47,6 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetListItem.Root) = with(binding) {
             rootIcon.setIcon(item.icon, imageLoader)
-            description.text = root.context.getString(R.string.bittensor_root_row_description, item.tokenSymbol.value)
             root.setOnClickListener { onRootClick() }
         }
     }
@@ -69,9 +55,27 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetRowUi) = with(binding) {
             val subnet = item.subnet
-            val name = subnet.name.ifBlank { root.context.getString(R.string.bittensor_subnet_number, subnet.id.value) }
-            title.text = "\u200e" + subnet.displayName(name)
+            title.text = subnet.displayName(root.context).ltrIsolated()
             price.text = item.price
+            val weeklyChange = item.weeklyChange
+            val summary = (weeklyChange as? BittensorSubnetWeeklyChange.Available)?.summary
+            change.text = when (weeklyChange) {
+                BittensorSubnetWeeklyChange.Loading -> null
+                BittensorSubnetWeeklyChange.NotListed -> root.context.getString(R.string.bittensor_no_price_history)
+                BittensorSubnetWeeklyChange.Unavailable -> "—"
+                is BittensorSubnetWeeklyChange.Available -> root.context.getString(
+                    R.string.bittensor_picker_weekly_change,
+                    bittensorPickerChangePercent(weeklyChange.summary.changePercent)
+                )
+            }
+            change.setTextColorRes(
+                when {
+                    summary == null -> R.color.text_secondary
+                    summary.changePercent.isNegative -> R.color.text_negative
+                    else -> R.color.text_positive
+                }
+            )
+            sparkline.setSummary(summary)
             logo.load(subnet.logoUrl, imageLoader) {
                 bittensorSubnetIcon()
             }
@@ -89,23 +93,21 @@ class BittensorSubnetListAdapter(
         }
     }
 
-    private object Diff : BaseGroupedDiffCallback<BittensorSubnetGroup, BittensorSubnetListItem>(BittensorSubnetGroup::class.java) {
+    private object Diff : DiffUtil.ItemCallback<BittensorSubnetListItem>() {
 
-        override fun areGroupItemsTheSame(oldItem: BittensorSubnetGroup, newItem: BittensorSubnetGroup) = oldItem == newItem
-
-        override fun areGroupContentsTheSame(oldItem: BittensorSubnetGroup, newItem: BittensorSubnetGroup) = oldItem == newItem
-
-        override fun areChildItemsTheSame(oldItem: BittensorSubnetListItem, newItem: BittensorSubnetListItem): Boolean = when {
+        override fun areItemsTheSame(oldItem: BittensorSubnetListItem, newItem: BittensorSubnetListItem): Boolean = when {
             oldItem is BittensorSubnetListItem.Root && newItem is BittensorSubnetListItem.Root -> true
             oldItem is BittensorSubnetListItem.Subnet && newItem is BittensorSubnetListItem.Subnet ->
                 oldItem.row.metaId == newItem.row.metaId && oldItem.row.subnet.id == newItem.row.subnet.id
             else -> false
         }
 
-        override fun areChildContentsTheSame(oldItem: BittensorSubnetListItem, newItem: BittensorSubnetListItem) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: BittensorSubnetListItem, newItem: BittensorSubnetListItem) = oldItem == newItem
     }
 
     private companion object {
         const val TYPE_ROOT = 3
+
+        const val TYPE_SUBNET = 2
     }
 }

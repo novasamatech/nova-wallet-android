@@ -55,24 +55,24 @@
                     android:layout_height="44dp"
                     app:title="@string/swap_slippage_title"
                     app:titleIcon="@drawable/ic_info" />
-                <io.novafoundation.nova.common.view.TableCellView
+                <include
                     android:id="@+id/validator"
+                    layout="@layout/view_bittensor_validator_row"
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    app:title="@string/bittensor_validator"
-                    app:titleIcon="@drawable/ic_info"
-                    android:clickable="false" />
+                    android:layout_height="wrap_content" />
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/monthlyTokens"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_monthly_tokens"
+                    app:titleIcon="@drawable/ic_info"
                     app:primaryValue="—" />
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/projectedAveragePrice"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    app:title="@string/bittensor_exit_avg_buy_price" />
+                    app:title="@string/bittensor_exit_avg_buy_price"
+                    app:titleIcon="@drawable/ic_info" />
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                     android:id="@+id/networkFee"
                     android:layout_width="match_parent"
@@ -103,14 +103,6 @@
                     app:shouldDrawDivider="false" />
             </io.novafoundation.nova.common.view.TableView>
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="@string/bittensor_return_disclaimer"
-                android:textColor="@color/text_secondary" />
             <TextView
                 android:id="@+id/feeCaption"
                 style="@style/TextAppearance.NovaFoundation.Regular.Caption1"

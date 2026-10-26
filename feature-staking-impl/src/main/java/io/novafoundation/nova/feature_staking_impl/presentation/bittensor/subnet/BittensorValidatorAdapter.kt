@@ -5,11 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
@@ -55,16 +57,20 @@ class BittensorValidatorAdapter(
             onInfo: (BittensorValidatorUi) -> Unit
         ) = with(binder) {
             val row = model.eligibility
-            root.alpha = if (row.selectable) 1f else 0.5f
-            choice.isChecked = selected
-            choice.isEnabled = row.selectable
-            bindAccessibility(selected)
-            name.text = row.validator.name.ifBlank { row.address }
-            subtitle.text = formatSubtitle(row)
+            root.alpha = if (row.canSelect) 1f else 0.5f
+            choice.isChecked = selected && row.canSelect
+            choice.isEnabled = row.canSelect
+            bindAccessibility(selected && row.canSelect)
+            name.text = bittensorValidatorDisplayName(row)
+            subtitle.text = model.subtitle ?: formatSubtitle(row)
+            apy.text = if (row.inactive) root.context.getString(R.string.staking_nominator_status_inactive) else model.apy
+            apy.isVisible = row.inactive || model.apy != null
+            apy.setTextColorRes(if (row.inactive) R.color.text_secondary else model.apyColorRes)
             icon.setImageDrawable(model.icon)
             info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)
             info.setOnClickListener { onInfo(model) }
-            root.setOnClickListener { if (row.selectable) onSelected(model) }
+            // Inactive rows stay tappable so the screen can explain why they cannot be selected.
+            root.setOnClickListener { if (row.canSelect || row.inactive) onSelected(model) }
         }
 
         private fun bindAccessibility(selected: Boolean) {
@@ -88,12 +94,7 @@ class BittensorValidatorAdapter(
             val context = binder.root.context
             val commissionPercentage = validator.commissionRate.movePointRight(2)
                 .setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
-            val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
-            return when {
-                !validator.selectable -> fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
-                validator.recommended -> context.getString(R.string.bittensor_recommended_validator) + " · " + fee
-                else -> fee
-            }
+            return context.getString(R.string.bittensor_validator_take, commissionPercentage)
         }
     }
 

@@ -54,37 +54,37 @@ class BittensorEstimatedCostBasis(
 
     init {
         val seen = mutableSetOf<BittensorReportedOperation>()
-        operations.asReversed().forEach { row ->
-            if (row.eventId.isNotEmpty() && !seen.add(row)) return@forEach
-            if (BittensorNetuid.from(row.netuid).isRoot() || isNonTradeOperation(row.type)) {
-                return@forEach
+        operations.asReversed().forEach { operation ->
+            if (!seen.add(operation)) return@forEach
+            when (val classification = classify(operation)) {
+                is Classification.Purchase -> addPurchase(operation.netuid, classification.paidTao, classification.receivedAlpha)
+                is Classification.Sale -> reducePurchase(operation.netuid, classification.soldAlpha)
+                Classification.Unclassified -> unclassified += operation.netuid
+                Classification.Ignored -> Unit
             }
-            applyOperation(row)
         }
     }
 
-    private fun applyOperation(operation: BittensorReportedOperation) {
-        val trade = parseTrade(operation)
-        if (trade == null) {
-            unclassified += operation.netuid
-            return
+    // Provider rows always report TAO in and alpha out; only the event name carries the direction.
+    private fun classify(operation: BittensorReportedOperation): Classification {
+        val event = TradeEvent.from(operation.eventId)
+        val isNonTrade = operationTypeWords(operation.type).any { it in NON_TRADE_WORDS }
+        if (BittensorNetuid.from(operation.netuid).isRoot() || event == null || isNonTrade) {
+            return Classification.Ignored
         }
-        if (trade.amountIn.isZero || trade.amountOut.isZero || trade.price.isZero) return
-        val buy = matchesReportedPrice(trade.amountIn, trade.amountOut, trade.price)
-        val sell = matchesReportedPrice(trade.amountOut, trade.amountIn, trade.price)
-        when {
-            buy && !sell -> addPurchase(operation.netuid, trade)
-            sell && !buy -> reducePurchase(operation.netuid, trade.amountIn)
-            else -> unclassified += operation.netuid
-        }
-    }
 
-    private fun parseTrade(operation: BittensorReportedOperation): ReportedTrade? {
-        val amountIn = parseAmount(operation.amountIn) ?: return null
-        val amountOut = parseAmount(operation.amountOut) ?: return null
+        val tao = parseAmount(operation.amountIn)
+        val alpha = parseAmount(operation.amountOut)
         val price = operation.price.toBigDecimalOrNull()
-            ?.abs() ?: return null
-        return ReportedTrade(amountIn, amountOut, price)
+            ?.abs()
+        if (tao == null || alpha == null || price == null) return Classification.Unclassified
+        if (tao.isZero || alpha.isZero || price.isZero) return Classification.Ignored
+        if (!matchesReportedPrice(tao, alpha, price)) return Classification.Unclassified
+
+        return when (event) {
+            TradeEvent.STAKE_ADDED -> Classification.Purchase(tao, alpha)
+            TradeEvent.STAKE_REMOVED -> Classification.Sale(alpha)
+        }
     }
 
     private fun parseAmount(value: String): BigInteger? = value.toBigDecimalOrNull()
@@ -94,10 +94,11 @@ class BittensorEstimatedCostBasis(
 
     private fun addPurchase(
         netuid: Int,
-        trade: ReportedTrade
+        tao: BigInteger,
+        alpha: BigInteger
     ) {
-        totals[netuid] = totals[netuid]?.adding(trade.amountIn, trade.amountOut)
-            ?: BittensorEstimatedPurchaseTotals(trade.amountIn, trade.amountOut)
+        totals[netuid] = totals[netuid]?.adding(tao, alpha)
+            ?: BittensorEstimatedPurchaseTotals(tao, alpha)
     }
 
     private fun reducePurchase(
@@ -108,7 +109,21 @@ class BittensorEstimatedCostBasis(
         if (remaining == null) totals.remove(netuid) else totals[netuid] = remaining
     }
 
-    private data class ReportedTrade(val amountIn: BigInteger, val amountOut: BigInteger, val price: BigDecimal)
+    private enum class TradeEvent(val eventName: String) {
+        STAKE_ADDED("StakeAdded"),
+        STAKE_REMOVED("StakeRemoved");
+
+        companion object {
+            fun from(eventName: String): TradeEvent? = entries.firstOrNull { it.eventName == eventName }
+        }
+    }
+
+    private sealed interface Classification {
+        class Purchase(val paidTao: BigInteger, val receivedAlpha: BigInteger) : Classification
+        class Sale(val soldAlpha: BigInteger) : Classification
+        object Ignored : Classification
+        object Unclassified : Classification
+    }
 
     fun canEstimate(netuid: Int): Boolean = allProviderPagesRead && netuid !in unclassified
 
@@ -126,31 +141,32 @@ class BittensorEstimatedCostBasis(
         return meetsLowerBound && meetsUpperBound
     }
 
-    private fun isNonTradeOperation(operationType: String?): Boolean {
-        if (operationType == null) return false
+    private fun operationTypeWords(operationType: String?): Set<String> = buildSet {
+        if (operationType == null) return@buildSet
 
-        return operationTypeWords(operationType)
-            .any { it.lowercase() in NON_TRADE_WORDS }
+        var wordStart = 0
+        for (index in operationType.indices) {
+            if (!operationType[index].isLetter()) {
+                if (index > wordStart) add(operationType.substring(wordStart, index).lowercase())
+                wordStart = index + 1
+            } else if (index > wordStart && startsCamelCaseWord(operationType, index)) {
+                add(operationType.substring(wordStart, index).lowercase())
+                wordStart = index
+            }
+        }
+        if (wordStart < operationType.length) add(operationType.substring(wordStart).lowercase())
     }
 
-    private fun operationTypeWords(operationType: String): List<String> {
-        val separatedWords = operationType
-            .replace(CAMEL_CASE_BOUNDARY, "$1 $2")
-            .replace(ACRONYM_WORD_BOUNDARY, "$1 $2")
-
-        return separatedWords.split(NON_LETTER_SEPARATOR)
+    private fun startsCamelCaseWord(value: String, index: Int): Boolean {
+        val previous = value[index - 1]
+        val precedesLowercase = value.getOrNull(index + 1)?.isLowerCase() == true
+        return value[index].isUpperCase() && (previous.isLowerCase() || previous.isUpperCase() && precedesLowercase)
     }
 
     private companion object {
         // Matches the iOS ledger heuristic: accept ratios from 1 / 1.5 through 1.5.
         val PRICE_TOLERANCE_FACTOR = 1.5.toBigDecimal()
 
-        val NON_TRADE_WORDS = setOf("move", "transfer")
-
-        val CAMEL_CASE_BOUNDARY = Regex("([a-z])([A-Z])")
-
-        val ACRONYM_WORD_BOUNDARY = Regex("([A-Z])([A-Z][a-z])")
-
-        val NON_LETTER_SEPARATOR = Regex("[^A-Za-z]+")
+        val NON_TRADE_WORDS = setOf("move", "moved", "transfer", "transferred")
     }
 }

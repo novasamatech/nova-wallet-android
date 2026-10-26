@@ -37,7 +37,8 @@ class RealGetAssetOptionsMixinFactory(
     override fun create(
         assetFlow: Flow<Chain.Asset?>,
         scope: CoroutineScope,
-        additionalButtonFilter: Flow<Boolean>
+        additionalButtonFilter: Flow<Boolean>,
+        showWhenNoOptions: Boolean
     ): GetAssetOptionsMixin {
         return RealGetAssetOptionsMixin(
             assetFlow,
@@ -48,7 +49,8 @@ class RealGetAssetOptionsMixinFactory(
             chainRegistry,
             actionAwaitableFactory,
             additionalButtonFilter,
-            scope
+            scope,
+            showWhenNoOptions
         )
     }
 }
@@ -62,7 +64,8 @@ class RealGetAssetOptionsMixin(
     private val chainRegistry: ChainRegistry,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     additionalButtonFilter: Flow<Boolean>,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    showWhenNoOptions: Boolean
 ) : GetAssetOptionsMixin, CoroutineScope by scope {
 
     private val getAssetOptionsFlow = assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(assetFlow)
@@ -73,7 +76,7 @@ class RealGetAssetOptionsMixin(
         getAssetOptionsFlow,
         additionalButtonFilter
     ) { assetIn, getAssetInOptions, shouldShownButton ->
-        if (shouldShownButton && getAssetInOptions.isNotEmpty()) {
+        if (shouldShowGetAssetButton(shouldShownButton, getAssetInOptions, showWhenNoOptions)) {
             val symbol = assetIn.symbol
             DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_get_token_format, symbol))
         } else {
@@ -126,3 +129,9 @@ class RealGetAssetOptionsMixin(
         walletRouter.openReceive(AssetPayload(chainAssetIn.chainId, chainAssetIn.id))
     }
 }
+
+internal fun shouldShowGetAssetButton(
+    shouldShow: Boolean,
+    options: Set<GetAssetOption>,
+    showWhenNoOptions: Boolean
+): Boolean = shouldShow && (options.isNotEmpty() || showWhenNoOptions)

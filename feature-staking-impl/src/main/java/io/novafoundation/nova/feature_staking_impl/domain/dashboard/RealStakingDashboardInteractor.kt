@@ -2,6 +2,7 @@
 
 package io.novafoundation.nova.feature_staking_impl.domain.dashboard
 
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.data.model.isStaking
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
@@ -36,6 +39,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.group
@@ -49,13 +53,17 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+
+private const val BITTENSOR_DETAILS_CACHE = "StakingDashboard.BittensorDetails"
 
 class RealStakingDashboardInteractor(
     private val dashboardRepository: StakingDashboardRepository,
@@ -65,6 +73,8 @@ class RealStakingDashboardInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
     private val walletRepository: WalletRepository,
     private val totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
+    private val bittensorDetailsSource: BittensorDashboardDetailsSource,
+    private val computationalCache: ComputationalCache,
 ) : StakingDashboardInteractor {
 
     override suspend fun syncDapps() {
@@ -92,7 +102,10 @@ class RealStakingDashboardInteractor(
 
                 val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
 
-                combine(noPriceDashboardFlow, assetsFlow, ::addPricesToDashboard)
+                val pricedDashboard = combine(noPriceDashboardFlow, assetsFlow, ::addPricesToDashboard)
+                combine(pricedDashboard, bittensorDetailsFlow(metaAccount, stakingChains)) { dashboard, details ->
+                    dashboard.map { it.withBittensorDetails(details) }
+                }
             }
 
             emitAll(dashboardFlow)
@@ -103,27 +116,36 @@ class RealStakingDashboardInteractor(
         return flow {
             val stakingChains = chainRegistry.stakingChainsById()
             val knownStakingAssets = stakingChains.knownStakingAssets()
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-
-            val noPriceDashboardFlow = combine(
-                dashboardRepository.dashboardItemsFlow(metaAccount.id),
-                stakingDashboardSyncTracker.syncedItemsFlow,
-            ) { dashboardItems, syncedItems ->
-                constructMoreStakingOptions(stakingChains, dashboardItems, syncedItems)
-            }
-
-            val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
             val dApps = dAppMetadataRepository.stakingDAppsFlow()
                 .mapLoading { dapps -> dapps.sortedBy { it.name } }
 
-            val dashboardFlow = combine(
-                noPriceDashboardFlow,
-                assetsFlow,
-                dApps,
-                ::combineNoMoreOptionsInfo
-            )
+            val accountOptions = accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+                val noPriceDashboardFlow = combine(
+                    dashboardRepository.dashboardItemsFlow(metaAccount.id),
+                    stakingDashboardSyncTracker.syncedItemsFlow,
+                ) { dashboardItems, syncedItems ->
+                    constructMoreStakingOptions(stakingChains, dashboardItems, syncedItems)
+                }
+                val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
+                val dashboardFlow = combine(noPriceDashboardFlow, assetsFlow, dApps, ::combineNoMoreOptionsInfo)
+                combine(dashboardFlow, bittensorDetailsFlow(metaAccount, stakingChains)) { options, details ->
+                    MoreStakingOptions(options.inAppStaking.map { it.withBittensorDetails(details) }, options.browserStaking)
+                }
+            }
+            emitAll(accountOptions)
+        }
+    }
 
-            emitAll(dashboardFlow)
+    // The dashboard and its More options show the same Bittensor figures: one observation serves both,
+    // so its requests are not doubled.
+    private fun bittensorDetailsFlow(metaAccount: MetaAccount, stakingChains: ChainsById): Flow<Map<String, BittensorDashboardDetails>> = flow {
+        coroutineScope {
+            val shared = computationalCache.useSharedFlow(BITTENSOR_DETAILS_CACHE, this) {
+                accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
+                    bittensorDetailsSource.observe(account, stakingChains.values).map { details -> AccountBittensorDetails(account.id, details) }
+                }
+            }
+            emitAll(shared.filter { it.metaId == metaAccount.id }.map { it.details })
         }
     }
 
@@ -387,7 +409,8 @@ class RealStakingDashboardInteractor(
         val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
 
         return sortedWith(
-            compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.mainChainsFirstAscendingOrder }
+            compareByDescending<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.id == ChainGeneses.BITTENSOR }
+                .thenBy { it.chain.mainChainsFirstAscendingOrder }
                 .thenByDescending { it.token.planksToFiat(it.stakingState.availableBalance()) }
                 .thenByDescending { it.stakingState.availableBalance() }
                 .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
@@ -398,7 +421,8 @@ class RealStakingDashboardInteractor(
     @JvmName("sortedHasStakeByChain")
     private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
-            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { option -> option.stakingState.stake?.let(option.token::planksToFiat) }
+            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.chain.id == ChainGeneses.BITTENSOR }
+                .thenByDescending { option -> option.stakingState.stake?.let(option.token::planksToFiat) }
                 .thenByDescending { it.stakingState.stake }
                 .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }
@@ -482,4 +506,6 @@ class RealStakingDashboardInteractor(
         val noStake: List<NoPriceStakingDashboardOption<NoBalanceNoStake>>,
         val notYetResolved: List<NoPriceStakingDashboardOption<NotYetResolved>>
     )
+
+    private class AccountBittensorDetails(val metaId: Long, val details: Map<String, BittensorDashboardDetails>)
 }

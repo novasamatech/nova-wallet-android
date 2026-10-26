@@ -15,6 +15,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.HttpException
 import java.io.IOException
+import java.io.InterruptedIOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.Executors
+import kotlinx.coroutines.awaitCancellation
 
 private const val CLIENT_ID = "6f2c1e4a-0000-4000-8000-000000000001"
 
@@ -205,5 +210,58 @@ class AttestationInterceptorTest {
 
         assertTrue("expected the rejection itself, got $error", error is IOException)
         assertSame(rejection, error)
+    }
+
+    @Test
+    fun `bootstrap deadline cancels suspended work without sending the business request`() {
+        val started = CountDownLatch(1)
+        val cancelled = CountDownLatch(1)
+        val service = suspendedService(started, cancelled)
+        val interceptor = AttestationInterceptor(service, bootstrapTimeoutMillis = 100)
+        val backend = FakeBackend(200 to "{}")
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).addInterceptor(backend).build()
+
+        val error = runCatching { client.newCall(analyticsRequest).execute() }.exceptionOrNull()
+
+        assertTrue(error is InterruptedIOException)
+        assertTrue(cancelled.await(2, TimeUnit.SECONDS))
+        assertTrue(backend.sent.isEmpty())
+    }
+
+    @Test
+    fun `cancelling the HTTP call cancels bootstrap before its deadline`() {
+        val started = CountDownLatch(1)
+        val cancelled = CountDownLatch(1)
+        val service = suspendedService(started, cancelled)
+        val interceptor = AttestationInterceptor(service)
+        val backend = FakeBackend(200 to "{}")
+        val client = OkHttpClient.Builder().addInterceptor(interceptor).addInterceptor(backend).build()
+        val call = client.newCall(analyticsRequest)
+        val executor = Executors.newSingleThreadExecutor()
+        try {
+            val result = executor.submit<Throwable?> { runCatching { call.execute() }.exceptionOrNull() }
+            assertTrue(started.await(2, TimeUnit.SECONDS))
+            call.cancel()
+            assertTrue(result.get(2, TimeUnit.SECONDS) is InterruptedIOException)
+            assertTrue(cancelled.await(2, TimeUnit.SECONDS))
+            assertTrue(backend.sent.isEmpty())
+        } finally {
+            call.cancel()
+            executor.shutdownNow()
+        }
+    }
+
+    private fun suspendedService(started: CountDownLatch, cancelled: CountDownLatch): ClientAttestationService {
+        val delegate = RecordingAttestationService()
+        return object : ClientAttestationService by delegate {
+            override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String> {
+                started.countDown()
+                try {
+                    awaitCancellation()
+                } finally {
+                    cancelled.countDown()
+                }
+            }
+        }
     }
 }

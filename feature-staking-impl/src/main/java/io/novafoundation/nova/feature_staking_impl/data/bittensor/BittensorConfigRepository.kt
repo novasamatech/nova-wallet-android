@@ -15,6 +15,8 @@ data class BittensorConfig(val commission: BittensorSubnetCommission, val subnet
 fun interface BittensorConfigRepository {
 
     suspend fun config(): BittensorConfig
+
+    suspend fun subnetLogos(): Map<BittensorNetuid.Subnet, String> = config().subnetLogos
 }
 
 class RemoteBittensorConfigRepository(
@@ -27,17 +29,30 @@ class RemoteBittensorConfigRepository(
 
     override suspend fun config(): BittensorConfig {
         try {
-            withTimeoutOrNull(15_000L) { cachedConfig() }?.let { return it }
-            logger.log("[BittensorConfig] Config request timed out; using fallback fee and chain logos")
+            return withTimeoutOrNull(CONFIG_TIMEOUT_MILLIS) { cachedConfig() }
+                ?: throw BittensorTimeoutException("Bittensor config request")
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logger.log("[BittensorConfig] Config unavailable; using fallback fee and chain logos")
+            logger.log("[BittensorConfig] Config unavailable; commission cannot be resolved")
             logger.log(e)
+            throw e
         }
-        return fallbackBittensorConfig()
+    }
+
+    override suspend fun subnetLogos(): Map<BittensorNetuid.Subnet, String> {
+        return try {
+            config().subnetLogos
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logger.log("[BittensorConfig] Optional subnet logos unavailable; retaining chain logos")
+            emptyMap()
+        }
     }
 }
+
+private const val CONFIG_TIMEOUT_MILLIS = 30_000L
 
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())
 

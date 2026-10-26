@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,28 +13,35 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPrecisionValidator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
 
 @Module(includes = [ViewModelModule::class])
 class BittensorExitAmountModule {
+
     @Provides
     @IntoMap
     @ViewModelKey(BittensorExitAmountViewModel::class)
     fun amount(
+        analytics: AnalyticsService,
         payload: BittensorExitPositionPayload,
         bittensorExitInteractor: BittensorExitInteractor,
         router: StakingRouter,
@@ -45,10 +56,16 @@ class BittensorExitAmountModule {
         validationExecutor: ValidationExecutor,
         exitValidationSystem: BittensorExitValidationSystem,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        exitFormatter: BittensorExitFormatter
+        exitFormatter: BittensorExitFormatter,
+        slippageSettings: BittensorSlippageSettings,
+        costBasisFormatter: BittensorSaleCostBasisFormatter,
+        precisionValidator: BittensorExitPrecisionValidator,
+        validatorInteractor: BittensorValidatorInteractor,
+        rootHoldFormatter: BittensorRootHoldFormatter,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
     ): ViewModel {
         return BittensorExitAmountViewModel(
-            payload,
+            analytics, payload,
             bittensorExitInteractor,
             router,
             resources,
@@ -62,7 +79,13 @@ class BittensorExitAmountModule {
             validationExecutor,
             exitValidationSystem,
             feeLoaderMixinFactory,
-            exitFormatter
+            exitFormatter,
+            slippageSettings = slippageSettings,
+            costBasisFormatter = costBasisFormatter,
+            precisionValidator = precisionValidator,
+            validatorInteractor = validatorInteractor,
+            rootHoldFormatter = rootHoldFormatter,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

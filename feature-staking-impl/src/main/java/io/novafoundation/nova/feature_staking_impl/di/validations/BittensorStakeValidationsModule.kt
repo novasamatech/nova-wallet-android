@@ -2,16 +2,17 @@ package io.novafoundation.nova.feature_staking_impl.di.validations
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorInactiveValidatorValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorColdkeySwapValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorMinimumStakeValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorOrderToleranceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteAvailabilityValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteTermsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRegisteredValidatorValidation
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRootStakeHoldValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorSafeModeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorSlippageValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorStakeFeeReserveValidation
@@ -30,13 +31,13 @@ class BittensorStakeValidationsModule {
 
         val stakingEnabled = BittensorSubnetStakingEnabledValidation()
 
-        val rootHold = BittensorRootStakeHoldValidation()
-
         val coldkeySwap = BittensorColdkeySwapValidation()
 
         val safeMode = BittensorSafeModeValidation()
 
         val quoteAvailability = BittensorQuoteAvailabilityValidation()
+
+        val orderTolerance = BittensorOrderToleranceValidation()
 
         val quoteFreshness = BittensorQuoteFreshnessValidation()
 
@@ -46,20 +47,26 @@ class BittensorStakeValidationsModule {
 
         val priceImpact = BittensorPriceImpactValidation()
 
+        val inactiveValidator = BittensorInactiveValidatorValidation()
+
+        // Order matters: the same failure level shows the first listed failure.
         return bittensorStakeValidationSystem(
-            listOf(
+            quoteValidations = listOf(
+                quoteAvailability,
+                orderTolerance
+            ),
+            validations = listOf(
                 feeReserve,
                 minimumStake,
                 registeredValidator,
                 stakingEnabled,
-                rootHold,
                 coldkeySwap,
                 safeMode,
-                quoteAvailability,
-                quoteTerms,
-                quoteFreshness,
+                inactiveValidator,
+                priceImpact,
                 slippage,
-                priceImpact
+                quoteTerms,
+                quoteFreshness
             )
         )
     }

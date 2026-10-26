@@ -53,6 +53,11 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
+import io.novafoundation.nova.runtime.extrinsic.decodeExtrinsicDryRunResult
+import io.novafoundation.nova.runtime.extrinsic.requireDryRunRpcSuccess
+import kotlinx.coroutines.withTimeout
 
 private const val FEE_DECODE_TYPE = "RuntimeDispatchInfo"
 
@@ -61,6 +66,27 @@ class RpcCalls(
     private val chainRegistry: ChainRegistry,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi
 ) {
+
+    suspend fun requireDryRunSupported(chainId: ChainId) = withTimeout(30_000L) {
+        val request = RuntimeRequest("rpc_methods", emptyList())
+        val response = socketFor(chainId).executeAsync(request)
+        response.requireDryRunRpcSuccess("rpc_methods")
+        val methods = response.result as? Map<*, *>
+        if ((methods?.get("methods") as? List<*>)?.contains("system_dryRun") != true) {
+            throw UnsupportedOperationException("The selected node does not advertise system_dryRun")
+        }
+    }
+
+    suspend fun dryRunExtrinsic(chainId: ChainId, extrinsic: SendableExtrinsic): ExtrinsicDryRunResult = withTimeout(30_000L) {
+        val request = RuntimeRequest("system_dryRun", listOf(extrinsic.extrinsicHex))
+        val response = socketFor(chainId).executeAsync(
+            request,
+            deliveryType = DeliveryType.AT_MOST_ONCE
+        )
+        response.requireDryRunRpcSuccess("system_dryRun")
+        val encodedResult = response.result as? String ?: error("Missing dry run result")
+        decodeExtrinsicDryRunResult(encodedResult, chainRegistry.getRuntime(chainId))
+    }
 
     suspend fun getExtrinsicFee(chain: Chain, extrinsic: SendableExtrinsic): FeeResponse {
         val chainId = chain.id

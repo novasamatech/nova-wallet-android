@@ -4,7 +4,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.CacheControl
 import okhttp3.HttpUrl
 import retrofit2.HttpException
@@ -16,40 +16,51 @@ class BittensorEstimatesRemoteSource(
 ) {
 
     suspend fun history(baseUrl: HttpUrl, address: String): EstimatePages<BittensorReportedOperation> =
-        loadPages(HISTORY_PAGE_LIMIT) { page -> loadHistoryPage(baseUrl, address, page) }
+        loadPages(HISTORY_PAGE_LIMIT, spacingMillis) { page -> loadHistoryPage(baseUrl, address, page) }
 
-    internal suspend fun yields(baseUrl: HttpUrl, chain: Chain, subnet: BittensorNetuid.Subnet): EstimatePages<BittensorValidatorYield> =
-        loadPages(YIELD_PAGE_LIMIT) { page -> loadYieldPage(baseUrl, chain, subnet, page) }
+    /** Alpha yields arrive as one unpaginated collection per subnet, so there is nothing to page through. */
+    internal suspend fun yields(baseUrl: HttpUrl, chain: Chain, subnet: BittensorNetuid.Subnet): EstimatePages<BittensorValidatorYield> {
+        val snapshot = loadYieldSnapshot(baseUrl, chain, subnet)
+        return EstimatePages(snapshot.items, snapshot.validUntilNanos, allPagesRead = true)
+    }
 
     private suspend fun loadHistoryPage(baseUrl: HttpUrl, address: String, page: Int): EstimatePage<BittensorReportedOperation> {
         val url = endpoint(baseUrl, "operations/search")
-        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.operations(url, address, page) }
-        val validUntilNanos = deadline(response)
+        val requestStartedAtNanos = System.nanoTime()
+        val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.operations(url, address, page) }
+            ?: throw BittensorTimeoutException("Operation history page")
+        val validUntilNanos = deadline(response, requestStartedAtNanos)
         val body = requireBody(response)
-        requireFreshComponent(body.meta?.components?.operationHistory)
-        require(body.historyScope == "TAO_APP_PARTIAL" && body.pageInfo?.page == page)
-        val items = requireNotNull(body.items)
+        requireAvailableBittensorComponent(body.meta?.components?.operationHistory, "Operation history")
+        require(body.historyScope == "TAO_APP_PARTIAL")
+        val remoteItems = requireNotNull(body.items)
+        validateHistoryPage(body.pageInfo, page, remoteItems.size)
+        val items = remoteItems
             .map(::mapBittensorReportedOperation)
         return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
     }
 
-    private suspend fun loadYieldPage(
+    private suspend fun loadYieldSnapshot(
         baseUrl: HttpUrl,
         chain: Chain,
-        subnetId: BittensorNetuid.Subnet,
-        page: Int
+        subnetId: BittensorNetuid.Subnet
     ): EstimatePage<BittensorValidatorYield> {
         val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha")
-        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url, page) }
-        val validUntilNanos = deadline(response)
+        val requestStartedAtNanos = System.nanoTime()
+        val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
+            ?: throw BittensorTimeoutException("Validator yield snapshot")
+        val validUntilNanos = deadline(response, requestStartedAtNanos)
         val body = requireBody(response)
-        requireFreshComponent(body.meta?.components?.alphaYield)
-        require(body.pageInfo?.page == page)
+        requireAvailableBittensorComponent(body.meta?.components?.alphaYield, "Yield source")
         val items = requireNotNull(body.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnetId) }
-        return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
+        return EstimatePage(items, null, validUntilNanos)
     }
 
-    private suspend fun <T> loadPages(pageLimit: Int, loadPage: suspend (Int) -> EstimatePage<T>): EstimatePages<T> {
+    private suspend fun <T> loadPages(
+        pageLimit: Int,
+        spacingMillis: Long,
+        loadPage: suspend (Int) -> EstimatePage<T>
+    ): EstimatePages<T> {
         val items = mutableListOf<T>()
         var nextPage: Int? = FIRST_PAGE
         var validUntilNanos = Long.MAX_VALUE
@@ -67,7 +78,7 @@ class BittensorEstimatesRemoteSource(
         return EstimatePages(items, validUntilNanos, allPagesRead = nextPage == null)
     }
 
-    private fun deadline(response: Response<*>): Long {
+    private fun deadline(response: Response<*>, requestStartedAtNanos: Long): Long {
         val cache = CacheControl.parse(response.headers())
         val age = response.headers()["Age"]
             ?.toLongOrNull()
@@ -78,17 +89,20 @@ class BittensorEstimatesRemoteSource(
             (cache.maxAgeSeconds.toLong() - age)
                 .coerceIn(0, MAX_CACHE_AGE_SECONDS)
         }
-        return System.nanoTime() + seconds * NANOS_PER_SECOND
-    }
-
-    private fun requireFreshComponent(component: BittensorRecommendationsRemote.Component?) {
-        require(component?.availability == "AVAILABLE" && component.freshness == "FRESH") { "Estimate source is unavailable or stale" }
+        return requestStartedAtNanos + seconds * NANOS_PER_SECOND
     }
 
     private fun nextPage(info: BittensorHistoryPageInfo?, current: Int): Int? {
         val value = requireNotNull(info).nextPage
-        require(value == null || value in (current + 1)..MAX_PROVIDER_PAGE)
+        require(value == null || value == current + 1 && value <= MAX_PROVIDER_PAGE)
         return value
+    }
+
+    private fun validateHistoryPage(info: BittensorHistoryPageInfo?, requestedPage: Int, itemCount: Int) {
+        requireNotNull(info) { "Missing operation history pagination" }
+        require(info.page == requestedPage && requestedPage in FIRST_PAGE..MAX_PROVIDER_PAGE) { "Unexpected operation history page" }
+        require(info.pageSize == PAGE_SIZE) { "Unexpected operation history page size" }
+        require(itemCount <= PAGE_SIZE) { "Operation history page exceeds its declared size" }
     }
 
     private fun <T> requireBody(response: Response<T>): T {
@@ -107,8 +121,8 @@ class BittensorEstimatesRemoteSource(
 
     private companion object {
         const val FIRST_PAGE = 1
+        const val PAGE_SIZE = 100
         const val HISTORY_PAGE_LIMIT = 10
-        const val YIELD_PAGE_LIMIT = 3
         const val MAX_PROVIDER_PAGE = 100
         const val REQUEST_TIMEOUT_MILLIS = 25_000L
         const val MAX_CACHE_AGE_SECONDS = 60L

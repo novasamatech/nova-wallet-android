@@ -14,9 +14,9 @@ class BittensorExitFeeBalanceValidation : BittensorExitValidation {
         if (!value.feeFromStake) return valid()
 
         val quote = value.quote
-        val canPayFeeFromStake = quote.netuid.isRoot() && value.supportsFeeFromStake
+        val canPayFeeFromStake = quote.netuid.isRoot() && value.supportsFeeFromStake && quote.exitHotkeys.size <= 1 && quote.plan?.isBatched != true
         val withdrawalCoversFeeAndDeposit = quote.amount > value.fee + value.existentialDeposit
-        val stakeCoversWithdrawalAndFee = quote.fullExit || quote.amount + value.fee <= value.preflight.stake
+        val stakeCoversWithdrawalAndFee = quote.amount <= value.preflight.totalStake
 
         return validOrError(canPayFeeFromStake && withdrawalCoversFeeAndDeposit && stakeCoversWithdrawalAndFee) {
             BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE

@@ -1,10 +1,29 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.resolvedValidatorNames
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
+
 import android.os.SystemClock
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.map
@@ -21,33 +40,44 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.actualSellReceive
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.actualRootStakeMoved
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.mapDisplay
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorSubmissionError
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorResultAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
@@ -64,19 +94,47 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitSelection
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.analytics.StakingValidationKind
+import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.sync.Mutex
 
 private sealed interface ExitExecution {
     data object Idle : ExitExecution
     data class Running(val startedAt: Long, val estimatedDuration: Duration) : ExitExecution
-    data class Success(val at: Long) : ExitExecution
+    data class Success(val at: Long, val outcome: BittensorOperationOutcome?, val draft: BittensorExitDraft) : ExitExecution
     data class Failure(val model: BittensorStakeResultUi.Failure, val at: Long = System.currentTimeMillis()) : ExitExecution
+    data class Unconfirmed(
+        val model: BittensorStakeResultUi.Unconfirmed,
+        val draft: BittensorExitDraft,
+        val at: Long = System.currentTimeMillis()
+    ) : ExitExecution
 }
 
+/** One validator of a sale spread over several; [detail] marks a full exit. */
+data class BittensorExitLegUi(val name: String, val amount: String, val detail: String?)
+
 class BittensorExitReviewViewModel(
+    private val analytics: AnalyticsService,
+    private val operationAnalytics: BittensorOperationAnalytics,
     private val payload: BittensorExitReviewPayload,
     private val bittensorExitInteractor: BittensorExitInteractor,
     private val router: StakingRouter,
@@ -95,14 +153,23 @@ class BittensorExitReviewViewModel(
     private val validationExecutor: ValidationExecutor,
     private val exitValidationSystem: BittensorExitValidationSystem,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-    private val exitFormatter: BittensorExitFormatter
+    private val exitFormatter: BittensorExitFormatter,
+    private val saleCostBasisFormatter: BittensorSaleCostBasisFormatter,
+    private val validatorInteractor: BittensorValidatorInteractor,
+    private val logger: Logger
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val isRoot = payload.position.netuid().isRoot()
 
-    val isFullExit = payload.fullExit
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.UNSTAKE,
+        bittensorExitAnalyticsTarget(isRoot),
+        newPosition = false
+    )
 
-    val slippage = bittensorExitInteractor.slippage.fraction.movePointRight(2).toStripTrailingZerosString() + "%"
+    val slippage = payload.slippageFraction.toBigDecimal().movePointRight(2).toStripTrailingZerosString() + "%"
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
 
@@ -115,23 +182,49 @@ class BittensorExitReviewViewModel(
 
     private val confirmMutex = Mutex()
 
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.CONFIRM)
+
     val retryEvents = retryController.events
 
     private val validating = MutableStateFlow(false)
 
     private val execution = MutableStateFlow<ExitExecution>(ExitExecution.Idle)
 
-    private val sheetDismissed = MutableStateFlow(false)
+    // The rows show the latest block re-quote; the fee and the limit Confirm checks against stay with the acknowledged quote.
+    private val quotes = MutableStateFlow(BittensorExitReviewQuotes(payload.quote()))
 
-    private val requestState = retryController.observe(
-        step = "exit confirmation",
-        transform = { it.withSafeLoading() }
-    ) {
-        flowOf {
-            val position = bittensorExitInteractor.load(payload.position.metaId, payload.position.netuid(), payload.position.hotkeyAddress)
-            BittensorExitRequest(position, payload.quote())
+    private val acknowledgedQuote = quotes.map { it.acknowledged }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    private val retryRequotes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    private val priceMoveBanner = BittensorExitPriceMoveBanner { outcome ->
+        analytics.track(
+            BittensorAnalyticsEvent.ValidationShown(
+                StakingFlow.UNSTAKE,
+                StakingValidationKind.PRICE_MOVED,
+                StakingValidationStage.CONFIRM,
+                outcome,
+                StakingAnalyticsTarget.SUBNET
+            )
+        )
+    }
+
+    private val positionReload = MutableStateFlow(0)
+
+    private val positionState = positionReload.flatMapLatest {
+        retryController.observe(
+            step = "exit confirmation",
+            analytics = chainRpcReads,
+            transform = { it.withSafeLoading() }
+        ) {
+            flowOf { bittensorExitInteractor.load(payload.position.metaId, payload.position.netuid(), payload.position.hotkeyAddress) }
         }
     }
+        .shareInBackground()
+
+    private val requestState = combine(positionState, acknowledgedQuote) { state, quote -> state.map { BittensorExitRequest(it, quote) } }
         .shareInBackground()
 
     private val request = requestState.map { it.dataOrNull }
@@ -153,26 +246,15 @@ class BittensorExitReviewViewModel(
 
     private val prepared = combine(
         requestState,
-        feeStatus
-    ) { state, status ->
-        val request = state.dataOrNull
-        val estimate = status.loadedFeeOrNull()
-        when {
-            request == null -> state.map { null }
-            status is FeeStatus.Error || status is FeeStatus.NoFee -> ExtendedLoadingState.Loaded(null)
-            estimate == null || estimate.request != request -> ExtendedLoadingState.Loading
-            else -> {
-                val fromStake = bittensorExitInteractor.feeFromStake(request.position, estimate)
-                val draft = bittensorExitInteractor.prepare(
-                    request.position,
-                    request.quote,
-                    estimate,
-                    fromStake
-                )
-                ExtendedLoadingState.Loaded(draft)
-            }
-        }
+        feeStatus,
+        quotes
+    ) { state, status, reviewed ->
+        state.dataOrNull?.let { status.exitDraft(bittensorExitInteractor, it, reviewed.displayed) } ?: state.map { null }
     }
+        .shareInBackground()
+
+    val isPriceMoved = quotes.map { it.isPriceMoved }
+        .distinctUntilChanged()
         .shareInBackground()
 
     val position = prepared.map { it.dataOrNull?.position }
@@ -182,8 +264,8 @@ class BittensorExitReviewViewModel(
 
     val primaryAmount = prepared.map {
         it.dataOrNull?.let { draft ->
-            exitFormatter.amount(draft.position, draft.quote.amount, !isRoot).let {
-                if (isFullExit) {
+            exitFormatter.amount(draft.position, draft.quote.amount, !isRoot, draft.quote).let {
+                if (draft.quote.fullExit) {
                     it.copy(
                         token = "≈ " + it.token
                     )
@@ -195,19 +277,29 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    val assets = prepared.map {
-        it.dataOrNull?.let { draft ->
+    val assets = combine(prepared, execution) { prepared, state ->
+        ((state as? ExitExecution.Success)?.draft ?: prepared.dataOrNull)?.let { draft ->
+            val outcome = (state as? ExitExecution.Success)?.outcome
+            val actualAlpha = outcome?.alpha
             val inIcon = draft.position.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
             val outIcon = assetIconProvider.getAssetIconOrFallback(draft.position.asset.token.configuration)
-            val output = exitFormatter.amount(draft.position, draft.quote.estimatedTaoOut - draft.quote.serviceFee, false)
+            val actualReceive = outcome?.actualSellReceive(draft.quote.serviceFee)
+            val token = draft.position.asset.token
+            // Fiat under both sides, as on the iOS done page: received TAO at the current TAO price.
+            val output = formatBittensorNativeResult(actualReceive, draft.netReceive, draft.position.chain, tokenFormatter).copy(
+                fiat = token.toFiatOrNull(token.amountFromPlanks(actualReceive ?: draft.netReceive))?.let { fiatFormatter.formatFiat(it, token.currency) }
+            )
             SwapAssetsView.Model(
                 SwapAssetView.Model(
                     inIcon,
-                    exitFormatter.amount(draft.position, draft.quote.amount, true),
+                    exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true, draft.quote).let {
+                        val amount = it.token.ltrIsolated()
+                        if (actualAlpha == null) it.copy(token = "≈ $amount".ltrIsolated()) else it.copy(token = amount, fiat = null)
+                    },
                     iconSizeDp = 48,
                     clipIconToOutline = true
                 ),
-                SwapAssetView.Model(outIcon, output.copy(token = "≈ " + output.token), iconSizeDp = 48)
+                SwapAssetView.Model(outIcon, output, iconSizeDp = 48)
             )
         }
     }
@@ -216,17 +308,14 @@ class BittensorExitReviewViewModel(
     val stakeAfter = prepared.mapLoading {
         it?.let { draft ->
             val before = tokenFormatter.formatToken(
-                draft.position.asset.token.amountFromPlanks(draft.position.preflight.stake),
-                draft.position.asset.token.configuration.symbol
+                draft.position.asset.token.amountFromPlanks(draft.position.preflight.totalStake),
+                draft.position.asset.token.configuration.symbol,
+                TokenConfig(includeAssetTicker = false)
             )
             val after = if (draft.quote.fullExit) {
                 BigInteger.ZERO
             } else {
-                draft.position.preflight.stake - draft.quote.amount - if (draft.feeFromStake) {
-                    draft.fee.maxAmountDeductionFor(draft.position.asset.token.configuration)
-                } else {
-                    BigInteger.ZERO
-                }
+                (draft.position.preflight.totalStake - draft.quote.amount).max(BigInteger.ZERO)
             }
             "$before → " + tokenFormatter.formatToken(draft.position.asset.token.amountFromPlanks(after), draft.position.asset.token.configuration.symbol)
         } ?: "—"
@@ -236,82 +325,135 @@ class BittensorExitReviewViewModel(
     val rate = prepared.mapLoading { exitFormatter.exchangeRate(it) }
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
-        position.map {
-            it?.takeUnless { it.isRoot }
-                ?.let { BittensorEstimateContext(it.metaId, it.chain) }
-        }
+    // Keyed by the loaded position, not the fee-dependent draft, so a fee reload does not drop the estimate.
+    private val saleCostBasis = estimatesMixin.observeSaleCostBasis(
+        request.filterNotNull().map { it.position },
+        payload.position.netuid,
+        carried = payload.costBasis?.totals()
     )
         .shareInBackground()
 
     val averagePrice = combine(
-        costBasisState,
-        position
-    ) { state, position ->
-        state.map { basis ->
-            val average = basis?.forSubnet(payload.position.netuid)
-                ?.averagePrice
-            when {
-                average != null && position != null -> "≈ " + tokenFormatter.formatToken(average, position.asset.token.configuration.symbol)
-                basis?.canEstimate(payload.position.netuid) == true -> resources.getString(R.string.common_not_available)
-                else -> "—"
-            }
-        }
+        saleCostBasis,
+        request
+    ) { state, request ->
+        state.map { saleCostBasisFormatter.averagePrice(it, request?.position) }
     }
         .shareInBackground()
 
     val earned = combine(
-        costBasisState,
-        prepared
-    ) { state, prepared ->
-        bittensorLoadingValue(state, prepared) {
-            val basis = state.dataOrNull
-            val draft = prepared.dataOrNull
-            val totals = basis?.forSubnet(payload.position.netuid)
-            if (draft == null || totals == null) {
-                "—"
-            } else {
-                val profit = totals.estimatedProfit(draft.quote.amount, draft.quote.estimatedTaoOut - draft.quote.serviceFee)
-                "≈ " + tokenFormatter.formatToken(draft.position.asset.token.amountFromPlanks(profit), draft.position.asset.token.configuration.symbol)
-            }
+        saleCostBasis,
+        requestState,
+        quotes
+    ) { state, request, reviewed ->
+        bittensorLoadingValue(state, request) {
+            val exit = request.dataOrNull
+            saleCostBasisFormatter.profit(state.dataOrNull, exit?.let { reviewed.displayed }, exit?.position?.asset?.token)
         }
     }
         .shareInBackground()
 
+    // The settled totals behind "You will earn" at confirm time: after a full sale the live history may settle again or drop the subnet.
+    private var confirmedPurchaseTotals: BittensorEstimatedPurchaseTotals? = null
+
+    /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
+    val completedEarned = execution.map { state ->
+        val success = state as? ExitExecution.Success
+        if (isRoot || success == null) return@map null
+        saleCostBasisFormatter.completedProfit(confirmedPurchaseTotals, success.draft.quote, success.outcome, success.draft.position.asset.token)
+    }
+        .shareInBackground()
+
     val validator = payload.position.hotkeyAddress
+
+    private val validatorHotkey by lazyAsync { AccountIdKey(chain.await().accountIdOf(validator)) }
+
+    // One lookup names the reviewed validator and the validators of the plan, which block re-quotes keep.
+    private val validatorNames = acknowledgedQuote.map { quote -> quote.plan?.slices.orEmpty().map { it.hotkey }.toSet() + validatorHotkey.await() }
+        .resolvedValidatorNames(
+            onFailure = { cause ->
+                logger.log("[BittensorExitReview] Optional validator names unavailable")
+                logger.log(cause)
+            }
+        ) { hotkeys -> validatorInteractor.validatorNames(payload.position.netuid(), hotkeys) }
+        .shareInBackground()
+
+    val validatorName = validatorNames.map { names -> names?.get(validatorHotkey.await()) ?: validator.ellipsizeAddress() }
+        .shareInBackground()
 
     val validatorIcon = position.map { position ->
         position?.let { addressIconGenerator.createAddressIcon(it.hotkey.value, 18, AddressIconGenerator.BACKGROUND_TRANSPARENT) }
     }
         .shareInBackground()
 
+    val isMultiValidator = acknowledgedQuote.map { quote -> quote.plan?.slices.orEmpty().map { it.hotkey }.distinct().size > 1 }
+        .shareInBackground()
+
+    val legs = combine(request, isMultiValidator, validatorNames) { request, multiValidator, names ->
+        if (request == null || !multiValidator) return@combine emptyList()
+        request.quote.plan?.slices.orEmpty().map { slice ->
+            BittensorExitLegUi(
+                name = names?.get(slice.hotkey) ?: request.position.chain.addressOf(slice.hotkey.value).ellipsizeAddress(),
+                amount = exitFormatter.amount(request.position, slice.amount, !isRoot).token.toString(),
+                detail = resources.getString(R.string.bittensor_exit_full_exit).takeIf { slice.fullExit }
+            )
+        }
+    }
+        .shareInBackground()
+
     val fee = feeStatus
+
+    val executionFee = combine(fee, prepared, execution) { status, preparation, state ->
+        val draft = (state as? ExitExecution.Success)?.draft ?: preparation.dataOrNull
+        val outcome = (state as? ExitExecution.Success)?.outcome
+        if (state is ExitExecution.Success && draft != null) {
+            val fee = outcome.formatNetworkFee(draft.fee, draft.position.chain, resources, tokenFormatter)
+            FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(fee.amount, fee.fiatAmount)))
+        } else {
+            status.mapDisplay { display -> FeeDisplay("≈ " + display.title, null) }
+        }
+    }
+        .shareInBackground()
 
     val commissionCaption = prepared.map { state ->
         state.dataOrNull?.let { draft ->
-            val fee = tokenFormatter.formatToken(
-                draft.position.asset.token.amountFromPlanks(draft.quote.serviceFee),
-                draft.position.asset.token.configuration.symbol
-            )
-            resources.getString(R.string.bittensor_exit_service_fee, fee)
+            val percentage = draft.quote.serviceFeeRate?.movePointRight(2)?.toStripTrailingZerosString()
+                ?: return@map null
+            resources.getString(R.string.bittensor_subnet_fee_caption, percentage)
         }
     }
         .shareInBackground()
 
     val feeCaption = prepared.map { state ->
         val draft = state.dataOrNull ?: return@map null
-        val feeSource = resources.getString(
-            if (draft.feeFromStake) R.string.bittensor_exit_fee_from_stake else R.string.bittensor_exit_fee_from_free,
-            draft.position.asset.token.configuration.symbol.value
-        )
-        if (isFullExit) resources.getString(R.string.bittensor_exit_full_position) + "\n" + feeSource else feeSource
+        val feeSource = exitFormatter.feeSource(draft)
+        if (draft.quote.fullExit) resources.getString(R.string.bittensor_exit_full_position) + "\n" + feeSource else feeSource
     }
         .shareInBackground()
+
+    val swapRateDescription = prepared.map { state -> state.dataOrNull?.let { exitFormatter.swapRateDescription(it.position, it.quote) } }
+        .shareInBackground()
+
+    val averagePriceDescription = position.map { it?.let(exitFormatter::averagePriceDescription) }
+        .shareInBackground()
+
+    val profitDescription = position.map { position ->
+        position?.let { resources.getString(R.string.bittensor_sale_profit_description, it.asset.token.configuration.symbol.value) }
+    }
+        .shareInBackground()
+
+    val slippageDescription = resources.getString(R.string.bittensor_slippage_description, slippage)
 
     val isExecuting = execution.map { it is ExitExecution.Running }
         .shareInBackground()
 
     val isCompleted = execution.map { it is ExitExecution.Success }
+        .shareInBackground()
+
+    val canFinish = execution.map { it is ExitExecution.Success || it is ExitExecution.Unconfirmed }
+        .shareInBackground()
+
+    val executionUnconfirmed = execution.map { if (isRoot) null else (it as? ExitExecution.Unconfirmed)?.model }
         .shareInBackground()
 
     val showExecution = execution.map { !isRoot && it !is ExitExecution.Idle }
@@ -325,11 +467,12 @@ class BittensorExitReviewViewModel(
             resources.formatDateTime(state.at)
         } else if (state is ExitExecution.Failure) {
             resources.formatDateTime(state.at)
+        } else if (state is ExitExecution.Unconfirmed) {
+            resources.formatDateTime(state.at)
         } else {
             resources.getString(
                 R.string.bittensor_exit_selling_progress,
-                position?.subnet?.name?.ifBlank { resources.getString(R.string.bittensor_subnet_number, payload.position.netuid) }
-                    ?: resources.getString(R.string.bittensor_subnet_number, payload.position.netuid),
+                position?.subnet.title(payload.position.netuid, resources),
                 position?.asset?.token?.configuration?.symbol?.value.orEmpty()
             )
         }
@@ -339,10 +482,11 @@ class BittensorExitReviewViewModel(
     val confirmButtonState = combine(
         prepared,
         execution,
-        validating
-    ) { prepared, state, validating ->
-        val label = resources.getString(R.string.common_confirm)
-        val blocked = state is ExitExecution.Running || state is ExitExecution.Success ||
+        validating,
+        isPriceMoved
+    ) { prepared, state, validating, priceMoved ->
+        val label = resources.getString(if (priceMoved) R.string.bittensor_exit_confirm_new_rate else R.string.common_confirm)
+        val blocked = state is ExitExecution.Running || state is ExitExecution.Success || state is ExitExecution.Unconfirmed ||
             state is ExitExecution.Failure && !state.model.canRetry
         if (validating) {
             DescriptiveButtonState.Loading
@@ -361,11 +505,10 @@ class BittensorExitReviewViewModel(
 
     val resultState = combine(
         prepared,
-        execution,
-        sheetDismissed
-    ) { prepared, state, dismissed ->
-        if (dismissed) return@combine null
+        execution
+    ) { prepared, state ->
         when (state) {
+            is ExitExecution.Unconfirmed -> if (isRoot) state.model else null
             is ExitExecution.Failure -> if (isRoot) state.model else null
             is ExitExecution.Running -> if (isRoot) {
                 BittensorStakeResultUi.Progress(
@@ -376,14 +519,7 @@ class BittensorExitReviewViewModel(
                 null
             }
             is ExitExecution.Success -> if (isRoot) {
-                prepared.dataOrNull?.let { draft ->
-                    BittensorStakeResultUi.Success(
-                        resources.getString(R.string.bittensor_exit_root_completed),
-                        resources.getString(R.string.bittensor_exit_root_completed_description),
-                        validator,
-                        BittensorFeeUi("≈ " + tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol), null)
-                    )
-                }
+                rootUnstakeSuccess(state.draft, state.outcome)
             } else {
                 null
             }
@@ -392,13 +528,51 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    init {
-        feeLoaderMixin.connectWith(request) { _, request ->
-            request?.let {
-                val fee = bittensorExitInteractor.estimateFee(it.position, it.quote)
-                BittensorFeeEstimate(it, fee)
-            }
+    /** iOS done sheet: "You unstaked X", the root stake left after it, and the fee. */
+    private fun rootUnstakeSuccess(draft: BittensorExitDraft, outcome: BittensorOperationOutcome?): BittensorStakeResultUi.Success {
+        val token = draft.position.asset.token
+        val moved = outcome?.actualRootStakeMoved() ?: draft.quote.amount
+        val after = if (draft.quote.fullExit) BigInteger.ZERO else (draft.position.preflight.totalStake - moved).max(BigInteger.ZERO)
+        val stakeAfter = tokenFormatter.formatToken(token.amountFromPlanks(after), token.configuration.symbol).toString()
+        val description = if (after.signum() == 0) {
+            resources.getString(R.string.bittensor_exit_root_unstaked_all_description)
+        } else {
+            resources.getString(R.string.bittensor_exit_root_unstaked_description, stakeAfter)
         }
+        return BittensorStakeResultUi.Success(
+            title = resources.getString(
+                R.string.bittensor_exit_root_unstaked_title,
+                formatBittensorNativeResult(outcome?.actualRootStakeMoved(), draft.quote.amount, draft.position.chain, tokenFormatter).token
+            ),
+            description = description,
+            validator = null,
+            fee = outcome.formatNetworkFee(draft.fee, draft.position.chain, resources, tokenFormatter),
+            stakeAfter = stakeAfter,
+            actions = resultNavigation.landingActions(draft.quote.fullExit)
+        )
+    }
+
+    init {
+        feeLoaderMixin.connectWith(request) { _, request -> bittensorExitInteractor.feeEstimate(request) }
+
+        if (!isRoot) {
+            // Every new block re-quotes the sale until it is handed to submission, and a retry re-quotes at once.
+            bittensorExitInteractor.requotes(flowOf { true }, retryRequotes)
+                .filter { execution.value is ExitExecution.Idle }
+                .mapLatest { requote() }
+                .inBackground()
+                .launchIn(this)
+
+            quotes.map { it.isPriceMoved }
+                .distinctUntilChanged()
+                .onEach(priceMoveBanner::sync)
+                .launchIn(this)
+        }
+    }
+
+    override fun onCleared() {
+        priceMoveBanner.leave()
+        super.onCleared()
     }
 
     fun remainingExecutionTime(): Duration {
@@ -407,17 +581,35 @@ class BittensorExitReviewViewModel(
         return (running.estimatedDuration - elapsed).coerceAtLeast(Duration.ZERO)
     }
 
+    /** Try again returns to the review with the position, fee and quote refreshed; Confirm signs again. */
     fun retryClicked() {
         val failure = execution.value as? ExitExecution.Failure ?: return
         if (!failure.model.canRetry) return
         execution.value = ExitExecution.Idle
+        positionReload.update { it + 1 }
+        retryRequotes.tryEmit(Unit)
     }
 
-    fun confirmClicked() = launchUnit {
+    fun confirmClicked(): Unit = launchUnit {
         if (!confirmMutex.tryLock()) return@launchUnit
         try {
+            priceMoveBanner.beginTap()
             if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
-            val draft = prepared.first().dataOrNull ?: return@launchUnit
+            val loaded = prepared.first().dataOrNull ?: return@launchUnit
+            // Confirm at the new rate acknowledges the latest quote; a crossing the banner does not show yet only raises it.
+            val reviewed = when {
+                quotes.value.isPriceMoved -> {
+                    priceMoveBanner.acknowledge()
+                    quotes.updateAndGet { it.acknowledgeLatest() }
+                }
+                quotes.value.latestCrossesAcknowledgedLimit -> {
+                    quotes.update { it.copy(isPriceMoved = true) }
+                    return@launchUnit
+                }
+                else -> quotes.value
+            }
+            val acknowledged = reviewed.acknowledged
+            val draft = bittensorExitInteractor.prepare(loaded.position, reviewed.displayed, loaded.fee, loaded.feeFromStake)
             validating.value = true
             val estimatedDuration = chainStateRepository.expectedBlockTime(ChainGeneses.BITTENSOR)
             val validationPayload = bittensorExitInteractor.validationPayload(
@@ -426,56 +618,124 @@ class BittensorExitReviewViewModel(
                 draft.fee,
                 draft.feeFromStake
             )
+                .copy(acknowledgedLimit = acknowledged.limitPrice)
+            val failureLimits = bittensorExitInteractor.failureLimits(validationPayload, draft.position, reviewedSelection(draft.position))
+            val failureValues = exitFormatter.failureValues(validationPayload, draft.position, failureLimits)
             validationExecutor.requireValid(
                 validationSystem = exitValidationSystem,
                 payload = validationPayload,
-                validationFailureTransformer = { resources.getString(R.string.common_error_general_title) to it.message(resources) }
-            ) {
-                execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
-                launchUnit { submit(draft) }
+                validationFailureTransformerCustom = { failure, actions ->
+                    val moved = validationPayload.latestQuote?.takeIf { failure.reason == BittensorExitValidationFailure.QUOTE_CHANGED }
+                    moved?.let { latest -> quotes.update { if (it.acknowledged == acknowledged) it.withMovedPrice(latest) else it } }
+                    bittensorExitValidationFailureUi(
+                        failure.reason,
+                        actions,
+                        resources,
+                        isRoot = isRoot,
+                        values = failureValues,
+                        // A swept remainder is warned about again, with Proceed and Cancel only.
+                        unstakeAll = null,
+                        acceptsRate = false,
+                        onOutcome = { analytics.trackExitValidation(failure.reason, StakingValidationStage.CONFIRM, it, isRoot) }
+                    )
+                }
+            ) { validated ->
+                val state = execution.value
+                val handedOff = state is ExitExecution.Running || state is ExitExecution.Success || state is ExitExecution.Unconfirmed
+                val current = validated.latestQuote?.let { verified ->
+                    quotes.updateAndGet { if (it.acknowledged == acknowledged) it.withLatest(verified) else it }
+                } ?: quotes.value
+                // Hand off only while no block re-quote has moved the price past the acknowledged limit since the tap.
+                if (current.acknowledged == acknowledged && !current.isPriceMoved && !handedOff) {
+                    priceMoveBanner.takeAcknowledgement()
+                    confirmedPurchaseTotals = settledPurchaseTotals(saleCostBasis.replayCache.lastOrNull()?.dataOrNull)
+                    execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
+                    launchUnit { submit(signedDraft(draft, validated)) }
+                }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            // A slow node gets the same Retry / Skip dialog as a failed read, not the raw "<read> timed out" text.
+            if (!retryController.reportSlowAction("exit review", e, ::confirmClicked)) showError(e)
         } finally {
             validating.value = false
             confirmMutex.unlock()
         }
     }
 
+    /** Signs the verified re-read quote, with its service fee, at the tighter of its own and the acknowledged limit. */
+    private fun signedDraft(draft: BittensorExitDraft, validated: BittensorExitValidationPayload): BittensorExitDraft {
+        val verified = validated.latestQuote ?: return draft
+        val signed = verified.signedAt(verified.tighterLimit(than = requireNotNull(validated.acknowledgedLimit)))
+        return bittensorExitInteractor.prepare(draft.position, signed, draft.fee, draft.feeFromStake)
+    }
+
+    /** Re-quotes the acknowledged sale on a block; after a failed one the review shows the acknowledged quote. */
+    private suspend fun requote() {
+        val current = request.filterNotNull().first()
+        val latest = bittensorExitInteractor.blockRequote(current.position, current.quote)
+            .onFailure(chainRpcReads::failed)
+            .getOrNull()
+        quotes.update { state ->
+            when {
+                state.acknowledged != current.quote -> state
+                latest == null -> state.withoutLatest()
+                else -> state.withLatest(latest)
+            }
+        }
+    }
+
+    private fun reviewedSelection(position: BittensorExitPosition): BittensorExitSelection {
+        return if (payload.allValidators) BittensorExitSelection.All else BittensorExitSelection.Validator(position.hotkey)
+    }
+
     private suspend fun submit(draft: BittensorExitDraft) {
-        sheetDismissed.value = false
         try {
-            when (val result = bittensorExitInteractor.execute(draft)) {
-                is BittensorOperationResult.Success -> execution.value = ExitExecution.Success(System.currentTimeMillis())
-                is BittensorOperationResult.Failure -> execution.value = ExitExecution.Failure(
-                    BittensorStakeResultUi.Failure(
-                        resources.getString(R.string.common_failed),
-                        resources.getString(R.string.bittensor_staking_failed_description),
-                        result.cause.message ?: resources.getString(R.string.common_retry_message)
-                    )
+            operationAnalytics.startOperation()
+            val result = bittensorExitInteractor.execute(draft)
+            trackOutcome(result, draft)
+            when (result) {
+                is BittensorOperationResult.Success -> execution.value = ExitExecution.Success(
+                    System.currentTimeMillis(),
+                    result.outcome,
+                    draft
                 )
-                is BittensorOperationResult.Unknown -> execution.value = ExitExecution.Failure(
-                    BittensorStakeResultUi.Failure(
-                        resources.getString(R.string.bittensor_submission_unknown_title),
-                        resources.getString(R.string.bittensor_submission_unknown_description),
-                        result.transactionHash,
-                        canRetry = false
-                    )
-                )
+                is BittensorOperationResult.Failure -> {
+                    if (result.isSigningCancelled) {
+                        execution.value = ExitExecution.Idle
+                        return
+                    }
+                    val model = result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit))
+                    execution.value = when (model) {
+                        is BittensorStakeResultUi.Failure -> ExitExecution.Failure(model)
+                        is BittensorStakeResultUi.Unconfirmed -> ExitExecution.Unconfirmed(model, draft)
+                        else -> error("Unexpected failure presentation")
+                    }
+                }
+                is BittensorOperationResult.Unknown ->
+                    execution.value = ExitExecution.Unconfirmed(result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit)), draft)
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            execution.value = ExitExecution.Failure(
-                BittensorStakeResultUi.Failure(
-                    resources.getString(R.string.common_failed),
-                    resources.getString(R.string.common_retry_message),
-                    e.message.orEmpty()
-                )
-            )
+            val result = e.mapBittensorSubmissionError()
+            trackOutcome(result, draft)
+            execution.value = ExitExecution.Unconfirmed(result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit)), draft)
         }
+    }
+
+    private fun trackOutcome(result: BittensorOperationResult, draft: BittensorExitDraft) {
+        val exitAnalytics = BittensorExitAnalyticsValues(draft.position, draft.quote)
+        operationAnalytics.outcome(
+            result,
+            exitAnalytics.target,
+            StakingFlow.UNSTAKE,
+            unstakeMode = exitAnalytics.mode,
+            hotkeys = exitAnalytics.hotkeys,
+            hasLocked = exitAnalytics.hasLocked,
+            slippage = exitAnalytics.slippage
+        )
     }
 
     fun accountClicked() = launchUnit {
@@ -485,19 +745,47 @@ class BittensorExitReviewViewModel(
         )
     }
 
-    fun validatorClicked() = launchUnit {
-        externalActions.showAddressActions(validator, chain.await())
+    fun validatorClicked() {
+        router.openBittensorValidatorInfo(BittensorValidatorInfoPayload(payload.position.netuid, validator))
     }
 
-    fun resultDismissed() {
-        sheetDismissed.value = true
+    fun resultActionClicked(action: BittensorResultAction) {
+        if (!isRoot || action !in shownResultActions()) return
+
+        resultNavigation.activate(action, finishedEmptiesPosition() ?: false) { retryClicked() }
     }
 
-    fun doneClicked() = launchUnit {
-        router.openBittensorPortfolio()
+    /** The subnet failure page button: Try again when a retry can succeed, otherwise Close leaves the flow. */
+    fun failureActionClicked() {
+        val failure = execution.value as? ExitExecution.Failure ?: return
+        val action = if (failure.model.canRetry) BittensorResultAction.TRY_AGAIN else BittensorResultAction.CLOSE
+
+        resultNavigation.activate(action) { retryClicked() }
+    }
+
+    fun doneClicked() {
+        finishedEmptiesPosition()?.let(resultNavigation::done)
     }
 
     fun back() {
-        if (execution.value !is ExitExecution.Running) router.back()
+        when (execution.value) {
+            is ExitExecution.Running -> Unit
+            is ExitExecution.Success, is ExitExecution.Unconfirmed -> resultNavigation.leave(finishedEmptiesPosition() ?: false)
+            else -> router.back()
+        }
+    }
+
+    private fun shownResultActions(): List<BittensorResultAction> = when (val state = execution.value) {
+        is ExitExecution.Success -> resultNavigation.landingActions(state.draft.quote.fullExit)
+        is ExitExecution.Unconfirmed -> state.model.actions
+        is ExitExecution.Failure -> state.model.actions
+        else -> emptyList()
+    }
+
+    /** Whether the finished exit emptied the position (iOS `emptiesPosition`); null while nothing has finished. */
+    private fun finishedEmptiesPosition(): Boolean? = when (val state = execution.value) {
+        is ExitExecution.Success -> state.draft.quote.fullExit
+        is ExitExecution.Unconfirmed -> state.draft.quote.fullExit
+        else -> null
     }
 }

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -18,14 +19,24 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicWatchException
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
@@ -46,6 +57,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val accounts = mock(AccountRepository::class.java)
 
+    // Read only by the executor to pick the build timeout; kept apart so `accounts` interactions stay meaningful.
+    private val signingWallets = mock(AccountRepository::class.java)
+
     private val wallets = mock(WalletRepository::class.java)
 
     private val chainRegistry = mock(ChainRegistry::class.java)
@@ -62,7 +76,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val fee = mock(Fee::class.java)
 
-    private val submissionHierarchy = SubmissionHierarchy(emptyList())
+    private val submissionHierarchy = SubmissionHierarchy(selectedAccount, CallExecutionType.IMMEDIATE)
 
     private val successfulExecution = ExtrinsicExecutionResult(
         "0x1234",
@@ -75,7 +89,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val extrinsicService = RecordingExtrinsicService(unusedExtrinsicService, fee, Result.success(successfulExecution))
 
-    private val submission = BittensorSubmissionExecutor(extrinsicService)
+    private val positionUpdates = BittensorPositionUpdates()
+
+    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates) { _, _ -> extrinsicService.result.getOrThrow() }
 
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
@@ -96,22 +112,26 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     private val rootRepository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(rootDetails)
 
-        override fun observeRootStakingDetails(metaId: Long) = flowOf(rootDetails)
+        override fun observeRootAccountDetails(metaId: Long) = flowOf(rootDetails)
     }
 
     private val rootValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
     private val rootInteractor = BittensorStakingInteractor(
         rootRepository,
+        mock(BittensorPresetValidatorInteractor::class.java),
         extrinsicService,
         wallets,
         rootValidators,
-        submission
+        submission,
+        mock(Logger::class.java)
     )
 
     private val subnetValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
+
+    private val costBasis = mock(BittensorCostBasisInteractor::class.java)
 
     private val subnetStakingInteractor = BittensorSubnetStakingInteractor(
         chainRegistry,
@@ -120,7 +140,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         subnetInteractor,
         extrinsicService,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
-        submission
+        submission,
+        costBasis,
+        BittensorBlockRequotes(mock(ChainStateRepository::class.java), mock(Logger::class.java))
     )
 
     private val subnetId = BittensorNetuid.Subnet(1)
@@ -155,6 +177,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun prepare(): Unit = runBlocking {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(selectedAccount.id).thenReturn(1L)
+        `when`(signingWallets.getMetaAccount(1L)).thenReturn(selectedAccount)
+        `when`(signingWallets.getMetaAccount(2L)).thenReturn(selectedAccount)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selectedAccount)
         `when`(chainRegistry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
         `when`(chain.assets).thenReturn(listOf(chainAsset))
@@ -231,19 +255,52 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
-    fun `submission error is propagated without a persistent lock`() = runBlocking {
+    fun `signing cancellation proves non submission and permits a fresh attempt`() = runBlocking {
+        val cancellation = io.novafoundation.nova.common.base.errors.SigningCancelledException()
+        extrinsicService.result = Result.failure(cancellation)
+
+        val result = execute() as BittensorOperationResult.Failure
+        assertSame(cancellation, result.cause)
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
+        assertTrue(result.isSigningCancelled)
+
+        extrinsicService.result = Result.success(successfulExecution)
+        assertTrue(execute() is BittensorOperationResult.Success)
+    }
+
+    @Test
+    fun `submission error is unknown without a persistent lock`() = runBlocking {
         val failure = IOException("Connection lost")
         extrinsicService.result = Result.failure(failure)
 
-        assertSame(
-            failure,
-            (execute() as BittensorOperationResult.Failure).cause
-        )
+        assertEquals(BittensorOperationResult.Unknown(null), execute())
         assertEquals(1, extrinsicService.submissions)
 
         extrinsicService.result = Result.success(successfulExecution)
         assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(2, extrinsicService.submissions)
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test
+    fun `only confirmed execution publishes a position and history refresh`() = runTest {
+        val notifications = mutableListOf<BittensorPositionUpdates.Update>()
+        backgroundScope.launch(kotlinx.coroutines.test.UnconfinedTestDispatcher(testScheduler)) {
+            positionUpdates.updates.collect { notifications += it }
+        }
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Unknown))
+        execute()
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token)))
+        execute()
+        val delayed = SubmissionHierarchy(selectedAccount, CallExecutionType.DELAYED)
+        extrinsicService.result = Result.success(successfulExecution.copy(submissionHierarchy = delayed))
+        execute()
+        assertTrue(notifications.isEmpty())
+        extrinsicService.result = Result.success(successfulExecution)
+        execute()
+        assertEquals(1, notifications.size)
+        assertEquals(1L, notifications.single().metaId)
+        assertEquals(ChainGeneses.BITTENSOR, notifications.single().chainId)
     }
 
     @Test
@@ -255,6 +312,32 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
+    fun `watch failure preserves hash and is not retryable failure`() = runTest {
+        val status = ExtrinsicStatus.Dropped(successfulExecution.extrinsicHash)
+        val error = ExtrinsicWatchException(status)
+        extrinsicService.result = Result.failure(error)
+
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
+    }
+
+    @Test
+    fun `nested immediate outer success is not completed trade`() = runTest {
+        val node = SubmissionHierarchy.Node(selectedAccount, CallExecutionType.IMMEDIATE)
+        val hierarchy = SubmissionHierarchy(listOf(node, node))
+        extrinsicService.result = Result.success(successfulExecution.copy(submissionHierarchy = hierarchy))
+
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
+    }
+
+    @Test
+    fun `delayed approval outer success is not completed trade`() = runTest {
+        val hierarchy = SubmissionHierarchy(selectedAccount, CallExecutionType.DELAYED)
+        extrinsicService.result = Result.success(successfulExecution.copy(submissionHierarchy = hierarchy))
+
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
+    }
+
+    @Test
     fun `on chain failure is propagated`() = runBlocking {
         extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token)))
 
@@ -263,6 +346,70 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             (execute() as BittensorOperationResult.Failure).cause
         )
         assertEquals(1, extrinsicService.submissions)
+    }
+
+    @Test
+    fun `executor attaches actual amounts for exact requested wallet context`() = runTest {
+        val coldkey = ByteArray(32) { 9 }
+        `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(coldkey)
+        val target = BittensorOutcomeTarget(BittensorOperationKind.STAKE, BittensorNetuid.Root, setOf(validator.hotkey))
+        val added = outcomeEvent("SubtensorModule", "StakeAdded", listOf(coldkey, validator.hotkey.value, amount, amount, BigInteger.ZERO, BigInteger.ZERO))
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Ok(listOf(added))))
+
+        val result = submission.execute(1L, chain, target) {} as BittensorOperationResult.Success
+
+        assertEquals(amount, result.outcome?.tao)
+        assertEquals(successfulExecution.blockHash, result.outcome?.blockHash)
+        val wrongWallet = submission.execute(2L, chain, target) {} as BittensorOperationResult.Success
+        org.junit.Assert.assertNull(wrongWallet.outcome)
+    }
+
+    @Test
+    fun `failed dispatch keeps paid fee events but never executed amounts`() = runTest {
+        val coldkey = ByteArray(32) { 9 }
+        `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(coldkey)
+        val target = BittensorOutcomeTarget(BittensorOperationKind.STAKE, BittensorNetuid.Root, setOf(validator.hotkey))
+        val feeEvent = outcomeEvent("TransactionPayment", "TransactionFeePaid", listOf(coldkey, BigInteger.TEN, BigInteger.ZERO))
+        val added = outcomeEvent("SubtensorModule", "StakeAdded", listOf(coldkey, validator.hotkey.value, amount, amount, BigInteger.ZERO, BigInteger.ZERO))
+        val dispatch = ExtrinsicDispatch.Failed(DispatchError.Token, listOf(feeEvent, added))
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = dispatch))
+
+        val result = submission.execute(1L, chain, target) {} as BittensorOperationResult.Failure
+
+        assertEquals(BigInteger.TEN, result.outcome?.networkFee)
+        assertEquals(AccountIdKey(coldkey), result.outcome?.feePayer)
+        org.junit.Assert.assertNull(result.outcome?.tao)
+        org.junit.Assert.assertNull(result.outcome?.alpha)
+    }
+
+    @Test
+    fun `root aggregate fallback requires confirmed execution and cannot override delayed execution`() = runTest {
+        val coldkey = ByteArray(32) { 9 }
+        `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(coldkey)
+        val target = BittensorOutcomeTarget(BittensorOperationKind.CLAIM, BittensorNetuid.Root, setOf(validator.hotkey))
+        val claimed = outcomeEvent("SubtensorModule", "RootClaimed", listOf(coldkey, amount))
+        val dispatch = ExtrinsicDispatch.Ok(listOf(claimed))
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = dispatch))
+        val confirmed = submission.execute(1L, chain, target) {} as BittensorOperationResult.Success
+        assertEquals(amount, confirmed.outcome?.tao)
+
+        val delayed = SubmissionHierarchy(selectedAccount, CallExecutionType.DELAYED)
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = dispatch, submissionHierarchy = delayed))
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), submission.execute(1L, chain, target) {})
+
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token, listOf(claimed))))
+        val failed = submission.execute(1L, chain, target) {} as BittensorOperationResult.Failure
+        org.junit.Assert.assertNull(failed.outcome?.tao)
+    }
+
+    private fun outcomeEvent(moduleName: String, name: String, arguments: List<Any?>): GenericEvent.Instance {
+        val module = mock(Module::class.java)
+        `when`(module.name).thenReturn(moduleName)
+        val event = Event(name, index = 0 to 0, arguments = emptyList(), documentation = emptyList())
+        return GenericEvent.Instance(module, event, arguments)
     }
 
     @Test
@@ -289,6 +436,22 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         } catch (error: kotlinx.coroutines.CancellationException) {
             assertSame(cancellation, error)
         }
+    }
+
+    @Test
+    fun `additional subnet stake requires accepted inactivity warning before signing`() = runBlocking {
+        org.junit.Assume.assumeTrue(stakingType == StakingType.SUBNET)
+        val row = BittensorSubnetValidator(validator, "address", BigDecimal.ZERO, false, inactive = true, canAddToExistingPosition = true)
+        `when`(subnetValidators.existingPositionValidator(chain, subnetId, validator)).thenReturn(row)
+        val existing = subnetDraft.copy(existingPosition = true)
+
+        val rejected = runCatching { subnetStakingInteractor.execute(existing) }
+        assertTrue(rejected.exceptionOrNull() is IllegalArgumentException)
+        verifyNoInteractions(costBasis)
+
+        assertTrue(subnetStakingInteractor.execute(existing.copy(inactiveValidatorAccepted = true)) is BittensorOperationResult.Success)
+        verify(subnetValidators, org.mockito.Mockito.times(2)).existingPositionValidator(chain, subnetId, validator)
+        verify(subnetValidators, org.mockito.Mockito.never()).validate(chain, subnetId, validator)
     }
 
     private suspend fun execute(): BittensorOperationResult = when (stakingType) {
@@ -335,17 +498,19 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             return fee
         }
 
-        override suspend fun submitExtrinsicAndAwaitExecution(
+        override suspend fun submitAndWatchExtrinsic(
             chain: Chain,
             origin: TransactionOrigin,
             submissionOptions: ExtrinsicService.SubmissionOptions,
             formExtrinsic: FormExtrinsicWithOrigin
-        ): Result<ExtrinsicExecutionResult> {
+        ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> {
             submissions++
             submissionOrigin = origin
             submissionChain = chain
             this.submissionOptions = submissionOptions
-            return result
+            return result.map { execution ->
+                flowOf(ExtrinsicWatchResult(ExtrinsicStatus.InBlock(execution.blockHash, execution.extrinsicHash), execution.submissionHierarchy))
+            }
         }
     }
 

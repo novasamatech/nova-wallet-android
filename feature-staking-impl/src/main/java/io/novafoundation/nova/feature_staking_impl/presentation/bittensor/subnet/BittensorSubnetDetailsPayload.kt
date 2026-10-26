@@ -1,7 +1,17 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.analytics.SubnetDetailsSource
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class BittensorSubnetDetailsPayload(val subnetId: Int) : Parcelable
+class BittensorSubnetDetailsPayload(
+    val subnetId: Int,
+    val replaceAmount: Boolean = false,
+    val replaceOrigin: BittensorReplaceOrigin = BittensorReplaceOrigin.SUBNET_AMOUNT,
+    val validatorAddress: String? = null,
+    val selectionState: BittensorSelectionState = BittensorSelectionState(),
+    val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER,
+    /** Opened from an existing position to read about the subnet: no "Use subnet" flow continues from here. */
+    val viewOnly: Boolean = false
+) : Parcelable

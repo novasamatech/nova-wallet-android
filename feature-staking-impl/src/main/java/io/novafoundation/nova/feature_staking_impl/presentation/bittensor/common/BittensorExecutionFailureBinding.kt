@@ -32,5 +32,5 @@ fun ViewBittensorSubnetExecutionBinding.showFailure(failure: BittensorStakeResul
     failureIcon.background = context.getRoundedCornerDrawable(R.color.error_block_background, cornerSizeInDp = 32)
     root.setPadding(0, 0, 0, 84.dp(context))
     title.text = if (failure.canRetry) context.getString(R.string.common_failed) else failure.title
-    operationLabel.text = if (failure.canRetry) failure.error else failure.description + "\n" + failure.error
+    operationLabel.text = failure.description + "\n" + failure.error
 }

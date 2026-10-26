@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -21,12 +19,14 @@ data class BittensorRootStakingDetails(
 
 data class BittensorValidator(
     val hotkey: AccountIdKey,
-    val name: String
+    val name: String,
+    val reportedStake: BigDecimal? = null
 )
 
 data class BittensorRootPosition(
     val validatorHotkey: AccountIdKey,
-    val stakeInPlanks: BigInteger
+    val stakeInPlanks: BigInteger,
+    val isRegistered: Boolean? = null
 )
 
 data class BittensorRootStakeRequest(
@@ -47,15 +47,20 @@ sealed interface BittensorDataStatus {
 
 sealed interface BittensorOperationResult {
 
-    data class Success(val transactionHash: String) : BittensorOperationResult
+    data class Success(val transactionHash: String, val outcome: BittensorOperationOutcome? = null) : BittensorOperationResult
 
-    data class Failure(val cause: Throwable, val transactionHash: String? = null) : BittensorOperationResult
+    data class Failure(
+        val cause: Throwable,
+        val transactionHash: String? = null,
+        val stage: BittensorFailureStage = BittensorFailureStage.UNKNOWN,
+        val outcome: BittensorOperationOutcome? = null
+    ) : BittensorOperationResult
 
-    data class Unknown(val transactionHash: String) : BittensorOperationResult
+    data class Unknown(val transactionHash: String?) : BittensorOperationResult
 }
 
-internal fun requireBittensorImmediateWallet(wallet: MetaAccount) {
-    require(wallet.type != LightMetaAccount.Type.MULTISIG) {
-        "Bittensor multisig approval flows are not supported yet"
-    }
+enum class BittensorFailureStage {
+    NOT_SUBMITTED,
+    DISPATCHED,
+    UNKNOWN
 }

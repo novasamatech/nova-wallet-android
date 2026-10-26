@@ -10,47 +10,161 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:titleText="@string/bittensor_select_validator"
-        app:dividerVisible="false" />
+        android:background="@color/solid_navigation_background"
+        app:contentBackground="@color/solid_navigation_background"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_arrow_back"
+        app:titleText="@string/bittensor_select_validator_title" />
 
-    <ProgressBar
-        android:id="@+id/progress"
-        style="@style/Widget.Nova.ProgressBar.Indeterminate"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="16dp" />
-
-    <TextView
-        android:id="@+id/empty"
-        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+    <!-- Expanded from the toolbar magnifier, as on iOS -->
+    <FrameLayout
+        android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:visibility="gone"
-        android:text="@string/bittensor_no_validators" />
+        android:background="@color/solid_navigation_background"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:visibility="gone">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
+        <io.novafoundation.nova.common.view.SearchView
+            android:id="@+id/searchField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/bittensor_validator_search_hint" />
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/navigation_divider" />
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/listFailure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:alertMode="warning" />
+
+    <LinearLayout
+        android:id="@+id/listHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="36dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="6dp"
+        android:gravity="center_vertical">
+
+        <!-- The count always shows in full; at large font scales the sort label wraps to a second line instead of colliding with it. -->
+        <TextView
+            android:id="@+id/count"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/sortLabel"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:gravity="end"
+            android:textAlignment="viewEnd"
+            android:maxLines="2"
+            android:textColor="@color/text_secondary" />
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/staleRankingWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:visibility="gone"
+        app:alertMode="warning" />
+
+    <FrameLayout
+        android:id="@+id/listContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@style/Widget.Nova.ProgressBar.Indeterminate"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/emptyIcon"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginBottom="16dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_placeholder"
+                android:visibility="gone"
+                app:tint="@color/icon_secondary" />
+
+            <TextView
+                android:id="@+id/empty"
+                style="@style/TextAppearance.NovaFoundation.Regular.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                android:text="@string/bittensor_no_validators" />
+
+            <TextView
+                android:id="@+id/removeFilters"
+                style="@style/Widget.Nova.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                android:visibility="gone"
+                android:text="@string/bittensor_remove_validator_filters" />
+        </LinearLayout>
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/solid_navigation_background"
+        android:background="@drawable/bg_bittensor_bottom_button_container"
         android:padding="16dp">
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/confirm"
             style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="@string/bittensor_select_validator" />
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/bittensor_select_validator_title" />
     </FrameLayout>
 </LinearLayout>

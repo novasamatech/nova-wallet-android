@@ -5,9 +5,16 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.ReferendumHandlingException
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_deep_linking.R
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.StakingHandlingException
 
 fun formatDeepLinkHandlingException(resourceManager: ResourceManager, exception: DeepLinkHandlingException): String {
     return when (exception) {
+        is StakingHandlingException -> when (exception) {
+            StakingHandlingException.ChainIsNotFound -> resourceManager.getString(R.string.deep_linking_chain_id_is_not_found)
+            StakingHandlingException.AssetIsNotFound -> resourceManager.getString(R.string.deep_linking_staking_asset_not_found)
+            StakingHandlingException.StakingIsNotSupported -> resourceManager.getString(R.string.deep_linking_staking_not_supported)
+        }
+
         is ReferendumHandlingException -> handleReferendumException(resourceManager, exception)
 
         is DAppHandlingException -> handleDAppException(resourceManager, exception)

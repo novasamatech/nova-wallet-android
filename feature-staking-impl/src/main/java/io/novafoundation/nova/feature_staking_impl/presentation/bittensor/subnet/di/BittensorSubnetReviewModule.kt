@@ -1,9 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -15,13 +19,12 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
@@ -37,8 +40,9 @@ class BittensorSubnetReviewModule {
     @IntoMap
     @ViewModelKey(BittensorSubnetReviewViewModel::class)
     fun provideViewModel(
+        analytics: AnalyticsService,
+        operationAnalytics: BittensorOperationAnalytics,
         payload: BittensorSubnetReviewPayload,
-        bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
@@ -55,14 +59,14 @@ class BittensorSubnetReviewModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         estimatesMixin: BittensorEstimatesMixin,
         tokenFormatter: TokenFormatter,
+        fiatFormatter: FiatFormatter,
         chainStateRepository: ChainStateRepository
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
-            BittensorNetuid.Subnet(payload.subnetId),
+            analytics, operationAnalytics, BittensorNetuid.Subnet(payload.subnetId),
             payload.amountInPlanks,
             payload.metaId,
             payload.validatorAddress,
-            bittensorSubnetInteractor,
             router,
             chainRegistry,
             walletUiUseCase,
@@ -79,7 +83,11 @@ class BittensorSubnetReviewModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             estimatesMixin = estimatesMixin,
             tokenFormatter = tokenFormatter,
-            chainStateRepository = chainStateRepository
+            fiatFormatter = fiatFormatter,
+            chainStateRepository = chainStateRepository,
+            selectedSlippage = payload.slippage,
+            existingPosition = payload.existingPosition,
+            inactiveValidatorAccepted = payload.inactiveValidatorAccepted
         )
     }
 

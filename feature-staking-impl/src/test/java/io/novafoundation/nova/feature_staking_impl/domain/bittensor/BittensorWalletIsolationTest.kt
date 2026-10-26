@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubne
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.first
@@ -32,6 +33,8 @@ class BittensorWalletIsolationTest {
 
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
+    private val presets = mock(BittensorPresetValidatorInteractor::class.java)
+
     private val fee = mock(Fee::class.java)
 
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator")
@@ -51,7 +54,7 @@ class BittensorWalletIsolationTest {
 
         override fun observeRootStakingDetails() = flowOf(details)
 
-        override fun observeRootStakingDetails(metaId: Long) = flowOf(details)
+        override fun observeRootAccountDetails(metaId: Long) = flowOf(details)
     }
 
     @Test
@@ -85,6 +88,7 @@ class BittensorWalletIsolationTest {
             true
         )
         `when`(validators.rootValidators(details.chain)).thenReturn(listOf(row))
+        `when`(presets.rootPreset(details.chain, details.positions)).thenReturn(validator)
         val interactor = interactor()
 
         val selectedValidator = interactor.rootValidator(details.chain, row.address)
@@ -124,9 +128,11 @@ class BittensorWalletIsolationTest {
 
     private fun interactor() = BittensorStakingInteractor(
         repository,
+        presets,
         extrinsics,
         wallets,
         validators,
-        submission
+        submission,
+        mock(Logger::class.java)
     )
 }

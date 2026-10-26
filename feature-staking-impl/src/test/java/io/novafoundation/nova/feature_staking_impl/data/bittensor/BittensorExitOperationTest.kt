@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitOperation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPlan
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitSlice
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimOperation
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -35,6 +37,69 @@ class BittensorExitOperationTest {
     private val hotkey = AccountIdKey(ByteArray(32) { 1 })
 
     private val beneficiary = AccountIdKey(ByteArray(32) { 2 })
+
+    @Test
+    fun `root gross debit subtracts network fee from encoded partial only`() {
+        val builder = builder()
+        val quote = BittensorExitQuote(BittensorNetuid.Root, BigInteger.TEN, false, BigInteger.TEN, BigInteger.TEN, BigInteger.ZERO, null)
+        val operation = BittensorExitOperation(quote, hotkey, beneficiary, rootFeeFromStake = BigInteger.ONE)
+        operation.build(builder)
+        assertEquals(BigInteger.valueOf(9), calls(builder).single().arguments["amount_unstaked"])
+        assertEquals(BigInteger.TEN, operation.quote.amount)
+    }
+
+    @Test
+    fun `mixed group uses frozen full and partial calls with one commission transfer`() {
+        val builder = builder()
+        val second = AccountIdKey(ByteArray(32) { 3 })
+        val plan = BittensorExitPlan(
+            listOf(BittensorExitSlice(second, BigInteger.valueOf(400), true), BittensorExitSlice(hotkey, BigInteger.valueOf(400), false))
+        )
+        val quote = BittensorExitQuote(
+            BittensorNetuid.Subnet(64),
+            plan.amount,
+            false,
+            BigInteger.valueOf(100),
+            BigInteger.valueOf(99),
+            BigInteger.ONE,
+            BigInteger.TEN,
+            plan = plan
+        )
+        val operation = BittensorExitOperation(quote, hotkey, beneficiary)
+        operation.build(builder)
+        val calls = calls(builder)
+        assertEquals(listOf("remove_stake_full_limit", "remove_stake_limit", "transfer_keep_alive"), calls.map { it.function.name })
+        assertArrayEquals(second.value, calls[0].arguments["hotkey"] as ByteArray)
+        assertEquals(BigInteger.valueOf(400), calls[1].arguments["amount_unstaked"])
+        assertEquals(quote.limitPrice, calls[1].arguments["limit_price"])
+        assertEquals(false, calls[1].arguments["allow_partial"])
+    }
+
+    @Test
+    fun `group sale exits each reviewed validator then transfers commission once`() {
+        val builder = builder()
+        val secondHotkey = AccountIdKey(ByteArray(32) { 3 })
+        val quote = BittensorExitQuote(
+            netuid = BittensorNetuid.Subnet(1),
+            amount = BigInteger.valueOf(1000),
+            fullExit = true,
+            estimatedTaoOut = BigInteger.valueOf(100),
+            minimumTaoOut = BigInteger.valueOf(99),
+            serviceFee = BigInteger.ONE,
+            limitPrice = BigInteger.TEN,
+            exitHotkeys = listOf(hotkey, secondHotkey)
+        )
+        val operation = BittensorExitOperation(quote, hotkey, beneficiary)
+        operation.build(builder)
+
+        val calls = calls(builder)
+        assertEquals(listOf("remove_stake_full_limit", "remove_stake_full_limit", "transfer_keep_alive"), calls.map { it.function.name })
+        assertArrayEquals(hotkey.value, calls[0].arguments["hotkey"] as ByteArray)
+        assertArrayEquals(secondHotkey.value, calls[1].arguments["hotkey"] as ByteArray)
+        assertEquals(quote.limitPrice, calls[0].arguments["limit_price"])
+        assertEquals(quote.limitPrice, calls[1].arguments["limit_price"])
+        assertEquals(quote.serviceFee, calls[2].arguments["value"])
+    }
 
     @Test
     fun `partial root withdrawal encodes root netuid and exact unstaked u64 amount`() {
@@ -187,7 +252,12 @@ class BittensorExitOperationTest {
         .filter { it.method.name == "call" }
         .map { it.getArgument(0) }
 
-    private fun builder(): ExtrinsicBuilder {
+    private fun builder(): ExtrinsicBuilder = BittensorExitOperationTestFixture.builder()
+}
+
+internal object BittensorExitOperationTestFixture {
+
+    fun builder(): ExtrinsicBuilder {
         val account = FixedByteArray("AccountId32", 32)
         val optionalPrice = Option("OptionPrice", TypeReference(u64))
         val common = listOf(FunctionArgument("hotkey", account), FunctionArgument("netuid", u16))

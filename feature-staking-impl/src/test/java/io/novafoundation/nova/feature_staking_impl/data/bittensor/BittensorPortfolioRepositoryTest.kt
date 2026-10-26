@@ -4,6 +4,10 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
@@ -26,6 +30,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -40,6 +45,10 @@ class BittensorPortfolioRepositoryTest {
 
     private val accounts = mock(AccountRepository::class.java)
 
+    private val signerProvider = mock(SignerProvider::class.java)
+
+    private val signer = mock(NovaSigner::class.java)
+
     private val wallet = mock(WalletRepository::class.java)
 
     private val chain = mock(Chain::class.java)
@@ -50,7 +59,7 @@ class BittensorPortfolioRepositoryTest {
 
     private val blockNumbers = MutableStateFlow(BigInteger.ZERO)
 
-    private val swapSource = mock(BittensorSwapSource::class.java)
+    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
 
     private val logger = mock(Logger::class.java)
 
@@ -79,7 +88,7 @@ class BittensorPortfolioRepositoryTest {
 
         assertEquals(asset, repository().observeAsset().first())
         assertEquals(0, positionRequests)
-        verifyNoInteractions(swapSource, logger)
+        verifyNoInteractions(priceRepository, logger)
     }
 
     @Test
@@ -156,7 +165,29 @@ class BittensorPortfolioRepositoryTest {
         assertNull(states[1].positions)
     }
 
+    @Test
+    fun `immediate multisig enables portfolio and root actions`() = runBlocking {
+        prepare()
+        `when`(selected.value.type).thenReturn(LightMetaAccount.Type.MULTISIG)
+        val repository = repository()
+
+        assertTrue(repository.observePortfolio().first().supportsImmediateOperations)
+        assertTrue(repository.observeRootPortfolio().first().supportsImmediateOperations)
+    }
+
+    @Test
+    fun `delayed multisig disables portfolio and root actions`() = runBlocking {
+        prepare()
+        `when`(selected.value.type).thenReturn(LightMetaAccount.Type.MULTISIG)
+        `when`(signer.callExecutionType()).thenReturn(CallExecutionType.DELAYED)
+        val repository = repository()
+
+        assertFalse(repository.observePortfolio().first().supportsImmediateOperations)
+        assertFalse(repository.observeRootPortfolio().first().supportsImmediateOperations)
+    }
+
     private suspend fun prepare() {
+        `when`(signer.callExecutionType()).thenReturn(CallExecutionType.IMMEDIATE)
         `when`(registry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(chain.assets).thenReturn(listOf(chainAsset))
@@ -167,17 +198,27 @@ class BittensorPortfolioRepositoryTest {
     }
 
     private fun account(id: Long): MetaAccount = mock(MetaAccount::class.java).also {
+        `when`(signerProvider.rootSignerFor(it)).thenReturn(signer)
         `when`(it.id).thenReturn(id)
         `when`(it.accountIdIn(chain)).thenReturn(ByteArray(32) { id.toByte() })
     }
 
-    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
     private val commonModule = CommonModule()
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val positionRepository = RealBittensorPositionRepository(positions, portfolioLoader, chainStateRepository, computationalCache, logger)
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository)
+    private val positionRepository = RealBittensorPositionRepository(
+        positions,
+        portfolioLoader,
+        chainStateRepository,
+        computationalCache,
+        logger,
+        positionUpdates
+    )
+
+    private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)
 }

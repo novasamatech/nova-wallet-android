@@ -31,6 +31,15 @@
                 android:paddingHorizontal="16dp"
                 android:paddingBottom="24dp">
 
+                <io.novafoundation.nova.common.view.AlertView
+                    android:id="@+id/priceMoved"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/bittensor_exit_price_moved"
+                    android:visibility="gone"
+                    app:alertMode="info" />
+
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
                     android:id="@+id/primaryAmount"
                     android:layout_width="match_parent"
@@ -81,7 +90,7 @@
                         android:id="@+id/earned"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="@string/bittensor_exit_earned"
+                        app:title="@string/bittensor_you_will_earn"
                         app:primaryValue="—"
                         app:titleIcon="@drawable/ic_info" />
 
@@ -97,7 +106,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:title="@string/bittensor_validator"
-                        app:primaryValueEndIcon="@drawable/ic_info" />
+                        app:titleIcon="@drawable/ic_info" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/stakeAfter"
@@ -105,14 +114,62 @@
                         android:layout_height="wrap_content"
                         app:title="@string/bittensor_exit_stake_after"
                         app:shouldDrawDivider="false" />
+
+                    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                        android:id="@+id/networkFee"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/network_fee"
+                        app:titleIcon="@drawable/ic_info" />
+                </io.novafoundation.nova.common.view.TableView>
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:id="@+id/validators"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    app:drawDividers="true"
+                    app:title="@string/bittensor_validators_count" />
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:id="@+id/saleWalletInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:drawDividers="true">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/saleWallet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/common_wallet" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/saleAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/common_account"
+                        app:primaryValueEndIcon="@drawable/ic_info" />
                 </io.novafoundation.nova.common.view.TableView>
 
                 <TextView
-                    android:id="@+id/commissionCaption"
-                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:id="@+id/profitCaption"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/bittensor_sale_profit_disclaimer"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/commissionCaption"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
                     android:textColor="@color/text_secondary" />
 
                 <TextView

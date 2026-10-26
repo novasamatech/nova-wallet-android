@@ -10,10 +10,10 @@ interface BittensorValidatorsApi {
     suspend fun validators(@Url url: String): Response<BittensorValidatorsRemote>
 
     @GET
-    suspend fun rootClaims(@Url url: String): Response<BittensorRootClaimsRemote>
+    suspend fun rootValidators(@Url url: String): Response<BittensorRootValidatorRemote>
 
     @GET
-    suspend fun rootValidator(@Url url: String): Response<BittensorRootValidatorRemote>
+    suspend fun rootOverview(@Url url: String): Response<BittensorRootOverviewRemote>
 
     @GET
     suspend fun rankedValidators(@Url url: String): Response<BittensorRankedValidatorsRemote>

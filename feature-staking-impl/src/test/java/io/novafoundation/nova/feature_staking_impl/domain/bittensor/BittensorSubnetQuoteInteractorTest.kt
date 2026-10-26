@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfig
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapQuote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -28,10 +29,26 @@ class BittensorSubnetQuoteInteractorTest {
     private var requestedInput: BigInteger? = null
 
     private val source = object : BittensorSwapSource {
-        override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger = BigInteger.valueOf(1000)
+        override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger = error("Unpinned price requested")
+
+        override suspend fun quote(
+            chainId: String,
+            subnetId: BittensorNetuid.Subnet,
+            direction: BittensorSwapDirection,
+            amountIn: BigInteger
+        ): BittensorSwapQuote {
+            val simulation = simulation(subnetId, direction, amountIn)
+            return BittensorSwapQuote("0xpinned", simulation, BigInteger.valueOf(1000))
+        }
 
         override suspend fun simulate(
             chainId: String,
+            subnetId: BittensorNetuid.Subnet,
+            direction: BittensorSwapDirection,
+            amountIn: BigInteger
+        ): BittensorSwapSimulation = error("Unpinned simulation requested")
+
+        private fun simulation(
             subnetId: BittensorNetuid.Subnet,
             direction: BittensorSwapDirection,
             amountIn: BigInteger

@@ -2,6 +2,8 @@ package io.novafoundation.nova.app.di.app.navigation.staking
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorSelectUnstakePositionCommunicatorImpl
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
+import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorPortfolioReopenCommunicatorImpl
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -13,6 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorSelectValidatorCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorValidatorFiltersCommunicatorImpl
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
 
 @Module
 class RelayStakingNavigationModule {
@@ -24,8 +28,18 @@ class RelayStakingNavigationModule {
 
     @Provides
     @ApplicationScope
+    fun providePortfolioReopenCommunicator(registry: NavigationHoldersRegistry): BittensorPortfolioReopenCommunicator =
+        BittensorPortfolioReopenCommunicatorImpl(registry)
+
+    @Provides
+    @ApplicationScope
     fun provideBittensorValidatorCommunicator(registry: NavigationHoldersRegistry): BittensorSelectValidatorCommunicator =
         BittensorSelectValidatorCommunicatorImpl(registry)
+
+    @Provides
+    @ApplicationScope
+    fun provideBittensorValidatorFiltersCommunicator(registry: NavigationHoldersRegistry): BittensorValidatorFiltersCommunicator =
+        BittensorValidatorFiltersCommunicatorImpl(registry)
 
     @Provides
     @ApplicationScope
@@ -33,8 +47,9 @@ class RelayStakingNavigationModule {
         navigationHoldersRegistry: NavigationHoldersRegistry,
         navigator: Navigator,
         dashboardRouter: StakingDashboardRouter,
-        dAppRouter: DAppRouter
+        dAppRouter: DAppRouter,
+        portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator
     ): StakingRouter {
-        return RelayStakingNavigator(navigationHoldersRegistry, navigator, dashboardRouter, dAppRouter)
+        return RelayStakingNavigator(navigationHoldersRegistry, navigator, dashboardRouter, dAppRouter, portfolioReopenCommunicator)
     }
 }

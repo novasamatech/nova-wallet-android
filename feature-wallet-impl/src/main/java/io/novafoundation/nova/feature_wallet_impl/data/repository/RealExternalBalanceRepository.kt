@@ -41,6 +41,7 @@ internal class RealExternalBalanceRepository(
         return when (local) {
             ExternalBalanceLocal.Type.CROWDLOAN -> ExternalBalance.Type.CROWDLOAN
             ExternalBalanceLocal.Type.NOMINATION_POOL -> ExternalBalance.Type.NOMINATION_POOL
+            ExternalBalanceLocal.Type.BITTENSOR -> ExternalBalance.Type.BITTENSOR
         }
     }
 }

@@ -2,11 +2,16 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPresetValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -19,6 +24,8 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
@@ -29,6 +36,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyList
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
@@ -77,29 +86,30 @@ class BittensorStakingRepositoryTest {
     }
 
     private val validatorSource = object : BittensorRootValidatorSource {
-        override suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator {
-            validatorRequests++
-            check(!failValidatorSelection) { "Validators unavailable" }
-            return validator
-        }
+        override suspend fun validatorDetails(chain: Chain) = emptyMap<AccountIdKey, BittensorRootValidatorDetails>()
 
         override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal? = null
     }
+
+    private val presetValidatorInteractor = mock(BittensorPresetValidatorInteractor::class.java)
 
     private val commonModule = CommonModule()
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val swapSource = mock(BittensorSwapSource::class.java)
+    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
 
-    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
+
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
     private val positionRepository = RealBittensorPositionRepository(
         positions,
         portfolioLoader,
         chainStateRepository,
         computationalCache,
-        logger
+        logger,
+        positionUpdates
     )
 
     private val repository = RealBittensorStakingRepository(
@@ -107,7 +117,16 @@ class BittensorStakingRepositoryTest {
         walletRepository,
         accountRepository,
         positionRepository,
-        validatorSource,
+        validatorSource
+    )
+
+    private val interactor = BittensorStakingInteractor(
+        repository,
+        presetValidatorInteractor,
+        mock(ExtrinsicService::class.java),
+        walletRepository,
+        mock(BittensorSubnetValidatorRepository::class.java),
+        mock(BittensorSubmissionExecutor::class.java),
         logger
     )
 
@@ -116,7 +135,7 @@ class BittensorStakingRepositoryTest {
         prepare()
 
         withTimeout(3_000L) {
-            repository.observeRootStakingDetails().onEach { if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE }
+            interactor.observeRootStakingDetails().onEach { if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE }
                 .take(2)
                 .toList()
         }
@@ -126,11 +145,43 @@ class BittensorStakingRepositoryTest {
     }
 
     @Test
+    fun `explicit raw details do not depend on default validator eligibility`() = runBlocking<Unit> {
+        prepare()
+        failValidatorSelection = true
+        `when`(accountRepository.metaAccountFlow(1L)).thenReturn(flowOf(account))
+
+        val details = withTimeout(3_000L) {
+            repository.observeRootAccountDetails(1L).first { it.dataStatus is BittensorDataStatus.Fresh }
+        }
+
+        assertEquals(1L, details.metaId)
+        assertEquals(asset, details.asset)
+        assertEquals(validator.hotkey, details.positions.single().validatorHotkey)
+        assertNull(details.validator)
+        assertEquals(0, validatorRequests)
+    }
+
+    @Test
+    fun `explicit raw balances continue updating without validator requests`() = runBlocking<Unit> {
+        prepare()
+        `when`(accountRepository.metaAccountFlow(1L)).thenReturn(flowOf(account))
+        val states = withTimeout(3_000L) {
+            repository.observeRootAccountDetails(1L)
+                .filter { it.dataStatus is BittensorDataStatus.Fresh }
+                .onEach { blockNumbers.value += BigInteger.ONE }
+                .take(2)
+                .toList()
+        }
+        assertEquals(listOf(BigInteger.ONE, BigInteger.TWO), states.map { it.positions.single().stakeInPlanks })
+        assertEquals(0, validatorRequests)
+    }
+
+    @Test
     fun `failed refresh keeps the default validator from cached positions`() = runBlocking {
         prepare()
 
         val states = withTimeout(3_000L) {
-            repository.observeRootStakingDetails().onEach {
+            interactor.observeRootStakingDetails().onEach {
                 failPositions = true
                 blockNumbers.value += BigInteger.ONE
             }
@@ -157,7 +208,7 @@ class BittensorStakingRepositoryTest {
         failValidatorSelection = true
 
         val states = withTimeout(3_000L) {
-            repository.observeRootStakingDetails().onEach {
+            interactor.observeRootStakingDetails().onEach {
                 failValidatorSelection = false
                 blockNumbers.value += BigInteger.ONE
             }
@@ -184,5 +235,10 @@ class BittensorStakingRepositoryTest {
         `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(walletRepository.assetFlow(1L, chainAsset)).thenReturn(flowOf(asset))
         `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
+        `when`(presetValidatorInteractor.rootPreset(eq(chain) ?: chain, anyList())).thenAnswer {
+            validatorRequests++
+            check(!failValidatorSelection) { "Validators unavailable" }
+            validator
+        }
     }
 }

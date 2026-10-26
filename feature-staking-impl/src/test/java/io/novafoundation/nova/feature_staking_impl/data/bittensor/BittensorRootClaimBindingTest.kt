@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZero
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 import org.junit.Assert.assertEquals
@@ -12,11 +13,23 @@ class BittensorRootClaimBindingTest {
     private val unit = BigInteger.ONE.shiftLeft(32)
 
     @Test
+    fun `unset root hold interval and last stake block mean no hold`() {
+        assertEquals(BigInteger.ZERO, bindNumberOrZero(null))
+        assertEquals(BigInteger.valueOf(42), bindNumberOrZero(BigInteger.valueOf(42)))
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `malformed nonempty root hold does not silently become zero`() {
+        bindNumberOrZero("42")
+    }
+
+    @Test
     fun `distributed rewards cannot be combined to reach the minimum`() {
         val claims = claimsWithRewards(200_000, 300_000)
 
         assertTrue(claims.claimable.isEmpty())
         assertTrue(claims.hasRewardsBelowMinimum)
+        assertEquals(BigInteger.valueOf(500_000), claims.totalRedeemable)
     }
 
     @Test
@@ -49,6 +62,16 @@ class BittensorRootClaimBindingTest {
             previews = bindBittensorRootClaimPreviews(previews),
             minimum = BigInteger.valueOf(500_000)
         )
+    }
+
+    @Test
+    fun `accrued but entirely forfeited rewards do not show a minimum hint`() {
+        val previews = bindBittensorRootClaimPreviews(listOf(preview(1, 100_000, 0, 100_000)))
+        val claims = BittensorRootClaims(previews, BigInteger.valueOf(500_000))
+
+        assertFalse(claims.hasRewardsBelowMinimum)
+        assertTrue(claims.claimable.isEmpty())
+        assertEquals(BigInteger.ZERO, claims.totalRedeemable)
     }
 
     @Test fun `unset threshold uses runtime default`() {
@@ -196,29 +219,27 @@ class BittensorRootClaimBindingTest {
         )
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `inconsistent availability is rejected`() {
+    @Test fun `availability net of miner collateral is read as reported`() {
         val coldkey = ByteArray(32)
-        bindBittensorExitAvailability(
-            listOf(
-                listOf(
-                    coldkey,
-                    listOf(
-                        listOf(
-                            BigInteger.ONE,
-                            Struct.Instance(
-                                mapOf(
-                                    "total" to BigInteger.TEN,
-                                    "locked" to BigInteger.TEN,
-                                    "available" to BigInteger.ONE
-                                )
-                            )
-                        )
-                    )
-                )
-            ),
-            coldkey,
-            1
+        assertEquals(
+            BittensorExitAvailability(BigInteger.TEN, BigInteger.valueOf(3), BigInteger.valueOf(5)),
+            bindBittensorExitAvailability(availabilityResponse(coldkey, netuid = 1, total = 10, locked = 3, available = 5), coldkey, 1)
+        )
+    }
+
+    @Test fun `lock above the stake leaves nothing available`() {
+        val coldkey = ByteArray(32)
+        assertEquals(
+            BittensorExitAvailability(BigInteger.valueOf(4), BigInteger.valueOf(6), BigInteger.ZERO),
+            bindBittensorExitAvailability(availabilityResponse(coldkey, netuid = 1, total = 4, locked = 6, available = 0), coldkey, 1)
+        )
+    }
+
+    @Test fun `subnet omitted by the runtime has nothing available`() {
+        val coldkey = ByteArray(32)
+        assertEquals(
+            BittensorExitAvailability(BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO),
+            bindBittensorExitAvailability(availabilityResponse(coldkey, netuid = 1, total = 10, locked = 0, available = 10), coldkey, 64)
         )
     }
 
@@ -251,6 +272,30 @@ class BittensorRootClaimBindingTest {
             claims.claimable.map { it.hotkey.value.first() }
         )
     }
+
+    private fun availabilityResponse(
+        coldkey: ByteArray,
+        netuid: Long,
+        total: Long,
+        locked: Long,
+        available: Long
+    ) = listOf(
+        listOf(
+            coldkey,
+            listOf(
+                listOf(
+                    BigInteger.valueOf(netuid),
+                    Struct.Instance(
+                        mapOf(
+                            "total" to BigInteger.valueOf(total),
+                            "locked" to BigInteger.valueOf(locked),
+                            "available" to BigInteger.valueOf(available)
+                        )
+                    )
+                )
+            )
+        )
+    )
 
     private fun preview(
         key: Byte,

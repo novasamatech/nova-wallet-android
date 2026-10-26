@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
-
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -13,14 +13,16 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.awaitableActionFlow
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartStakingLandingBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.announcements.setAnnouncement
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 class StartStakingLandingFragment :
     BaseFragment<StartStakingLandingViewModel, FragmentStartStakingLandingBinding>(),
@@ -51,6 +53,11 @@ class StartStakingLandingFragment :
 
         binder.startStakingLandingButton.prepareForProgress(viewLifecycleOwner)
         binder.startStakingLandingButton.setOnClickListener { viewModel.continueClicked() }
+        if (viewModel.isBittensor) {
+            binder.startStakingLandingButton.setText(R.string.bittensor_start_earning)
+        }
+        binder.startStakingLandingAllOptions.isVisible = viewModel.isBittensor
+        binder.startStakingLandingAllOptions.setOnClickListener { viewModel.allOptionsClicked() }
     }
 
     override fun inject() {
@@ -66,8 +73,13 @@ class StartStakingLandingFragment :
     override fun subscribe(viewModel: StartStakingLandingViewModel) {
         observeBrowserEvents(viewModel)
         observeValidations(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
+        observeActionBottomSheet(viewModel.walletGate)
 
-        viewModel.isContinueButtonLoading.observe(binder.startStakingLandingButton::setProgressState)
+        viewModel.isContinueButtonLoading.observe {
+            binder.startStakingLandingButton.setProgressState(it)
+            binder.startStakingLandingAllOptions.isEnabled = !it
+        }
 
         viewModel.announcementFlow.observe { announcement ->
             binder.startStakingLandingAnnouncement.letOrHide(announcement) {
@@ -84,17 +96,19 @@ class StartStakingLandingFragment :
 
             when (it) {
                 is ExtendedLoadingState.Loaded<StartStakingInfoModel> -> {
-                    headerAdapter.setTitle(it.data.title)
+                    headerAdapter.setTitle(it.data.title, it.data.moreInfo.takeIf { viewModel.isBittensor })
                     conditionsAdapter.submitList(it.data.conditions)
-                    footerAdapter.setMoreInformationText(it.data.moreInfo)
+                    footerAdapter.setMoreInformationText(if (viewModel.isBittensor) "" else it.data.moreInfo)
                     binder.startStakingLandingButton.setButtonColor(it.data.buttonColor)
                 }
 
                 is ExtendedLoadingState.Error -> {
-                    dialog(providedContext) {
-                        setTitle(providedContext.getString(io.novafoundation.nova.common.R.string.common_error_general_title))
-                        it.exception.message?.let { setMessage(it) }
-                        setPositiveButton(io.novafoundation.nova.common.R.string.common_ok) { _, _ -> viewModel.back() }
+                    if (!viewModel.isBittensor) {
+                        dialog(providedContext) {
+                            setTitle(providedContext.getString(io.novafoundation.nova.common.R.string.common_error_general_title))
+                            it.exception.message?.let { setMessage(it) }
+                            setPositiveButton(io.novafoundation.nova.common.R.string.common_ok) { _, _ -> viewModel.back() }
+                        }
                     }
                 }
 

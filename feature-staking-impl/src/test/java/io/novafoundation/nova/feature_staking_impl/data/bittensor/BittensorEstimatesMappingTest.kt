@@ -95,6 +95,30 @@ class BittensorEstimatesMappingTest {
         assertNull(mapBittensorValidatorYield(malformed, chain, subnetId))
     }
 
+    @Test
+    fun `only a RELIABLE verdict or an absent one permits recommendations`() {
+        val address = chain.addressOf(ByteArray(32) { 1 })
+        fun item(rate: String, verdict: String?) = BittensorAlphaYieldsRemote.Item(
+            1,
+            address,
+            rate,
+            "ALPHA_VALIDATOR_APY",
+            rateReliability = verdict
+        )
+
+        // A dust nominated stake compounded into 669,990 percent: the backend verdict hides it.
+        assertEquals(false, mapBittensorValidatorYield(item("669990.45", "UNRELIABLE"), chain, subnetId)?.reliable)
+        assertEquals(false, mapBittensorValidatorYield(item("79.56", "MAYBE"), chain, subnetId)?.reliable)
+        assertEquals(
+            BigDecimal("79.56"),
+            mapBittensorValidatorYield(item("79.56", "RELIABLE"), chain, subnetId)?.annualPercentageYield
+        )
+        assertEquals(
+            BigDecimal("79.56"),
+            mapBittensorValidatorYield(item("79.56", null), chain, subnetId)?.annualPercentageYield
+        )
+    }
+
     private fun operation(netuid: Int?) = BittensorOperationsRemote.Item(
         netuid = netuid,
         hotkey = "hotkey",

@@ -60,6 +60,15 @@ class BittensorPositionBindingTest {
         )
     }
 
+    @Test
+    fun `root registration preserves true false and unknown regardless of positive stake`() {
+        for (registered in listOf(true, false, null)) {
+            val raw = position(0, 100)
+            val decoded = if (registered == null) raw else Struct.Instance(raw.mapping + ("isRegistered" to registered))
+            assertEquals(registered, bindBittensorRootPositions(listOf(decoded)).single().isRegistered)
+        }
+    }
+
     private fun position(netuid: Long, stake: Long, hotkey: Byte = 1) = Struct.Instance(
         mapOf(
             "netuid" to BigInteger.valueOf(netuid),

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -8,23 +10,54 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStaki
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.addBittensorRootStake
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+
+data class BittensorRootValidatorDetails(val validator: BittensorValidator, val annualPercentageYield: BigDecimal?)
 
 class BittensorStakingInteractor(
     private val repository: BittensorStakingRepository,
+    private val presetValidatorInteractor: BittensorPresetValidatorInteractor,
     private val extrinsicService: ExtrinsicService,
     private val walletRepository: WalletRepository,
     private val validatorRepository: BittensorSubnetValidatorRepository,
-    private val submissionExecutor: BittensorSubmissionExecutor
+    private val submissionExecutor: BittensorSubmissionExecutor,
+    private val logger: Logger
 ) {
 
-    fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails()
+    fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails().withDefaultValidator()
 
-    fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails(metaId)
+    fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails> = repository.observeRootAccountDetails(metaId).withDefaultValidator()
+
+    fun observeRootAccountDetails(metaId: Long): Flow<BittensorRootStakingDetails> = repository.observeRootAccountDetails(metaId)
+
+    suspend fun rootValidatorDetails(chain: Chain, address: String): BittensorRootValidatorDetails {
+        val validator = rootValidator(chain, address)
+        val annualPercentageYield = repository.annualPercentageYield(chain, validator)
+        return BittensorRootValidatorDetails(validator, annualPercentageYield)
+    }
+
+    fun detailsForFixedValidator(
+        details: BittensorRootStakingDetails,
+        address: String,
+        resolved: BittensorRootValidatorDetails?
+    ): BittensorRootStakingDetails {
+        val hotkey = AccountIdKey(details.chain.accountIdOf(address))
+        return details.copy(
+            validator = resolved?.validator,
+            annualPercentageYield = resolved?.annualPercentageYield,
+            position = details.positions.firstOrNull { it.validatorHotkey == hotkey }
+        )
+    }
 
     suspend fun detailsForValidator(details: BittensorRootStakingDetails, validator: BittensorValidator): BittensorRootStakingDetails {
         if (details.validator?.hotkey == validator.hotkey) return details.copy(validator = validator)
@@ -38,7 +71,7 @@ class BittensorStakingInteractor(
     suspend fun rootValidator(chain: Chain, address: String): BittensorValidator {
         val validatorRepository = validatorRepository.rootValidators(chain)
         val selectedValidator = validatorRepository
-            .firstOrNull { it.address == address && it.selectable }
+            .firstOrNull { it.address == address && it.canSelect }
         return requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }
             .validator
     }
@@ -75,19 +108,57 @@ class BittensorStakingInteractor(
         validatorRepository.validateRoot(request.chain, request.validator)
         return submissionExecutor.execute(
             request.metaId,
-            request.chain
+            request.chain,
+            BittensorOutcomeTarget(BittensorOperationKind.STAKE, BittensorNetuid.Root, setOf(request.validator.hotkey))
         ) {
             addBittensorRootStake(request.validator.hotkey.value, request.amountInPlanks)
         }
     }
 
-    fun validationPayload(request: BittensorRootStakeRequest, fee: Fee, checkRootHold: Boolean = false) = BittensorStakePreflightPayload(
+    fun validationPayload(request: BittensorRootStakeRequest, fee: Fee) = BittensorStakePreflightPayload(
         chain = request.chain,
         metaId = request.metaId,
         netuid = BittensorNetuid.Root,
         hotkey = request.validator.hotkey.value,
         amount = request.amountInPlanks,
-        fee = fee,
-        checkRootHold = checkRootHold
+        fee = fee
     )
+
+    private fun Flow<BittensorRootStakingDetails>.withDefaultValidator(): Flow<BittensorRootStakingDetails> = flowOfAll {
+        var defaultValidatorSelection: DefaultValidatorSelection? = null
+        filter { it.dataStatus !is BittensorDataStatus.Loading }
+            .map { details ->
+                val validator = try {
+                    val selection = selectDefaultValidator(details, defaultValidatorSelection)
+                    defaultValidatorSelection = selection
+                    selection.validator
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logger.log("[BittensorRoot] Failed to select a default validator")
+                    logger.log(e)
+                    null
+                }
+                details.copy(
+                    validator = validator,
+                    annualPercentageYield = validator?.let { repository.annualPercentageYield(details.chain, it) },
+                    position = details.positions.firstOrNull { it.validatorHotkey == validator?.hotkey }
+                )
+            }
+    }
+
+    private suspend fun selectDefaultValidator(
+        details: BittensorRootStakingDetails,
+        cachedSelection: DefaultValidatorSelection?
+    ): DefaultValidatorSelection {
+        val primaryHotkey = bittensorRootPrimaryHotkey(details.positions)
+        if (cachedSelection != null && cachedSelection.metaId == details.metaId && cachedSelection.positionHotkey == primaryHotkey) {
+            return cachedSelection
+        }
+
+        val validator = presetValidatorInteractor.rootPreset(details.chain, details.positions)
+        return DefaultValidatorSelection(details.metaId, primaryHotkey, validator)
+    }
+
+    private data class DefaultValidatorSelection(val metaId: Long, val positionHotkey: AccountIdKey?, val validator: BittensorValidator?)
 }

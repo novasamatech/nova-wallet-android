@@ -47,6 +47,8 @@ import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinG
 
 interface SettingsFeatureDependencies {
 
+    fun preferences(): io.novafoundation.nova.common.data.storage.Preferences
+
     val analyticsOptOutManager: AnalyticsOptOutManager
 
     val maskingModeUseCase: MaskingModeUseCase
