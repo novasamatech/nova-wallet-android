@@ -50,6 +50,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWit
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWithdrawalFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWithdrawalNotice
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
@@ -228,7 +230,7 @@ class BittensorSubnetPositionViewModel(
         }
     }.map { it.isLoading() }.shareInBackground()
 
-    val withdrawalHint = combine(withdrawalState, subnet) { state, subnet ->
+    val withdrawalHint: Flow<BittensorWithdrawalNotice?> = combine(withdrawalState, subnet) { state, subnet ->
         // iOS shows no withdrawal caption while the whole stake is free to sell.
         val withdrawal = state.dataOrNull?.takeIf { it.hasWithdrawalRestriction() } ?: return@combine null
         val symbol = subnet?.symbol?.takeIf { it.isNotBlank() } ?: return@combine null

@@ -55,7 +55,11 @@ data class BittensorExitMember(
 
     val free: BigInteger get() = if (holdRemaining.isPositive()) BigInteger.ZERO else (stake - collateral).max(BigInteger.ZERO)
 
-    fun drawable(floor: BigInteger): BigInteger = if (collateral.isPositive() && free < floor) BigInteger.ZERO else free
+    fun drawable(floor: BigInteger, exitFloor: BigInteger = BigInteger.ZERO): BigInteger = when {
+        !collateral.isPositive() && stake < exitFloor -> BigInteger.ZERO
+        collateral.isPositive() && free < floor -> BigInteger.ZERO
+        else -> free
+    }
 }
 
 /** Frozen call slices: full removals first, followed by exact partial amounts. */

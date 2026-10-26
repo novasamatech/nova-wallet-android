@@ -26,6 +26,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 interface BittensorSubnetValidatorRepository {
 
+    suspend fun linkedSubnets(chainId: String, hotkey: AccountIdKey, subnets: Set<BittensorNetuid.Subnet>): Set<BittensorNetuid.Subnet>
+
     suspend fun validatorCount(chain: Chain, netuid: BittensorNetuid.Subnet): Int
 
     suspend fun rootValidators(chain: Chain): List<BittensorSubnetValidator>
@@ -57,6 +59,19 @@ class RealBittensorSubnetValidatorRepository(
     private val storage: StorageDataSource,
     private val rpc: RpcCalls
 ) : BittensorSubnetValidatorRepository {
+
+    override suspend fun linkedSubnets(
+        chainId: String,
+        hotkey: AccountIdKey,
+        subnets: Set<BittensorNetuid.Subnet>
+    ): Set<BittensorNetuid.Subnet> {
+        if (subnets.isEmpty()) return emptySet()
+        val hash = rpc.getBlockHash(chainId)
+        return storage.query(chainId, at = hash, applyStorageDefault = false) {
+            loadBittensorValidatorLinks(subnets.map { BittensorValidatorLink(hotkey, it.value) })
+                .mapTo(mutableSetOf()) { BittensorNetuid.Subnet(it.netuid) }
+        }
+    }
 
     override suspend fun validatorCount(chain: Chain, netuid: BittensorNetuid.Subnet): Int {
         val hash = rpc.getBlockHash(chain.id)

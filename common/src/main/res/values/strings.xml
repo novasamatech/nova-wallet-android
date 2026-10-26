@@ -3137,6 +3137,10 @@
     <string name="bittensor_claim_stale">Rewards could not be refreshed. Claiming is unavailable until fresh data is loaded.</string>
     <string name="bittensor_position_withdrawable">Available to withdraw: %1$s</string>
     <string name="bittensor_position_locked">Locked or held: %1$s. Only the available amount can be withdrawn.</string>
+    <string name="bittensor_withdrawal_locked_title">Locked or held: %1$s</string>
+    <string name="bittensor_withdrawal_partial">Only the available amount can be withdrawn.</string>
+    <string name="bittensor_validator_active_via_child_key">Active via Child Key</string>
+    <string name="bittensor_withdrawal_unavailable">Nothing is currently available to withdraw.</string>
     <string name="bittensor_position_hold">Longest current withdrawal hold: approximately %1$s.</string>
     <string name="bittensor_estimated_apy">Est. APY</string>
     <string name="bittensor_root_hold_title">Root stake locked</string>
@@ -3197,4 +3201,6 @@
     <string name="bittensor_claim_dry_run_invalid">Simulation: transaction validation failed.\n%1$s\nNo transaction was broadcast by the app.</string>
     <string name="bittensor_claim_dry_run_error">Dry run could not complete (%1$s). Check node support and connection. No fallback submission was attempted.</string>
     <string name="bittensor_claim_dry_run_cancelled">Signing cancelled. No dry-run request or transaction was sent.</string>
+    <string name="debug_disable_node_logs">Disable node logs</string>
+    <string name="debug_disable_node_logs_description">Hide socket, state-machine and HTTP logs immediately. Operation logs and exception traces stay enabled.</string>
 </resources>

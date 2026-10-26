@@ -467,7 +467,7 @@ class BittensorExitAmountViewModel(
         .shareInBackground()
 
     private val isFullyLocked = combine(exitGroup, currentSelection) { group, selection ->
-        group != null && selection != null && group.basis(selection).available.isZero
+        group != null && selection != null && group.maximum(selection).isZero
     }
         .distinctUntilChanged()
 

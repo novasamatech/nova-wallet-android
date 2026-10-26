@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
@@ -93,7 +93,7 @@ class SwapMainSettingsModule {
         validationExecutor: ValidationExecutor,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
-        maxActionProviderFactory: MaxActionProviderFactory,
+        maxActionProviderFactory: SwapMaxActionProviderFactory,
         swapStateStoreProvider: SwapStateStoreProvider,
         swapRouteFormatter: SwapRouteFormatter,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,

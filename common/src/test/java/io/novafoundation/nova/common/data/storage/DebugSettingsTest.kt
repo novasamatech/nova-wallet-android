@@ -28,6 +28,17 @@ class DebugSettingsTest {
     private val settings = DebugSettings(preferences)
 
     @Test
+    fun `node logging toggle is persistent reversible and independent from claim`() {
+        assertFalse(settings.nodeLogsDisabled())
+        settings.setNodeLogsDisabled(true)
+        val reopened = DebugSettings(preferences)
+        assertTrue(reopened.nodeLogsDisabled())
+        assertFalse(reopened.bittensorClaimEnabled())
+        reopened.setNodeLogsDisabled(false)
+        assertFalse(settings.nodeLogsDisabled())
+    }
+
+    @Test
     fun `button can be enabled without dry run`() = runBlocking {
         settings.setBittensorClaimButtonEnabled(true)
         assertTrue(settings.bittensorClaimButtonEnabled())

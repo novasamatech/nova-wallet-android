@@ -36,14 +36,30 @@ class BittensorValidatorSnapshotLoaderTest {
     private val runtime = createRuntime()
 
     @Test
+    fun `parent and child links are batched deduplicated and scoped to subnet`() = runBlocking {
+        val first = BittensorValidatorLink(validator.hotkey, 1)
+        val second = BittensorValidatorLink(validator.hotkey, 64)
+        val absent = BittensorValidatorLink(validator.hotkey, 65)
+        val context = RecordingQueryContext(runtime, delegate, expectedReads = 2, links = mapOf(
+            "ParentKeys" to setOf(first),
+            "ChildKeys" to setOf(first, second)
+        ))
+
+        val result = withTimeout(5_000) { context.loadBittensorValidatorLinks(listOf(first, first, second, absent)) }
+
+        assertEquals(setOf(first, second), result)
+        assertEquals(mapOf("ParentKeys" to 3, "ChildKeys" to 3), context.batchSizes)
+    }
+
+    @Test
     fun `all independent storage reads start before any result is awaited`() = runBlocking {
-        val context = RecordingQueryContext(runtime, delegate, expectedReads = 7)
+        val context = RecordingQueryContext(runtime, delegate, expectedReads = 9)
 
         val snapshot = withTimeout(5_000) {
             context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator))
         }
 
-        assertEquals(setOf("ValidatorPermit", "LastUpdate", "Number", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates"), context.requests)
+        assertEquals(setOf("ValidatorPermit", "LastUpdate", "Number", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates", "ParentKeys", "ChildKeys"), context.requests)
         assertEquals(mapOf(validator.hotkey to 0), snapshot.uids)
         assertEquals(mapOf(validator.hotkey to BigInteger.ZERO), snapshot.commissionsInU16)
         assertEquals(listOf(true), snapshot.permits)
@@ -53,7 +69,7 @@ class BittensorValidatorSnapshotLoaderTest {
 
     @Test
     fun `directory snapshot includes the subnet registration block`() = runBlocking {
-        val context = RecordingQueryContext(runtime, delegate, expectedReads = 8)
+        val context = RecordingQueryContext(runtime, delegate, expectedReads = 10)
 
         val snapshot = withTimeout(5_000) {
             context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator), includeRegistration = true)
@@ -80,7 +96,7 @@ class BittensorValidatorSnapshotLoaderTest {
     @Test
     fun `failed storage read cancels other reads instead of returning a partial snapshot`() = runBlocking {
         val failure = IllegalStateException("Storage unavailable")
-        val context = RecordingQueryContext(runtime, delegate, expectedReads = 7, failure = failure)
+        val context = RecordingQueryContext(runtime, delegate, expectedReads = 9, failure = failure)
 
         try {
             withTimeout(5_000) {
@@ -97,7 +113,7 @@ class BittensorValidatorSnapshotLoaderTest {
     private fun createRuntime(): RuntimeSnapshot {
         val subtensorModule = createModule(
             "SubtensorModule",
-            listOf("ValidatorPermit", "LastUpdate", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates", "NetworkRegisteredAt")
+            listOf("ValidatorPermit", "LastUpdate", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates", "NetworkRegisteredAt", "ParentKeys", "ChildKeys")
         )
         val systemModule = createModule("System", listOf("Number"))
         val modules = mapOf(
@@ -124,10 +140,13 @@ class BittensorValidatorSnapshotLoaderTest {
         override val runtime: RuntimeSnapshot,
         delegate: StorageQueryContext,
         private val expectedReads: Int,
-        private val failure: Exception? = null
+        private val failure: Exception? = null,
+        private val links: Map<String, Set<BittensorValidatorLink>> = emptyMap()
     ) : StorageQueryContext by delegate {
 
         val requests = mutableSetOf<String>()
+
+        val batchSizes = mutableMapOf<String, Int>()
 
         var cancelledReads = 0
             private set
@@ -154,11 +173,21 @@ class BittensorValidatorSnapshotLoaderTest {
             binding: DynamicInstanceBinderWithKey<K, V>,
             recover: (exception: Exception, rawValue: String?) -> Unit
         ): Map<K, V> {
+            batchSizes[name] = keysArguments.size
             record(name)
             return keysArguments.associate { arguments ->
                 val components = ComponentHolder(arguments)
                 val key = keyExtractor(components)
-                key to binding(BigInteger.ZERO, key)
+                val value = if (name == "ParentKeys" || name == "ChildKeys") {
+                    if (key is BittensorValidatorLink && key in links[name].orEmpty()) {
+                        listOf(listOf(BigInteger.ONE, ByteArray(32)))
+                    } else {
+                        emptyList<Any>()
+                    }
+                } else {
+                    BigInteger.ZERO
+                }
+                key to binding(value, key)
             }
         }
 

@@ -129,7 +129,8 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         viewModel.canSell.observe { sell.isEnabled = it }
         viewModel.withdrawalLoading.observe { withdrawalLoading.isVisible = it }
         viewModel.withdrawalHint.observe {
-            withdrawalHint.text = it
+            withdrawalTitle.text = it?.title
+            withdrawalMessage.text = it?.message
             withdrawalHint.isVisible = it != null
         }
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)

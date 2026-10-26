@@ -86,7 +86,13 @@ class BittensorValidatorInfoViewModel(
 
     val status = loadedDetail.map { detail ->
         BittensorValidatorStatusUi(
-            text = resources.getString(if (detail.inactive) R.string.staking_nominator_status_inactive else R.string.common_active),
+            text = resources.getString(
+                when {
+                    detail.isViaChildKeys -> R.string.bittensor_validator_active_via_child_key
+                    detail.inactive -> R.string.staking_nominator_status_inactive
+                    else -> R.string.common_active
+                }
+            ),
             style = if (detail.inactive) TableCellView.FieldStyle.SECONDARY else TableCellView.FieldStyle.POSITIVE
         )
     }

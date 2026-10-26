@@ -22,7 +22,8 @@ class BittensorValidatorInfoPayload(
         val name: String?,
         val reportedStake: BigDecimal?,
         val commissionRate: BigDecimal,
-        val inactive: Boolean
+        val inactive: Boolean,
+        val isViaChildKeys: Boolean = false
     ) : Parcelable
 }
 
@@ -30,5 +31,6 @@ fun BittensorSubnetValidator.toValidatorInfoDetail() = BittensorValidatorInfoPay
     name = validator.name.trim().takeIf { it.isNotEmpty() && it != address },
     reportedStake = validator.reportedStake,
     commissionRate = commissionRate,
-    inactive = inactive
+    inactive = inactive,
+    isViaChildKeys = isViaChildKeys
 )

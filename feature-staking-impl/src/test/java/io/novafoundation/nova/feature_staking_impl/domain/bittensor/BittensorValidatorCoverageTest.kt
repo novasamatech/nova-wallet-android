@@ -9,6 +9,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRemote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
@@ -21,6 +22,18 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
 class BittensorValidatorCoverageTest {
+
+    private val validators = mock(BittensorSubnetValidatorRepository::class.java)
+
+    @Test
+    fun `coverage includes linked subnets once and excludes unlisted links`() {
+        val permits = setOf(BittensorNetuid.Subnet(1))
+        val listed = setOf(BittensorNetuid.Subnet(1), BittensorNetuid.Subnet(64))
+        val linked = listed + BittensorNetuid.Subnet(99)
+
+        assertEquals(BittensorValidatorCoverage(2, 2), bittensorValidatorCoverage(permits, listed, linked))
+        assertNull(bittensorValidatorCoverage(null, listed, linked))
+    }
 
     @Test
     fun `coverage counts only permits on listed subnets`() {
@@ -60,7 +73,8 @@ class BittensorValidatorCoverageTest {
         val catalogue = mock(BittensorSubnetCatalogueRepository::class.java)
         val hotkey = AccountIdKey(ByteArray(32))
         `when`(catalogue.catalogue()).thenReturn(emptyCatalogue())
-        val interactor = BittensorValidatorCoverageInteractor(delegates, catalogue, timeoutMillis = 100)
+        `when`(validators.linkedSubnets(ChainGeneses.BITTENSOR, hotkey, emptySet())).thenReturn(emptySet())
+        val interactor = BittensorValidatorCoverageInteractor(delegates, catalogue, validators, timeoutMillis = 100)
 
         val failure = runCatching { interactor.coverage(hotkey) }.exceptionOrNull()
 
@@ -76,7 +90,27 @@ class BittensorValidatorCoverageTest {
         `when`(delegates.validatorPermits(ChainGeneses.BITTENSOR, hotkey)).thenReturn(null)
         `when`(catalogue.catalogue()).thenReturn(emptyCatalogue())
 
-        assertNull(BittensorValidatorCoverageInteractor(delegates, catalogue).coverage(hotkey))
+        `when`(validators.linkedSubnets(ChainGeneses.BITTENSOR, hotkey, emptySet())).thenReturn(emptySet())
+        val interactor = BittensorValidatorCoverageInteractor(delegates, catalogue, validators)
+        assertNull(interactor.coverage(hotkey))
+    }
+
+    @Test
+    fun `interactor includes links queried for catalogue subnets`() = runTest {
+        val delegates = mock(BittensorDelegateSource::class.java)
+        val catalogue = mock(BittensorSubnetCatalogueRepository::class.java)
+        val hotkey = AccountIdKey(ByteArray(32))
+        val listed = setOf(BittensorNetuid.Subnet(1), BittensorNetuid.Subnet(64))
+        val response = BittensorSubnetCatalogueRemote(
+            listOf(1, 64).map { BittensorSubnetCatalogueRemote.Subnet(it, taoPerAlpha = null) },
+            emptyCatalogue().meta
+        )
+        `when`(delegates.validatorPermits(ChainGeneses.BITTENSOR, hotkey)).thenReturn(setOf(BittensorNetuid.Subnet(1)))
+        `when`(catalogue.catalogue()).thenReturn(response)
+        `when`(validators.linkedSubnets(ChainGeneses.BITTENSOR, hotkey, listed)).thenReturn(setOf(BittensorNetuid.Subnet(64)))
+        val interactor = BittensorValidatorCoverageInteractor(delegates, catalogue, validators)
+
+        assertEquals(BittensorValidatorCoverage(2, 2), interactor.coverage(hotkey))
     }
 
     private fun emptyCatalogue(): BittensorSubnetCatalogueRemote {

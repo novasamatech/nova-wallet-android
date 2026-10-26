@@ -38,7 +38,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.types.BaseTypeSynchro
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.TypesFetcher
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import kotlinx.coroutines.flow.MutableStateFlow
-import okhttp3.logging.HttpLoggingInterceptor
+import io.novafoundation.nova.common.data.network.DebugHttpLoggingInterceptor
 import org.web3j.protocol.http.HttpService
 import javax.inject.Provider
 
@@ -200,12 +200,13 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideWeb3ApiFactory(
         strategyProvider: NodeSelectionStrategyProvider,
+        loggingInterceptor: DebugHttpLoggingInterceptor,
     ): Web3ApiFactory {
         val builder = HttpService.getOkHttpClientBuilder()
         builder.interceptors().clear() // getOkHttpClientBuilder() adds logging interceptor which doesn't log into LogCat
 
         if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            builder.addInterceptor(loggingInterceptor)
         }
 
         val okHttpClient = builder.build()

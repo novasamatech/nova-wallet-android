@@ -8,6 +8,13 @@ import kotlinx.coroutines.flow.combine
 
 class DebugSettings @Inject constructor(private val preferences: Preferences) {
 
+    fun nodeLogsDisabled(): Boolean = BuildConfig.DEBUG && preferences.getBoolean(NODE_LOGS_KEY, false)
+
+    fun setNodeLogsDisabled(disabled: Boolean) {
+        check(BuildConfig.DEBUG)
+        preferences.putBoolean(NODE_LOGS_KEY, disabled)
+    }
+
     fun bittensorClaimEnabled(): Boolean = BuildConfig.DEBUG && preferences.getBoolean(CLAIM_KEY, false)
 
     fun observeBittensorClaim(): Flow<Boolean> = preferences.booleanFlow(CLAIM_KEY, false).map { BuildConfig.DEBUG && it }
@@ -33,6 +40,7 @@ class DebugSettings @Inject constructor(private val preferences: Preferences) {
     }
 
     private companion object {
+        const val NODE_LOGS_KEY = "debug.nodeLogs.disabled"
         const val CLAIM_KEY = "debug.bittensor.claim.dryRun"
         const val CLAIM_BUTTON_KEY = "debug.bittensor.claim.alwaysEnabled"
     }
