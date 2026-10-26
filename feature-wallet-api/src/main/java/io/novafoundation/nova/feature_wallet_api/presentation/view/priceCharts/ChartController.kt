@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.YAxis
@@ -50,21 +52,25 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         setupChartUI()
     }
 
-    fun showYAxis(show: Boolean) {
-        chart.axisRight.setDrawLabels(show)
+    /**
+     * Shows or hides the amount labels and the dashed grid of the right axis. Without them MPAndroidChart reserves
+     * no right offset, so the plot stretches across the full view width.
+     */
+    fun setAxisVisible(visible: Boolean) {
+        chart.axisRight.setDrawLabels(visible)
+        chart.axisRight.setDrawGridLines(visible)
+        chart.notifyDataSetChanged()
         chart.invalidate()
     }
 
+    /** The label chip (text, size, background) is drawn by [ReferenceLineRenderer], the line owns only its stroke. */
     fun setReferencePrice(value: Float?, label: String) {
         chart.axisRight.removeAllLimitLines()
         if (value != null && value > 0 && !value.isInfinite() && !value.isNaN()) {
             val line = LimitLine(value, label)
-            line.lineWidth = 1f
+            line.lineWidth = REFERENCE_LINE_WIDTH_DP
             line.lineColor = context.getColor(R.color.text_secondary)
-            line.textColor = context.getColor(R.color.text_secondary)
-            line.textSize = 11f
-            line.enableDashedLine(4.dpF(context), 4.dpF(context), 0f)
-            line.labelPosition = LimitLine.LimitLabelPosition.RIGHT_TOP
+            line.enableDashedLine(REFERENCE_LINE_DASH_DP.dpF(context), REFERENCE_LINE_DASH_DP.dpF(context), 0f)
             chart.axisRight.addLimitLine(line)
         }
         chart.invalidate()
@@ -142,9 +148,21 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             gridColor = context.getColor(R.color.price_chart_grid_line)
             setGridDashedLine(chartUIParams.gridLineDashEffect)
         }
+        chart.rendererRightYAxis = ReferenceLineRenderer(chart, referenceLineStyle())
 
         chart.setOnTouchListener(this)
     }
+
+    private fun referenceLineStyle() = ReferenceLineRenderer.Style(
+        textColor = context.getColor(R.color.text_primary),
+        textSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, REFERENCE_LABEL_TEXT_SP, context.resources.displayMetrics),
+        typeface = ResourcesCompat.getFont(context, R.font.public_sans_semi_bold),
+        chipColor = context.getColor(R.color.block_background_dark),
+        chipCornerRadiusPx = REFERENCE_CHIP_CORNER_DP.dpF(context),
+        chipPaddingHorizontalPx = REFERENCE_CHIP_PADDING_HORIZONTAL_DP.dpF(context),
+        chipPaddingVerticalPx = REFERENCE_CHIP_PADDING_VERTICAL_DP.dpF(context),
+        chipMarginPx = REFERENCE_CHIP_MARGIN_DP.dpF(context)
+    )
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         longClickDetector.onTouch(v, event)
@@ -253,5 +271,16 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         } else {
             return null
         }
+    }
+
+    private companion object {
+
+        const val REFERENCE_LINE_WIDTH_DP = 1f
+        const val REFERENCE_LINE_DASH_DP = 4
+        const val REFERENCE_LABEL_TEXT_SP = 12f
+        const val REFERENCE_CHIP_CORNER_DP = 6
+        const val REFERENCE_CHIP_PADDING_HORIZONTAL_DP = 6
+        const val REFERENCE_CHIP_PADDING_VERTICAL_DP = 2
+        const val REFERENCE_CHIP_MARGIN_DP = 4
     }
 }

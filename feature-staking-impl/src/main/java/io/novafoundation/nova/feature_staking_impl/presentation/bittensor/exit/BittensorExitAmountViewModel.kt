@@ -13,6 +13,7 @@ import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.SubnetDetailsSource
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -66,6 +67,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -372,6 +374,9 @@ class BittensorExitAmountViewModel(
     val averagePriceDescription = position.map { it?.let(exitFormatter::averagePriceDescription) }
         .shareInBackground()
 
+    val earnedDescription = position.map { it?.let(exitFormatter::earnedDescription) }
+        .shareInBackground()
+
     val earned = combine(
         saleCostBasis,
         requestState
@@ -601,6 +606,14 @@ class BittensorExitAmountViewModel(
         analytics.trackExitValidation(BittensorExitValidationFailure.INSUFFICIENT_STAKE, StakingValidationStage.SETUP, StakingValidationOutcome.BLOCKED, isRoot)
         val (title, message) = resources.bittensorExitExceedsAvailable(maximum)
         showError(title, message)
+    }
+
+    /** Opens the subnet's details to read; selling never changes the subnet, so nothing continues from there. */
+    fun subnetClicked() {
+        if (isRoot) return
+        router.openBittensorSubnetDetails(
+            BittensorSubnetDetailsPayload(subnetId = payload.netuid, analyticsSource = SubnetDetailsSource.POSITION, viewOnly = true)
+        )
     }
 
     fun validatorClicked() = launchUnit {

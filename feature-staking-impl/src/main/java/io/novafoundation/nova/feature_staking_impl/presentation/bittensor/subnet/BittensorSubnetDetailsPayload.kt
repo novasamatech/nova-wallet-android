@@ -11,5 +11,7 @@ class BittensorSubnetDetailsPayload(
     val replaceOrigin: BittensorReplaceOrigin = BittensorReplaceOrigin.SUBNET_AMOUNT,
     val validatorAddress: String? = null,
     val selectionState: BittensorSelectionState = BittensorSelectionState(),
-    val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER
+    val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER,
+    /** Opened from an existing position to read about the subnet: no "Use subnet" flow continues from here. */
+    val viewOnly: Boolean = false
 ) : Parcelable

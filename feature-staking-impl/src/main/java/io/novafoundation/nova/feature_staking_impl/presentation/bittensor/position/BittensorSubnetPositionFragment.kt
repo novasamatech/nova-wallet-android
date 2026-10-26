@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.utils.setTextColorRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.setTextOrHide
 import coil.transform.RoundedCornersTransformation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 import io.novafoundation.nova.common.base.BaseFragment
@@ -61,7 +62,9 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         sell.setOnClickListener { viewModel.sellClicked() }
         buy.setOnClickListener { viewModel.buyClicked() }
         validators.adapter = adapter
+        swipeRefresh.setOnRefreshListener { viewModel.pullToRefresh.refresh() }
         chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
+        chart.setAxisVisible(false)
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
@@ -80,6 +83,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         observeActionBottomSheet(viewModel.walletGate)
+        viewModel.pullToRefresh.isRefreshing.observe { swipeRefresh.isRefreshing = it }
         viewModel.subnet.observe { subnet ->
             val name = subnet?.displayName(requireContext()) ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)
@@ -106,7 +110,10 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
                 renderVisibility = { earned.isVisible = it }
             )
         }
-        viewModel.price.observe { price.text = it }
+        viewModel.price.observe {
+            price.text = it.token
+            priceFiat.setTextOrHide(it.fiat)
+        }
         combine(viewModel.charts, viewModel.priceChangeFormatter, ::Pair).observe { (charts, formatter) ->
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
             chart.setCharts(charts)

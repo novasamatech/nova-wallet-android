@@ -82,8 +82,6 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         subnet.setOnClickListener { viewModel.subnetClicked() }
         manualSubnet.setOnClickListener { viewModel.chooseSubnetClicked() }
         manualSubnet.isVisible = viewModel.isQuickPick
-        subnet.isClickable = !viewModel.existingPosition
-        subnetArrow.isVisible = !viewModel.existingPosition
         projectedAveragePrice.isVisible = viewModel.existingPosition
         validator.root.setOnClickListener { viewModel.validatorClicked() }
         validator.setSelectable(!viewModel.existingPosition)

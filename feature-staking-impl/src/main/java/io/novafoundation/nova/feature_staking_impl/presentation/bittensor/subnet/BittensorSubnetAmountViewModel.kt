@@ -814,8 +814,19 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun subnetClicked() = launchUnit {
-        if (existingPosition || validating.value) return@launchUnit
+        if (validating.value) return@launchUnit
         val selectedSubnet = subnet.first() ?: return@launchUnit
+        if (existingPosition) {
+            // Buying more never changes the subnet: details only inform here.
+            router.openBittensorSubnetDetails(
+                BittensorSubnetDetailsPayload(
+                    subnetId = selectedSubnet.id.value,
+                    analyticsSource = SubnetDetailsSource.POSITION,
+                    viewOnly = true
+                )
+            )
+            return@launchUnit
+        }
         val payload = BittensorSubnetDetailsPayload(
             subnetId = selectedSubnet.id.value,
             analyticsSource = SubnetDetailsSource.SETUP,

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.alphaSymbol
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.isNegative
@@ -35,10 +34,10 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
 ) {
 
     fun averagePrice(basis: BittensorEstimatedCostBasis?, position: BittensorExitPosition?, netuid: Int): AmountModel {
-        return averagePrice(basis, netuid, position?.asset?.token, position?.subnet?.symbol)
+        return averagePrice(basis, netuid, position?.asset?.token)
     }
 
-    fun averagePrice(basis: BittensorEstimatedCostBasis?, netuid: Int, token: TokenBase?, alphaSymbol: String?): AmountModel {
+    fun averagePrice(basis: BittensorEstimatedCostBasis?, netuid: Int, token: TokenBase?): AmountModel {
         val totals = basis?.forSubnet(netuid)
         if (totals == null) {
             return if (basis?.canEstimate(netuid) == true) {
@@ -48,15 +47,15 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
             }
         }
         if (token == null) return AmountModel("—", null)
-        return averagePriceOf(totals, token, alphaSymbol)
+        return averagePriceOf(totals, token)
     }
 
     fun averagePrice(sale: BittensorSaleCostBasis, position: BittensorExitPosition?): AmountModel {
-        return averagePrice(sale, position?.asset?.token, position?.let { it.subnet.alphaSymbol(it.netuid.value) })
+        return averagePrice(sale, position?.asset?.token)
     }
 
-    fun averagePrice(sale: BittensorSaleCostBasis, token: TokenBase?, alphaSymbol: String?): AmountModel = when (sale) {
-        is BittensorSaleCostBasis.Known -> token?.let { averagePriceOf(sale.totals, it, alphaSymbol) } ?: AmountModel("—", null)
+    fun averagePrice(sale: BittensorSaleCostBasis, token: TokenBase?): AmountModel = when (sale) {
+        is BittensorSaleCostBasis.Known -> token?.let { averagePriceOf(sale.totals, it) } ?: AmountModel("—", null)
         BittensorSaleCostBasis.NoPurchases -> AmountModel(
             resources.getString(R.string.common_not_available),
             resources.getString(R.string.bittensor_no_purchases)
@@ -71,10 +70,10 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
         return profit(token?.amountFromPlanks(estimatedSaleProfit(totals, quote)), token)
     }
 
-    private fun averagePriceOf(totals: BittensorEstimatedPurchaseTotals, token: TokenBase, alphaSymbol: String?) = AmountModel(
+    /** The average price per alpha with its fiat value underneath, like every other amount row. */
+    private fun averagePriceOf(totals: BittensorEstimatedPurchaseTotals, token: TokenBase) = AmountModel(
         tokenFormatter.formatToken(totals.averagePrice, token.configuration.symbol),
-        alphaSymbol?.takeIf { it.isNotBlank() }
-            ?.let { resources.getString(R.string.bittensor_avg_buy_price_per, it) }
+        token.toFiatOrNull(totals.averagePrice)?.let { fiatFormatter.formatFiat(it, token.currency) }
     )
 
     fun projectedAveragePrice(
@@ -86,7 +85,7 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
     ): BittensorAveragePriceUi {
         val current = basis?.forSubnet(netuid)
         if (current == null || quote == null) {
-            return BittensorAveragePriceUi(averagePrice(basis, netuid, token, alphaSymbol), R.color.text_primary)
+            return BittensorAveragePriceUi(averagePrice(basis, netuid, token), R.color.text_primary)
         }
         val projected = current.adding(quote.totalTaoInPlanks, quote.alphaOutInPlanks)
         val difference = projected.averagePrice.compareTo(current.averagePrice)

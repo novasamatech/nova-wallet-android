@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import android.os.Bundle
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.setTextOrHide
 import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
@@ -60,10 +61,10 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         favorite.setOnClickListener { viewModel.toggleFavorite() }
         availableValidators.adapter = ConcatAdapter(validatorShimmer, validatorAdapter)
         chooseValidator.setOnClickListener { viewModel.validatorClicked() }
-        tao.setOnClickListener { viewModel.showFiat(false) }
-        fiat.setOnClickListener { viewModel.showFiat(true) }
+        useSubnet.isVisible = !viewModel.isViewOnly
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
+        chart.setAxisVisible(false)
         chart.setPlotHeight(208)
         chart.onPeriodSelected = { index ->
             viewModel.selectPeriod(index)
@@ -99,7 +100,6 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             github.isVisible = label != null
         }
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
-        viewModel.nativeTokenSymbol.observe { tao.text = it }
         viewModel.subnet.observe { subnet ->
             val name = subnet.displayName(requireContext())
             toolbar.setTitle(name.ltrIsolated())
@@ -122,11 +122,9 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
                     .build()
             )
         }
-        viewModel.price.observe { price.text = it }
-        viewModel.currencyLabel.observe { fiat.text = it }
-        viewModel.isFiatMode.observe {
-            tao.isSelected = !it
-            fiat.isSelected = it
+        viewModel.price.observe {
+            price.text = it.token
+            priceFiat.setTextOrHide(it.fiat)
         }
         combine(viewModel.charts, viewModel.priceChangeFormatter, ::Pair).observe { (charts, formatter) ->
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }

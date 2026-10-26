@@ -54,6 +54,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         amount.setAssetIconRounded(!viewModel.isRoot)
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
         amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
+        if (!viewModel.isRoot) amount.setAssetClickListener { viewModel.subnetClicked() }
         receive.isVisible = !viewModel.isRoot
         rate.isVisible = !viewModel.isRoot
         averagePrice.isVisible = !viewModel.isRoot
@@ -89,6 +90,11 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
             viewModel.earned.observe { state ->
                 earned.showBittensorLoadingAmount(state.map { it.amount })
                 earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+            }
+            viewModel.earnedDescription.observe { description ->
+                earned.setOnClickListener {
+                    description?.let { DescriptionBottomSheet(requireContext(), getString(R.string.bittensor_exit_earned), it).show() }
+                }
             }
             viewModel.received.observe(receive::showBittensorLoadingAmount)
             viewModel.rate.observe(rate::showBittensorLoadingValue)

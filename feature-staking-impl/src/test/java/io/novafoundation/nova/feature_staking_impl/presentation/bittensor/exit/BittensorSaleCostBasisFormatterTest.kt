@@ -57,7 +57,6 @@ class BittensorSaleCostBasisFormatterTest {
     fun prepareToken() {
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(chainAsset.symbol).thenReturn(TokenSymbol("NATIVE"))
-        `when`(resources.getString(R.string.bittensor_avg_buy_price_per, "α")).thenReturn("per α")
         `when`(resources.getString(R.string.bittensor_avg_buy_price_from, "0.1", "α")).thenReturn("from 0.1 per α")
         `when`(resources.getString(R.string.common_not_available)).thenReturn("Not available")
         `when`(resources.getString(R.string.bittensor_no_purchases)).thenReturn("no purchases")
@@ -68,7 +67,8 @@ class BittensorSaleCostBasisFormatterTest {
         val result = profitFormatter.projectedAveragePrice(basis, null, 1, token, "α")
 
         assertEquals("0.1 NATIVE", result.amount.token)
-        assertEquals("per α", result.amount.fiat)
+        // A token without a known rate has no fiat line; the alpha symbol is no longer shown there.
+        assertNull(result.amount.fiat)
         assertEquals(R.color.text_primary, result.colorRes)
     }
 
@@ -172,15 +172,15 @@ class BittensorSaleCostBasisFormatterTest {
 
     @Test
     fun `sale average shows no purchases only for a settled empty history`() {
-        val known = profitFormatter.averagePrice(BittensorSaleCostBasis.Known(BittensorEstimatedPurchaseTotals(number(10), number(100)), false), token, "α")
+        val known = profitFormatter.averagePrice(BittensorSaleCostBasis.Known(BittensorEstimatedPurchaseTotals(number(10), number(100)), false), token)
         assertEquals("0.1 NATIVE", known.token)
-        assertEquals("per α", known.fiat)
+        assertNull(known.fiat)
 
-        val none = profitFormatter.averagePrice(BittensorSaleCostBasis.NoPurchases, token, "α")
+        val none = profitFormatter.averagePrice(BittensorSaleCostBasis.NoPurchases, token)
         assertEquals("Not available", none.token)
         assertEquals("no purchases", none.fiat)
 
-        val settling = profitFormatter.averagePrice(BittensorSaleCostBasis.Unknown, token, "α")
+        val settling = profitFormatter.averagePrice(BittensorSaleCostBasis.Unknown, token)
         assertEquals("—", settling.token)
         assertNull(settling.fiat)
     }

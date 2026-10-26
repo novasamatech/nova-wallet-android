@@ -49,6 +49,7 @@ dependencies {
     implementation materialDep
     implementation cardViewDep
     implementation constraintDep
+    implementation swipeRefershLayout
 
     implementation permissionsDep
 
