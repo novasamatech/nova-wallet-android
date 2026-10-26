@@ -55,6 +55,11 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
                 binding = { value, _ -> value?.let(::bindBittensorU16) }
             )
     }
+    val linkedHotkeys = async {
+        if (netuid.isRoot()) emptySet() else {
+            loadBittensorValidatorLinks(validators.map { BittensorValidatorLink(it.hotkey, netuid.value) }).mapTo(mutableSetOf()) { it.hotkey }
+        }
+    }
     val commissionsInU16 = async {
         pallet.storage("Delegates")
             .entries(
@@ -70,7 +75,8 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
         permits = permits.await(),
         lastUpdates = updates.await(),
         activeThreshold = activeThreshold.await(),
-        registeredAt = registeredAt.await()
+        registeredAt = registeredAt.await(),
+        linkedHotkeys = linkedHotkeys.await()
     )
 }
 

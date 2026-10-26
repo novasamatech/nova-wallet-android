@@ -22,6 +22,29 @@ class BittensorValidatorSnapshotTest {
 
     private val gates = BittensorValidatorGates(BigDecimal("0.2"), requirePermit = true, requireActive = true)
 
+    @Test
+    fun `linked unregistered validator is active and selectable but not recommended`() {
+        val linked = snapshot.copy(uids = emptyMap(), linkedHotkeys = setOf(validator.hotkey))
+        val subnet = BittensorNetuid.Subnet(64)
+        val row = map(subnet, linked)
+
+        assertFalse(row.inactive)
+        assertTrue(row.canSelect)
+        assertTrue(row.isViaChildKeys)
+        assertFalse(linked.passesBittensorRecommendationGates(subnet, validator.hotkey, gates))
+        assertFalse(map(BittensorNetuid.Root, linked).isViaChildKeys)
+    }
+
+    @Test
+    fun `links do not override an existing uid status`() {
+        val linked = snapshot.copy(permits = listOf(false), linkedHotkeys = setOf(validator.hotkey))
+        val row = map(BittensorNetuid.Subnet(64), linked)
+
+        assertTrue(row.inactive)
+        assertFalse(row.canSelect)
+        assertFalse(row.isViaChildKeys)
+    }
+
     private val snapshot = BittensorValidatorSnapshot(
         uids = mapOf(validator.hotkey to 0),
         commissionsInU16 = mapOf(validator.hotkey to BigInteger.ZERO),
