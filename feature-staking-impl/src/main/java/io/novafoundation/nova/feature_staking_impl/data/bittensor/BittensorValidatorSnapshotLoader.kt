@@ -56,7 +56,9 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
             )
     }
     val linkedHotkeys = async {
-        if (netuid.isRoot()) emptySet() else {
+        if (netuid.isRoot()) {
+            emptySet()
+        } else {
             loadBittensorValidatorLinks(validators.map { BittensorValidatorLink(it.hotkey, netuid.value) }).mapTo(mutableSetOf()) { it.hotkey }
         }
     }
