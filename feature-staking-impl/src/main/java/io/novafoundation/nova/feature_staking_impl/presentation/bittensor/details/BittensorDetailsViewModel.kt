@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorPullToRefresh
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
@@ -110,10 +111,15 @@ class BittensorDetailsViewModel(
     )
         .shareInBackground()
 
+    val pullToRefresh = BittensorPullToRefresh(retryController, portfolioState, this)
+
     private val portfolio = portfolioState.filterLoaded()
         .shareInBackground()
 
-    val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
+    // A pull-to-refresh keeps the current content on screen; only the first load shows the placeholder.
+    val isLoading = combine(portfolioState, pullToRefresh.isRefreshing) { state, refreshing ->
+        !refreshing && (state.isLoading() || state.dataOrNull?.dataStatus is BittensorDataStatus.Loading)
+    }
         .shareInBackground()
 
     private val positionWarning = portfolioState.map { state ->

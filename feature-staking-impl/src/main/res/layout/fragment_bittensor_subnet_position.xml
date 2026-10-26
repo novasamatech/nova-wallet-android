@@ -15,10 +15,15 @@
         app:contentBackground="@android:color/transparent"
         app:dividerVisible="false" />
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -165,12 +170,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp" />
 
-            <TextView
-                android:id="@+id/price"
-                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            <!-- The fiat follows the price and wraps under it when both do not fit (large font scales). -->
+            <com.google.android.flexbox.FlexboxLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="—" />
+                app:alignItems="baseline"
+                app:flexWrap="wrap">
+
+                <TextView
+                    android:id="@+id/price"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="—" />
+
+                <TextView
+                    android:id="@+id/priceFiat"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone" />
+            </com.google.android.flexbox.FlexboxLayout>
 
             <TextView
                 android:id="@+id/change"
@@ -205,6 +227,7 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -59,6 +59,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorPullToRefresh
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.labelRes
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionUi
@@ -141,6 +142,8 @@ class BittensorSubnetPositionViewModel(
         source = bittensorSubnetInteractor::observePortfolio
     )
         .shareInBackground()
+
+    val pullToRefresh = BittensorPullToRefresh(retryController, portfolioState, this)
 
     private val portfolio = portfolioState.map { it.dataOrNull }
         .shareInBackground()
@@ -277,20 +280,22 @@ class BittensorSubnetPositionViewModel(
         val asset = assetState.dataOrNull
         val price = selection?.point?.price ?: subnet?.priceInRao?.let { asset?.token?.amountFromPlanks(it) }
         if (price == null || asset == null) {
-            "—"
+            AmountModel("—", null)
         } else {
-            tokenFormatter.formatToken(price, asset.token.configuration.symbol)
+            AmountModel(
+                tokenFormatter.formatToken(price, asset.token.configuration.symbol),
+                asset.token.toFiatOrNull(price)?.let { fiatFormatter.formatFiat(it, asset.token.currency) }
+            )
         }
     }
         .shareInBackground()
 
     val averagePrice = combine(
         costBasisUpdate,
-        chartAssetState,
-        subnet
-    ) { update, assetState, subnet ->
+        chartAssetState
+    ) { update, assetState ->
         resolveSaleCostBasis(update, subnetId.value).map { sale ->
-            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token, subnet.alphaSymbol(subnetId.value))
+            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token)
         }
     }
         .shareInBackground()

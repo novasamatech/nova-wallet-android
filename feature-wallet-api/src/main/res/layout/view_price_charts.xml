@@ -117,6 +117,7 @@
         app:layout_constraintTop_toTopOf="@+id/priceChart">
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.ChartsShimmeringView
+            android:id="@+id/priceChartPlotShimmering"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="26dp"

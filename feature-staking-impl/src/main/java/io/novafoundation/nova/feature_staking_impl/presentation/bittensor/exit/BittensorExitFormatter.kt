@@ -110,6 +110,16 @@ class BittensorExitFormatter @Inject constructor(
         resources.getString(R.string.bittensor_average_price_description, alphaSymbol(position), it.title(resources))
     }
 
+    /** The Earned explanation, including why the value lags behind the rest of the screen; a root unstake has none. */
+    fun earnedDescription(position: BittensorExitPosition): String? {
+        if (position.isRoot) return null
+        return resources.getString(
+            R.string.bittensor_exit_earned_description,
+            position.asset.token.configuration.symbol.value,
+            alphaSymbol(position)
+        )
+    }
+
     fun exchangeRate(draft: BittensorExitDraft?): String {
         draft ?: return "—"
         return exchangeRate(draft.position, draft.quote)

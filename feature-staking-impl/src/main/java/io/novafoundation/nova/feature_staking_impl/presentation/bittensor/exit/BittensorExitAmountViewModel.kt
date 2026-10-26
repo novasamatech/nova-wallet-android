@@ -372,6 +372,9 @@ class BittensorExitAmountViewModel(
     val averagePriceDescription = position.map { it?.let(exitFormatter::averagePriceDescription) }
         .shareInBackground()
 
+    val earnedDescription = position.map { it?.let(exitFormatter::earnedDescription) }
+        .shareInBackground()
+
     val earned = combine(
         saleCostBasis,
         requestState

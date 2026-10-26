@@ -2969,13 +2969,13 @@
     <string name="bittensor_price_impact_message">This order moves the pool price by %s. You will receive noticeably less than the current spot value suggests. Proceed anyway?</string>
     <string name="bittensor_exchange_rate">Swap rate</string>
     <string name="bittensor_you_will_earn">You will earn</string>
-    <string name="bittensor_avg_buy_price_per">per %1$s</string>
     <string name="bittensor_avg_buy_price_from">from %1$s per %2$s</string>
     <string name="bittensor_no_purchases">no purchases</string>
     <string name="bittensor_sale_profit_disclaimer">Profit is estimated from the average price you paid, before the network fee. The rate can change until the order fills.</string>
     <string name="bittensor_swap_rate_sell_description">How much %1$s you get for 1 %2$s right now. The rate is set by the subnet’s liquidity pool and changes with every trade. It already includes the %3$s%% Nova Wallet fee.</string>
     <string name="bittensor_average_price_description">The average price you paid per %1$s for your current %2$s position. Buying above it moves the average up, buying below moves it down. We use it to work out what you earn when you sell.</string>
     <string name="bittensor_sale_profit_description">The difference between what you paid for these tokens on average and what you get for them now, in %1$s, before the network fee. The average price comes from your purchases.</string>
+    <string name="bittensor_exit_earned_description">What you earn or lose if you sell this amount now: the %1$s you receive minus what you paid for these %2$s on average, before the network fee. It is worked out from your purchase history, so it appears a few seconds after the screen opens.</string>
     <string name="bittensor_swap_rate_buy_description">How many %1$s you get for 1 %2$s right now. The rate is set by the subnet’s liquidity pool and changes with every trade. It already includes the %3$s%% Nova Wallet fee.</string>
     <string name="bittensor_slippage_description">The most the price may move while your order fills. If it moves more than %1$s, the network cancels the order and only the network fee is charged.</string>
     <string name="bittensor_validator_description">The validator stakes your tokens on the subnet and pays out the rewards. A validator is preset for you; tap Validator on the subnet details to pick another one.</string>

@@ -44,10 +44,12 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
         unstake.setOnClickListener { viewModel.unstakeRoot() }
         validators.adapter = adapter
         rewards.valueSecondary.setTextColorRes(R.color.text_secondary)
+        swipeRefresh.setOnRefreshListener { viewModel.pullToRefresh.refresh() }
     }
 
     override fun subscribe(viewModel: BittensorRootDetailsViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
+        viewModel.pullToRefresh.isRefreshing.observe { swipeRefresh.isRefreshing = it }
         observeActionBottomSheet(viewModel.walletGate)
         setupExternalActions(viewModel)
         viewModel.isLoading.observe {

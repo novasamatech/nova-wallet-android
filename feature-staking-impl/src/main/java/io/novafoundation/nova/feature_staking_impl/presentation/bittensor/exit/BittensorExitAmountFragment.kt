@@ -90,6 +90,11 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
                 earned.showBittensorLoadingAmount(state.map { it.amount })
                 earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
             }
+            viewModel.earnedDescription.observe { description ->
+                earned.setOnClickListener {
+                    description?.let { DescriptionBottomSheet(requireContext(), getString(R.string.bittensor_exit_earned), it).show() }
+                }
+            }
             viewModel.received.observe(receive::showBittensorLoadingAmount)
             viewModel.rate.observe(rate::showBittensorLoadingValue)
             viewModel.swapRateDescription.observe { description ->

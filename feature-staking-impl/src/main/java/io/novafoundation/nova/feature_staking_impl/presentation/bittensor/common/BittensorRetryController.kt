@@ -13,6 +13,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -42,6 +43,14 @@ class BittensorRetryController(
 
     val events: Flow<BittensorReadFailure> = pending.filterNotNull()
 
+    // Bumped by pull-to-refresh; every read observed through this controller restarts.
+    private val refreshes = MutableStateFlow(0L)
+
+    /** Restarts every read observed through [observe] and [observeInline], e.g. on pull-to-refresh. */
+    fun reload() {
+        refreshes.update { it + 1 }
+    }
+
     fun <T, R> observe(
         step: String,
         analytics: BittensorReadAnalytics? = null,
@@ -49,7 +58,7 @@ class BittensorRetryController(
         source: () -> Flow<T>
     ): Flow<R> {
         val reload = MutableStateFlow(0L)
-        return reload.flatMapLatest {
+        return combine(reload, refreshes) { attempt, refresh -> attempt to refresh }.flatMapLatest {
             val attempt = flowOfAll { source() }
                 .catch { cause ->
                     // A child request timing out is a failed read, not cancellation of this screen.
@@ -99,7 +108,7 @@ class BittensorRetryController(
         transform: (Flow<T>) -> Flow<R>,
         source: () -> Flow<T>
     ): Flow<R> {
-        return retry.attempts.flatMapLatest { attempt ->
+        return combine(retry.attempts, refreshes) { attempt, refresh -> attempt to refresh }.flatMapLatest { (attempt, _) ->
             if (attempt > 0) analytics?.retry()
             val read = flowOfAll { source() }
                 .catch { cause ->

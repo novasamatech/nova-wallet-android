@@ -43,6 +43,7 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         onBackPressed { viewModel.back() }
         positions.adapter = adapter
         addPosition.setOnClickListener { viewModel.addPosition() }
+        swipeRefresh.setOnRefreshListener { viewModel.pullToRefresh.refresh() }
         priceChart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         priceChart.setTitle(getString(R.string.staking_validator_total_stake))
         priceChart.setPlotHeight(156)
@@ -61,6 +62,7 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
     override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
         observeActionBottomSheet(viewModel.walletGate)
+        viewModel.pullToRefresh.isRefreshing.observe { swipeRefresh.isRefreshing = it }
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)
