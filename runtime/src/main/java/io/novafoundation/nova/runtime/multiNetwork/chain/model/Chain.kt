@@ -64,8 +64,13 @@ data class Chain(
         val disabledCheckMetadataHash: Boolean?,
         val sessionLength: Int?,
         val sessionsPerEra: Int?,
-        val timelineChain: ChainId?
+        val timelineChain: ChainId?,
+        val newFeatures: Set<NewFeature>? = null
     )
+
+    enum class NewFeature {
+        STAKING
+    }
 
     data class Types(
         val url: String?,
@@ -131,7 +136,8 @@ data class Chain(
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
             PARACHAIN, TURING, // parachain-staking like
             NOMINATION_POOLS,
-            MYTHOS
+            MYTHOS,
+            BITTENSOR_ROOT
         }
 
         override val identifier = "$chainId:$id"

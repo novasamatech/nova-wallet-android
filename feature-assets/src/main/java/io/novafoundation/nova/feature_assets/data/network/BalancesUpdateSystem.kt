@@ -10,21 +10,26 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AutoEnableTokensRepository
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
+import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.BittensorBalanceUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.ext.isDisabled
 import io.novafoundation.nova.runtime.ext.isFullSync
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
@@ -43,11 +48,13 @@ class BalancesUpdateSystem(
     private val paymentUpdaterFactory: PaymentUpdaterFactory,
     private val balanceLocksUpdater: BalanceLocksUpdaterFactory,
     private val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
+    private val bittensorBalanceUpdaterFactory: BittensorBalanceUpdaterFactory,
     private val accountUpdateScope: AccountUpdateScope,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val walletRepository: WalletRepository,
     private val assetVisibilityRepository: AssetVisibilityRepository,
     private val autoEnableTokensRepository: AutoEnableTokensRepository,
+    private val externalBalanceRepository: ExternalBalanceRepository,
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
@@ -72,13 +79,27 @@ class BalancesUpdateSystem(
     private fun showTokensWithBalance(metaAccount: MetaAccount): Flow<Updater.SideEffect> {
         return autoEnableTokensRepository.autoEnableTokensFlow(metaAccount.id)
             .flatMapLatest { enabled ->
-                if (enabled) walletRepository.syncedAssetsFlow(metaAccount.id) else emptyFlow()
+                if (enabled) observeHeldAssets(metaAccount.id) else emptyFlow()
             }
-            .map { assets -> assets.filter(::hasPositiveBalance).mapTo(mutableSetOf()) { it.token.configuration.fullId } }
             // Balances tick constantly while the set of assets holding them barely changes
             .distinctUntilChanged()
             .onEach { assetVisibilityRepository.showIfUndecided(metaAccount.id, it) }
             .transform { }
+    }
+
+    private fun observeHeldAssets(metaId: Long): Flow<Set<FullChainAssetId>> {
+        return combine(
+            walletRepository.syncedAssetsFlow(metaId),
+            externalBalanceRepository.observeAccountExternalBalances(metaId)
+        ) { assets, externalBalances ->
+            val heldAssets = assets
+                .filter(::hasPositiveBalance)
+                .mapTo(mutableSetOf()) { it.token.configuration.fullId }
+            externalBalances
+                .filter { it.amount.isPositive() }
+                .mapTo(heldAssets) { it.chainAssetId }
+            heldAssets
+        }
     }
 
     private fun hasPositiveBalance(asset: Asset): Boolean = asset.total > BigDecimal.ZERO
@@ -147,7 +168,8 @@ class BalancesUpdateSystem(
         return listOf(
             paymentUpdaterFactory.createFullSync(chain),
             balanceLocksUpdater.create(chain),
-            pooledBalanceUpdaterFactory.create(chain)
+            pooledBalanceUpdaterFactory.create(chain),
+            bittensorBalanceUpdaterFactory.create(chain)
         )
     }
 

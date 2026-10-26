@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
@@ -77,10 +78,15 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.icon.IconGenerator
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.util.Random
 import javax.inject.Named
 
 interface AccountFeatureDependencies {
+
+    fun sharedPreferences(): SharedPreferences
+
+    fun logger(): Logger
 
     fun analyticsService(): AnalyticsService
 

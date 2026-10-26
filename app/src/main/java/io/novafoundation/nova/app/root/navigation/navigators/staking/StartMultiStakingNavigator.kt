@@ -36,6 +36,10 @@ class StartMultiStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openBittensorRootStaking() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_staking).navigateInFirstAttachedContext()
+    }
+
     override fun openStartMythosStaking() {
         navigationBuilder().action(R.id.action_startStakingLandingFragment_to_staking_mythos_start_graph)
             .navigateInFirstAttachedContext()

@@ -10,6 +10,7 @@ fun ResourceManager.formatStakingTypeLabel(stakingType: Chain.Asset.StakingType)
     return when (stakingType.group()) {
         StakingTypeGroup.RELAYCHAIN -> getString(R.string.setup_staking_type_direct_staking)
         StakingTypeGroup.NOMINATION_POOL -> getString(R.string.setup_staking_type_pool_staking)
+        StakingTypeGroup.BITTENSOR -> getString(R.string.bittensor_root_staking)
         StakingTypeGroup.UNSUPPORTED, StakingTypeGroup.PARACHAIN, StakingTypeGroup.MYTHOS -> error("Not yet available")
     }
 }

@@ -29,6 +29,17 @@
         android:textColor="@color/text_primary"
         tools:text="Stake more" />
 
+    <TextView
+        android:id="@+id/itemManageStakingActionDetail"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
+        tools:text="0.0312 TAO" />
+
     <io.novafoundation.nova.common.view.CounterView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

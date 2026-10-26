@@ -10,6 +10,7 @@ import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.dashboard.BittensorDashboardDetailsSource
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -33,6 +34,7 @@ class StakingDashboardModule {
     @ViewModelKey(StakingDashboardViewModel::class)
     fun provideViewModel(
         interactor: StakingDashboardInteractor,
+        bittensorDetailsSource: BittensorDashboardDetailsSource,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         dashboardUpdateSystem: StakingDashboardUpdateSystem,
@@ -49,6 +51,7 @@ class StakingDashboardModule {
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
+            bittensorDetailsSource = bittensorDetailsSource,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             stakingDashboardUpdateSystem = dashboardUpdateSystem,

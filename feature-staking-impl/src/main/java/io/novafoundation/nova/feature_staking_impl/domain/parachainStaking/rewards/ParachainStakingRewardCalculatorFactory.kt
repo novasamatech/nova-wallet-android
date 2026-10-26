@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.rewa
 
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.CollatorSnapshot
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
@@ -33,7 +34,7 @@ class ParachainStakingRewardCalculatorFactory(
         return when (stakingOption.additional.stakingType) {
             PARACHAIN -> defaultCalculator(chainId, snapshots)
             TURING -> turingCalculator(chainId, snapshots)
-            NOMINATION_POOLS, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED, MYTHOS -> {
+            NOMINATION_POOLS, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED, MYTHOS, Chain.Asset.StakingType.BITTENSOR_ROOT -> {
                 throw IllegalStateException("Unknown staking type in ParachainStakingRewardCalculatorFactory")
             }
         }

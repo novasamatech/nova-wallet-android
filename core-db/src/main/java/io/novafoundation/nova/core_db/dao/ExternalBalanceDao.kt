@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import io.novafoundation.nova.core_db.model.AggregatedExternalBalanceLocal
 import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -12,6 +13,20 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExternalBalanceDao {
+
+    @Transaction
+    suspend fun runInTransaction(action: suspend () -> Unit) {
+        action()
+    }
+
+    @Query("SELECT * FROM externalBalances WHERE metaId = :metaId AND chainId = :chainId AND assetId = :assetId AND type = :type AND subtype = :subtype")
+    suspend fun getExternalBalance(
+        metaId: Long,
+        chainId: String,
+        assetId: Int,
+        type: ExternalBalanceLocal.Type,
+        subtype: String
+    ): ExternalBalanceLocal?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertExternalBalance(externalBalance: ExternalBalanceLocal)

@@ -95,6 +95,10 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
         rewardsFiatGroup.applyState(rewardsState) { setMaskableText(it.maskableFiat()) }
     }
 
+    fun setStakeTitle(title: String?) {
+        binder.itemDashboardHasStakeStakeLabel.text = title ?: context.getString(R.string.staking_your_stake)
+    }
+
     fun setStake(stake: SyncingData<MaskableModel<AmountModel>>) {
         binder.itemDashboardHasStakeStakeAmount.setMaskableText(stake.data.maskableToken())
         binder.itemDashboardHasStakeStakeAmountContainer.setShimmerShown(stake.isSyncing)

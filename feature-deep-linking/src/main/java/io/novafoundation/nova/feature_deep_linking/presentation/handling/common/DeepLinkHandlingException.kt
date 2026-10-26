@@ -2,6 +2,15 @@ package io.novafoundation.nova.feature_deep_linking.presentation.handling.common
 
 sealed class DeepLinkHandlingException : Exception() {
 
+    sealed class StakingHandlingException : DeepLinkHandlingException() {
+
+        object ChainIsNotFound : StakingHandlingException()
+
+        object AssetIsNotFound : StakingHandlingException()
+
+        object StakingIsNotSupported : StakingHandlingException()
+    }
+
     sealed class ReferendumHandlingException : DeepLinkHandlingException() {
 
         object ReferendumIsNotSpecified : ReferendumHandlingException()

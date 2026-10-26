@@ -4,9 +4,10 @@ import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.analytics.StakingStage
-import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.isLoading
@@ -20,6 +21,7 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
@@ -44,47 +46,58 @@ import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRecommendedYieldInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.awaitStakingStarted
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.LandingAvailableBalance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.ParticipationInGovernance
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.Payouts
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StartStakingCompoundData
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.StartStakingLandingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.handleStartStakingLandingValidationFailure
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.validations.startStalingLanding
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWalletGate
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StakingConditionRVItem
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
-import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
-import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
+import java.math.BigInteger
+import kotlin.time.Duration
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.math.BigInteger
-import kotlin.time.Duration
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 
 class StartStakingInfoModel(
     val title: CharSequence,
@@ -111,7 +124,11 @@ class StartStakingLandingViewModel(
     private val contextManager: ContextManager,
     private val amountFormatter: AmountFormatter,
     private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val bittensorSubnetInteractor: BittensorSubnetInteractor,
+    private val bittensorRecommendedYieldInteractor: BittensorRecommendedYieldInteractor,
+    private val bittensorRetryController: BittensorRetryController,
+    val walletGate: BittensorWalletGate
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
@@ -127,16 +144,26 @@ class StartStakingLandingViewModel(
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
     private val stakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds()
 
+    val isBittensor = availableStakingOptionsPayload.stakingTypes.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT
+
+    val retryEvents = bittensorRetryController.events
+
     val announcementFlow = stakingAnnouncementsUseCase.announcementFlow(availableStakingOptionsPayload.chainId)
         .map { announcement -> announcement?.let(::mapAnnouncementToUi) }
         .shareInBackground()
 
-    private val startStakingInteractor = flowOf {
-        stakingTypeDetailsCompoundInteractorFactory.create(
-            multiStakingOptionIds = stakingOptionIds,
-            computationalScope = this
-        )
-    }.shareInBackground()
+    private val startStakingInteractor = (
+        if (isBittensor) {
+            emptyFlow()
+        } else {
+            flowOf {
+                stakingTypeDetailsCompoundInteractorFactory.create(
+                    multiStakingOptionIds = stakingOptionIds,
+                    computationalScope = this
+                )
+            }
+        }
+        ).shareInBackground()
 
     val acknowledgeStakingStarted = actionAwaitableMixinFactory.confirmingAction<AcknowledgeStakingStartedTitle>()
 
@@ -146,7 +173,7 @@ class StartStakingLandingViewModel(
         .withSafeLoading()
         .shareInBackground()
 
-    val modelFlow = startStakingInfo
+    private val regularModelFlow = startStakingInfo
         .mapLoading {
             val themeColor = getThemeColor(it.chain)
             StartStakingInfoModel(
@@ -159,13 +186,31 @@ class StartStakingLandingViewModel(
         .onEach { it.onError { Log.e("StartStakingLandingViewModel", "Failed to load staking info", it) } }
         .shareInBackground()
 
-    private val availableBalance = startStakingInteractor.flatMapLatest { interactor ->
-        interactor.observeAvailableBalance()
-    }.shareInBackground()
+    val modelFlow = (if (isBittensor) observeBittensorModel() else regularModelFlow)
+        .shareInBackground()
+
+    private val availableBalance = (
+        if (isBittensor) {
+            bittensorRetryController.observe(
+                step = "available staking balance",
+                transform = { it.catch { cause -> if (cause is CancellationException) throw cause } },
+                source = bittensorSubnetInteractor::observeAsset
+            ).map { LandingAvailableBalance(it, it.transferableInPlanks) }
+        } else {
+            startStakingInteractor.flatMapLatest { interactor ->
+                interactor.observeAvailableBalance()
+            }
+        }
+        ).shareInBackground()
 
     val availableBalanceTextFlow = availableBalance.map { availableBalance ->
         val amountModel = amountFormatter.formatAmountToAmountModel(availableBalance.availableBalance, availableBalance.asset.token)
-        resourceManager.getString(R.string.start_staking_fragment_available_balance, amountModel.token, amountModel.fiat!!)
+        val fiat = amountModel.fiat
+        if (fiat == null) {
+            resourceManager.getString(R.string.common_available_format, amountModel.token)
+        } else {
+            resourceManager.getString(R.string.start_staking_fragment_available_balance, amountModel.token, fiat)
+        }
     }.shareInBackground()
 
     private val validationInProgressFlow = MutableStateFlow(false)
@@ -177,9 +222,10 @@ class StartStakingLandingViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     init {
-        launchSync()
-
-        closeOnStakingStarted()
+        if (!isBittensor) {
+            launchSync()
+            closeOnStakingStarted()
+        }
     }
 
     fun back() {
@@ -190,12 +236,17 @@ class StartStakingLandingViewModel(
         stakingRouter.openDAppBrowser(url)
     }
 
-    fun continueClicked() = launch {
-        val interactor = startStakingInteractor.first()
+    fun continueClicked() = continueToSetup(allOptions = false)
 
-        val validationSystem = interactor.validationSystem()
+    fun allOptionsClicked() {
+        if (isBittensor) continueToSetup(allOptions = true)
+    }
+
+    private fun continueToSetup(allOptions: Boolean) = launch {
+        val interactor = if (isBittensor) null else startStakingInteractor.first()
+        val validationSystem = interactor?.validationSystem() ?: ValidationSystem.startStalingLanding()
         val payload = StartStakingLandingValidationPayload(
-            chain = interactor.chain,
+            chain = interactor?.chain ?: chainRegistry.getChain(availableStakingOptionsPayload.chainId),
             metaAccount = selectedMetaAccountUseCase.getSelectedMetaAccount()
         )
 
@@ -213,7 +264,24 @@ class StartStakingLandingViewModel(
         ) {
             validationInProgressFlow.value = false
 
-            openStartStaking()
+            if (isBittensor) {
+                launch { continueToBittensorSetup(payload.metaAccount, allOptions) }
+            } else {
+                openStartStaking()
+            }
+        }
+    }
+
+    // Past the account check, an unsupported wallet gets the sheet instead of the setup,
+    // and the landing is then not reported as abandoned.
+    private suspend fun continueToBittensorSetup(wallet: MetaAccount, allOptions: Boolean) {
+        walletGate.checkingSupport(wallet, StakingFlow.STAKE, target = null, onRefusal = { flowContinued = true }) {
+            if (allOptions) {
+                flowContinued = true
+                stakingRouter.openBittensorChooseSubnet()
+            } else {
+                openStartStaking()
+            }
         }
     }
 
@@ -265,8 +333,48 @@ class StartStakingLandingViewModel(
             StakingTypeGroup.NOMINATION_POOL -> router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
 
             StakingTypeGroup.MYTHOS -> router.openStartMythosStaking()
+            StakingTypeGroup.BITTENSOR -> stakingRouter.openBittensorWhereToStake()
 
             StakingTypeGroup.UNSUPPORTED -> Unit
+        }
+    }
+
+    private fun observeBittensorModel() = bittensorRetryController.observe(
+        step = "staking introduction",
+        transform = { it.withSafeLoading() }
+    ) {
+        combine(
+            bittensorSubnetInteractor.observeAsset(),
+            flowOf { requireNotNull(bittensorRecommendedYieldInteractor.maximumYields().values.maxOrNull()) }
+        ) { asset, maximumYield ->
+            val chain = chainRegistry.getChain(availableStakingOptionsPayload.chainId)
+            val themeColor = getThemeColor(chain)
+            val accentColor = resourceManager.getColor(R.color.button_text_accent)
+            val rootAccent = resourceManager.getString(R.string.bittensor_intro_root_accent, asset.token.configuration.symbol.value)
+                .toSpannable(colorSpan(accentColor))
+            val subnetAccent = resourceManager.getString(R.string.bittensor_intro_subnet_accent).toSpannable(colorSpan(accentColor))
+            val rewardsAccent = resourceManager.getString(R.string.bittensor_intro_rewards_accent).toSpannable(colorSpan(accentColor))
+            val unstakeAccent = resourceManager.getString(R.string.bittensor_intro_unstake_accent).toSpannable(colorSpan(accentColor))
+            StartStakingInfoModel(
+                title = createTitle(asset.token.configuration, maximumYield.percents, themeColor),
+                conditions = listOf(
+                    StakingConditionRVItem(
+                        R.drawable.ic_stake_anytime,
+                        resourceManager.getString(R.string.bittensor_intro_root).formatAsSpannable(rootAccent)
+                    ),
+                    StakingConditionRVItem(
+                        R.drawable.ic_bittensor_intro_subnet,
+                        resourceManager.getString(R.string.bittensor_intro_subnet).formatAsSpannable(subnetAccent)
+                    ),
+                    StakingConditionRVItem(R.drawable.ic_rewards, resourceManager.getString(R.string.bittensor_intro_rewards).formatAsSpannable(rewardsAccent)),
+                    StakingConditionRVItem(
+                        R.drawable.ic_unstake_anytime,
+                        resourceManager.getString(R.string.bittensor_intro_unstake).formatAsSpannable(unstakeAccent)
+                    )
+                ),
+                moreInfo = resourceManager.getString(R.string.bittensor_intro_caption),
+                buttonColor = themeColor
+            )
         }
     }
 

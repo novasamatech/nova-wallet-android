@@ -39,6 +39,19 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
     @Inject
     lateinit var branchIOLinkHandler: BranchIOLinkHandler
 
+    @Inject
+    lateinit var debugMenuShakeListener: DebugMenuShakeListener
+
+    override fun onResume() {
+        super.onResume()
+        debugMenuShakeListener.start(this)
+    }
+
+    override fun onPause() {
+        debugMenuShakeListener.stop()
+        super.onPause()
+    }
+
     override fun createBinding(): ActivityRootBinding {
         return ActivityRootBinding.inflate(LayoutInflater.from(this))
     }

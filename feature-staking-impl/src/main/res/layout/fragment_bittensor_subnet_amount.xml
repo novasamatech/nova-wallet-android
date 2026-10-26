@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical" >
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:iconRight="@drawable/ic_settings_outline"
+        app:titleText="@string/bittensor_earn_title"
+        app:dividerVisible="false" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="vertical" >
+            <include
+                android:id="@+id/fundingCard"
+                layout="@layout/view_bittensor_get_asset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:visibility="gone" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+                android:id="@+id/amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                app:title="@string/bittensor_you_stake" />
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/reserveWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/selectionError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
+
+            <TextView
+                android:id="@+id/subnetSectionTitle"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:textColor="@color/text_secondary" />
+
+            <include
+                android:id="@+id/selectionSkeleton"
+                layout="@layout/view_bittensor_pick_card_skeleton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/selectedSubnetCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:orientation="vertical"
+                android:background="@drawable/bg_primary_list_item_corner_12_solid" >
+                <LinearLayout
+                    android:id="@+id/subnet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:background="?attr/selectableItemBackground" >
+                    <ImageView
+                        android:id="@+id/subnetIcon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="fitCenter"
+                        android:importantForAccessibility="no" />
+                    <TextView
+                        android:id="@+id/subnetName"
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginHorizontal="10dp"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+                    <ImageView
+                        android:id="@+id/subnetArrow"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/icon_secondary"
+                        android:importantForAccessibility="no" />
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/subnetChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone"
+                    app:chipSpacingHorizontal="6dp"
+                    app:chipSpacingVertical="6dp" />
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    app:showBackground="false"
+                    app:childrenPaddingStart="0dp"
+                    app:childrenPaddingEnd="0dp"
+                    app:childrenPaddingTop="0dp"
+                    app:childrenPaddingBottom="0dp"
+                    app:drawDividers="true" >
+                    <include
+                        android:id="@+id/validator"
+                        layout="@layout/view_bittensor_validator_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/receive"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="@android:color/transparent"
+                        app:title="@string/bittensor_you_receive" />
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/rate"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="@android:color/transparent"
+                        app:title="@string/bittensor_exchange_rate"
+                        app:titleIcon="@drawable/ic_info" />
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/monthlyTokens"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        app:title="@string/bittensor_monthly_tokens" />
+                    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                        android:id="@+id/networkFee"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        app:title="@string/network_fee" />
+                </io.novafoundation.nova.common.view.TableView>
+
+                <TextView
+                    android:id="@+id/manualSubnet"
+                    style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="12dp"
+                    android:drawablePadding="2dp"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="4dp"
+                    android:text="@string/bittensor_see_all_subnets"
+                    android:textColor="@color/button_text_accent"
+                    android:visibility="gone"
+                    app:drawableEndCompat="@drawable/ic_chevron_right_16"
+                    app:drawableTint="@color/icon_accent" />
+
+            </LinearLayout>
+
+            <!-- Buy more: the average buy price sits in its own card under the pick card (iOS / Figma B-10). -->
+            <io.novafoundation.nova.common.view.TableView
+                android:id="@+id/projectedAveragePriceCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:childrenPaddingStart="12dp"
+                app:childrenPaddingEnd="12dp" >
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/projectedAveragePrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="52dp"
+                    android:visibility="gone"
+                    app:title="@string/bittensor_exit_avg_buy_price"
+                    app:titleIcon="@drawable/ic_info" />
+            </io.novafoundation.nova.common.view.TableView>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="84dp"
+        android:background="@drawable/bg_bittensor_bottom_button_container"
+        android:padding="16dp" >
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/continueButton"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/common_continue" />
+    </FrameLayout>
+</LinearLayout>

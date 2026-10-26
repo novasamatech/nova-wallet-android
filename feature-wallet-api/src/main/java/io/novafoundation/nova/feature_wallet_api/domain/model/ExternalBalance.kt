@@ -11,7 +11,7 @@ class ExternalBalance(
 ) {
 
     enum class Type {
-        CROWDLOAN, NOMINATION_POOL
+        CROWDLOAN, NOMINATION_POOL, BITTENSOR
     }
 }
 

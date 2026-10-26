@@ -69,6 +69,8 @@ import io.novafoundation.nova.analytics.AnalyticsService
 
 interface RootDependencies {
 
+    fun preferences(): io.novafoundation.nova.common.data.storage.Preferences
+
     val stakingDeepLinks: StakingDeepLinks
 
     val accountDeepLinks: AccountDeepLinks

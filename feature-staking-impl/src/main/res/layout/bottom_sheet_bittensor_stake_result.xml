@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_marginTop="6dp" />
+
+    <LinearLayout
+        android:id="@+id/bittensorStakeResultProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/bittensorStakeResultProgressTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:textColor="@color/text_primary"
+            tools:text="Staking…" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bittensorStakeResultSpinner"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/ic_bittensor_staking_spinner" />
+
+        <TextView
+            android:id="@+id/bittensorStakeResultProgressDescription"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            tools:text="Staking 20 TOKEN to root · usually a few seconds" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bittensorStakeResultSuccess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/ic_bittensor_staking_success" />
+
+        <TextView
+            android:id="@+id/bittensorStakeResultSuccessTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:textColor="@color/text_primary"
+            tools:text="You staked 20 TOKEN to root" />
+
+        <TextView
+            android:id="@+id/bittensorStakeResultSuccessDescription"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            tools:text="Rewards accrue every day. Your position is live." />
+
+        <io.novafoundation.nova.common.view.TableView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:childrenPaddingBottom="0dp"
+            app:childrenPaddingEnd="16dp"
+            app:childrenPaddingStart="16dp"
+            app:childrenPaddingTop="0dp"
+            app:drawDividers="true">
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/common_amount" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultValidator"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                app:title="@string/bittensor_validator"
+                tools:primaryValue="Nova Wallet" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultStakeAfter"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:visibility="gone"
+                app:title="@string/bittensor_claim_stake_after"
+                tools:primaryValue="12.5 TOKEN"
+                tools:visibility="visible" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultFee"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                app:shouldDrawDivider="false"
+                app:title="@string/network_fee"
+                tools:primaryValue="0.0015 TOKEN"
+                tools:secondaryValue="$0.51" />
+        </io.novafoundation.nova.common.view.TableView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bittensorStakeResultFailure"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="20dp"
+            android:id="@+id/bittensorStakeResultStatusIcon"
+            android:src="@drawable/ic_bittensor_staking_error" />
+
+        <TextView
+            android:id="@+id/bittensorStakeResultFailureTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:textColor="@color/text_primary"
+            tools:text="Staking failed" />
+
+        <TextView
+            android:id="@+id/bittensorStakeResultFailureDescription"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            tools:text="The transaction did not go through. Nothing was spent — you can try again." />
+
+        <io.novafoundation.nova.common.view.TableView
+            android:id="@+id/bittensorStakeResultFailureFees"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            app:childrenPaddingBottom="0dp"
+            app:childrenPaddingEnd="16dp"
+            app:childrenPaddingStart="16dp"
+            app:childrenPaddingTop="0dp"
+            app:drawDividers="true"
+            tools:visibility="visible">
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultFailureFee"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                app:shouldDrawDivider="false"
+                app:title="@string/network_fee"
+                tools:primaryValue="0.0015 TOKEN"
+                tools:secondaryValue="$0.51" />
+        </io.novafoundation.nova.common.view.TableView>
+
+        <io.novafoundation.nova.common.view.AlertView
+            android:id="@+id/bittensorStakeResultError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:alertMode="error"
+            app:styleBackgroundColor="@color/error_block_background"
+            app:styleIcon="@drawable/ic_bittensor_x_clear_filled"
+            tools:text="RootStakeLocked — the root stake is still locked after the last stake change. Try again in 2 d 4 h." />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bittensorStakeResultActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/bittensorStakeResultSecondaryAction"
+            style="@style/Widget.Nova.Button.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            tools:text="@string/bittensor_discover_subnets" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/bittensorStakeResultPrimaryAction"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            tools:text="@string/bittensor_view_position" />
+    </LinearLayout>
+</LinearLayout>

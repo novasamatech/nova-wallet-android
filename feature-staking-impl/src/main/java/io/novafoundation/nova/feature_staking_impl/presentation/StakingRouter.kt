@@ -1,6 +1,25 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
+
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
+
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
+
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitReviewPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
@@ -101,5 +120,47 @@ interface StakingRouter {
 
     fun openDAppBrowser(url: String)
 
-    fun openStakingDashboard()
+    fun openStakingDashboard(target: StakingDeepLinkTarget? = null)
+
+    fun openBittensorExitAmount(position: BittensorExitPositionPayload)
+
+    fun openBittensorExitReview(review: BittensorExitReviewPayload)
+
+    fun openBittensorRootClaim(payload: BittensorRootClaimPayload)
+
+    fun openBittensorRootStaking(
+        payload: BittensorStakeAmountPayload? = null,
+        selectionState: BittensorSelectionState = BittensorSelectionState()
+    )
+
+    fun openBittensorPortfolio(payload: BittensorPortfolioPayload)
+
+    /** Opens the Bittensor Earn landing on top of the current screen ("Add position" on the portfolio). */
+    fun openBittensorStartStaking(payload: StartStakingLandingPayload)
+
+    /** Leaves a finished Bittensor operation, dropping its flow screens from the back stack. */
+    fun finishBittensorFlow(exit: BittensorFlowExit)
+
+    fun openBittensorRootDetails()
+
+    fun openBittensorStakeConfirm(payload: BittensorStakeConfirmPayload)
+
+    fun openBittensorChooseSubnet(payload: BittensorChooseSubnetPayload = BittensorChooseSubnetPayload())
+
+    fun replaceBittensorSubnetAmountWithRoot(
+        selectionState: BittensorSelectionState,
+        quickPick: Boolean = false
+    )
+
+    fun openBittensorWhereToStake()
+
+    fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload)
+
+    fun openBittensorValidatorInfo(payload: BittensorValidatorInfoPayload)
+
+    fun openBittensorSubnetPosition(payload: BittensorSubnetPositionPayload)
+
+    fun openBittensorSubnetAmount(payload: BittensorSubnetAmountPayload)
+
+    fun openBittensorSubnetReview(payload: BittensorSubnetReviewPayload)
 }

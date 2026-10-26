@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemStakingLandingTitle"
-    style="@style/TextAppearance.NovaFoundation.Bold.Title1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="12dp"
-    android:gravity="center"
-    android:textColor="@color/text_primary"
-    tools:text="Earn up to 16.36%\non your WND tokens\nper year" />
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/itemStakingLandingTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/text_primary"
+        tools:text="Earn up to 16.36%\non your WND tokens\nper year" />
+
+    <TextView
+        android:id="@+id/itemStakingLandingSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:visibility="gone"
+        tools:text="@string/bittensor_intro_caption"
+        tools:visibility="visible" />
+
+</LinearLayout>

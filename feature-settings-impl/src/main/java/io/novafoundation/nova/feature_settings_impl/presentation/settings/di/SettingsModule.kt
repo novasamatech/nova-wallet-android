@@ -51,7 +51,8 @@ class SettingsModule {
         twoFactorVerificationService: TwoFactorVerificationService,
         biometricService: BiometricService,
         pushNotificationsInteractor: PushNotificationsInteractor,
-        maskingModeUseCase: MaskingModeUseCase
+        maskingModeUseCase: MaskingModeUseCase,
+        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
     ): ViewModel {
         return SettingsViewModel(
             languageUseCase,
@@ -67,7 +68,8 @@ class SettingsModule {
             twoFactorVerificationService,
             biometricService,
             pushNotificationsInteractor,
-            maskingModeUseCase
+            maskingModeUseCase,
+            debugSettings
         )
     }
 

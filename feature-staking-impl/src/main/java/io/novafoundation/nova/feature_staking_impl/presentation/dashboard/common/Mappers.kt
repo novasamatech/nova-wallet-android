@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.getUnmaskedOrElse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.appendEnd
@@ -20,12 +21,14 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.AnnouncementModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
 import io.novasama.substrate_sdk_android.hash.isPositive
 
@@ -40,6 +43,12 @@ class StakingDashboardPresentationMapperFactory(
 
 interface StakingDashboardPresentationMapper {
 
+    fun mapDetailedStakeItemToUi(
+        option: AggregatedStakingDashboardOption<AggregatedStakingDashboardOption.HasStake>,
+        amountFormatter: AmountFormatter,
+        announcement: AnnouncementModel?
+    ): StakingDashboardModel.HasStakeItem?
+
     fun mapWithoutStakeItemToUi(withoutStake: AggregatedStakingDashboardOption<WithoutStake>): StakingDashboardModel.NoStakeItem
 
     fun mapStakingTypeToUi(stakingType: StakingType): StakingTypeModel
@@ -50,6 +59,19 @@ class RealStakingDashboardPresentationMapper(
     private val maskableValueFormatter: MaskableValueFormatter,
     private val assetIconProvider: AssetIconProvider
 ) : StakingDashboardPresentationMapper {
+
+    override fun mapDetailedStakeItemToUi(
+        option: AggregatedStakingDashboardOption<AggregatedStakingDashboardOption.HasStake>,
+        amountFormatter: AmountFormatter,
+        announcement: AnnouncementModel?
+    ): StakingDashboardModel.HasStakeItem? = mapBittensorDashboardItem(
+        option,
+        amountFormatter,
+        announcement,
+        resourceManager,
+        maskableValueFormatter,
+        assetIconProvider
+    )
 
     @Suppress("UNCHECKED_CAST")
     override fun mapWithoutStakeItemToUi(
@@ -89,6 +111,7 @@ class RealStakingDashboardPresentationMapper(
     private fun mapNoStakeItemToUi(noStake: AggregatedStakingDashboardOption<NoStake>): StakingDashboardModel.NoStakeItem {
         val stats = noStake.stakingState.stats
         val syncingStage = noStake.syncingStage
+        val bittensorDetails = noStake.bittensorDetails
 
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {
@@ -110,8 +133,13 @@ class RealStakingDashboardPresentationMapper(
         return StakingDashboardModel.NoStakeItem(
             tokenName = noStake.token.configuration.name.syncingIf(syncingStage.isSyncingPrimary()),
             assetId = noStake.token.configuration.fullId,
-            earnings = stats.map { it.estimatedEarnings.format().syncingIf(syncingStage.isSyncingSecondary()) },
+            earnings = if (bittensorDetails != null) {
+                mapBittensorMaximumYield(bittensorDetails, resourceManager)
+            } else {
+                stats.map { it.estimatedEarnings.format().syncingIf(syncingStage.isSyncingSecondary()) }
+            },
             availableBalance = formattedAvailableBalance,
+            isNew = !syncingStage.isSyncingPrimary() && noStake.chain.additional?.newFeatures?.contains(Chain.NewFeature.STAKING) == true,
             stakingTypeBadge = stakingType?.let(::mapStakingTypeToUi),
             assetIcon = assetIconProvider.getAssetIconOrFallback(noStake.token.configuration.icon).syncingIf(syncingStage.isSyncingPrimary())
         )

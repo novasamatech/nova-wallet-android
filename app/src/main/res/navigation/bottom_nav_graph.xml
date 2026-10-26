@@ -26,7 +26,9 @@
     <include app:graph="@navigation/staking_dashboard_graph"  />
 
     <action android:id="@+id/action_open_staking"
-        app:destination="@+id/staking_dashboard_graph" />
+        app:destination="@+id/staking_dashboard_graph"
+        app:popUpTo="@id/staking_dashboard_graph"
+        app:popUpToInclusive="true" />
 
     <fragment
         android:id="@+id/walletFragment"

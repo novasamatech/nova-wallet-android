@@ -8,6 +8,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
@@ -16,11 +17,17 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioReopenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
+import io.novafoundation.nova.infrastructure.di.InfrastructureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -38,12 +45,19 @@ class StakingFeatureHolder @Inject constructor(
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
     private val selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
     private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
+    private val unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
+    private val portfolioReopenCommunicator: BittensorPortfolioReopenCommunicator,
+    private val bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
+    private val bittensorValidatorFiltersCommunicator: BittensorValidatorFiltersCommunicator,
+    private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
         val dependencies = DaggerStakingFeatureComponent_StakingFeatureDependenciesComponent.builder()
+            .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .commonApi(commonApi())
             .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
+            .infrastructureApi(getFeature(InfrastructureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
@@ -66,6 +80,11 @@ class StakingFeatureHolder @Inject constructor(
                 stakingDashboardRouter = stakingDashboardRouter,
                 selectMythosCollatorInterScreenCommunicator = selectMythosCollatorInterScreenCommunicator,
                 selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
+                unstakePositionCommunicator = unstakePositionCommunicator,
+                portfolioReopenCommunicator = portfolioReopenCommunicator,
+                bittensorValidatorCommunicator = bittensorValidatorCommunicator,
+                bittensorValidatorFiltersCommunicator = bittensorValidatorFiltersCommunicator,
+                slippageSettingsCommunicator = slippageSettingsCommunicator,
                 deps = dependencies
             )
     }

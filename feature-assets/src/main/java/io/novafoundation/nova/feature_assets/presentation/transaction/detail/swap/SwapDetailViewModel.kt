@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.rateAgainst
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionParcel
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
+import io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetView
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
