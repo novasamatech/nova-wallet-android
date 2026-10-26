@@ -33,6 +33,33 @@ class BittensorPositionWithdrawalTest {
     )
 
     @Test
+    fun `subnet availability and sell maximum both exclude zero payout positions`() {
+        val real = BittensorExitMember(number(1437781835), BigInteger.ZERO, false, BigInteger.ZERO)
+        val dust = real.copy(stake = BigInteger.ONE)
+        val total = real.stake + dust.stake
+        val snapshot = preflight.copy(
+            availability = BittensorExitAvailability(total, BigInteger.ZERO, total),
+            groupStakes = mapOf(held to real.stake, owner to dust.stake),
+            groupMembers = mapOf(held to real, owner to dust),
+            withdrawalPrice = number(24121195),
+            swapFeeRate = BittensorWithdrawalBounds.DEFAULT_SWAP_FEE_RATE
+        )
+        val netuid = BittensorNetuid.Subnet(9)
+        val result = snapshot.positionWithdrawal(netuid, BigDecimal.ZERO, number(12000))
+        val sellMaximum = snapshot.withWithdrawalFloors(netuid, BigDecimal.ZERO).exitGroup(held)
+            .maximumFill(BittensorExitSelection.All)
+
+        assertEquals(real.stake, result.available)
+        assertEquals(sellMaximum, result.available)
+        assertTrue(result.canWithdraw)
+
+        val onlyDust = snapshot.copy(groupMembers = mapOf(owner to dust), groupStakes = mapOf(owner to dust.stake))
+            .positionWithdrawal(netuid, BigDecimal.ZERO, number(12000))
+        assertEquals(BigInteger.ZERO, onlyDust.available)
+        assertFalse(onlyDust.canWithdraw)
+    }
+
+    @Test
     fun `hints use each validator hold and owner collateral`() {
         val result = preflight.positionWithdrawal(BittensorNetuid.Root, BigDecimal.ZERO, number(12_000))
         assertEquals(number(70), result.available)

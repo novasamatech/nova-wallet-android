@@ -3197,4 +3197,6 @@
     <string name="bittensor_claim_dry_run_invalid">Simulation: transaction validation failed.\n%1$s\nNo transaction was broadcast by the app.</string>
     <string name="bittensor_claim_dry_run_error">Dry run could not complete (%1$s). Check node support and connection. No fallback submission was attempted.</string>
     <string name="bittensor_claim_dry_run_cancelled">Signing cancelled. No dry-run request or transaction was sent.</string>
+    <string name="debug_disable_node_logs">Disable node logs</string>
+    <string name="debug_disable_node_logs_description">Hide socket, state-machine and HTTP logs immediately. Operation logs and exception traces stay enabled.</string>
 </resources>

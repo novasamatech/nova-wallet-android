@@ -33,7 +33,8 @@ data class BittensorExitPreflight(
     val withdrawalPrice: BigInteger? = null,
     val swapFeeRate: BigInteger = BigInteger.ZERO,
     val rootHoldInterval: BigInteger = BigInteger.ZERO,
-    val sweepFloor: BigInteger = BigInteger.ZERO
+    val sweepFloor: BigInteger = BigInteger.ZERO,
+    val exitFloor: BigInteger = BigInteger.ZERO
 ) {
 
     val totalStake: BigInteger
@@ -51,7 +52,7 @@ data class BittensorExitPreflight(
         get() = if (groupMembers.isEmpty()) {
             totalStake.min(availability.available)
         } else {
-            groupMembers.values.sumOf { it.drawable(withdrawalFloor) }.min(availability.available)
+            groupMembers.values.sumOf { it.drawable(withdrawalFloor, exitFloor) }.min(availability.available)
         }
 
     /**
@@ -73,6 +74,6 @@ data class BittensorExitPreflight(
             val member = groupMembers[hotkey] ?: BittensorExitMember(groupStakes[hotkey] ?: stake, BigInteger.ZERO, isOwnHotkey, rootHoldRemaining)
             BittensorExitBasisPosition(hotkey, member.stake, member.collateral, member.isOwnHotkey, member.holdRemaining.isPositive())
         }
-        return BittensorExitGroup(positions, availability.available, BittensorExitFloors(withdrawalFloor, sweepFloor))
+        return BittensorExitGroup(positions, availability.available, BittensorExitFloors(withdrawalFloor, sweepFloor, exitFloor))
     }
 }

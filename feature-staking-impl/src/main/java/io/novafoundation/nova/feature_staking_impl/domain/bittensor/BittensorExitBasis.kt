@@ -13,7 +13,7 @@ sealed interface BittensorExitSelection {
 }
 
 /** The smallest slice worth withdrawing and the nominator remainder the network sweeps. */
-data class BittensorExitFloors(val withdrawal: BigInteger, val sweep: BigInteger)
+data class BittensorExitFloors(val withdrawal: BigInteger, val sweep: BigInteger, val exit: BigInteger = BigInteger.ZERO)
 
 /** One position of the group; a root hold leaves nothing drawable until it ends. */
 data class BittensorExitBasisPosition(
@@ -26,10 +26,13 @@ data class BittensorExitBasisPosition(
 
     val free: BigInteger get() = (alpha - locked).max(BigInteger.ZERO)
 
-    fun drawable(floor: BigInteger): BigInteger = when {
+    fun isDust(floors: BittensorExitFloors): Boolean = !locked.isPositive() && alpha < floors.exit
+
+    fun drawable(floors: BittensorExitFloors): BigInteger = when {
         isHeld -> BigInteger.ZERO
+        isDust(floors) -> BigInteger.ZERO
         !locked.isPositive() -> alpha
-        free >= floor -> free
+        free >= floors.withdrawal -> free
         else -> BigInteger.ZERO
     }
 
@@ -48,9 +51,9 @@ data class BittensorExitBasis(
     val canExitAll: Boolean
         get() = available >= total && positions.none { it.locked.isPositive() } && positions.sumOf { it.alpha } == total
 
-    fun drawable(floor: BigInteger): BigInteger = positions.sumOf { it.drawable(floor) }
+    fun drawable(floors: BittensorExitFloors): BigInteger = positions.sumOf { it.drawable(floors) }
 
-    fun max(floor: BigInteger): BigInteger = available.min(drawable(floor))
+    fun max(floors: BittensorExitFloors): BigInteger = available.min(drawable(floors))
 
     /**
      * The primary takes the whole amount when it can; otherwise the smallest positions are drained first and the last
@@ -58,12 +61,13 @@ data class BittensorExitBasis(
      * be smaller than the requested one. It never grows past the requested amount: the validations warn about the remainder instead.
      */
     fun plan(amount: BigInteger, floors: BittensorExitFloors): BittensorExitPlan? {
-        val primary = positions.firstOrNull()
-        if (!amount.isPositive() || amount > max(floors.withdrawal) || primary == null) return null
+        val sellable = positions.filterNot { it.isDust(floors) }
+        val primary = sellable.firstOrNull()
+        if (!amount.isPositive() || amount > max(floors) || primary == null) return null
         if (!primary.locked.isPositive() && amount == primary.alpha) {
             return planOf(exits = listOf(BittensorExitSlice(primary.hotkey, amount, fullExit = true)))
         }
-        if (positions.size == 1 || primaryCovers(amount, primary, floors)) {
+        if (sellable.size == 1 || primaryCovers(amount, primary, floors)) {
             return planOf(partials = listOf(BittensorExitSlice(primary.hotkey, amount, fullExit = false)))
         }
 
@@ -72,7 +76,7 @@ data class BittensorExitBasis(
         var needed = amount
         for (position in positions.asReversed()) {
             if (!needed.isPositive()) break
-            val drawable = position.drawable(floors.withdrawal)
+            val drawable = position.drawable(floors)
             if (!drawable.isPositive()) continue
             if (needed < drawable) return adjustedPlan(exits, partials, position, needed, floors)
             needed -= drawable
@@ -86,7 +90,7 @@ data class BittensorExitBasis(
     }
 
     private fun primaryCovers(amount: BigInteger, primary: BittensorExitBasisPosition, floors: BittensorExitFloors): Boolean {
-        return amount <= primary.free && amount < drawable(floors.withdrawal) && primary.leavesSweepFloor(amount, floors)
+        return amount <= primary.free && amount < drawable(floors) && primary.leavesSweepFloor(amount, floors)
     }
 
     private fun adjustedPlan(
@@ -97,8 +101,8 @@ data class BittensorExitBasis(
         floors: BittensorExitFloors
     ): BittensorExitPlan? {
         val drawn = (exits + partials).sumOf { it.amount }
-        val drawable = position.drawable(floors.withdrawal)
-        val max = max(floors.withdrawal)
+        val drawable = position.drawable(floors)
+        val max = max(floors)
 
         fun fits(slice: BigInteger): Boolean = if (!slice.isPositive() || slice >= drawable) {
             slice.isPositive() || drawn.isPositive()
@@ -150,7 +154,7 @@ class BittensorExitGroup(
     val heldHotkeys: Set<AccountIdKey> = positions.filter { it.isHeld }.mapTo(mutableSetOf()) { it.hotkey }
 
     /** Held, or with nothing drawable above the withdrawal floor. */
-    val unsellableHotkeys: Set<AccountIdKey> = positions.filterNot { it.drawable(floors.withdrawal).isPositive() }.mapTo(mutableSetOf()) { it.hotkey }
+    val unsellableHotkeys: Set<AccountIdKey> = positions.filterNot { it.drawable(floors).isPositive() }.mapTo(mutableSetOf()) { it.hotkey }
 
     val canSellAll: Boolean get() = positions.size > 1 && positions.any { it.hotkey !in unsellableHotkeys }
 
@@ -173,12 +177,12 @@ class BittensorExitGroup(
         return BittensorExitBasis(total, total.min(availableStake), members)
     }
 
-    fun maximum(selection: BittensorExitSelection): BigInteger = basis(selection).max(floors.withdrawal)
+    fun maximum(selection: BittensorExitSelection): BigInteger = basis(selection).max(floors)
 
     /** The amount Max fills in: the planned amount at the maximum, which moves down off a remainder the network would sweep. */
     fun maximumFill(selection: BittensorExitSelection): BigInteger {
         val basis = basis(selection)
-        val maximum = basis.max(floors.withdrawal)
+        val maximum = basis.max(floors)
         return basis.plan(maximum, floors)?.amount ?: maximum
     }
 
@@ -194,7 +198,7 @@ class BittensorExitGroup(
     }
 
     private fun capLegs(members: List<BittensorExitBasisPosition>): List<BittensorExitBasisPosition> {
-        val undrawable = members.filterNot { it.drawable(floors.withdrawal).isPositive() }.mapTo(mutableSetOf()) { it.hotkey }
+        val undrawable = members.filterNot { it.drawable(floors).isPositive() }.mapTo(mutableSetOf()) { it.hotkey }
         val legs = members.filterNot { it.hotkey in undrawable }.take(MAX_LEGS).mapTo(mutableSetOf()) { it.hotkey }
         return members.filter { it.hotkey in legs || it.hotkey in undrawable }
     }

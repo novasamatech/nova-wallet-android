@@ -48,17 +48,29 @@ class BittensorSubmissionExecutor(
         metaId: Long,
         chain: Chain,
         target: BittensorOutcomeTarget? = null,
+        onStage: (String) -> Unit = {},
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
         try {
+            onStage("Submission lock acquired; building and signing")
             val watch = buildAndSign(metaId, chain, formExtrinsic)
                 ?: return@withLock BittensorBuildTimeoutException().mapBittensorPreSubmissionError()
 
             var lastSeenHash: String? = null
+            onStage("Build/sign finished; collecting submission watch")
             val execution = withTimeoutOrNull(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT) {
-                val inBlock = watch.onEach { lastSeenHash = it.status.extrinsicHash }.awaitStatus<ExtrinsicStatus.InBlock>()
+                val inBlock = watch.onEach {
+                    lastSeenHash = it.status.extrinsicHash
+                    onStage("Watch status=${it.status.javaClass.simpleName}; hash=$lastSeenHash")
+                }.awaitStatus<ExtrinsicStatus.InBlock>()
+                onStage("Included in block; resolving dispatch events")
                 outcomeResolver.resolve(chain, inBlock)
-            } ?: return@withLock BittensorOperationResult.Unknown(lastSeenHash)
+            } ?: run {
+                onStage("Inclusion/events timeout; outcome unknown; hash=$lastSeenHash")
+                return@withLock BittensorOperationResult.Unknown(lastSeenHash)
+            }
+
+            onStage("Dispatch resolved; mapping result")
 
             val result = execution.mapBittensorOperationResult(chain)
             val coldkey = execution.submissionHierarchy.path.lastOrNull()?.account

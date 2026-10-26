@@ -64,7 +64,9 @@ class DebugMenuShakeListener @Inject constructor(private val settings: DebugSett
             settings.bittensorClaimEnabled(),
             settings::setBittensorClaimEnabled,
             settings.bittensorClaimButtonEnabled(),
-            settings::setBittensorClaimButtonEnabled
+            settings::setBittensorClaimButtonEnabled,
+            settings.nodeLogsDisabled(),
+            settings::setNodeLogsDisabled
         ).also { it.show() }
     }
 

@@ -62,15 +62,7 @@ internal fun BittensorExitPreflight.positionWithdrawal(
     slippageFraction: BigDecimal,
     blockMillis: BigInteger
 ): BittensorPositionWithdrawal {
-    val price = withdrawalPrice
-    val floor = if (price == null) {
-        withdrawalFloor
-    } else {
-        val slippage = BittensorSlippage(slippageFraction)
-        val limit = if (netuid.isRoot()) price else slippage.limitPrice(price, BittensorSwapDirection.ALPHA_TO_TAO)
-        bittensorWithdrawalFloor(minStake, limit, swapFeeRate)
-    }
-    val maximum = copy(withdrawalFloor = floor).maximumAmount
+    val maximum = withWithdrawalFloors(netuid, slippageFraction).maximumAmount
     return BittensorPositionWithdrawal(
         available = maximum,
         locked = (totalStake - maximum).max(BigInteger.ZERO),

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
-import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.feature_swap_impl.domain.swapMaximum
+import java.math.BigInteger
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
@@ -98,11 +99,14 @@ fun SwapValidationSystemBuilder.enoughAssetInToPayForSwapAndFee(
     assetsValidationContext: AssetsValidationContext
 ) = sufficientBalanceGeneric(
     available = {
-        val transferable = assetsValidationContext.getAsset(it.amountIn.chainAsset).transferable
-        val extraDeductionPlanks = it.fee.additionalMaxAmountDeduction.fromCountedTowardsEd
-        val extraDeduction = it.amountIn.chainAsset.amountFromPlanks(extraDeductionPlanks)
-
-        (transferable - extraDeduction).atLeastZero()
+        val asset = assetsValidationContext.getAsset(it.amountIn.chainAsset)
+        val available = swapMaximum(
+            transferable = asset.transferableInPlanks,
+            countedTowardsEd = asset.balanceCountedTowardsEDInPlanks,
+            minimumBalance = it.fee.additionalMaxAmountDeduction.fromCountedTowardsEd,
+            fee = BigInteger.ZERO // The generic validation subtracts and displays the fee separately.
+        )
+        it.amountIn.chainAsset.amountFromPlanks(available)
     },
     amount = { it.amountIn.decimalAmount },
     fee = {
