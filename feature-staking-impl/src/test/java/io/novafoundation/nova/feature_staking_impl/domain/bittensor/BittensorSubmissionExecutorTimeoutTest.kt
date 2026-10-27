@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
@@ -15,12 +16,15 @@ import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccoun
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -146,6 +150,57 @@ class BittensorSubmissionExecutorTimeoutTest {
 
         assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
         assertEquals(0L, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `signing outside the app is reported from the build until the signature is in`() = runTest {
+        useWallet(LightMetaAccount.Type.LEDGER)
+        val signed = CompletableDeferred<Unit>()
+        extrinsics.build = {
+            signed.await()
+            inBlockWatch()
+        }
+        val observed = mutableListOf<Boolean>()
+        val observing = launch { executor.signingOutsideApp.toList(observed) }
+
+        val execution = async { executor.execute(METAID, chain) {} }
+        runCurrent()
+        assertTrue(executor.signingOutsideApp.value)
+
+        signed.complete(Unit)
+        assertEquals(BittensorOperationResult.Success(HASH), execution.await())
+        assertFalse(executor.signingOutsideApp.value)
+        observing.cancel()
+        assertEquals(listOf(false, true, false), observed)
+    }
+
+    @Test
+    fun `a key held in the app never reports signing outside the app`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        val signed = CompletableDeferred<Unit>()
+        extrinsics.build = {
+            signed.await()
+            inBlockWatch()
+        }
+
+        val execution = async { executor.execute(METAID, chain) {} }
+        runCurrent()
+        assertFalse(executor.signingOutsideApp.value)
+
+        signed.complete(Unit)
+        assertEquals(BittensorOperationResult.Success(HASH), execution.await())
+        assertFalse(executor.signingOutsideApp.value)
+    }
+
+    @Test
+    fun `signing outside the app is cleared when the signing screen is cancelled`() = runTest {
+        useWallet(LightMetaAccount.Type.LEDGER)
+        extrinsics.build = { throw SigningCancelledException() }
+
+        val result = executor.execute(METAID, chain) {} as BittensorOperationResult.Failure
+
+        assertTrue(result.isSigningCancelled)
+        assertFalse(executor.signingOutsideApp.value)
     }
 
     private suspend fun useWallet(type: LightMetaAccount.Type) {

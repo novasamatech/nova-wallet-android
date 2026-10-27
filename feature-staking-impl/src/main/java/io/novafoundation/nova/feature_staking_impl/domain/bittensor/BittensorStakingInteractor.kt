@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.StateFlow
 
 data class BittensorRootValidatorDetails(val validator: BittensorValidator, val annualPercentageYield: BigDecimal?)
 
@@ -33,6 +34,10 @@ class BittensorStakingInteractor(
     private val submissionExecutor: BittensorSubmissionExecutor,
     private val logger: Logger
 ) {
+
+    /** See [BittensorSubmissionExecutor.signingOutsideApp]. */
+    val signingOutsideApp: StateFlow<Boolean>
+        get() = submissionExecutor.signingOutsideApp
 
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails().withDefaultValidator()
 

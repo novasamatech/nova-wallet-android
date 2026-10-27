@@ -98,6 +98,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.sync.Mutex
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.hiddenWhileSigningOutsideApp
 
 private sealed interface ClaimExecution {
     data object Idle : ClaimExecution
@@ -360,6 +361,7 @@ class BittensorRootClaimViewModel(
             }
         }
     }
+        .hiddenWhileSigningOutsideApp(bittensorRootClaimInteractor.signingOutsideApp)
         .shareInBackground()
 
     init {

@@ -25,6 +25,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 // Nonce, mortality and signing with a key held in the app: past this the node is stalled, and nothing has been sent yet.
 internal val BITTENSOR_BUILD_AND_SIGN_TIMEOUT = 60.seconds
@@ -43,6 +46,14 @@ class BittensorSubmissionExecutor(
 ) {
 
     private val mutex = Mutex()
+
+    private val _signingOutsideApp = MutableStateFlow(false)
+
+    /**
+     * True while a wallet that signs outside the app ([SIGNED_OUTSIDE_APP], or PROXIED through one) is building and
+     * signing: its signing screen is added on top of the flow for that time, so the flow's result sheet has to stay away.
+     */
+    val signingOutsideApp: StateFlow<Boolean> = _signingOutsideApp.asStateFlow()
 
     suspend fun execute(
         metaId: Long,
@@ -106,22 +117,27 @@ class BittensorSubmissionExecutor(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Flow<ExtrinsicWatchResult<ExtrinsicStatus>>? {
         val bounded = !signsOutsideApp(metaId)
+        _signingOutsideApp.value = !bounded
         // submitAndWatchExtrinsic returns failures as Result instead of throwing, so a failed build does not cancel this
         // coroutineScope and getOrThrow below rethrows the original exception.
-        val built = coroutineScope {
-            val build = async {
-                val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
-                extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.WalletWithId(metaId), options, formExtrinsic)
-            }
-
-            if (bounded) {
-                withTimeoutOrNull(BITTENSOR_BUILD_AND_SIGN_TIMEOUT) { build.await() } ?: run {
-                    build.cancel()
-                    null
+        val built = try {
+            coroutineScope {
+                val build = async {
+                    val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+                    extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.WalletWithId(metaId), options, formExtrinsic)
                 }
-            } else {
-                build.await()
+
+                if (bounded) {
+                    withTimeoutOrNull(BITTENSOR_BUILD_AND_SIGN_TIMEOUT) { build.await() } ?: run {
+                        build.cancel()
+                        null
+                    }
+                } else {
+                    build.await()
+                }
             }
+        } finally {
+            _signingOutsideApp.value = false
         }
 
         return built?.getOrThrow()
