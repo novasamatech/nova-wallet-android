@@ -213,14 +213,6 @@ class BittensorStakeValidationUiTest {
     }
 
     @Test
-    fun `ledger refusal shows the iOS signing not supported copy`() {
-        val (title, message) = BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED.titleAndMessage(resources, format)
-
-        assertEquals(R.string.account_parity_signer_not_supported_title.toString(), title)
-        assertEquals(R.string.ledger_sign_raw_not_supported.toString(), message)
-    }
-
-    @Test
     fun `proxied and delayed multisig refusals name the wallet type like iOS`() {
         `when`(resources.getString(R.string.bittensor_staking_wallet_unsupported_title, R.string.account_proxied.toString()))
             .thenReturn("Bittensor staking is not supported for Proxied wallets")

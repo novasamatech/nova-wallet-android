@@ -25,8 +25,6 @@ data class BittensorStakeValidationPayload(
 
 sealed interface BittensorStakeValidationFailure {
 
-    data object LEDGER_NOT_SUPPORTED : BittensorStakeValidationFailure
-
     data object PROXIED_NOT_SUPPORTED : BittensorStakeValidationFailure
 
     data object DELAYED_EXECUTION : BittensorStakeValidationFailure

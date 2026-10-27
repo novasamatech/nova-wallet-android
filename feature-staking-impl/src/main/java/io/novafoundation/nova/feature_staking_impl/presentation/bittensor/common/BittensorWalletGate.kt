@@ -26,8 +26,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Inject
 
 /**
- * The gate in front of a TAO staking flow: a Ledger or proxied wallet, or a multisig
- * whose calls execute with a delay, gets the unsupported-wallet sheet and one `staking_blocked` instead of the flow.
+ * The gate in front of a TAO staking flow: a proxied wallet, or a multisig whose calls
+ * execute with a delay, gets the unsupported-wallet sheet and one `staking_blocked` instead of the flow.
  */
 class BittensorWalletGate @Inject constructor(
     private val immediateExecution: BittensorImmediateExecution,
@@ -52,7 +52,6 @@ class BittensorWalletGate @Inject constructor(
     ) {
         val refusal = when (immediateExecution.support(wallet)) {
             BittensorWalletSupport.SUPPORTED -> return onSupported()
-            BittensorWalletSupport.LEDGER_NOT_SUPPORTED -> StakingBlockedReason.LEDGER
             BittensorWalletSupport.PROXIED_NOT_SUPPORTED -> StakingBlockedReason.PROXY
             BittensorWalletSupport.DELAYED_EXECUTION -> StakingBlockedReason.MULTISIG_UNSUPPORTED
         }
@@ -62,7 +61,6 @@ class BittensorWalletGate @Inject constructor(
 
         val nativeSymbol = chainRegistry.getChain(ChainGeneses.BITTENSOR).utilityAsset.symbol.value
         when (refusal) {
-            StakingBlockedReason.LEDGER -> showWarning(R.drawable.ic_ledger, resourceManager.bittensorLedgerNotSupported())
             StakingBlockedReason.PROXY -> showWarning(R.drawable.ic_proxy, resourceManager.bittensorWalletNotSupported(R.string.account_proxied, nativeSymbol))
             else -> showWarning(R.drawable.ic_multisig, resourceManager.bittensorWalletNotSupported(R.string.account_multisig, nativeSymbol))
         }
@@ -79,10 +77,6 @@ class BittensorWalletGate @Inject constructor(
         )
     }
 }
-
-// Ledger gets the signer-not-supported copy, proxied and delayed multisig wallets the unsupported-wallet copy.
-fun ResourceManager.bittensorLedgerNotSupported(): TitleAndMessage =
-    getString(R.string.account_parity_signer_not_supported_title) to getString(R.string.ledger_sign_raw_not_supported)
 
 fun ResourceManager.bittensorWalletNotSupported(@StringRes walletType: Int, nativeSymbol: String): TitleAndMessage =
     getString(R.string.bittensor_staking_wallet_unsupported_title, getString(walletType)) to

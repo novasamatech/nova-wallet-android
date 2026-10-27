@@ -6,23 +6,22 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 
 enum class BittensorWalletSupport {
-    SUPPORTED, LEDGER_NOT_SUPPORTED, PROXIED_NOT_SUPPORTED, DELAYED_EXECUTION
+    SUPPORTED, PROXIED_NOT_SUPPORTED, DELAYED_EXECUTION
 }
 
 class BittensorImmediateExecution(
     private val signerProvider: SignerProvider
 ) {
 
-    // Ledger and proxied wallets are refused by type, a multisig only when its calls
-    // execute with a delay. This is not signing authorization: submission still uses the normal signer hierarchy.
+    // A proxied wallet is refused by type, a multisig only when its calls execute with a delay.
+    // This is not signing authorization: submission still uses the normal signer hierarchy.
     suspend fun support(wallet: MetaAccount): BittensorWalletSupport = when (wallet.type) {
         LightMetaAccount.Type.SECRETS,
         LightMetaAccount.Type.WATCH_ONLY,
         LightMetaAccount.Type.PARITY_SIGNER,
-        LightMetaAccount.Type.POLKADOT_VAULT -> BittensorWalletSupport.SUPPORTED
-
+        LightMetaAccount.Type.POLKADOT_VAULT,
         LightMetaAccount.Type.LEDGER_LEGACY,
-        LightMetaAccount.Type.LEDGER -> BittensorWalletSupport.LEDGER_NOT_SUPPORTED
+        LightMetaAccount.Type.LEDGER -> BittensorWalletSupport.SUPPORTED
 
         LightMetaAccount.Type.PROXIED -> BittensorWalletSupport.PROXIED_NOT_SUPPORTED
 

@@ -11,7 +11,6 @@ class BittensorImmediateStakeValidation : Validation<BittensorWalletSupport, Bit
 
     override suspend fun validate(value: BittensorWalletSupport): ValidationStatus<BittensorStakeValidationFailure> = when (value) {
         BittensorWalletSupport.SUPPORTED -> valid()
-        BittensorWalletSupport.LEDGER_NOT_SUPPORTED -> validationError(BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED)
         BittensorWalletSupport.PROXIED_NOT_SUPPORTED -> validationError(BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED)
         BittensorWalletSupport.DELAYED_EXECUTION -> validationError(BittensorStakeValidationFailure.DELAYED_EXECUTION)
     }
