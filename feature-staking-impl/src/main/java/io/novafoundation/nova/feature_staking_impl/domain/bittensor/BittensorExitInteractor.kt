@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.flow.StateFlow
 
 class BittensorExitInteractor(
     private val chainRegistry: ChainRegistry,
@@ -59,6 +60,10 @@ class BittensorExitInteractor(
     private val chainState: ChainStateRepository,
     private val blockRequotes: BittensorBlockRequotes
 ) {
+
+    /** See [BittensorSubmissionExecutor.signingOutsideApp]. */
+    val signingOutsideApp: StateFlow<Boolean>
+        get() = submissionExecutor.signingOutsideApp
 
     private companion object {
 

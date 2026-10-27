@@ -196,6 +196,7 @@ class BittensorStakeConfirmViewModel(
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
 
     val resultState = submission.map { it.result }
+        .hiddenWhileSigningOutsideApp(bittensorStakingInteractor.signingOutsideApp)
         .shareInBackground()
 
     private val validating = MutableStateFlow(false)
