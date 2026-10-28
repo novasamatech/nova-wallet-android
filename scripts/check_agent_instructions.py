@@ -14,6 +14,33 @@ REQUIRED_TOPICS = {
     "transactions", "analytics", "infrastructure-auth", "bittensor",
     "testing", "instruction-maintenance", "reference-patterns", "migration",
 }
+ADDITIONAL_GUIDES = ("docs/adding-a-feature-module.md", "docs/swap-service-commission.md")
+
+
+def without_fenced_code(content):
+    prose = []
+    opening = None
+    for line in content.splitlines():
+        fence = re.match(r"^ {0,3}(`{3,}|~{3,})(.*)$", line)
+        if opening is not None:
+            if (fence and fence[1][0] == opening[0] and len(fence[1]) >= len(opening)
+                    and not fence[2].strip()):
+                opening = None
+        elif fence and not (fence[1][0] == "`" and "`" in fence[2]):
+            opening = fence[1]
+        else:
+            prose.append(line)
+    return "\n".join(prose)
+
+
+def document_links(content):
+    # Only prose links are reading routes. This supports the inline Markdown
+    # links used by these docs, not every Markdown extension or reference syntax.
+    prose = without_fenced_code(content)
+    prose = re.sub(r"<!--.*?-->", "", prose, flags=re.S)
+    # Preserve a nonempty label in [`code`](target), but mask links inside code spans.
+    prose = re.sub(r"`+[^`\n]*`+", "code", prose)
+    return LINK.findall(prose)
 
 
 def check(root, verify_reference_revision=False):
@@ -33,23 +60,30 @@ def check(root, verify_reference_revision=False):
     if bridge.read_text(encoding="utf-8").strip() != "@AGENTS.md":
         errors.append("CLAUDE.md must contain only @AGENTS.md")
 
+    routes = {link.split("#", 1)[0] for link in document_links(entry_text)}
     discovered_topics = {path.stem for path in topics.glob("*.md")}
     for name in sorted(REQUIRED_TOPICS | discovered_topics):
         relative = f"docs/engineering/{name}.md"
         if not (root / relative).is_file():
             errors.append(f"Missing topic: {relative}")
-        if relative not in entry_text:
+        if relative not in routes:
             errors.append(f"Unrouted topic: {relative}")
 
     documents = [entry, *sorted(topics.glob("*.md"))]
+    for relative in ADDITIONAL_GUIDES:
+        if relative not in routes:
+            errors.append(f"Unrouted guide: {relative}")
+        if not (root / relative).is_file():
+            errors.append(f"Missing guide: {relative}")
+        else:
+            documents.append(root / relative)
     for path in documents:
         content = path.read_text(encoding="utf-8")
         budget = 20480 if path.name == "bittensor.md" else 12288
         if path != entry and len(content.encode("utf-8")) > budget:
             errors.append(f"Topic exceeds {budget} byte budget: {path.relative_to(root)}")
-        # Check document links, not sample code. Anchors are not interpreted.
-        prose = re.sub(r"```[^\n]*\n.*?\n```", "", content, flags=re.S)
-        for link in LINK.findall(prose):
+        # Anchors are not interpreted.
+        for link in document_links(content):
             target = link.split("#", 1)[0]
             if not target or re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", target):
                 continue

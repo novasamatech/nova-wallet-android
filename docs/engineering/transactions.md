@@ -14,7 +14,8 @@ Implement each validation rule as a separate Validation with one responsibility;
 
 ## Financial review gate
 
-Read [Bittensor constraints](bittensor.md) for its explicit exceptions; do not generalize them.
+Only for Bittensor work, or shared transaction changes affecting its explicit exceptions, read
+[Bittensor constraints](bittensor.md). Do not load that domain guide for unrelated transactions or generalize its exceptions.
 Keep amount units, rounding, Max, fee source, existential deposit/holds and batch mode consistent
 between input, display, validation, call construction and signing. Use actual chain/asset rules;
 do not assume every locked balance covers every minimum or reserve ED twice.

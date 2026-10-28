@@ -46,7 +46,8 @@ Stale branch-status text in the commission guide is marked historical; product r
 ## Known limitations / acceptance
 
 Master examples contain deprecated formatting/state patterns; each is scoped with exclusions in
-[reference patterns](reference-patterns.md). They are candidates, not user-approved universal templates.
+[reference patterns](reference-patterns.md). They were initially candidates; the user approved the listed
+aspects on 2026-10-28, not whole files or universal templates.
 Old product parity rules are preserved, not reverified against current iOS in this documentation task.
 The feature checklist's historical counts and misleading binding claim were removed; current build/schema own versions.
 A documentation checker does not validate runtime architecture or force agent obedience.
@@ -62,3 +63,9 @@ Real Codex/Claude end-to-end pilot on an application task and independent/human 
 - Traced an analytics-event task to event classes and AnalyticsService; auth rules remain a separate route.
 - Traced a Bittensor task to its preserved domain exceptions plus general rules, not to Bittensor as an exemplar.
 - This is a documentation/review pilot by the author, not an independent review or a fresh Claude session.
+
+## Follow-up pilot and independent review
+
+The later implementation pilot, independent findings/fixes and verification limits are recorded in
+[the follow-up report](../reviews/agent-workflow-pilot-2026-10-28.md). The original read-only pilot above
+remains historical evidence; it is not substituted for the later checks.

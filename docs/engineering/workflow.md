@@ -2,6 +2,9 @@
 
 Use these passes within one task; do not ask the user to request a separate refactoring round.
 Scale effort to risk. A label change does not need a design document; financial changes do need invariant tests.
+Implementation/refactoring applies only to authorized change tasks. For review-only, diagnosis or explanation,
+read and check the relevant code, then report findings and proposed fixes; do not edit files.
+Feedback-driven instruction maintenance follows the same boundary: propose it during read-only work.
 
 ## Before implementation
 

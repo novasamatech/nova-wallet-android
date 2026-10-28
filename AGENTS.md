@@ -36,6 +36,9 @@ Then read every topic touched by the task; do not load unrelated topic files.
 
 ## Work contract
 
+Apply implementation/refactoring steps only when changes are authorized. For review, diagnosis or explanation,
+inspect and report findings without editing code or instructions unless the user also asks for changes.
+
 1. Identify the requested behavior, affected layers, invariants and verification before editing.
 2. Inspect analogous master code and the actual shared component/contract. State what will be reused.
 3. Implement the smallest complete vertical change. Keep business decisions out of UI and transport.

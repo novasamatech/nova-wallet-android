@@ -11,6 +11,10 @@ A budget is a prompt to consolidate, not permission to delete safeguards. Do not
 ## User feedback → durable rule
 
 When the user corrects a reusable convention (for example “use this status widget”):
+
+Apply the updates below during an authorized change task. A review/diagnosis-only request permits a proposed
+rule update, not a file edit, unless the user separately authorizes the update.
+
 1. Inspect the named component/pattern and determine whether the rule is general, feature-specific or one-off.
 2. Update the existing owning topic in the same task; replace the old rule instead of appending a competing one.
 3. Include the rationale/exception only when it prevents ambiguity; add a verified example where useful.

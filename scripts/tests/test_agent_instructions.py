@@ -22,6 +22,9 @@ class AgentInstructionChecksTest(unittest.TestCase):
             path = f"docs/engineering/{name}.md"
             self.write(path, f"# {name}\n")
             routes.append(f"[{name}]({path})")
+        for path in ("docs/adding-a-feature-module.md", "docs/swap-service-commission.md"):
+            self.write(path, "# Guide\n")
+            routes.append(f"[Guide]({path})")
         self.write("AGENTS.md", "\n".join(routes))
         self.write(
             "docs/engineering/reference-patterns.md",
@@ -63,6 +66,46 @@ class AgentInstructionChecksTest(unittest.TestCase):
     def test_new_topic_cannot_be_silently_unrouted(self):
         self.write("docs/engineering/new-topic.md", "# New topic")
         self.assertIn("Unrouted topic: docs/engineering/new-topic.md", CHECKS.check(self.root))
+
+    def test_path_in_comment_or_code_is_not_a_reading_route(self):
+        entry = self.root / "AGENTS.md"
+        original = entry.read_text(encoding="utf-8")
+        for replacement in (
+            "<!-- [UI](docs/engineering/ui.md) -->",
+            "```markdown\n[UI](docs/engineering/ui.md)\n```",
+            "~~~markdown\n[UI](docs/engineering/ui.md)\n~~~",
+            "```markdown\n[UI](docs/engineering/ui.md)\n````",
+            "~~~markdown\n[UI](docs/engineering/ui.md)\n~~~~",
+            "```markdown\n[UI](docs/engineering/ui.md)",
+            "`[UI](docs/engineering/ui.md)`",
+        ):
+            with self.subTest(replacement=replacement):
+                entry.write_text(original.replace("[ui](docs/engineering/ui.md)", replacement), encoding="utf-8")
+                self.assertIn("Unrouted topic: docs/engineering/ui.md", CHECKS.check(self.root))
+
+    def test_code_in_link_label_preserves_route_and_target_validation(self):
+        entry = self.root / "AGENTS.md"
+        entry.write_text(entry.read_text(encoding="utf-8").replace(
+            "[ui](docs/engineering/ui.md)", "[`ui`](docs/engineering/ui.md)"
+        ), encoding="utf-8")
+        self.assertEqual([], CHECKS.check(self.root))
+        self.write("docs/engineering/ui.md", "[`missing`](missing.md)")
+        self.assertTrue(any("Broken/local-outside link" in error for error in CHECKS.check(self.root)))
+
+    def test_links_in_routed_feature_and_commission_guides_are_checked(self):
+        for path in ("docs/adding-a-feature-module.md", "docs/swap-service-commission.md"):
+            with self.subTest(path=path):
+                self.write(path, "[Missing](engineering/missing.md)")
+                self.assertTrue(any(f"Broken/local-outside link in {path}" in error
+                                    for error in CHECKS.check(self.root)))
+                self.write(path, "# Guide")
+
+    def test_missing_links_in_code_and_comments_are_ignored(self):
+        self.write("docs/engineering/ui.md", "<!-- [Missing](missing.md) -->\n"
+                   "```markdown\n[Missing](missing.md)\n```\n"
+                   "~~~markdown\n[Missing](missing.md)\n~~~\n"
+                   "`[Missing](missing.md)`")
+        self.assertEqual([], CHECKS.check(self.root))
 
     def test_missing_entry_point(self):
         (self.root / "AGENTS.md").unlink()

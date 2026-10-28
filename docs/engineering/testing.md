@@ -57,6 +57,8 @@ overwrite real values, print secrets, or claim integrations work because a mock-
 The new agent-instructions workflow runs without Android SDK or secrets: it validates instruction links,
 entry-point size, the Claude bridge, literal feature-to-implementation Gradle dependencies and checker tests.
 The dependency check is not a Gradle parser: dynamic dependencies and ownership still need review/compilation.
-Link checks cover local file targets, not Markdown anchors or remote URLs. It does not prove UI quality.
+Route/link checks cover inline Markdown prose links in AGENTS, engineering topics and the feature/commission
+guides, excluding comments and code. They do not validate Markdown anchors, remote URLs or every Markdown dialect.
+These checks do not prove UI quality.
 Existing Android CI remains unchanged. Making a check required on protected branches needs separate approval.
 Pinned-master object verification is local/optional because shallow CI may not contain that historical object.

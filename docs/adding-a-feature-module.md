@@ -16,6 +16,8 @@ feature-<name>-impl/    # data/ domain/ presentation/, di/ at module root
 - `build.gradle` stays minimal: **no** `plugins`/`compileSdk`/`kotlinOptions` blocks — `allmodules.gradle`
   owns the Android library plugin, KSP, Java configuration and `-Xcontext-receivers` setup.
   Declare only `namespace`, `buildFeatures { viewBinding true }` (impl only) and dependencies.
+- If the module declares `@Parcelize` models/payloads, add `apply plugin: 'kotlin-parcelize'` in that
+  module's Gradle file, as the gift modules do. `allmodules.gradle` does not apply this plugin.
 - Java package is `io.novafoundation.nova.feature_<name>_api|impl` (underscores, not dashes).
 - The `-api` module `api`-exposes what dependents need (`api project(":feature-wallet-api")`); the `-impl`
   module uses `implementation` for everything.
