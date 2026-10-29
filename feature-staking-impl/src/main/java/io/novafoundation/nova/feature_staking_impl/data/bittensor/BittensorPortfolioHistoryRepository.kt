@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistory
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryRequest
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioFiatHistory
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.TimeoutCancellationException
@@ -30,17 +31,18 @@ class BittensorPortfolioHistoryRepository(
     }
 
     private suspend fun loadHistory(request: BittensorPortfolioHistoryRequest, accountSubject: String): BittensorPortfolioHistory = coroutineScope {
-        val nativePrices = async {
-            if (request.currency.code.equals("USD", ignoreCase = true)) {
-                null
-            } else {
-                val priceId = requireNotNull(request.nativePriceId) { "Missing native FX price identifier" }
-                coinPriceRepository.getLastHistoryForPeriod(priceId, request.currency, request.period.priceSource)
-            }
-        }
+        val fiatHistory = async { loadFiatHistory(request) }
         val url = urls.bittensorBackendUrl("portfolio/history/search")
         val response = api.history(url, accountSubject, request.period.name)
         val accountHistory = mapBittensorPortfolioHistory(response, request.period)
-        BittensorPortfolioHistory(accountHistory, nativePrices.await())
+        BittensorPortfolioHistory(accountHistory, fiatHistory.await())
+    }
+
+    private suspend fun loadFiatHistory(request: BittensorPortfolioHistoryRequest): BittensorPortfolioFiatHistory {
+        if (request.currency.code.equals("USD", ignoreCase = true)) return BittensorPortfolioFiatHistory.ReportedUsd
+
+        val priceId = requireNotNull(request.nativePriceId) { "Missing native FX price identifier" }
+        val nativePrices = coinPriceRepository.getLastHistoryForPeriod(priceId, request.currency, request.period.priceSource)
+        return BittensorPortfolioFiatHistory.Converted(nativePrices)
     }
 }

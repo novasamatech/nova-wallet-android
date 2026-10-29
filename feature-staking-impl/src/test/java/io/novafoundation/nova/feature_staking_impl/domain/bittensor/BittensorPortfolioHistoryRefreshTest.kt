@@ -34,7 +34,13 @@ class BittensorPortfolioHistoryRefreshTest {
 
     private val updates = BittensorPositionUpdates()
 
-    private val interactor = BittensorPortfolioChartInteractor(repository, calculator, accounts, chains, updates)
+    private val interactor = BittensorPortfolioChartInteractor(
+        historyRepository = repository,
+        calculator = calculator,
+        accounts = accounts,
+        chainRegistry = chains,
+        positionUpdates = updates
+    )
 
     private val chain = mock(Chain::class.java)
 
@@ -42,19 +48,31 @@ class BittensorPortfolioHistoryRefreshTest {
 
     private val currency = mock(Currency::class.java)
 
-    private val request = BittensorPortfolioHistoryRequest(1L, "chain", null, currency, BittensorPortfolioPeriod.ONE_DAY)
+    private val request = BittensorPortfolioHistoryRequest(
+        metaId = 1L,
+        chainId = "chain",
+        nativePriceId = null,
+        currency = currency,
+        period = BittensorPortfolioPeriod.ONE_DAY
+    )
 
-    private val status = BittensorPortfolioHistoryStatus(BigDecimal.ZERO, false)
+    private val status = BittensorPortfolioHistoryStatus(asOf = BigDecimal.ZERO, stale = false)
 
-    private val historyAccount = BittensorAccountHistory(BittensorPortfolioPeriod.ONE_DAY, 0, 1000, emptyList(), status)
+    private val historyAccount = BittensorAccountHistory(
+        period = BittensorPortfolioPeriod.ONE_DAY,
+        windowStart = 0,
+        windowEnd = 1000,
+        points = emptyList(),
+        status = status
+    )
 
-    private val history = BittensorPortfolioHistory(historyAccount, null)
+    private val history = BittensorPortfolioHistory(historyAccount, fiatHistory = BittensorPortfolioFiatHistory.ReportedUsd)
 
     private suspend fun prepare() {
-        `when`(chains.getChain("chain")).thenReturn(chain)
-        `when`(accounts.getMetaAccount(1L)).thenReturn(account)
-        `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
-        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: "")).thenReturn(history)
+        `when`(chains.getChain(chainId = "chain")).thenReturn(chain)
+        `when`(accounts.getMetaAccount(metaId = 1L)).thenReturn(account)
+        `when`(account.accountIdIn(chain)).thenReturn(ByteArray(size = 32))
+        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, accountSubject = anyString() ?: "")).thenReturn(history)
     }
 
     @Test
@@ -67,14 +85,14 @@ class BittensorPortfolioHistoryRefreshTest {
         advanceTimeBy(299_999)
         runCurrent()
         assertEquals(1, loads)
-        updates.confirmed(1L, "chain", null)
+        updates.confirmed(metaId = 1L, chainId = "chain", coldkey = null)
         runCurrent()
         assertEquals(2, loads)
         advanceTimeBy(1)
         runCurrent()
         assertEquals(3, loads)
         job.cancelAndJoin()
-        updates.confirmed(1L, "chain", null)
+        updates.confirmed(metaId = 1L, chainId = "chain", coldkey = null)
         advanceTimeBy(300_000)
         runCurrent()
         assertEquals(3, loads)
@@ -86,8 +104,8 @@ class BittensorPortfolioHistoryRefreshTest {
         var loads = 0
         val job = launch { interactor.observeHistory(request).collect { loads++ } }
         runCurrent()
-        updates.confirmed(2L, "chain", null)
-        updates.confirmed(1L, "another-chain", null)
+        updates.confirmed(metaId = 2L, chainId = "chain", coldkey = null)
+        updates.confirmed(metaId = 1L, chainId = "another-chain", coldkey = null)
         runCurrent()
         assertEquals(1, loads)
         job.cancelAndJoin()
@@ -96,7 +114,7 @@ class BittensorPortfolioHistoryRefreshTest {
     @Test
     fun `cancelling history observation is not converted to an empty success`() = runTest {
         prepare()
-        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
+        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, accountSubject = anyString() ?: ""))
             .thenThrow(CancellationException("Switched wallet"))
         var emitted = false
         val job = launch { interactor.observeHistory(request).collect { emitted = true } }

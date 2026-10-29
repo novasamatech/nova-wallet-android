@@ -9,7 +9,12 @@ class BittensorPortfolioHistoryRemote(
 ) {
     class Window(val start: String?, val end: String?)
 
-    class Point(val timestamp: String?, val reportedValueTao: String?, val reportedValueUsd: String?, val completed: Boolean?)
+    class Point(
+        val timestamp: String?,
+        val reportedValueTao: String?,
+        val reportedValueUsd: String?,
+        val completed: Boolean?
+    )
 
     class Meta(val completeness: String?, val components: Components?)
 

@@ -14,9 +14,15 @@ data class BittensorPortfolioHistoryRequest(
 
 data class BittensorPortfolioHistory(
     val account: BittensorAccountHistory,
-    // Null means reported USD; an empty list means no usable FX observations.
-    val nativePrices: List<HistoricalCoinRate>?
+    val fiatHistory: BittensorPortfolioFiatHistory
 )
+
+sealed interface BittensorPortfolioFiatHistory {
+
+    object ReportedUsd : BittensorPortfolioFiatHistory
+
+    data class Converted(val nativePrices: List<HistoricalCoinRate>) : BittensorPortfolioFiatHistory
+}
 
 /** Complete response for a bounded window of partial tao.app-reported history, not a wallet ledger. */
 data class BittensorAccountHistory(

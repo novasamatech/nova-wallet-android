@@ -14,9 +14,15 @@ data class BittensorPortfolioLiveAnchor(val tao: BigDecimal, val currentNativePr
  */
 class BittensorPortfolioChartCalculator {
 
-    private class HistoricalFx(val prices: List<HistoricalCoinRate>) {
+    /** Calculation-local FX index: filter and sort once, then reuse for completed and carried points. */
+    private sealed interface PreparedFiatHistory {
 
-        val timestamps = prices.map { it.timestamp }
+        object ReportedUsd : PreparedFiatHistory
+
+        class Converted(val prices: List<HistoricalCoinRate>) : PreparedFiatHistory {
+
+            val timestamps = prices.map { it.timestamp }
+        }
     }
 
     fun calculate(
@@ -24,17 +30,17 @@ class BittensorPortfolioChartCalculator {
         liveAnchor: BittensorPortfolioLiveAnchor?,
         now: Long = System.currentTimeMillis() / 1000
     ): BittensorPortfolioValueSeries {
-        val fx = historicalFx(history)
+        val fx = history.fiatHistory.prepare()
         val historical = gridPoints(history.account, completedPoints(history, fx), fx, now)
         val livePoint = livePoint(history, liveAnchor, historical.lastOrNull(), now)
         val points = if (livePoint == null) historical else historical + livePoint
         return BittensorPortfolioValueSeries(points, periodChange(points, history.account))
     }
 
-    private fun completedPoints(history: BittensorPortfolioHistory, fx: HistoricalFx?): List<BittensorPortfolioValuePoint> {
+    private fun completedPoints(history: BittensorPortfolioHistory, fx: PreparedFiatHistory): List<BittensorPortfolioValuePoint> {
         return history.account.points
             .filter { it.completed }
-            .mapNotNull { historicalPoint(it, fx, history.account.period.fxToleranceSeconds) }
+            .mapNotNull { it.toValuePoint(fx, history.account.period.fxToleranceSeconds) }
             .sortedBy { it.timestamp }
     }
 
@@ -46,7 +52,7 @@ class BittensorPortfolioChartCalculator {
     private fun gridPoints(
         account: BittensorAccountHistory,
         completed: List<BittensorPortfolioValuePoint>,
-        fx: HistoricalFx?,
+        fx: PreparedFiatHistory,
         now: Long
     ): List<BittensorPortfolioValuePoint> {
         if (account.windowStart > account.windowEnd) return completed
@@ -82,37 +88,43 @@ class BittensorPortfolioChartCalculator {
     private fun carriedPoint(
         last: BittensorPortfolioValuePoint,
         instant: Long,
-        fx: HistoricalFx?,
+        fx: PreparedFiatHistory,
         tolerance: Long
     ): BittensorPortfolioValuePoint {
-        val price = fx?.let { historicalPrice(it, instant, tolerance) }
+        val price = when (fx) {
+            PreparedFiatHistory.ReportedUsd -> null
+            is PreparedFiatHistory.Converted -> historicalPrice(fx, instant, tolerance)
+        }
         val fiat = if (price == null) last.fiat else last.tao * price
         return BittensorPortfolioValuePoint(instant, last.tao, fiat)
     }
 
-    private fun historicalFx(history: BittensorPortfolioHistory): HistoricalFx? {
-        val prices = history.nativePrices ?: return null
-        val usablePrices = prices
-            .filter { it.rate.isPositive }
-            .sortedBy { it.timestamp }
-        return HistoricalFx(usablePrices)
+    private fun BittensorPortfolioFiatHistory.prepare(): PreparedFiatHistory {
+        return when (this) {
+            BittensorPortfolioFiatHistory.ReportedUsd -> PreparedFiatHistory.ReportedUsd
+            is BittensorPortfolioFiatHistory.Converted -> PreparedFiatHistory.Converted(
+                nativePrices
+                    .filter { it.rate.isPositive }
+                    .sortedBy { it.timestamp }
+            )
+        }
     }
 
-    private fun historicalPoint(
-        point: BittensorPortfolioHistoryPoint,
-        fx: HistoricalFx?,
+    private fun BittensorPortfolioHistoryPoint.toValuePoint(
+        fx: PreparedFiatHistory,
         tolerance: Long
     ): BittensorPortfolioValuePoint? {
-        val fiat = if (fx == null) {
-            point.usd
-        } else {
-            val price = historicalPrice(fx, point.timestamp, tolerance) ?: return null
-            point.tao * price
+        val fiat = when (fx) {
+            PreparedFiatHistory.ReportedUsd -> usd
+            is PreparedFiatHistory.Converted -> {
+                val price = historicalPrice(fx, timestamp, tolerance) ?: return null
+                tao * price
+            }
         }
-        return BittensorPortfolioValuePoint(point.timestamp, point.tao, fiat)
+        return BittensorPortfolioValuePoint(timestamp, tao, fiat)
     }
 
-    private fun historicalPrice(fx: HistoricalFx, timestamp: Long, tolerance: Long): BigDecimal? {
+    private fun historicalPrice(fx: PreparedFiatHistory.Converted, timestamp: Long, tolerance: Long): BigDecimal? {
         val index = nearestBittensorPriceIndex(fx.timestamps, timestamp, tolerance) ?: return null
         return fx.prices[index].rate
     }
@@ -131,7 +143,7 @@ class BittensorPortfolioChartCalculator {
     }
 
     private fun livePrice(history: BittensorPortfolioHistory, anchor: BittensorPortfolioLiveAnchor, now: Long): BigDecimal? {
-        if (history.nativePrices == null) {
+        if (history.fiatHistory is BittensorPortfolioFiatHistory.ReportedUsd) {
             reportedUsdPrice(history.account, now)?.let { return it }
         }
         return anchor.currentNativePrice?.takeIf { it.isPositive }
@@ -142,14 +154,14 @@ class BittensorPortfolioChartCalculator {
         if (history.status.stale) return null
 
         val point = history.points.lastOrNull {
-            isUsableUsdPrice(it, now, history.period.fxToleranceSeconds)
+            it.isUsableUsdPrice(now, history.period.fxToleranceSeconds)
         } ?: return null
         return point.usd.divide(point.tao, CALCULATION_SCALE, RoundingMode.HALF_EVEN)
     }
 
-    private fun isUsableUsdPrice(point: BittensorPortfolioHistoryPoint, now: Long, tolerance: Long): Boolean {
-        val isRecent = now - point.timestamp <= tolerance
-        return isRecent && point.tao.isPositive && point.usd.isPositive
+    private fun BittensorPortfolioHistoryPoint.isUsableUsdPrice(now: Long, tolerance: Long): Boolean {
+        val isRecent = now - timestamp <= tolerance
+        return isRecent && tao.isPositive && usd.isPositive
     }
 
     private fun periodChange(points: List<BittensorPortfolioValuePoint>, history: BittensorAccountHistory): BigDecimal? {

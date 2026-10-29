@@ -21,7 +21,13 @@ internal fun mapBittensorPortfolioHistory(remote: BittensorPortfolioHistoryRemot
     val window = mapPortfolioHistoryWindow(remote.window)
     val status = mapPortfolioHistoryStatus(remote.meta)
     val points = mapPortfolioHistoryPoints(remote.points, window)
-    return BittensorAccountHistory(period, window.start.toLong(), window.end.toLong(), points, status)
+    return BittensorAccountHistory(
+        period = period,
+        windowStart = window.start.toLong(),
+        windowEnd = window.end.toLong(),
+        points = points,
+        status = status
+    )
 }
 
 private fun mapPortfolioHistoryWindow(remote: BittensorPortfolioHistoryRemote.Window?): PortfolioHistoryWindow {
@@ -55,22 +61,22 @@ private fun mapPortfolioHistoryPoints(
 ): List<BittensorPortfolioHistoryPoint> {
     val points = requireNotNull(remote)
     require(points.size <= MAX_PORTFOLIO_HISTORY_POINTS) { "Too many portfolio history points" }
-    var previous: BigDecimal? = null
+    var previousTimestamp: BigDecimal? = null
     return points.map { point ->
         val timestamp = parseBittensorTimestamp(requireNotNull(point.timestamp))
         require(timestamp >= window.start && timestamp <= window.end) { "Portfolio history point outside window" }
-        require(previous?.let { timestamp > it } != false) { "Portfolio history points not strictly ascending" }
-        previous = timestamp
+        require(previousTimestamp?.let { timestamp > it } != false) { "Portfolio history points not strictly ascending" }
+        previousTimestamp = timestamp
         mapPortfolioHistoryPoint(point, timestamp)
     }
 }
 
 private fun mapPortfolioHistoryPoint(point: BittensorPortfolioHistoryRemote.Point, timestamp: BigDecimal): BittensorPortfolioHistoryPoint {
     return BittensorPortfolioHistoryPoint(
-        timestamp.toLong(),
-        mapPortfolioDecimal(point.reportedValueTao),
-        mapPortfolioDecimal(point.reportedValueUsd),
-        requireNotNull(point.completed)
+        timestamp = timestamp.toLong(),
+        tao = mapPortfolioDecimal(point.reportedValueTao),
+        usd = mapPortfolioDecimal(point.reportedValueUsd),
+        completed = requireNotNull(point.completed)
     )
 }
 
