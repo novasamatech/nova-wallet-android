@@ -34,11 +34,13 @@ class BittensorEstimatesRepositoryTest {
 
     private val computationalCache = mock(ComputationalCache::class.java)
 
+    private val preferences = mock(Preferences::class.java)
+
     private val historyRepository = BittensorOperationHistoryRepository(
         remoteSource,
         infrastructureUrls,
         computationalCache,
-        mock(Preferences::class.java)
+        preferences
     )
 
     private val yieldRepository = BittensorAlphaYieldRepository(remoteSource, infrastructureUrls)
@@ -178,6 +180,18 @@ class BittensorEstimatesRepositoryTest {
         val failure = runCatching { history() }.exceptionOrNull()
 
         assertEquals("Operation history page exceeds its declared size", failure?.message)
+    }
+
+    @Test
+    fun `invalid next page is rejected before mapping items`() = runBlocking {
+        api.nextHistoryPage = { 3 }
+        val item = mock(BittensorOperationsRemote.Item::class.java)
+        api.historyItems = listOf(item)
+
+        val failure = runCatching { history() }.exceptionOrNull()
+
+        assertEquals("Unexpected operation history next page", failure?.message)
+        assertEquals(listOf(1), api.historyPages)
     }
 
     @Test

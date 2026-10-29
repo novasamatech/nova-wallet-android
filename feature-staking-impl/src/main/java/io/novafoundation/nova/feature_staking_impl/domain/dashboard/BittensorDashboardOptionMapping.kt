@@ -19,14 +19,18 @@ internal fun <S> AggregatedStakingDashboardOption<S>.withBittensorDetails(
         else -> false
     }
     if (!matches) return this
-    var details = detailsByChain[chain.id] ?: mapBittensorDashboardDetails(null, emptyMap(), emptyMap(), emptyMap())
-        .copy(rootYieldLoading = true, subnetYieldLoading = true, maximumYieldLoading = true)
+    var details = detailsByChain[chain.id] ?: mapBittensorDashboardDetails(
+        positions = null,
+        rootYields = emptyMap(),
+        subnetYields = emptyMap(),
+        recommendedYields = emptyMap()
+    ).copy(rootYieldLoading = true, subnetYieldLoading = true, maximumYieldLoading = true)
     // The updater's HasStake classification includes claimable root rewards without stake; those get
-    // their own panel. An emptied stake stays loading until the updater has read the rewards and
+    // their own panel. A confirmed empty stake stays loading until the updater has read the rewards and
     // reclassified the card, never an active zero stake.
     if (stakingState is AggregatedStakingDashboardOption.HasStake &&
         details.composition == BittensorDashboardDetails.Composition.NONE &&
-        details.pricing != BittensorDashboardDetails.Pricing.LOADING &&
+        details.pricing == BittensorDashboardDetails.Pricing.KNOWN &&
         !details.showsClaimableRewardsPanel
     ) {
         details = details.copy(totalStakeInPlanks = null, pricing = BittensorDashboardDetails.Pricing.LOADING)

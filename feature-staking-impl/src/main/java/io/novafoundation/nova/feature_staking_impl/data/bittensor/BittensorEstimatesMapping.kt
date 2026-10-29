@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRep
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
+import kotlinx.coroutines.CancellationException
 
 internal data class BittensorValidatorYield(val hotkey: AccountIdKey, val annualPercentageYield: BigDecimal, val reliable: Boolean = true)
 
@@ -45,8 +46,13 @@ internal fun mapBittensorValidatorYield(
     require(remote.netuid == subnetId.value && remote.metricKind == "ALPHA_VALIDATOR_APY")
 
     val address = remote.hotkey ?: return null
-    val hotkey = runCatching { AccountIdKey(chain.accountIdOf(address)) }
-        .getOrNull() ?: return null
+    val hotkey = try {
+        AccountIdKey(chain.accountIdOf(address))
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        return null
+    }
 
     val reliability = remote.rateReliability
 

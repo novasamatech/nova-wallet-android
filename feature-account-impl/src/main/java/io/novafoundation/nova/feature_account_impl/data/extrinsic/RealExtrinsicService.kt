@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
@@ -62,6 +61,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -101,6 +101,8 @@ class RealExtrinsicService(
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
 
         ExtrinsicSubmission(hash, submissionOrigin, callExecutionType, signingHierarchy)
+    }.onFailure {
+        if (it is CancellationException) throw it
     }
 
     override suspend fun submitMultiExtrinsicAwaitingInclusion(
@@ -136,6 +138,8 @@ class RealExtrinsicService(
         rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic)
             .map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
             .takeWhileInclusive { !it.status.terminal }
+    }.onFailure {
+        if (it is CancellationException) throw it
     }
 
     override suspend fun submitExtrinsicAndAwaitExecution(
@@ -227,6 +231,7 @@ class RealExtrinsicService(
 
             extrinsicWithEvents.determineOutcome(runtime)
         }.getOrElse {
+            if (it is CancellationException) throw it
             Log.w(LOG_TAG, "Failed to determine extrinsic outcome", it)
 
             ExtrinsicDispatch.Unknown

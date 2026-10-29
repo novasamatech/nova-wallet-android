@@ -66,7 +66,7 @@ class BittensorQuickPickInteractorTest {
     }
 
     @Test
-    fun `changed registration is shown as a failure before a later retry can select anew`() = runTest {
+    fun `retry preserves the selected registration until a new visit`() = runTest {
         val eligible = subnet.copy(taoReserveInPlanks = BigInteger.TEN.pow(15))
         val registeredAgain = eligible.copy(registrationBlock = BigInteger.valueOf(11))
         `when`(repository.quickPickSubnets()).thenReturn(listOf(eligible), listOf(registeredAgain), listOf(registeredAgain))
@@ -81,7 +81,40 @@ class BittensorQuickPickInteractorTest {
         assertTrue(emitted.last() is ExtendedLoadingState.Error)
         retries.value += 1
         runCurrent()
-        assertEquals(registeredAgain.registrationBlock, emitted.last().dataOrNull?.registrationBlock)
+        assertTrue(emitted.last() is ExtendedLoadingState.Error)
+        job.cancel()
+
+        val nextVisit = mutableListOf<ExtendedLoadingState<BittensorSubnet>>()
+        val nextRetries = MutableStateFlow(0)
+        val nextJob = backgroundScope.launch {
+            interactor.observeSelection(BittensorQuickPickOrder.POOL_SIZE, nextRetries).collect(nextVisit::add)
+        }
+        runCurrent()
+        assertEquals(registeredAgain.registrationBlock, nextVisit.last().dataOrNull?.registrationBlock)
+        nextJob.cancel()
+    }
+
+    @Test
+    fun `retry does not replace a removed subnet with another candidate`() = runTest {
+        val eligible = subnet.copy(taoReserveInPlanks = BigInteger.TEN.pow(15))
+        val replacementId = BittensorNetuid.Subnet(2)
+        val replacement = eligible.copy(id = replacementId)
+        `when`(repository.quickPickSubnets()).thenReturn(listOf(eligible), listOf(replacement), listOf(replacement))
+        `when`(availability.isEnabled(subnetId)).thenReturn(false)
+        `when`(availability.isEnabled(replacementId)).thenReturn(true)
+        `when`(swaps.currentAlphaPrice(ChainGeneses.BITTENSOR, replacementId)).thenReturn(BigInteger.ONE)
+        val retries = MutableStateFlow(0)
+        val emitted = mutableListOf<ExtendedLoadingState<BittensorSubnet>>()
+        val job = backgroundScope.launch { interactor.observeSelection(BittensorQuickPickOrder.POOL_SIZE, retries).collect(emitted::add) }
+        runCurrent()
+
+        repeat(2) {
+            retries.value += 1
+            runCurrent()
+            assertTrue(emitted.last() is ExtendedLoadingState.Error)
+        }
+
+        assertTrue(emitted.none { it is ExtendedLoadingState.Loaded })
         job.cancel()
     }
 

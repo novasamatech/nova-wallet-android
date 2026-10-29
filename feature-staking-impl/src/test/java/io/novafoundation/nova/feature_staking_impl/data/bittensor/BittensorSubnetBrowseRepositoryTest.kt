@@ -11,8 +11,10 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import java.io.IOException
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.mockito.Mockito.mock
@@ -100,7 +102,9 @@ class BittensorSubnetBrowseRepositoryTest {
         val storage = DisabledStorage(storageDelegate)
         val availability = BittensorSubnetTradingAvailabilityRepository(storage)
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
-        val repository = BittensorSubnetBrowseRepository(BittensorSubnetCatalogueRepository(api, urls), runtime, availability, RecordingLogger())
+        val catalogueRepository = BittensorSubnetCatalogueRepository(api, urls)
+        val logger = RecordingLogger()
+        val repository = BittensorSubnetBrowseRepository(catalogueRepository, runtime, availability, logger)
         val row = BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend", "S", 10.toBigInteger(), "2000")
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
         val components = BittensorSubnetCatalogueRemote.Components(component, component)
@@ -168,6 +172,23 @@ class BittensorSubnetBrowseRepositoryTest {
         assertTrue(failure?.cause is TimeoutCancellationException)
     }
 
+    @Test
+    fun `caller timeout and cancellation cannot return the last loaded catalogue`() = runTest {
+        val api = SwitchableCatalogueApi()
+        val storageDelegate = mock(StorageDataSource::class.java)
+        val storage = SwitchableStorage(storageDelegate)
+        val repository = browseRepository(api, storage)
+        repository.subnets()
+        storage.offline = true
+
+        val timeout = runCatching { withTimeout(1L) { repository.subnets() } }.exceptionOrNull()
+        assertTrue(timeout is TimeoutCancellationException)
+
+        storage.offline = false
+        api.failure = CancellationException("Cancelled")
+        assertTrue(runCatching { repository.subnets() }.exceptionOrNull() is CancellationException)
+    }
+
     private class DisabledStorage(delegate: StorageDataSource) : StorageDataSource by delegate {
 
         @Suppress("UNCHECKED_CAST")
@@ -189,7 +210,8 @@ class BittensorSubnetBrowseRepositoryTest {
         val runtime = mock(BittensorSubnetRepository::class.java)
         runBlocking { `when`(runtime.catalogue()).thenReturn(BittensorSubnetCatalogue(listOf(subnet(1, 10, 1)), fromChain = true)) }
         val availability = BittensorSubnetTradingAvailabilityRepository(storage)
-        return BittensorSubnetBrowseRepository(BittensorSubnetCatalogueRepository(api, urls), runtime, availability, logger, timeoutMillis)
+        val catalogueRepository = BittensorSubnetCatalogueRepository(api, urls)
+        return BittensorSubnetBrowseRepository(catalogueRepository, runtime, availability, logger, timeoutMillis)
     }
 
     private class RecordingLogger : Logger {

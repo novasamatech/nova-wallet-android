@@ -1,8 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.utils.asGsonParsedIntOrNull
-import io.novafoundation.nova.common.utils.asGsonParsedLongOrNull
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
@@ -18,6 +16,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.ChainRemote
+import java.math.BigDecimal
+import java.math.BigInteger
 
 private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
@@ -46,6 +46,7 @@ private const val DISABLED_CHECK_METADATA_HASH = "disabledCheckMetadataHash"
 private const val SESSION_LENGTH = "sessionLength"
 private const val SESSIONS_PER_ERA = "sessionsPerEra"
 private const val TIMELINE_CHAIN = "timelineChain"
+private const val NEW_FEATURES = "newFeatures"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -65,17 +66,17 @@ fun mapRemoteChainToLocal(
             defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
             themeColor = (it[CHAIN_THEME_COLOR] as? String),
             stakingWiki = (it[CHAIN_STAKING_WIKI] as? String),
-            defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
+            defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asChainConfigLongOrNull(),
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
-            stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asGsonParsedIntOrNull(),
+            stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asChainConfigIntOrNull(),
             feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
             supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
             identityChain = it[IDENTITY_CHAIN] as? ChainId,
             disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
-            sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull(),
-            sessionsPerEra = it[SESSIONS_PER_ERA].asGsonParsedIntOrNull(),
+            sessionLength = it[SESSION_LENGTH].asChainConfigIntOrNull(),
+            sessionsPerEra = it[SESSIONS_PER_ERA].asChainConfigIntOrNull(),
             timelineChain = it[TIMELINE_CHAIN] as? ChainId,
-            newFeatures = mapNewChainFeatures(it["newFeatures"])
+            newFeatures = mapNewChainFeatures(it[NEW_FEATURES])
         )
     }
 
@@ -108,6 +109,30 @@ fun mapRemoteChainToLocal(
     }
 
     return chainLocal
+}
+
+private fun Any?.asChainConfigIntOrNull(): Int? {
+    return asChainConfigIntegerOrNull()
+        ?.takeIf { it >= Int.MIN_VALUE.toBigInteger() && it <= Int.MAX_VALUE.toBigInteger() }
+        ?.toInt()
+}
+
+private fun Any?.asChainConfigLongOrNull(): Long? {
+    return asChainConfigIntegerOrNull()
+        ?.takeIf { it >= Long.MIN_VALUE.toBigInteger() && it <= Long.MAX_VALUE.toBigInteger() }
+        ?.toLong()
+}
+
+private fun Any?.asChainConfigIntegerOrNull(): BigInteger? {
+    val decimal = when (this) {
+        is String -> return toBigIntegerOrNull()
+        is Double -> takeIf { it.isFinite() }?.let { BigDecimal(it) }
+        is Float -> takeIf { it.isFinite() }?.let { BigDecimal(it.toDouble()) }
+        is Number -> toString().toBigDecimalOrNull()
+        else -> null
+    }
+
+    return decimal?.takeIf { it.stripTrailingZeros().scale() <= 0 }?.toBigInteger()
 }
 
 private fun mapNodeSelectionStrategyToLocal(remote: String?): AutoBalanceStrategyLocal {

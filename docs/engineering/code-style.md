@@ -19,9 +19,20 @@ Order class members as properties, init blocks, then functions. Do not interleav
 
 For calls with multiple arguments that include a lambda or are followed by a trailing lambda, put each parenthesized argument on its own line. Keep the closing parenthesis on a separate line; do not compress such calls just because they fit the line-length limit.
 
+Use named arguments for `null`, empty collections/arrays, and other non-self-describing literals or placeholder values so the parameter's role is clear at the call site. Descriptively named variables may remain positional; do not require names for every argument merely because another argument is named. When mixing named and positional arguments, keep declaration order. For APIs that do not support named arguments (such as Java methods), use a descriptive local value when the argument would otherwise be ambiguous.
+
+```kotlin
+mapBittensorDashboardDetails(
+    positions = null,
+    rootYields = emptyMap(),
+    subnetYieldsCached,
+    recommendedYieldsFiltered
+)
+```
+
 Put successive transformation calls in a method chain on separate lines when this improves readability. Keep short expressions, simple property access, and short predicate calls together; do not mechanically split expressions such as `finalizedBlock(chainId).number` or `hash.equals(transactionHash, ignoreCase = true)`. Keep a short call and its arguments on one line when they fit naturally. When an `if` condition contains a multi-line collection predicate or nested transformation, extract a descriptively named Boolean before the `if` so the control flow remains immediately visible.
 
-Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
+Separate fetching a remote response from transforming its contents. Break large methods that mix source construction, mapping, state transitions, and persistence into focused, descriptively named functions. The entry method should read as orchestration, and a `combine` lambda should assemble results instead of owning whole workflows. Do not merely move the entire large body into another method or introduce wrappers without reducing complexity. Preserve subscription topology, state ownership, emission order, cancellation, and side-effect timing during extraction. Extract nested transformations and error handling into focused functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
 
 Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
 

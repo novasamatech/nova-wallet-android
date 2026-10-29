@@ -17,52 +17,56 @@ private val SUBNET_SYMBOL_PATTERN = Regex("sn[0-9]+")
 private val MARKET_ID_PATTERN = Regex("[a-z0-9-]+")
 
 /** CoinGecko uses sn<N> market symbols; names and alpha symbols are not reliable identifiers. */
-class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi) {
+class BittensorSubnetMarketRepository(
+    private val api: BittensorSubnetMarketsApi,
+    private val nanoTime: () -> Long = System::nanoTime
+) {
+
+    private class CachedMarkets(val rows: Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote>, val loadedAtNanos: Long)
 
     private val mutex = Mutex()
 
-    private var cached = emptyMap<BittensorNetuid.Subnet, String>()
-
-    private var cachedMarkets = emptyMap<BittensorNetuid.Subnet, BittensorSubnetMarketRemote>()
-
-    private var loadedAt = 0L
+    private var cached: CachedMarkets? = null
 
     suspend fun priceId(subnetId: BittensorNetuid.Subnet): String? = mutex.withLock {
-        refreshMarkets()
-        cached[subnetId]
+        markets()[subnetId]?.id
     }
 
     suspend fun weeklyMarkets(): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> = mutex.withLock {
-        refreshMarkets()
-        cachedMarkets
+        markets()
     }
 
-    private suspend fun refreshMarkets() {
-        if (loadedAt == 0L || System.nanoTime() - loadedAt > MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
-            val requestStartedAt = System.nanoTime()
-            val markets = loadMarkets()
-            val ids = mapBittensorMarketIds(markets)
-            // No listed subnet is a degraded response, not every subnet unlisted, so the read fails.
-            require(ids.isNotEmpty()) { "Empty subnet markets" }
-            cached = ids
-            val byId = markets.associateBy { it.id }
-            cachedMarkets = cached.mapValues { (_, id) -> requireNotNull(byId[id]) }
-            loadedAt = requestStartedAt
-        }
+    private suspend fun markets(): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> {
+        cached?.takeIf { nanoTime() - it.loadedAtNanos < MARKET_CACHE_VALIDITY.inWholeNanoseconds }?.let { return it.rows }
+
+        val requestStartedAt = nanoTime()
+        val response = loadMarkets()
+        val markets = mapBittensorMarkets(response)
+        // No listed subnet is a degraded response, not every subnet unlisted, so the read fails.
+        require(markets.isNotEmpty()) { "Empty subnet markets" }
+        cached = CachedMarkets(markets, requestStartedAt)
+        return markets
     }
 
     private suspend fun loadMarkets(): List<BittensorSubnetMarketRemote> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
-        buildList {
-            for (page in 1..MAX_MARKET_PAGES) {
-                val markets = api.markets(perPage = MARKET_PAGE_SIZE, page = page)
-                addAll(markets)
-                if (markets.size < MARKET_PAGE_SIZE) break
-            }
+        val markets = mutableListOf<BittensorSubnetMarketRemote>()
+        val seenMarketIds = mutableSetOf<String>()
+        for (page in 1..MAX_MARKET_PAGES) {
+            val response = api.markets(perPage = MARKET_PAGE_SIZE, page = page)
+            require(response.size <= MARKET_PAGE_SIZE) { "Oversized subnet markets page" }
+            val pageIds = response.mapNotNull { it.id?.trim() }
+            require(pageIds.all { seenMarketIds.add(it) }) { "Duplicate subnet market id" }
+            markets.addAll(response)
+            if (response.size < MARKET_PAGE_SIZE) return@withTimeoutOrNull markets
         }
+        error("Incomplete subnet markets pagination")
     } ?: throw BittensorTimeoutException("Subnet markets")
 }
 
-internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {
+internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> =
+    mapBittensorMarkets(rows).mapValues { (_, market) -> requireNotNull(market.id) }
+
+private fun mapBittensorMarkets(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> = buildMap {
     rows.forEach { row ->
         val symbol = row.symbol?.trim()?.lowercase() ?: return@forEach
         if (!symbol.matches(SUBNET_SYMBOL_PATTERN)) return@forEach
@@ -71,6 +75,6 @@ internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map
         val subnetId = runCatching { BittensorNetuid.Subnet(netuid) }
             .getOrNull() ?: return@forEach
         val id = row.id?.trim()?.takeIf { it.matches(MARKET_ID_PATTERN) } ?: return@forEach
-        if (subnetId !in this) put(subnetId, id)
+        if (subnetId !in this) put(subnetId, row.copy(id = id))
     }
 }

@@ -49,6 +49,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -98,6 +99,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.la
 class BittensorDetailsRetryTest {
 
     private val analyticsService = RecordingBittensorAnalytics()
+
     private val analytics = analyticsService
 
     private val accountRepository = mock(AccountRepository::class.java)
@@ -186,7 +188,9 @@ class BittensorDetailsRetryTest {
 
     private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry, positionUpdates)
 
-    private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
+    private val automaticInteractionGate = mock(AutomaticInteractionGate::class.java)
+
+    private val retryController = BittensorRetryController(resources, logger, automaticInteractionGate)
 
     private val router = mock(StakingRouter::class.java)
 
@@ -208,18 +212,27 @@ class BittensorDetailsRetryTest {
 
     private val fiatFormatter = mock(FiatFormatter::class.java)
 
-    private val tokenFormatter = mock(TokenFormatter::class.java)
+    private val tokenFormatter = object : TokenFormatter {
+        override fun formatToken(amount: BigDecimal, token: TokenSymbol, config: TokenConfig): CharSequence =
+            "${amount.stripTrailingZeros().toPlainString()} ${token.value}"
+    }
 
     private val amountFormatter = BittensorAmountFormatter(tokenFormatter, fiatFormatter, resources)
 
     private val axisFormatterFactory = BittensorChartAxisFormatter.Factory(fiatFormatter, tokenFormatter)
 
+    private val actionLauncher = mock(ActionBottomSheetLauncher::class.java)
+
     private val actionLauncherFactory = object : ActionBottomSheetLauncherFactory {
-        override fun create(): ActionBottomSheetLauncher = mock(ActionBottomSheetLauncher::class.java)
+        override fun create(): ActionBottomSheetLauncher = actionLauncher
     }
 
+    private val signerProvider = mock(SignerProvider::class.java)
+
+    private val immediateExecution = BittensorImmediateExecution(signerProvider)
+
     private val walletGate = BittensorWalletGate(
-        BittensorImmediateExecution(mock(SignerProvider::class.java)),
+        immediateExecution,
         accountRepository,
         chainRegistry,
         resources,

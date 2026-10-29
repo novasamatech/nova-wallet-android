@@ -4,15 +4,17 @@ import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsFlushReason
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.analyticsLog
+import io.novafoundation.nova.analytics.analyticsWarn
 import java.util.UUID
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -49,7 +51,7 @@ class RealAnalyticsService(
 
     private var session: ConsentSession? = null
 
-    private var erasure: Deferred<Unit>? = null
+    private var erasure: ConsentErasure? = null
 
     @Volatile
     private var lastFlushAt = 0L
@@ -68,14 +70,9 @@ class RealAnalyticsService(
                     session = null
 
                     // A later consent waits for erasure. Shared authentication is never reset here.
-                    val previousErasure = erasure
-                    erasure = scope.async(dispatcher, start = CoroutineStart.LAZY) {
-                        previousErasure?.await()
-                        queueMutex.withLock {
-                            queue.clear()
-                            identity.resetInstallId()
-                        }
-                    }.also { it.start() }
+                    val pendingErasure = ConsentErasure()
+                    erasure = pendingErasure
+                    scope.launch(dispatcher) { eraseConsent(pendingErasure) }
                 }
             }
         }
@@ -134,7 +131,9 @@ class RealAnalyticsService(
 
     private suspend fun withConsent(consent: ConsentSession, action: suspend () -> Unit) = coroutineScope {
         val work = async(start = CoroutineStart.LAZY) {
-            consent.erasure?.await()
+            consent.job.ensureActive()
+            val pendingErasure = consent.erasure
+            if (pendingErasure != null && eraseConsent(pendingErasure) != ErasureStatus.COMPLETE) return@async
             consent.job.ensureActive()
             action()
         }
@@ -144,6 +143,31 @@ class RealAnalyticsService(
             work.await()
         } finally {
             cancellation.dispose()
+        }
+    }
+
+    private suspend fun eraseConsent(pendingErasure: ConsentErasure): ErasureStatus = queueMutex.withLock {
+        // Delayed work from an older withdrawal must not clear a newer session's events.
+        if (synchronized(consentLock) { erasure !== pendingErasure }) return@withLock ErasureStatus.RETRY_REQUIRED
+        if (pendingErasure.status == ErasureStatus.COMPLETE) return@withLock ErasureStatus.COMPLETE
+
+        var operation = "clearing queued events"
+        try {
+            currentCoroutineContext().ensureActive()
+            queue.clear()
+            currentCoroutineContext().ensureActive()
+            operation = "rotating install identity"
+            identity.resetInstallId()
+            pendingErasure.status = ErasureStatus.COMPLETE
+            ErasureStatus.COMPLETE
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (failure: Exception) {
+            analyticsWarn(
+                "consent erasure failed while $operation (${failure.javaClass.simpleName}); " +
+                    "analytics blocked until the next track, flush or disable retries"
+            )
+            ErasureStatus.RETRY_REQUIRED
         }
     }
 
@@ -157,5 +181,10 @@ class RealAnalyticsService(
         }
     }
 
-    private class ConsentSession(val job: Job, val erasure: Deferred<Unit>?)
+    private class ConsentSession(val job: Job, val erasure: ConsentErasure?)
+
+    // Accessed only under queueMutex; completion opens the gate for this consent generation.
+    private class ConsentErasure(var status: ErasureStatus = ErasureStatus.RETRY_REQUIRED)
+
+    private enum class ErasureStatus { RETRY_REQUIRED, COMPLETE }
 }

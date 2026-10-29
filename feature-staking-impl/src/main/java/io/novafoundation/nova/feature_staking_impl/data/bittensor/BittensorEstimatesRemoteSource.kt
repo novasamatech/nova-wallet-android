@@ -16,7 +16,10 @@ class BittensorEstimatesRemoteSource(
 ) {
 
     suspend fun history(baseUrl: HttpUrl, address: String): EstimatePages<BittensorReportedOperation> =
-        loadPages(HISTORY_PAGE_LIMIT, spacingMillis) { page -> loadHistoryPage(baseUrl, address, page) }
+        loadPages(
+            HISTORY_PAGE_LIMIT,
+            spacingMillis
+        ) { page -> loadHistoryPage(baseUrl, address, page) }
 
     /** Alpha yields arrive as one unpaginated collection per subnet, so there is nothing to page through. */
     internal suspend fun yields(baseUrl: HttpUrl, chain: Chain, subnet: BittensorNetuid.Subnet): EstimatePages<BittensorValidatorYield> {
@@ -25,19 +28,12 @@ class BittensorEstimatesRemoteSource(
     }
 
     private suspend fun loadHistoryPage(baseUrl: HttpUrl, address: String, page: Int): EstimatePage<BittensorReportedOperation> {
-        val url = endpoint(baseUrl, "operations/search")
+        val url = endpoint(baseUrl, path = "operations/search")
         val requestStartedAtNanos = System.nanoTime()
-        val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.operations(url, address, page) }
-            ?: throw BittensorTimeoutException("Operation history page")
+        val response = requestHistoryPage(url, address, page)
         val validUntilNanos = deadline(response, requestStartedAtNanos)
-        val body = requireBody(response)
-        requireAvailableBittensorComponent(body.meta?.components?.operationHistory, "Operation history")
-        require(body.historyScope == "TAO_APP_PARTIAL")
-        val remoteItems = requireNotNull(body.items)
-        validateHistoryPage(body.pageInfo, page, remoteItems.size)
-        val items = remoteItems
-            .map(::mapBittensorReportedOperation)
-        return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
+
+        return mapHistoryPage(requireBody(response), page, validUntilNanos)
     }
 
     private suspend fun loadYieldSnapshot(
@@ -45,15 +41,45 @@ class BittensorEstimatesRemoteSource(
         chain: Chain,
         subnetId: BittensorNetuid.Subnet
     ): EstimatePage<BittensorValidatorYield> {
-        val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha")
+        val url = endpoint(baseUrl, path = "subnets/${subnetId.value}/yields/alpha")
         val requestStartedAtNanos = System.nanoTime()
-        val response = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
-            ?: throw BittensorTimeoutException("Validator yield snapshot")
+        val response = requestYieldSnapshot(url)
         val validUntilNanos = deadline(response, requestStartedAtNanos)
-        val body = requireBody(response)
-        requireAvailableBittensorComponent(body.meta?.components?.alphaYield, "Yield source")
-        val items = requireNotNull(body.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnetId) }
-        return EstimatePage(items, null, validUntilNanos)
+
+        return mapYieldSnapshot(requireBody(response), chain, subnetId, validUntilNanos)
+    }
+
+    private suspend fun requestHistoryPage(url: String, address: String, page: Int): Response<BittensorOperationsRemote> =
+        withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.operations(url, address, page) }
+            ?: throw BittensorTimeoutException(operation = "Operation history page")
+
+    private suspend fun requestYieldSnapshot(url: String): Response<BittensorAlphaYieldsRemote> =
+        withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
+            ?: throw BittensorTimeoutException(operation = "Validator yield snapshot")
+
+    private fun mapHistoryPage(
+        remote: BittensorOperationsRemote,
+        requestedPage: Int,
+        validUntilNanos: Long
+    ): EstimatePage<BittensorReportedOperation> {
+        requireAvailableBittensorComponent(remote.meta?.components?.operationHistory, name = "Operation history")
+        require(remote.historyScope == "TAO_APP_PARTIAL")
+        val remoteItems = requireNotNull(remote.items)
+        val nextPage = requireHistoryNextPage(remote.pageInfo, requestedPage, remoteItems.size)
+        val items = remoteItems.map(::mapBittensorReportedOperation)
+        return EstimatePage(items, nextPage, validUntilNanos)
+    }
+
+    private fun mapYieldSnapshot(
+        remote: BittensorAlphaYieldsRemote,
+        chain: Chain,
+        subnetId: BittensorNetuid.Subnet,
+        validUntilNanos: Long
+    ): EstimatePage<BittensorValidatorYield> {
+        requireAvailableBittensorComponent(remote.meta?.components?.alphaYield, name = "Yield source")
+        val remoteItems = requireNotNull(remote.items)
+        val items = remoteItems.mapNotNull { mapBittensorValidatorYield(it, chain, subnetId) }
+        return EstimatePage(items, nextPage = null, validUntilNanos)
     }
 
     private suspend fun <T> loadPages(
@@ -92,17 +118,14 @@ class BittensorEstimatesRemoteSource(
         return requestStartedAtNanos + seconds * NANOS_PER_SECOND
     }
 
-    private fun nextPage(info: BittensorHistoryPageInfo?, current: Int): Int? {
-        val value = requireNotNull(info).nextPage
-        require(value == null || value == current + 1 && value <= MAX_PROVIDER_PAGE)
-        return value
-    }
-
-    private fun validateHistoryPage(info: BittensorHistoryPageInfo?, requestedPage: Int, itemCount: Int) {
+    private fun requireHistoryNextPage(info: BittensorHistoryPageInfo?, requestedPage: Int, itemCount: Int): Int? {
         requireNotNull(info) { "Missing operation history pagination" }
         require(info.page == requestedPage && requestedPage in FIRST_PAGE..MAX_PROVIDER_PAGE) { "Unexpected operation history page" }
         require(info.pageSize == PAGE_SIZE) { "Unexpected operation history page size" }
         require(itemCount <= PAGE_SIZE) { "Operation history page exceeds its declared size" }
+        val nextPage = info.nextPage
+        require(nextPage == null || nextPage == requestedPage + 1 && nextPage <= MAX_PROVIDER_PAGE) { "Unexpected operation history next page" }
+        return nextPage
     }
 
     private fun <T> requireBody(response: Response<T>): T {

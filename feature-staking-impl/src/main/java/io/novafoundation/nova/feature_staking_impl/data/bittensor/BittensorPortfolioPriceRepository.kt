@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
@@ -26,7 +23,10 @@ class RealBittensorPortfolioPriceRepository(
 
     override suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
         if (heldSubnets.isEmpty()) return emptyMap()
-        val backend = loadPrices("backend") { mapBittensorPortfolioPrices(catalogueRepository.catalogue()) }
+        val backend = loadPrices("backend") {
+            val response = catalogueRepository.catalogue()
+            mapBittensorPortfolioPrices(response)
+        }
             .filterKeys { it in heldSubnets }
         val missing = heldSubnets - backend.keys
         if (missing.isEmpty()) return backend
@@ -62,25 +62,4 @@ class RealBittensorPortfolioPriceRepository(
 internal fun mapBittensorPortfolioPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
     val fresh = requireAvailableBittensorComponent(response.meta?.components?.alphaPrices, "Portfolio prices")
     return if (fresh) mapBittensorSubnetPrices(response) else emptyMap()
-}
-
-/** Catalogue prices regardless of freshness - for listing, never for valuing holdings. */
-internal fun mapBittensorSubnetPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
-    val subnets = requireNotNull(response.items)
-    val seenSubnets = mutableSetOf<BittensorNetuid.Subnet>()
-
-    return buildMap {
-        for (subnet in subnets) {
-            val netuid = BittensorNetuid.from(requireNotNull(subnet.netuid))
-            if (netuid !is BittensorNetuid.Subnet || !seenSubnets.add(netuid)) continue
-
-            val reportedPrice = subnet.taoPerAlpha ?: continue
-            val price = reportedPrice
-                .toBigDecimal()
-                .multiply(BittensorProtocolUnits.RAO_PER_TAO.toBigDecimal())
-                .toBigIntegerExact()
-            require(price.isNonNegative) { "Negative subnet price" }
-            if (price.isPositive()) put(netuid, price)
-        }
-    }
 }

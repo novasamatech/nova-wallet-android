@@ -32,12 +32,7 @@ class BittensorQuickPickInteractor(
                     val catalogue = subnets()
                     val reference = selected ?: select(catalogue, order)
                     selected = reference
-                    try {
-                        resolve(catalogue, reference)
-                    } catch (invalidated: SelectionInvalidated) {
-                        selected = null
-                        throw invalidated
-                    }
+                    resolve(catalogue, reference)
                 }.withSafeLoading().onEach { state ->
                     if (state is ExtendedLoadingState.Error && state.exception is CancellationException) throw state.exception
                 }

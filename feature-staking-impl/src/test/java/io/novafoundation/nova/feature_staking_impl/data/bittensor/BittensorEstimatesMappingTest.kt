@@ -4,11 +4,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
+import kotlinx.coroutines.CancellationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 class BittensorEstimatesMappingTest {
 
@@ -117,6 +120,61 @@ class BittensorEstimatesMappingTest {
             BigDecimal("79.56"),
             mapBittensorValidatorYield(item("79.56", null), chain, subnetId)?.annualPercentageYield
         )
+    }
+
+    @Test
+    fun `address decoding cancellation is propagated instead of skipping the yield`() {
+        val cancellation = CancellationException("Cancelled")
+        `when`(chain.isEthereumBased).thenThrow(cancellation)
+        val remote = BittensorAlphaYieldsRemote.Item(1, "hotkey", "12.5", "ALPHA_VALIDATOR_APY")
+
+        val failure = runCatching { mapBittensorValidatorYield(remote, chain, subnetId) }.exceptionOrNull()
+
+        assertSame(cancellation, failure)
+    }
+
+    @Test
+    fun `address decoding errors are propagated instead of skipping the yield`() {
+        val error = AssertionError("Decoder failure")
+        `when`(chain.isEthereumBased).thenThrow(error)
+        val remote = BittensorAlphaYieldsRemote.Item(1, "hotkey", "12.5", "ALPHA_VALIDATOR_APY")
+
+        val failure = runCatching { mapBittensorValidatorYield(remote, chain, subnetId) }.exceptionOrNull()
+
+        assertSame(error, failure)
+    }
+
+    @Test
+    fun `missing and malformed hotkeys are skipped`() {
+        for (hotkey in listOf(null, "", "invalid")) {
+            val remote = BittensorAlphaYieldsRemote.Item(1, hotkey, "12.5", "ALPHA_VALIDATOR_APY")
+
+            assertNull(mapBittensorValidatorYield(remote, chain, subnetId))
+        }
+    }
+
+    @Test
+    fun `unexpected subnet or metric is rejected even when the yield is unusable`() {
+        val wrongSubnet = BittensorAlphaYieldsRemote.Item(2, null, null, "ALPHA_VALIDATOR_APY")
+        val missingSubnet = BittensorAlphaYieldsRemote.Item(null, null, null, "ALPHA_VALIDATOR_APY")
+        val wrongMetric = BittensorAlphaYieldsRemote.Item(1, null, null, "OTHER")
+        val missingMetric = BittensorAlphaYieldsRemote.Item(1, null, null, null)
+
+        for (remote in listOf(wrongSubnet, missingSubnet, wrongMetric, missingMetric)) {
+            val failure = runCatching { mapBittensorValidatorYield(remote, chain, subnetId) }.exceptionOrNull()
+
+            assertTrue(failure is IllegalArgumentException)
+        }
+    }
+
+    @Test
+    fun `fractional and large yields preserve annual percent units`() {
+        val address = chain.addressOf(ByteArray(32) { 1 })
+        for (rate in listOf("0.125", "12.5", "669990.45")) {
+            val remote = BittensorAlphaYieldsRemote.Item(1, address, rate, "ALPHA_VALIDATOR_APY")
+
+            assertEquals(BigDecimal(rate), mapBittensorValidatorYield(remote, chain, subnetId)?.annualPercentageYield)
+        }
     }
 
     private fun operation(netuid: Int?) = BittensorOperationsRemote.Item(

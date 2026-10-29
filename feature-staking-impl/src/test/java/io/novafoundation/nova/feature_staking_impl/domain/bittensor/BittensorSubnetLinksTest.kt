@@ -20,6 +20,24 @@ class BittensorSubnetLinksTest {
     }
 
     @Test
+    fun `schemeless hosts can specify a port without becoming URL schemes`() {
+        assertEquals("https://example.com:8080/", BittensorSubnetLinks.website("example.com:8080"))
+        assertEquals("https://example.com:8080/app?view=1#details", BittensorSubnetLinks.website("example.com:8080/app?view=1#details"))
+        assertEquals("https://github.com/owner/repo", BittensorSubnetLinks.github("github.com:443/owner/repo"))
+    }
+
+    @Test
+    fun `port support does not admit invalid ports unsupported schemes or credentials`() {
+        listOf(
+            "example.com:65536",
+            "example.com:invalid",
+            "custom.scheme://example.com",
+            "ftp://example.com:8080",
+            "user:password@example.com:8080"
+        ).forEach { assertNull(it, BittensorSubnetLinks.website(it)) }
+    }
+
+    @Test
     fun `website rejects text that is not an http url`() {
         listOf(null, "", "   ", "not a url", "ByteLeap", "ftp://files.example", "https://", "mailto:hi@example.com", "https://user:pw@example.com")
             .forEach { assertNull(it, BittensorSubnetLinks.website(it)) }

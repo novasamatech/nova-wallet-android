@@ -3,10 +3,15 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavorites
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.text.Collator
 import java.util.Locale
 
-enum class BittensorSubnetSorting { SEVEN_DAY_CHANGE, POOL_DEPTH, AGE, NAME, APY }
+enum class BittensorSubnetSorting {
+    SEVEN_DAY_CHANGE,
+    POOL_DEPTH,
+    AGE,
+    NAME,
+    APY
+}
 
 internal fun sortBittensorSubnets(
     subnets: List<BittensorSubnet>,
@@ -19,60 +24,69 @@ internal fun sortBittensorSubnets(
     locale: Locale,
     subnetNumber: (Int) -> String
 ): List<BittensorSubnet> {
-    val ranks = previousOrder.withIndex().associate { it.value to it.index }
-    val order: Comparator<BittensorSubnet> = when (sorting) {
-        BittensorSubnetSorting.SEVEN_DAY_CHANGE -> compareByDescending<BittensorSubnet> { weekly[it.id] }
-        BittensorSubnetSorting.POOL_DEPTH -> compareByDescending { it.taoReserveInPlanks }
-        BittensorSubnetSorting.AGE -> compareBy { it.registrationBlock }
-        // By the title the row shows: an unnamed subnet sorts as "Subnet <netuid>".
-        BittensorSubnetSorting.NAME -> compareBy(BittensorNaturalOrder(locale)) { subnet ->
-            subnet.name.trim().ifEmpty { subnetNumber(subnet.id.value) }
-        }
-        BittensorSubnetSorting.APY -> compareByDescending { yields[it.id] }
-    }
-    val comparator = compareByDescending<BittensorSubnet> { it in favorites }.then(order)
-        .thenBy { subnet -> subnet.registrationBlock?.let { ranks[BittensorSubnetReference(subnet.id, it)] } ?: Int.MAX_VALUE }
+    val metricComparator = compareBySelectedMetric(
+        sorting,
+        yields,
+        weekly,
+        locale,
+        subnetNumber
+    )
+    val previousOrderComparator = compareByPreviousOrder(previousOrder)
+    val comparator = compareByDescending<BittensorSubnet> { it in favorites }
+        .then(metricComparator)
+        .then(previousOrderComparator)
         .thenBy { it.id.value }
         .thenBy { it.registrationBlock }
-    return subnets.filter { !hideThinPools || passesBittensorThinPoolFilter(it, favorites) }
+
+    return subnets
+        .filter { !hideThinPools || passesBittensorThinPoolFilter(it, favorites) }
         .sortedWith(comparator)
 }
 
-internal fun passesBittensorThinPoolFilter(subnet: BittensorSubnet, favorites: BittensorSubnetFavorites): Boolean =
-    subnet in favorites || (subnet.taoReserveInPlanks ?: BigInteger.ZERO) >= THIN_POOL_THRESHOLD
+internal fun passesBittensorThinPoolFilter(subnet: BittensorSubnet, favorites: BittensorSubnetFavorites): Boolean {
+    if (subnet in favorites) return true
 
-private val THIN_POOL_THRESHOLD = BigInteger.valueOf(2_000_000_000_000L)
+    val poolReserve = subnet.taoReserveInPlanks ?: return false
+    return poolReserve >= THIN_POOL_THRESHOLD
+}
 
-/** Finder order: case-insensitive, runs of digits compared by value ("Subnet 2" before "Subnet 10"). */
-internal class BittensorNaturalOrder(locale: Locale) : Comparator<String> {
-
-    private val letters = Collator.getInstance(locale).apply { strength = Collator.SECONDARY }
-
-    private val exact = Collator.getInstance(locale)
-
-    override fun compare(first: String, second: String): Int {
-        val firstRuns = first.runs()
-        val secondRuns = second.runs()
-        firstRuns.zip(secondRuns).forEach { (left, right) ->
-            val result = if (left.isNumber() && right.isNumber()) compareNumbers(left, right) else letters.compare(left, right)
-            if (result != 0) return result
-        }
-        val byRuns = firstRuns.size.compareTo(secondRuns.size)
-        return if (byRuns != 0) byRuns else exact.compare(first, second)
-    }
-
-    private fun String.runs(): List<String> = RUNS.findAll(this).map { it.value }.toList()
-
-    private fun String.isNumber(): Boolean = first() in '0'..'9'
-
-    private fun compareNumbers(left: String, right: String): Int {
-        val leftDigits = left.trimStart('0')
-        val rightDigits = right.trimStart('0')
-        return if (leftDigits.length != rightDigits.length) leftDigits.length.compareTo(rightDigits.length) else leftDigits.compareTo(rightDigits)
-    }
-
-    private companion object {
-
-        val RUNS = Regex("[0-9]+|[^0-9]+")
+private fun compareBySelectedMetric(
+    sorting: BittensorSubnetSorting,
+    annualYields: Map<BittensorNetuid.Subnet, BigDecimal>,
+    weeklyChanges: Map<BittensorNetuid.Subnet, BigDecimal>,
+    locale: Locale,
+    subnetNumber: (Int) -> String
+): Comparator<BittensorSubnet> {
+    return when (sorting) {
+        BittensorSubnetSorting.SEVEN_DAY_CHANGE -> compareByDescending { weeklyChanges[it.id] }
+        BittensorSubnetSorting.POOL_DEPTH -> compareByDescending { it.taoReserveInPlanks }
+        BittensorSubnetSorting.AGE -> compareBy(nullsLast<BigInteger>()) { it.registrationBlock }
+        BittensorSubnetSorting.NAME -> compareByDisplayedName(
+            locale,
+            subnetNumber
+        )
+        BittensorSubnetSorting.APY -> compareByDescending { annualYields[it.id] }
     }
 }
+
+private fun compareByDisplayedName(locale: Locale, subnetNumber: (Int) -> String): Comparator<BittensorSubnet> {
+    val nameComparator = BittensorSubnetNameComparator(locale)
+    return compareBy(nameComparator) { subnet ->
+        subnet.name.trim().ifEmpty { subnetNumber(subnet.id.value) }
+    }
+}
+
+private fun compareByPreviousOrder(previousOrder: List<BittensorSubnetReference>): Comparator<BittensorSubnet> {
+    val previousRanks = previousOrder.withIndex().associate { it.value to it.index }
+    return compareBy { subnet ->
+        subnet.previousRank(previousRanks)
+    }
+}
+
+private fun BittensorSubnet.previousRank(previousRanks: Map<BittensorSubnetReference, Int>): Int {
+    val registrationBlock = registrationBlock ?: return Int.MAX_VALUE
+    val reference = BittensorSubnetReference(id, registrationBlock)
+    return previousRanks[reference] ?: Int.MAX_VALUE
+}
+
+private val THIN_POOL_THRESHOLD = BigInteger.valueOf(2_000_000_000_000L)

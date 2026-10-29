@@ -9,7 +9,10 @@ class BittensorAnalyticsEventTest {
     @Test
     fun `selection retains wire name and string netuid`() {
         val event = BittensorAnalyticsEvent.TypeSelected(
-            "Bittensor", StakingAnalyticsTarget.SUBNET, StakingAnalyticsSelectionMethod.PICKER_SUBNET, 42
+            "Bittensor",
+            StakingAnalyticsTarget.SUBNET,
+            StakingAnalyticsSelectionMethod.PICKER_SUBNET,
+            42
         )
 
         assertEquals("staking_type_selected", event.name)
@@ -28,11 +31,20 @@ class BittensorAnalyticsEventTest {
     @Test
     fun `optional staking properties are omitted or included without changing values`() {
         val withoutOptionals = BittensorAnalyticsEvent.Initiated(
-            "Bittensor", StakingAnalyticsTarget.SUBNET, StakingMode.BUY_MORE, StakingValidatorSource.MANUAL, null, null
+            "Bittensor",
+            StakingAnalyticsTarget.SUBNET,
+            StakingMode.BUY_MORE,
+            StakingValidatorSource.MANUAL,
+            null,
+            null
         )
         val withOptionals = BittensorAnalyticsEvent.Initiated(
-            "Bittensor", StakingAnalyticsTarget.SUBNET, StakingMode.BUY_MORE, StakingValidatorSource.MANUAL,
-            SlippageBucket.LOW, AmountBucket.UNDER_1
+            "Bittensor",
+            StakingAnalyticsTarget.SUBNET,
+            StakingMode.BUY_MORE,
+            StakingValidatorSource.MANUAL,
+            SlippageBucket.LOW,
+            AmountBucket.UNDER_1
         )
 
         assertEquals("staking_initiated", withoutOptionals.name)
@@ -66,8 +78,14 @@ class BittensorAnalyticsEventTest {
         )
         expectedNames.forEach { (flow, name) ->
             val event = BittensorAnalyticsEvent.Failed(
-                flow, "Bittensor", StakingAnalyticsTarget.ROOT, null, null,
-                BittensorTransactionFailureReason.NOT_SUBMITTED, StakingFailureStage.NOT_SUBMITTED, false
+                flow,
+                "Bittensor",
+                StakingAnalyticsTarget.ROOT,
+                null,
+                null,
+                BittensorTransactionFailureReason.NOT_SUBMITTED,
+                StakingFailureStage.NOT_SUBMITTED,
+                false
             )
             assertEquals(name, event.name)
             assertFalse(event.properties.containsKey("mode"))
@@ -75,12 +93,24 @@ class BittensorAnalyticsEventTest {
         }
 
         val unstake = BittensorAnalyticsEvent.Failed(
-            StakingFlow.UNSTAKE, "Bittensor", StakingAnalyticsTarget.ROOT, null, UnstakeMode.FULL,
-            BittensorTransactionFailureReason.NOT_SUBMITTED, StakingFailureStage.NOT_SUBMITTED, true
+            StakingFlow.UNSTAKE,
+            "Bittensor",
+            StakingAnalyticsTarget.ROOT,
+            null,
+            UnstakeMode.FULL,
+            BittensorTransactionFailureReason.NOT_SUBMITTED,
+            StakingFailureStage.NOT_SUBMITTED,
+            true
         )
         val stake = BittensorAnalyticsEvent.Failed(
-            StakingFlow.STAKE, "Bittensor", StakingAnalyticsTarget.ROOT, StakingMode.ADD_STAKE, UnstakeMode.FULL,
-            BittensorTransactionFailureReason.NOT_SUBMITTED, StakingFailureStage.NOT_SUBMITTED, true
+            StakingFlow.STAKE,
+            "Bittensor",
+            StakingAnalyticsTarget.ROOT,
+            StakingMode.ADD_STAKE,
+            UnstakeMode.FULL,
+            BittensorTransactionFailureReason.NOT_SUBMITTED,
+            StakingFailureStage.NOT_SUBMITTED,
+            true
         )
         assertEquals("full", unstake.properties["mode"])
         assertEquals("add_stake", stake.properties["mode"])
@@ -91,6 +121,32 @@ class BittensorAnalyticsEventTest {
         mapOf(-1 to "0", 0 to "0", 1 to "1", 2 to "2", 3 to "3_plus", 10 to "3_plus").forEach { (count, bucket) ->
             val event = BittensorAnalyticsEvent.ClaimInitiated("Bittensor", null, count)
             assertEquals(bucket, event.properties["validators_count_bucket"])
+        }
+    }
+
+    @Test
+    fun `subnet interactions retain wire name and action properties`() {
+        val search = BittensorAnalyticsEvent.SubnetSearch()
+        val sort = BittensorAnalyticsEvent.SubnetSort(SubnetSortKey.SEVEN_DAY_CHANGE)
+        val favoriteAdded = BittensorAnalyticsEvent.SubnetFavorite(added = true)
+        val favoriteRemoved = BittensorAnalyticsEvent.SubnetFavorite(added = false)
+
+        listOf(search, sort, favoriteAdded, favoriteRemoved).forEach { event ->
+            assertEquals("subnet_list_interacted", event.name)
+        }
+        assertEquals(mapOf("action" to "search"), search.properties)
+        assertEquals(mapOf("action" to "sort", "value" to "seven_day_change"), sort.properties)
+        assertEquals(mapOf("action" to "favorite_added"), favoriteAdded.properties)
+        assertEquals(mapOf("action" to "favorite_removed"), favoriteRemoved.properties)
+    }
+
+    @Test
+    fun `subnet filter retains boolean values including false`() {
+        listOf(false, true).forEach { enabled ->
+            val event = BittensorAnalyticsEvent.SubnetFilter(enabled)
+
+            assertEquals("subnet_list_interacted", event.name)
+            assertEquals(mapOf("action" to "filter_thin_pools", "value" to enabled), event.properties)
         }
     }
 }

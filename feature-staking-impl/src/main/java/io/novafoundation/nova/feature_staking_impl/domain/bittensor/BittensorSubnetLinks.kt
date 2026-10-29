@@ -11,6 +11,8 @@ object BittensorSubnetLinks {
 
     private val schemePrefix = Regex("^[A-Za-z][A-Za-z0-9+.-]*:")
 
+    private val hostWithPortPrefix = Regex("^[^:/?#]+:[0-9]+(?:[/#?]|$)")
+
     private val githubHosts = setOf("github.com", "www.github.com")
 
     fun website(raw: String?): String? = parse(raw)?.toString()
@@ -40,7 +42,8 @@ object BittensorSubnetLinks {
             ?.takeIf { it.isNotEmpty() && it.none(Char::isWhitespace) }
             ?: return null
 
-        val withScheme = if (schemePrefix.containsMatchIn(text)) text else "https://$text"
+        val hasScheme = schemePrefix.containsMatchIn(text) && !hostWithPortPrefix.containsMatchIn(text)
+        val withScheme = if (hasScheme) text else "https://$text"
 
         return withScheme.toHttpUrlOrNull()
             ?.takeIf { it.host.contains('.') && it.username.isEmpty() && it.password.isEmpty() }

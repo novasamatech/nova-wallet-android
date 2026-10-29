@@ -40,10 +40,15 @@ class BittensorDashboardDetailsMappingTest {
     fun `root APY is stake weighted and remains percent`() {
         val positions = BittensorPortfolioPositions(
             listOf(BittensorRootPosition(first, n(1)), BittensorRootPosition(second, n(3))),
-            emptyList(),
-            emptyMap()
+            subnets = emptyList(),
+            subnetPrices = emptyMap()
         )
-        val details = mapBittensorDashboardDetails(positions, mapOf(first to d(10), second to d(20)), emptyMap(), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            positions,
+            rootYields = mapOf(first to d(10), second to d(20)),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap()
+        )
         assertEquals(Composition.ROOT, details.composition)
         assertEquals(n(4), details.panelStakeInPlanks)
         assertEquals(0, d(17.5).compareTo(details.panelAnnualPercentageYield))
@@ -52,12 +57,12 @@ class BittensorDashboardDetailsMappingTest {
     @Test
     fun `subnet APY weights TAO value rather than alpha units`() {
         val positions = BittensorPortfolioPositions(
-            emptyList(),
+            root = emptyList(),
             listOf(BittensorSubnetPosition(subnet, first, n(10)), BittensorSubnetPosition(otherSubnet, second, n(10))),
             mapOf(subnet to n(1_000_000_000), otherSubnet to n(3_000_000_000))
         )
         val rates = mapOf(subnet to mapOf(first to d(10)), otherSubnet to mapOf(second to d(20)))
-        val details = mapBittensorDashboardDetails(positions, emptyMap(), rates, emptyMap())
+        val details = mapBittensorDashboardDetails(positions, rootYields = emptyMap(), rates, recommendedYields = emptyMap())
         assertEquals(Composition.SUBNETS, details.composition)
         assertEquals(n(40), details.panelStakeInPlanks)
         assertEquals(0, d(17.5).compareTo(details.panelAnnualPercentageYield))
@@ -66,7 +71,12 @@ class BittensorDashboardDetailsMappingTest {
     @Test
     fun `mixed composition shows total above and root stake and yield in panel`() {
         val positions = portfolio()
-        val details = mapBittensorDashboardDetails(positions, mapOf(first to d(8)), mapOf(subnet to mapOf(second to d(30))), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            positions,
+            rootYields = mapOf(first to d(8)),
+            subnetYields = mapOf(subnet to mapOf(second to d(30))),
+            recommendedYields = emptyMap()
+        )
         assertEquals(Composition.MIXED, details.composition)
         assertEquals(n(30), details.totalStakeInPlanks)
         assertEquals(n(10), details.panelStakeInPlanks)
@@ -75,7 +85,12 @@ class BittensorDashboardDetailsMappingTest {
 
     @Test
     fun `unknown subnet price never becomes partial total or suppresses root panel`() {
-        val details = mapBittensorDashboardDetails(portfolio().copy(subnetPrices = emptyMap()), mapOf(first to d(8)), emptyMap(), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            portfolio().copy(subnetPrices = emptyMap()),
+            rootYields = mapOf(first to d(8)),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap()
+        )
         assertEquals(Pricing.UNKNOWN, details.pricing)
         assertNull(details.totalStakeInPlanks)
         assertNull(details.subnetAnnualPercentageYield)
@@ -85,7 +100,12 @@ class BittensorDashboardDetailsMappingTest {
 
     @Test
     fun `initial loading is distinct from settled unavailable`() {
-        val details = mapBittensorDashboardDetails(null, emptyMap(), emptyMap(), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            positions = null,
+            rootYields = emptyMap(),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap()
+        )
         assertEquals(Pricing.LOADING, details.pricing)
         assertNull(details.totalStakeInPlanks)
     }
@@ -94,17 +114,27 @@ class BittensorDashboardDetailsMappingTest {
     fun `missing validator yield does not produce partial weighted APY`() {
         val positions = BittensorPortfolioPositions(
             listOf(BittensorRootPosition(first, n(1)), BittensorRootPosition(second, n(3))),
-            emptyList(),
-            emptyMap()
+            subnets = emptyList(),
+            subnetPrices = emptyMap()
         )
-        val details = mapBittensorDashboardDetails(positions, mapOf(first to d(10)), emptyMap(), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            positions,
+            rootYields = mapOf(first to d(10)),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap()
+        )
         assertNull(details.rootAnnualPercentageYield)
     }
 
     @Test
     fun `no stake selects maximum reported recommendation yield including zero`() {
-        val positions = BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap())
-        val details = mapBittensorDashboardDetails(positions, emptyMap(), emptyMap(), mapOf(subnet to d(0), otherSubnet to d(15)))
+        val positions = BittensorPortfolioPositions(root = emptyList(), subnets = emptyList(), subnetPrices = emptyMap())
+        val details = mapBittensorDashboardDetails(
+            positions,
+            rootYields = emptyMap(),
+            subnetYields = emptyMap(),
+            recommendedYields = mapOf(subnet to d(0), otherSubnet to d(15))
+        )
         assertEquals(Composition.NONE, details.composition)
         assertEquals(d(15), details.maximumAnnualPercentageYield)
         assertNull(details.panelAnnualPercentageYield)
@@ -113,10 +143,15 @@ class BittensorDashboardDetailsMappingTest {
     @Test
     fun `emptied stake stays loading until the updater reclassifies it`() {
         `when`(chain.id).thenReturn("chain")
-        val state = AggregatedStakingDashboardOption.HasStake(false, Chain.Asset.StakingType.BITTENSOR_ROOT, n(0), ExtendedLoadingState.Loading)
+        val state = AggregatedStakingDashboardOption.HasStake(
+            showStakingType = false,
+            Chain.Asset.StakingType.BITTENSOR_ROOT,
+            stake = n(0),
+            ExtendedLoadingState.Loading
+        )
         val option = AggregatedStakingDashboardOption(chain, token, state, AggregatedStakingDashboardOption.SyncingStage.SYNCED)
-        val empty = BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap())
-        val details = mapBittensorDashboardDetails(empty, emptyMap(), emptyMap(), emptyMap())
+        val empty = BittensorPortfolioPositions(root = emptyList(), subnets = emptyList(), subnetPrices = emptyMap())
+        val details = mapBittensorDashboardDetails(empty, rootYields = emptyMap(), subnetYields = emptyMap(), recommendedYields = emptyMap())
         val mapped = option.withBittensorDetails(mapOf("chain" to details))
         assertSame(state, mapped.stakingState)
         assertEquals(Composition.NONE, mapped.bittensorDetails?.composition)
@@ -127,8 +162,19 @@ class BittensorDashboardDetailsMappingTest {
 
     @Test
     fun `claimable root rewards add root to a subnet stake`() {
-        val subnetOnly = BittensorPortfolioPositions(emptyList(), listOf(BittensorSubnetPosition(subnet, second, n(20))), mapOf(subnet to n(1_000_000_000)))
-        val details = mapBittensorDashboardDetails(subnetOnly, emptyMap(), emptyMap(), emptyMap(), pricingPending = false, claimableRootRewards = n(7))
+        val subnetOnly = BittensorPortfolioPositions(
+            root = emptyList(),
+            listOf(BittensorSubnetPosition(subnet, second, n(20))),
+            mapOf(subnet to n(1_000_000_000))
+        )
+        val details = mapBittensorDashboardDetails(
+            subnetOnly,
+            rootYields = emptyMap(),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap(),
+            pricingPending = false,
+            claimableRootRewards = n(7)
+        )
         assertEquals(Composition.MIXED, details.composition)
         assertFalse(details.showsClaimableRewardsPanel)
         assertEquals(n(0), details.panelStakeInPlanks)
@@ -138,10 +184,15 @@ class BittensorDashboardDetailsMappingTest {
     @Test
     fun `claimable rewards without stake get their own panel instead of a zero root stake`() {
         `when`(chain.id).thenReturn("chain")
-        val state = AggregatedStakingDashboardOption.HasStake(false, Chain.Asset.StakingType.BITTENSOR_ROOT, n(0), ExtendedLoadingState.Loading)
+        val state = AggregatedStakingDashboardOption.HasStake(
+            showStakingType = false,
+            Chain.Asset.StakingType.BITTENSOR_ROOT,
+            stake = n(0),
+            ExtendedLoadingState.Loading
+        )
         val option = AggregatedStakingDashboardOption(chain, token, state, AggregatedStakingDashboardOption.SyncingStage.SYNCED)
-        val empty = BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap())
-        val details = mapBittensorDashboardDetails(empty, emptyMap(), emptyMap(), emptyMap())
+        val empty = BittensorPortfolioPositions(root = emptyList(), subnets = emptyList(), subnetPrices = emptyMap())
+        val details = mapBittensorDashboardDetails(empty, rootYields = emptyMap(), subnetYields = emptyMap(), recommendedYields = emptyMap())
             .copy(rootYieldLoading = true, claimableRootRewardsInPlanks = n(7))
         val mapped = requireNotNull(option.withBittensorDetails(mapOf("chain" to details)).bittensorDetails)
         assertEquals(Composition.NONE, mapped.composition)
@@ -153,7 +204,12 @@ class BittensorDashboardDetailsMappingTest {
 
     @Test
     fun `claimable rewards do not replace an existing stake panel`() {
-        val details = mapBittensorDashboardDetails(portfolio(), mapOf(first to d(8)), emptyMap(), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            portfolio(),
+            rootYields = mapOf(first to d(8)),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap()
+        )
             .copy(claimableRootRewardsInPlanks = n(7))
         assertFalse(details.showsClaimableRewardsPanel)
         assertEquals(n(10), details.panelStakeInPlanks)
@@ -161,7 +217,12 @@ class BittensorDashboardDetailsMappingTest {
 
     @Test
     fun `root panel does not wait for subnet yields`() {
-        val details = mapBittensorDashboardDetails(portfolio(), mapOf(first to d(8)), emptyMap(), emptyMap())
+        val details = mapBittensorDashboardDetails(
+            portfolio(),
+            rootYields = mapOf(first to d(8)),
+            subnetYields = emptyMap(),
+            recommendedYields = emptyMap()
+        )
             .copy(rootYieldLoading = false, subnetYieldLoading = true)
         assertTrue(details.showsRootPanel)
         assertEquals(false, details.panelYieldLoading)

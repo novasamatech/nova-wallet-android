@@ -235,14 +235,14 @@ object BittensorAnalyticsEvent {
     class SubnetSearch : AnalyticsEvent(
         name = "subnet_list_interacted",
         properties = mapOf(
-            "action" to "search"
+            "action" to SubnetListAction.SEARCH.value
         )
     )
 
     class SubnetSort(sort: SubnetSortKey) : AnalyticsEvent(
         name = "subnet_list_interacted",
         properties = mapOf(
-            "action" to "sort",
+            "action" to SubnetListAction.SORT.value,
             "value" to sort.value
         )
     )
@@ -250,7 +250,7 @@ object BittensorAnalyticsEvent {
     class SubnetFilter(enabled: Boolean) : AnalyticsEvent(
         name = "subnet_list_interacted",
         properties = mapOf(
-            "action" to "filter_thin_pools",
+            "action" to SubnetListAction.FILTER_THIN_POOLS.value,
             "value" to enabled
         )
     )
@@ -258,7 +258,7 @@ object BittensorAnalyticsEvent {
     class SubnetFavorite(added: Boolean) : AnalyticsEvent(
         name = "subnet_list_interacted",
         properties = mapOf(
-            "action" to if (added) "favorite_added" else "favorite_removed"
+            "action" to if (added) SubnetListAction.FAVORITE_ADDED.value else SubnetListAction.FAVORITE_REMOVED.value
         )
     )
 
@@ -351,7 +351,14 @@ object BittensorAnalyticsEvent {
 }
 
 enum class BittensorTransactionFailureReason(val value: String) {
-    USER_CANCELLED("user_cancelled"), NETWORK_ERROR("network_error"), NOT_SUBMITTED("not_submitted"), DISPATCH_OTHER("dispatch_other"),
-    SLIPPAGE_EXCEEDED("slippage_exceeded"), ROOT_STAKE_LOCKED("root_stake_locked"), CHAIN_CONDITION("chain_condition"),
-    TOO_HEAVY("too_heavy"), FUND_UNAVAILABLE("fund_unavailable"), BELOW_MINIMUM("below_minimum")
+    USER_CANCELLED("user_cancelled"),
+    NETWORK_ERROR("network_error"),
+    NOT_SUBMITTED("not_submitted"),
+    DISPATCH_OTHER("dispatch_other"),
+    SLIPPAGE_EXCEEDED("slippage_exceeded"),
+    ROOT_STAKE_LOCKED("root_stake_locked"),
+    CHAIN_CONDITION("chain_condition"),
+    TOO_HEAVY("too_heavy"),
+    FUND_UNAVAILABLE("fund_unavailable"),
+    BELOW_MINIMUM("below_minimum")
 }

@@ -148,6 +148,26 @@ class ExtrinsicServiceExtTest {
         assertTrue(released)
     }
 
+    @Test
+    fun `cancellation returned from preparation is rethrown`() = runBlocking {
+        val cancellation = CancellationException("Preparation cancelled")
+        val submission = Result.failure<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>>(cancellation)
+
+        try {
+            submission.awaitInBlock()
+            fail("Cancellation must propagate")
+        } catch (error: CancellationException) {
+            assertSame(cancellation, error)
+        }
+    }
+
+    @Test
+    fun `watch completion without inclusion is not success`() = runBlocking {
+        val updates = flowOf(watch(ExtrinsicStatus.Ready(extrinsicHash)))
+
+        assertTrue(Result.success(updates).awaitInBlock().isFailure)
+    }
+
     private fun watch(status: ExtrinsicStatus): ExtrinsicWatchResult<ExtrinsicStatus> {
         return ExtrinsicWatchResult(status, hierarchy)
     }

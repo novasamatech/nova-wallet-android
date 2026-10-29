@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.analytics.transport.AnalyticsApi
 import io.novafoundation.nova.analytics.transport.AnalyticsEventQueue
 import io.novafoundation.nova.analytics.transport.AnalyticsEventsRequest
+import io.novafoundation.nova.analytics.transport.AnalyticsIdentity
 import io.novafoundation.nova.analytics.transport.AnalyticsUploader
 import io.novafoundation.nova.analytics.transport.QueuedEvent
 import io.novafoundation.nova.analytics.transport.RealAnalyticsIdentity
@@ -12,12 +13,14 @@ import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import java.io.IOException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -153,6 +156,201 @@ class AnalyticsConsentTest {
     }
 
     @Test
+    fun `failed first clear is retried by later disable and only new consent events upload`() = runTest {
+        val backingDao = InMemoryAnalyticsEventsDao()
+        val dao = ControllableErasureDao(backingDao)
+        dao.beforeClear = { if (dao.clearAttempts == 1) throw IOException("storage unavailable") }
+        // Like RootScope, backgroundScope supervises failures so the old implementation can
+        // reach the later disable and expose its poisoned erasure instead of cancelling this test.
+        val fixture = Fixture(this, dao, serviceScope = backgroundScope)
+        val oldId = fixture.identity.installId()
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.SessionStarted)
+        runCurrent()
+
+        fixture.service.isEnabled = false
+        runCurrent()
+        assertEquals(1, dao.clearAttempts)
+        assertEquals(listOf("session_started"), fixture.queue.peek(50).map { it.name })
+        assertEquals(oldId, fixture.identity.installId())
+
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.SessionStarted)
+        fixture.service.isEnabled = false
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.WalletCreationStarted)
+        runCurrent()
+        assertEquals(2, dao.clearAttempts)
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+
+        val request = fixture.api.requests.single()
+        assertEquals(listOf("wallet_creation_started"), request.events.map { it.name })
+        assertNotEquals(oldId, request.install_id)
+        assertEquals(fixture.identity.installId(), request.install_id)
+        assertEquals(0, fixture.queue.size())
+    }
+
+    @Test
+    fun `failed erasure blocks tracking and flush until tracking retries after storage recovery`() = runTest {
+        val backingDao = InMemoryAnalyticsEventsDao()
+        val dao = ControllableErasureDao(backingDao)
+        val fixture = Fixture(this, dao)
+        val oldId = fixture.identity.installId()
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.SessionStarted)
+        advanceUntilIdle()
+        dao.beforeClear = { throw IOException("storage unavailable") }
+
+        fixture.service.isEnabled = false
+        runCurrent()
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.WalletCreationStarted)
+        advanceUntilIdle()
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+
+        assertEquals(3, dao.clearAttempts)
+        assertTrue(fixture.service.isEnabled)
+        assertEquals(listOf("session_started"), fixture.queue.peek(50).map { it.name })
+        assertEquals(oldId, fixture.identity.installId())
+        assertTrue(fixture.api.requests.isEmpty())
+        assertEquals(0, fixture.urlReads)
+
+        dao.beforeClear = {}
+        fixture.service.track(AnalyticsEvent.WalletCreationStarted)
+        advanceUntilIdle()
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+
+        assertEquals(4, dao.clearAttempts)
+        val request = fixture.api.requests.single()
+        assertEquals(listOf("wallet_creation_started"), request.events.map { it.name })
+        assertNotEquals(oldId, request.install_id)
+        assertEquals(0, fixture.queue.size())
+    }
+
+    @Test
+    fun `flush retries failed erasure before reading obsolete events`() = runTest {
+        val backingDao = InMemoryAnalyticsEventsDao()
+        val dao = ControllableErasureDao(backingDao)
+        dao.beforeClear = { if (dao.clearAttempts == 1) throw IOException("storage unavailable") }
+        val fixture = Fixture(this, dao)
+        val oldId = fixture.identity.installId()
+        val oldEvent = QueuedEvent("old", "session_started", 0L, emptyMap())
+        fixture.queue.enqueue(oldEvent)
+        fixture.service.isEnabled = false
+        runCurrent()
+
+        fixture.service.isEnabled = true
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+
+        assertEquals(2, dao.clearAttempts)
+        assertEquals(0, fixture.queue.size())
+        assertNotEquals(oldId, fixture.identity.installId())
+        assertTrue(fixture.api.requests.isEmpty())
+        assertEquals(0, fixture.urlReads)
+
+        fixture.service.track(AnalyticsEvent.WalletCreationStarted)
+        advanceUntilIdle()
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+        assertEquals(listOf("wallet_creation_started"), fixture.api.requests.single().events.map { it.name })
+        assertEquals(2, dao.clearAttempts)
+    }
+
+    @Test
+    fun `superseded erasure cannot clear events admitted after current erasure`() = runTest {
+        val fixture = Fixture(this)
+        val oldEvent = QueuedEvent("old", "session_started", 0L, emptyMap())
+        val newEvent = QueuedEvent("new", "wallet_creation_started", 0L, emptyMap())
+        fixture.queue.enqueue(oldEvent)
+        fixture.service.isEnabled = false
+        fixture.service.isEnabled = false
+        fixture.service.isEnabled = true
+
+        // Complete the current gate before either scheduled background erasure runs,
+        // then model an event persisted under that successfully renewed consent.
+        val flushDispatcher = UnconfinedTestDispatcher(testScheduler)
+        withContext(flushDispatcher) {
+            fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+            fixture.queue.enqueue(newEvent)
+        }
+        runCurrent()
+
+        assertEquals(listOf("new"), fixture.queue.peek(50).map { it.id })
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+        assertEquals(listOf("new"), fixture.api.requests.single().events.map { it.id })
+    }
+
+    @Test
+    fun `failed identity rotation blocks new events until erasure retry completes`() = runTest {
+        val preferences = InMemoryPreferences()
+        val backingIdentity = RealAnalyticsIdentity(preferences)
+        var rotationUnavailable = true
+        val identity = object : AnalyticsIdentity by backingIdentity {
+            override fun resetInstallId() {
+                if (rotationUnavailable) throw IOException("identity storage unavailable")
+                backingIdentity.resetInstallId()
+            }
+        }
+        val fixture = Fixture(this, suppliedIdentity = identity)
+        val oldId = identity.installId()
+        val oldEvent = QueuedEvent("old", "session_started", 0L, emptyMap())
+        fixture.queue.enqueue(oldEvent)
+        fixture.service.isEnabled = false
+        runCurrent()
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.SessionStarted)
+        advanceUntilIdle()
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+
+        assertEquals(0, fixture.queue.size())
+        assertEquals(oldId, identity.installId())
+        assertTrue(fixture.api.requests.isEmpty())
+        assertEquals(0, fixture.urlReads)
+
+        rotationUnavailable = false
+        fixture.service.track(AnalyticsEvent.WalletCreationStarted)
+        advanceUntilIdle()
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+        val request = fixture.api.requests.single()
+        assertEquals(listOf("wallet_creation_started"), request.events.map { it.name })
+        assertNotEquals(oldId, request.install_id)
+    }
+
+    @Test
+    fun `withdrawal cancels erasure retry without poisoning the next consent`() = runTest {
+        val backingDao = InMemoryAnalyticsEventsDao()
+        val dao = ControllableErasureDao(backingDao)
+        var retryCancelled = false
+        dao.beforeClear = {
+            when (dao.clearAttempts) {
+                1 -> throw IOException("storage unavailable")
+                2 -> try {
+                    awaitCancellation()
+                } finally {
+                    retryCancelled = true
+                }
+            }
+        }
+        val fixture = Fixture(this, dao)
+        fixture.service.isEnabled = false
+        runCurrent()
+        fixture.service.isEnabled = true
+        val upload = launch { fixture.service.flush(AnalyticsFlushReason.LAUNCH) }
+        runCurrent()
+        assertEquals(2, dao.clearAttempts)
+
+        fixture.service.isEnabled = false
+        fixture.service.isEnabled = true
+        fixture.service.track(AnalyticsEvent.WalletCreationStarted)
+        advanceUntilIdle()
+        fixture.service.flush(AnalyticsFlushReason.LAUNCH)
+
+        assertTrue(retryCancelled)
+        assertTrue(upload.isCancelled)
+        assertEquals(3, dao.clearAttempts)
+        assertEquals(listOf("wallet_creation_started"), fixture.api.requests.single().events.map { it.name })
+    }
+
+    @Test
     fun `transient failure retains event identity and later flush drains batches`() = runTest {
         val fixture = Fixture(this)
         fixture.service.isEnabled = true
@@ -183,10 +381,28 @@ class AnalyticsConsentTest {
         }
     }
 
-    private class Fixture(scope: TestScope, suppliedDao: AnalyticsEventsDao? = null) {
+    private class ControllableErasureDao(private val backingDao: AnalyticsEventsDao) : AnalyticsEventsDao by backingDao {
+        var clearAttempts = 0
+            private set
+
+        var beforeClear: suspend () -> Unit = {}
+
+        override suspend fun clear() {
+            clearAttempts++
+            beforeClear()
+            backingDao.clear()
+        }
+    }
+
+    private class Fixture(
+        scope: TestScope,
+        suppliedDao: AnalyticsEventsDao? = null,
+        suppliedIdentity: AnalyticsIdentity? = null,
+        serviceScope: CoroutineScope = scope
+    ) {
         val preferences = InMemoryPreferences()
 
-        val identity = RealAnalyticsIdentity(preferences)
+        val identity = suppliedIdentity ?: RealAnalyticsIdentity(preferences)
 
         private val dao = suppliedDao ?: InMemoryAnalyticsEventsDao()
 
@@ -213,7 +429,7 @@ class AnalyticsConsentTest {
         private val clock = { 0L }
 
         val service = RealAnalyticsService(
-            scope = scope,
+            scope = serviceScope,
             queue = queue,
             uploader = uploader,
             identity = identity,

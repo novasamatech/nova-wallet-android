@@ -69,79 +69,129 @@ class BittensorDashboardDetailsSource(
     fun observe(account: MetaAccount, chains: Collection<Chain>): Flow<Map<String, BittensorDashboardDetails>> {
         val chain = chains.firstOrNull { chain ->
             chain.assets.any { Chain.Asset.StakingType.BITTENSOR_ROOT in it.staking }
-        } ?: return flowOf(emptyMap())
-        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null)
+        } ?: return flowOf(value = emptyMap())
+        val coldKey = account.accountIdIn(chain) ?: return observe(chain, coldKey = null)
 
         return flow { emitAll(observe(chain, coldKey)) }
     }
 
     private fun observe(chain: Chain, coldKey: AccountId?): Flow<Map<String, BittensorDashboardDetails>> {
-        val portfolio = if (coldKey != null) {
-            positions.observePortfolio(chain.id, coldKey)
-        } else {
-            flowOf(BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh))
-        }
+        val portfolio = observePortfolio(chain.id, coldKey)
         // Like iOS persisted dashboard details: shown until positions are known again (cold start, offline).
         val restored = coldKey?.let { snapshots.snapshot(chain.id, it) }
         var lastSaved = restored
         // Only a successful request replaces the stored maximum yield.
         var latestMaximumYield = restored?.maximumAnnualPercentageYield
-        val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(null)
+        val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(value = null)
+
+        return combine(
+            portfolio,
+            observeRootRates(portfolio),
+            observeSubnetRates(portfolio, claimable),
+            observeMaximumRates(portfolio, claimable, restored),
+            claimable
+        ) { state, root, subnets, maximum, rewards ->
+            if (maximum is ExtendedLoadingState.Loaded) latestMaximumYield = maximumYield(maximum.data)
+
+            val details = mapDashboardDetails(state, root, subnets, rewards, restored).copy(
+                maximumAnnualPercentageYield = latestMaximumYield,
+                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null
+            )
+            lastSaved = saveFreshSnapshot(chain.id, coldKey, state.status, details, lastSaved)
+
+            mapOf(chain.id to details)
+        }
+    }
+
+    private fun observePortfolio(chainId: String, coldKey: AccountId?): Flow<BittensorPortfolioState> {
+        if (coldKey != null) return positions.observePortfolio(chainId, coldKey)
+
+        val emptyPositions = BittensorPortfolioPositions(root = emptyList(), subnets = emptyList(), subnetPrices = emptyMap())
+        return flowOf(BittensorPortfolioState(emptyPositions, BittensorDataStatus.Fresh))
+    }
+
+    private fun observeRootRates(
+        portfolio: Flow<BittensorPortfolioState>
+    ): Flow<ExtendedLoadingState<Map<AccountIdKey, BigDecimal>>> {
         // Yields are requested once per held set, never polled.
-        val rootRates = portfolio
+        return portfolio
             .map { it.positions?.root.orEmpty().map { position -> position.validatorHotkey }.toSet() }
             .distinctUntilChanged()
             .flatMapLatest { hotkeys ->
-                if (hotkeys.isEmpty()) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else requested { validators.yields(BittensorNetuid.Root) }
+                if (hotkeys.isEmpty()) {
+                    flowOf(ExtendedLoadingState.Loaded(data = emptyMap()))
+                } else {
+                    requested { validators.yields(BittensorNetuid.Root) }
+                }
             }
-        val subnetRates = combine(portfolio, claimable) { state, rewards -> subnetsShowingRate(state.positions, rewards) }
+    }
+
+    private fun observeSubnetRates(
+        portfolio: Flow<BittensorPortfolioState>,
+        claimable: Flow<BigInteger?>
+    ): Flow<SubnetRates> {
+        return combine(portfolio, claimable) { state, rewards -> subnetsShowingRate(state.positions, rewards) }
             .distinctUntilChanged()
             .flatMapLatest(::observeSubnetRates)
-        val maximumRates = combine(portfolio, claimable) { state, rewards -> stakeActivity(state, rewards, restored) }
+    }
+
+    private fun observeMaximumRates(
+        portfolio: Flow<BittensorPortfolioState>,
+        claimable: Flow<BigInteger?>,
+        restored: BittensorDashboardSnapshot?
+    ): Flow<ExtendedLoadingState<Map<BittensorNetuid.Subnet, BigDecimal>>?> {
+        return combine(portfolio, claimable) { state, rewards -> stakeActivity(state, rewards, restored) }
             .distinctUntilChanged()
             .flatMapLatest { activity ->
                 // As iOS: the start-staking yield is only needed, and requested, once there is known to be no active stake.
                 when (activity) {
-                    StakeActivity.ACTIVE, StakeActivity.UNAVAILABLE -> flowOf(null)
+                    StakeActivity.ACTIVE, StakeActivity.UNAVAILABLE -> flowOf(value = null)
                     StakeActivity.PENDING -> flowOf(ExtendedLoadingState.Loading)
                     StakeActivity.NONE -> maximumYieldRequests()
                 }
             }
+    }
 
-        return combine(portfolio, rootRates, subnetRates, maximumRates, claimable) { state, root, subnets, maximum, rewards ->
-            if (maximum is ExtendedLoadingState.Loaded) latestMaximumYield = maximumYield(maximum.data)
-
-            val snapshot = restored.takeIf { state.positions == null }
-            val details = if (snapshot != null) {
-                snapshot.toDetails(rateLoading = state.status is BittensorDataStatus.Loading)
-                    .copy(claimableRootRewardsInPlanks = rewards)
-            } else {
-                mapBittensorDashboardDetails(
-                    positions = state.positions,
-                    rootYields = root.dataOrNull.orEmpty(),
-                    subnetYields = subnets.values,
-                    recommendedYields = emptyMap(),
-                    pricingPending = state.positions == null || state.pricesPending,
-                    claimableRootRewards = rewards
-                ).copy(
-                    rootYieldLoading = root is ExtendedLoadingState.Loading,
-                    subnetYieldLoading = subnets.loading
-                )
-            }.copy(
-                maximumAnnualPercentageYield = latestMaximumYield,
-                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null
-            )
-
-            if (coldKey != null && state.status is BittensorDataStatus.Fresh && details.pricing != BittensorDashboardDetails.Pricing.LOADING) {
-                val toSave = details.toSnapshot(lastSaved)
-                if (toSave != lastSaved) {
-                    snapshots.saveSnapshot(chain.id, coldKey, toSave)
-                    lastSaved = toSave
-                }
-            }
-
-            mapOf(chain.id to details)
+    private fun mapDashboardDetails(
+        state: BittensorPortfolioState,
+        root: ExtendedLoadingState<Map<AccountIdKey, BigDecimal>>,
+        subnets: SubnetRates,
+        claimableRewards: BigInteger?,
+        restored: BittensorDashboardSnapshot?
+    ): BittensorDashboardDetails {
+        val snapshot = restored.takeIf { state.positions == null }
+        if (snapshot != null) {
+            return snapshot.toDetails(rateLoading = state.status is BittensorDataStatus.Loading)
+                .copy(claimableRootRewardsInPlanks = claimableRewards)
         }
+
+        return mapBittensorDashboardDetails(
+            positions = state.positions,
+            rootYields = root.dataOrNull.orEmpty(),
+            subnetYields = subnets.values,
+            recommendedYields = emptyMap(),
+            pricingPending = state.pricesPending || (state.positions == null && state.status is BittensorDataStatus.Loading),
+            claimableRootRewards = claimableRewards
+        ).copy(
+            rootYieldLoading = root is ExtendedLoadingState.Loading,
+            subnetYieldLoading = subnets.loading
+        )
+    }
+
+    private fun saveFreshSnapshot(
+        chainId: String,
+        coldKey: AccountId?,
+        status: BittensorDataStatus,
+        details: BittensorDashboardDetails,
+        previous: BittensorDashboardSnapshot?
+    ): BittensorDashboardSnapshot? {
+        if (coldKey == null || status !is BittensorDataStatus.Fresh || details.pricing == BittensorDashboardDetails.Pricing.LOADING) return previous
+
+        val snapshot = details.toSnapshot(previous)
+        if (snapshot == previous) return previous
+
+        snapshots.saveSnapshot(chainId, coldKey, snapshot)
+        return snapshot
     }
 
     private fun stakeActivity(
@@ -193,7 +243,7 @@ class BittensorDashboardDetailsSource(
     private fun observeSubnetRates(
         subnets: Set<BittensorNetuid.Subnet>
     ): Flow<SubnetRates> {
-        if (subnets.isEmpty()) return flowOf(SubnetRates(emptyMap(), false))
+        if (subnets.isEmpty()) return flowOf(SubnetRates(values = emptyMap(), loading = false))
         val sources = subnets.map { subnet -> requested { validators.yields(subnet) }.map { subnet to it } }
         return combine(sources) { results ->
             SubnetRates(

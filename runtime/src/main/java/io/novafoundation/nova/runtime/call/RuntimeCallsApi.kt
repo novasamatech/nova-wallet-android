@@ -19,6 +19,7 @@ import io.novasama.substrate_sdk_android.wsrpc.executeAsync
 import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.state.StateCallRequest
+import kotlinx.coroutines.CancellationException
 
 typealias RuntimeTypeName = String
 typealias RuntimeTypeValue = Any?
@@ -74,6 +75,7 @@ suspend fun <R> RuntimeCallsApi.callCatching(
     returnBinding: (Any?) -> R
 ): Result<R> {
     return runCatching { call(section, method, arguments, returnBinding) }
+        .onFailure { if (it is CancellationException) throw it }
 }
 
 internal class RealRuntimeCallsApi(
