@@ -17,7 +17,7 @@ class BittensorEstimatesRemoteSource(
 
     suspend fun history(baseUrl: HttpUrl, address: String): EstimatePages<BittensorReportedOperation> =
         loadPages(
-            HISTORY_PAGE_LIMIT,
+            pageLimit = HISTORY_PAGE_LIMIT,
             spacingMillis
         ) { page -> loadHistoryPage(baseUrl, address, page) }
 
@@ -33,7 +33,8 @@ class BittensorEstimatesRemoteSource(
         val response = requestHistoryPage(url, address, page)
         val validUntilNanos = deadline(response, requestStartedAtNanos)
 
-        return mapHistoryPage(requireBody(response), page, validUntilNanos)
+        val remote = requireBody(response)
+        return mapHistoryPage(remote, page, validUntilNanos)
     }
 
     private suspend fun loadYieldSnapshot(
@@ -46,7 +47,8 @@ class BittensorEstimatesRemoteSource(
         val response = requestYieldSnapshot(url)
         val validUntilNanos = deadline(response, requestStartedAtNanos)
 
-        return mapYieldSnapshot(requireBody(response), chain, subnetId, validUntilNanos)
+        val remote = requireBody(response)
+        return mapYieldSnapshot(remote, chain, subnetId, validUntilNanos)
     }
 
     private suspend fun requestHistoryPage(url: String, address: String, page: Int): Response<BittensorOperationsRemote> =
@@ -105,25 +107,25 @@ class BittensorEstimatesRemoteSource(
     }
 
     private fun deadline(response: Response<*>, requestStartedAtNanos: Long): Long {
-        val cache = CacheControl.parse(response.headers())
-        val age = response.headers()["Age"]
+        val cacheControl = CacheControl.parse(response.headers())
+        val ageSeconds = response.headers()["Age"]
             ?.toLongOrNull()
             ?.coerceAtLeast(0) ?: 0L
-        val seconds = if (cache.noStore || cache.noCache) {
+        val lifetimeSeconds = if (cacheControl.noStore || cacheControl.noCache) {
             0L
         } else {
-            (cache.maxAgeSeconds.toLong() - age)
+            (cacheControl.maxAgeSeconds.toLong() - ageSeconds)
                 .coerceIn(0, MAX_CACHE_AGE_SECONDS)
         }
-        return requestStartedAtNanos + seconds * NANOS_PER_SECOND
+        return requestStartedAtNanos + lifetimeSeconds * NANOS_PER_SECOND
     }
 
-    private fun requireHistoryNextPage(info: BittensorHistoryPageInfo?, requestedPage: Int, itemCount: Int): Int? {
-        requireNotNull(info) { "Missing operation history pagination" }
-        require(info.page == requestedPage && requestedPage in FIRST_PAGE..MAX_PROVIDER_PAGE) { "Unexpected operation history page" }
-        require(info.pageSize == PAGE_SIZE) { "Unexpected operation history page size" }
+    private fun requireHistoryNextPage(pageInfo: BittensorHistoryPageInfo?, requestedPage: Int, itemCount: Int): Int? {
+        requireNotNull(pageInfo) { "Missing operation history pagination" }
+        require(pageInfo.page == requestedPage && requestedPage in FIRST_PAGE..MAX_PROVIDER_PAGE) { "Unexpected operation history page" }
+        require(pageInfo.pageSize == PAGE_SIZE) { "Unexpected operation history page size" }
         require(itemCount <= PAGE_SIZE) { "Operation history page exceeds its declared size" }
-        val nextPage = info.nextPage
+        val nextPage = pageInfo.nextPage
         require(nextPage == null || nextPage == requestedPage + 1 && nextPage <= MAX_PROVIDER_PAGE) { "Unexpected operation history next page" }
         return nextPage
     }
@@ -143,12 +145,19 @@ class BittensorEstimatesRemoteSource(
     data class EstimatePages<T>(val items: List<T>, val validUntilNanos: Long, val allPagesRead: Boolean)
 
     private companion object {
+
         const val FIRST_PAGE = 1
+
         const val PAGE_SIZE = 100
+
         const val HISTORY_PAGE_LIMIT = 10
+
         const val MAX_PROVIDER_PAGE = 100
+
         const val REQUEST_TIMEOUT_MILLIS = 25_000L
+
         const val MAX_CACHE_AGE_SECONDS = 60L
+
         const val NANOS_PER_SECOND = 1_000_000_000L
     }
 }

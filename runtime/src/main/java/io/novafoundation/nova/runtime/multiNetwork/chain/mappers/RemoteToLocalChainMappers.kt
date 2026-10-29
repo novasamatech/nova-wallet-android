@@ -54,33 +54,16 @@ fun mapRemoteChainToLocal(
     source: ChainLocal.Source,
     gson: Gson
 ): ChainLocal {
-    val types = chainRemote.types?.let {
+    val types = chainRemote.types?.let { typesRemote ->
         ChainLocal.TypesConfig(
-            url = it.url.orEmpty(),
-            overridesCommon = it.overridesCommon
+            url = typesRemote.url.orEmpty(),
+            overridesCommon = typesRemote.overridesCommon
         )
     }
 
-    val additional = chainRemote.additional?.let {
-        Chain.Additional(
-            defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
-            themeColor = (it[CHAIN_THEME_COLOR] as? String),
-            stakingWiki = (it[CHAIN_STAKING_WIKI] as? String),
-            defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asChainConfigLongOrNull(),
-            relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
-            stakingMaxElectingVoters = it[MAX_ELECTING_VOTES].asChainConfigIntOrNull(),
-            feeViaRuntimeCall = it[FEE_VIA_RUNTIME_CALL] as? Boolean,
-            supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
-            identityChain = it[IDENTITY_CHAIN] as? ChainId,
-            disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
-            sessionLength = it[SESSION_LENGTH].asChainConfigIntOrNull(),
-            sessionsPerEra = it[SESSIONS_PER_ERA].asChainConfigIntOrNull(),
-            timelineChain = it[TIMELINE_CHAIN] as? ChainId,
-            newFeatures = mapNewChainFeatures(it[NEW_FEATURES])
-        )
-    }
+    val additional = chainRemote.additional?.let(::mapRemoteChainAdditional)
 
-    val chainLocal = with(chainRemote) {
+    return with(chainRemote) {
         val optionsOrEmpty = options.orEmpty()
 
         ChainLocal(
@@ -107,8 +90,25 @@ fun mapRemoteChainToLocal(
             source = source
         )
     }
+}
 
-    return chainLocal
+private fun mapRemoteChainAdditional(additionalRemote: Map<String, Any?>): Chain.Additional {
+    return Chain.Additional(
+        defaultTip = (additionalRemote[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
+        themeColor = additionalRemote[CHAIN_THEME_COLOR] as? String,
+        stakingWiki = additionalRemote[CHAIN_STAKING_WIKI] as? String,
+        defaultBlockTimeMillis = additionalRemote[DEFAULT_BLOCK_TIME].asChainConfigLongOrNull(),
+        relaychainAsNative = additionalRemote[RELAYCHAIN_AS_NATIVE] as? Boolean,
+        stakingMaxElectingVoters = additionalRemote[MAX_ELECTING_VOTES].asChainConfigIntOrNull(),
+        feeViaRuntimeCall = additionalRemote[FEE_VIA_RUNTIME_CALL] as? Boolean,
+        supportLedgerGenericApp = additionalRemote[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
+        identityChain = additionalRemote[IDENTITY_CHAIN] as? ChainId,
+        disabledCheckMetadataHash = additionalRemote[DISABLED_CHECK_METADATA_HASH] as? Boolean,
+        sessionLength = additionalRemote[SESSION_LENGTH].asChainConfigIntOrNull(),
+        sessionsPerEra = additionalRemote[SESSIONS_PER_ERA].asChainConfigIntOrNull(),
+        timelineChain = additionalRemote[TIMELINE_CHAIN] as? ChainId,
+        newFeatures = mapNewChainFeatures(additionalRemote[NEW_FEATURES])
+    )
 }
 
 private fun Any?.asChainConfigIntOrNull(): Int? {
@@ -166,15 +166,15 @@ private fun mapGovernanceRemoteOptionsToLocal(remoteOptions: Set<String>): Strin
 }
 
 private fun mapSwapRemoteOptionsToLocal(remoteOptions: Set<String>): String {
-    val domainGovernanceTypes = remoteOptions.swapTypesFromOptions()
+    val swapTypes = remoteOptions.swapTypesFromOptions()
 
-    return mapSwapListToLocal(domainGovernanceTypes)
+    return mapSwapListToLocal(swapTypes)
 }
 
 private fun mapCustomFeeRemoteOptionsToLocal(remoteOptions: Set<String>): String {
-    val domainGovernanceTypes = remoteOptions.customFeeTypeFromOptions()
+    val customFeeTypes = remoteOptions.customFeeTypeFromOptions()
 
-    return mapCustomFeeToLocal(domainGovernanceTypes)
+    return mapCustomFeeToLocal(customFeeTypes)
 }
 
 fun mapRemoteAssetToLocal(

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -76,8 +77,7 @@ class BittensorEstimatesRepositoryTest {
 
         assertFalse(history.allProviderPagesRead)
         assertEquals(
-            (1..10)
-                .toList(),
+            (1..10).toList(),
             api.historyPages
         )
     }
@@ -91,12 +91,7 @@ class BittensorEstimatesRepositoryTest {
         history()
 
         assertEquals(
-            listOf(
-                1,
-                2,
-                1,
-                2
-            ),
+            listOf(1, 2, 1, 2),
             api.historyPages
         )
     }
@@ -305,7 +300,7 @@ class BittensorEstimatesRepositoryTest {
             listOf(
                 BittensorAlphaYieldsRemote.Item(
                     1,
-                    null,
+                    hotkey = null,
                     "10",
                     "OTHER"
                 )
@@ -343,7 +338,7 @@ class BittensorEstimatesRepositoryTest {
         assertEquals(3, api.yieldRequests.size)
     }
 
-    private suspend fun history(): io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory {
+    private suspend fun history(): BittensorOperationHistory {
         val request = requireNotNull(historyRepository.request(address))
         return historyRepository.history(request)
     }

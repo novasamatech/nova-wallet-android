@@ -53,16 +53,15 @@ class BittensorConfigRepositoryTest {
 
     @Test
     fun `invalid fee model cannot be serialized as an absent or valid fee`() {
-        val remote = BittensorConfigRemote(BittensorSwapFeeRemote.Invalid, emptyList())
+        val remote = BittensorConfigRemote(BittensorSwapFeeRemote.Invalid, subnets = emptyList())
 
         assertTrue(runCatching { gson.toJson(remote) }.exceptionOrNull() is IllegalArgumentException)
     }
 
     @Test
     fun `canonical iOS config supplies the fee and only valid HTTPS subnet logos`() {
-        val config = mapBittensorConfig(
-            document(
-                """
+        val remote = document(
+            """
             {"swapFee":0.005,"subnets":[
                 {"netuid":1,"logo":"https://logos.test/first.png"},
                 {"netuid":1,"logo":"https://logos.test/duplicate.png"},
@@ -74,8 +73,8 @@ class BittensorConfigRepositoryTest {
                 null, {"netuid":4}, {"logo":"https://logos.test/missing-id.png"}
             ]}
         """
-            )
         )
+        val config = mapBittensorConfig(remote)
 
         assertEquals(BigDecimal("0.005"), config.commission.fraction)
         assertEquals(mapOf(BittensorNetuid.Subnet(1) to "https://logos.test/first.png"), config.subnetLogos)

@@ -23,10 +23,7 @@ internal class BittensorSwapFeeAdapter : TypeAdapter<BittensorSwapFeeRemote?>() 
                 reader.nextNull()
                 null
             }
-            JsonToken.NUMBER -> {
-                val fraction = reader.nextString().toBigDecimalOrNull()
-                if (fraction != null) BittensorSwapFeeRemote.Value(DecimalFraction(fraction)) else BittensorSwapFeeRemote.Invalid
-            }
+            JsonToken.NUMBER -> mapNumericFee(reader.nextString())
             else -> {
                 reader.skipValue()
                 BittensorSwapFeeRemote.Invalid
@@ -40,5 +37,10 @@ internal class BittensorSwapFeeAdapter : TypeAdapter<BittensorSwapFeeRemote?>() 
             is BittensorSwapFeeRemote.Value -> writer.value(value.fraction.inFraction)
             BittensorSwapFeeRemote.Invalid -> throw IllegalArgumentException("Cannot serialize an invalid Bittensor swap fee")
         }
+    }
+
+    private fun mapNumericFee(rawFraction: String): BittensorSwapFeeRemote {
+        val fraction = rawFraction.toBigDecimalOrNull() ?: return BittensorSwapFeeRemote.Invalid
+        return BittensorSwapFeeRemote.Value(DecimalFraction(fraction))
     }
 }

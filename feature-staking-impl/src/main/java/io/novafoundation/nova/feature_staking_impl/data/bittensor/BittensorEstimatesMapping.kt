@@ -54,10 +54,10 @@ internal fun mapBittensorValidatorYield(
         return null
     }
 
-    val reliability = remote.rateReliability
-
-    val percentage = remote.reportedRate?.toBigDecimalOrNull()
+    val annualPercentageYield = remote.reportedRate
+        ?.toBigDecimalOrNull()
         ?.takeIf { it.isNonNegative } ?: return null
+    val isReliable = remote.rateReliability == null || remote.rateReliability == RELIABLE_VERDICT
 
-    return BittensorValidatorYield(hotkey, percentage, reliability == null || reliability == RELIABLE_VERDICT)
+    return BittensorValidatorYield(hotkey, annualPercentageYield, reliable = isReliable)
 }

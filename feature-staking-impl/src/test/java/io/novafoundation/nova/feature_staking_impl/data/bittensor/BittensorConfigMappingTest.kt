@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.utils.DecimalFraction
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -12,7 +13,7 @@ class BittensorConfigMappingTest {
 
     @Test fun `configured commission is included in total spend`() {
         val fee = BittensorSwapFeeRemote.Value(DecimalFraction(BigDecimal("0.005")))
-        val remote = BittensorConfigRemote(fee, emptyList())
+        val remote = BittensorConfigRemote(fee, subnets = emptyList())
         val config = mapBittensorConfig(remote)
         assertEquals(BigInteger.valueOf(5_000_000), config.commission.feeFor(BigInteger.valueOf(1_005_000_000)))
     }
@@ -25,7 +26,7 @@ class BittensorConfigMappingTest {
             BittensorSwapFeeRemote.Value(DecimalFraction(BigDecimal("-0.1")))
         )
         for (fee in fees) {
-            val remote = BittensorConfigRemote(fee, emptyList())
+            val remote = BittensorConfigRemote(fee, subnets = emptyList())
             assertEquals(
                 BigDecimal("0.003"),
                 mapBittensorConfig(remote).commission.fraction
@@ -35,7 +36,7 @@ class BittensorConfigMappingTest {
 
     @Test fun `valid commission boundaries remain decimal fractions`() {
         for (fraction in listOf(BigDecimal.ZERO, BigDecimal("0.999999999999999999"))) {
-            val remote = BittensorConfigRemote(BittensorSwapFeeRemote.Value(DecimalFraction(fraction)), emptyList())
+            val remote = BittensorConfigRemote(BittensorSwapFeeRemote.Value(DecimalFraction(fraction)), subnets = emptyList())
 
             assertEquals(fraction, mapBittensorConfig(remote).commission.fraction)
         }
@@ -71,6 +72,6 @@ class BittensorConfigMappingTest {
         )
         val config = mapBittensorConfig(remote)
         assertEquals(mapOf(BittensorNetuid.Subnet(1) to "https://example.com/first.png"), config.subnetLogos)
-        assertTrue(config.commission.fraction.compareTo(BigDecimal.ZERO) == 0)
+        assertTrue(config.commission.fraction.isZero)
     }
 }

@@ -7,11 +7,12 @@ import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValu
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Percent
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake.StakingStatus
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails.Composition
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboardValue
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isKnownAndZero
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.announcements.AnnouncementModel
@@ -21,6 +22,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.v
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import java.math.BigInteger
 import io.novafoundation.nova.runtime.ext.fullId
 
 internal fun mapBittensorDashboardItem(
@@ -32,14 +35,13 @@ internal fun mapBittensorDashboardItem(
     icons: AssetIconProvider
 ): StakingDashboardModel.HasStakeItem? {
     val details = option.bittensorDetails ?: return null
-    val pending = details.pricing == BittensorDashboardDetails.Pricing.LOADING
+    val pending = details.totalStake is StakingDashboardValue.Loading
     val total = masking.format {
-        val amount = details.totalStakeInPlanks?.let { amountFormatter.formatAmountToAmountModel(it, option.token) }
-            ?: AmountModel("—", null)
+        val amount = mapStakeAmount(details.totalStake, amountFormatter, option.token)
         if (details.subnetCount > 0) amount.copy(fiat = amount.fiat?.let { resources.getString(R.string.bittensor_dashboard_estimated, it) }) else amount
     }
     val panel = masking.format {
-        details.panelStakeInPlanks?.let { amountFormatter.formatAmountToAmountModel(it, option.token) } ?: AmountModel("—", null)
+        mapStakeAmount(details.panelStake, amountFormatter, option.token)
     }
     val rootTitle = resources.getString(R.string.bittensor_dashboard_root)
     val subnetTitle = if (details.subnetCount == 1) {
@@ -79,23 +81,33 @@ internal fun mapBittensorDashboardItem(
 }
 
 internal fun mapBittensorPanelYield(details: BittensorDashboardDetails): ExtendedLoadingState<SyncingData<String>> {
-    val pricingPending = details.pricing == BittensorDashboardDetails.Pricing.LOADING
-    val yieldPending = details.panelYieldLoading && details.panelStakeInPlanks?.isZero != true
+    val pricingPending = details.totalStake is StakingDashboardValue.Loading
+    val rate = details.panelAnnualPercentageYield
+    val yieldPending = rate is StakingDashboardValue.Loading && !details.panelStake.isKnownAndZero()
     if (pricingPending || yieldPending) return ExtendedLoadingState.Loading
 
-    val value = details.panelAnnualPercentageYield?.let { Percent(it.toDouble()).format() }.orUnavailable()
+    val value = when (rate) {
+        is StakingDashboardValue.Known -> Percent(rate.value.toDouble()).format()
+        StakingDashboardValue.Loading, StakingDashboardValue.Unavailable -> "—"
+    }
     return ExtendedLoadingState.Loaded(value.syncingIf(false))
+}
+
+private fun mapStakeAmount(valuation: StakingDashboardValue<BigInteger>, amountFormatter: AmountFormatter, token: Token): AmountModel {
+    return when (valuation) {
+        is StakingDashboardValue.Known -> amountFormatter.formatAmountToAmountModel(valuation.value, token)
+        StakingDashboardValue.Loading, StakingDashboardValue.Unavailable -> AmountModel(token = "—", fiat = null)
+    }
 }
 
 internal fun mapBittensorMaximumYield(
     details: BittensorDashboardDetails,
     resources: ResourceManager
 ): ExtendedLoadingState<SyncingData<String>> {
-    if (details.maximumYieldLoading) return ExtendedLoadingState.Loading
-    val value = details.maximumAnnualPercentageYield?.let {
-        resources.getString(R.string.bittensor_dashboard_max_apy, Percent(it.toDouble()).format())
-    }.orUnavailable()
+    val value = when (val rate = details.maximumAnnualPercentageYield) {
+        StakingDashboardValue.Loading -> return ExtendedLoadingState.Loading
+        StakingDashboardValue.Unavailable -> "—"
+        is StakingDashboardValue.Known -> resources.getString(R.string.bittensor_dashboard_max_apy, Percent(rate.value.toDouble()).format())
+    }
     return ExtendedLoadingState.Loaded(value.syncingIf(false))
 }
-
-private fun String?.orUnavailable(): String = this ?: "—"

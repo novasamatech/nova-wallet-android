@@ -65,7 +65,7 @@ class BittensorValidatorPreviewMappingTest {
     @Test
     fun `directory address decoding preserves cancellation and fatal errors`() {
         for (failure in listOf(CancellationException("Cancelled"), AssertionError("Decoder failure"))) {
-            val remote = BittensorValidatorsRemote.Item(64, "hotkey", "Validator", null)
+            val remote = BittensorValidatorsRemote.Item(netuid = 64, "hotkey", "Validator", stakeSourceName = null)
             val decodingChain = mock(Chain::class.java)
             `when`(decodingChain.isEthereumBased).thenThrow(failure)
 
@@ -78,5 +78,5 @@ class BittensorValidatorPreviewMappingTest {
         recommendation: String? = "balanced",
         address: String = chain.addressOf(hotkey),
         name: String = " Validator "
-    ) = BittensorRankedValidatorsRemote.Item(64, address, name, eligible, recommendation, null)
+    ) = BittensorRankedValidatorsRemote.Item(netuid = 64, address, name, eligible, recommendation, score = null)
 }

@@ -97,10 +97,15 @@ class RealExtrinsicService(
         submissionOptions: SubmissionOptions,
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicSubmission> = runCatching {
-        val (extrinsic, submissionOrigin, _, callExecutionType, signingHierarchy) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
-        val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
+        val submission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        val hash = rpcCalls.submitExtrinsic(chain.id, submission.extrinsic)
 
-        ExtrinsicSubmission(hash, submissionOrigin, callExecutionType, signingHierarchy)
+        ExtrinsicSubmission(
+            hash = hash,
+            submissionOrigin = submission.submissionOrigin,
+            callExecutionType = submission.callExecutionType,
+            submissionHierarchy = submission.submissionHierarchy
+        )
     }.onFailure {
         if (it is CancellationException) throw it
     }
@@ -312,9 +317,9 @@ class RealExtrinsicService(
             }
         }
 
-        val signingHierarchy = signer.getSigningHierarchy()
+        val submissionHierarchy = signer.getSigningHierarchy()
 
-        return MultiSubmission(extrinsics, submissionOrigin, feePayment, signingHierarchy)
+        return MultiSubmission(extrinsics, submissionOrigin, feePayment, submissionHierarchy)
     }
 
     private suspend fun buildSubmissionExtrinsic(
@@ -370,9 +375,9 @@ class RealExtrinsicService(
         // Build extrinsic
         val extrinsic = extrinsicBuilder.buildExtrinsic()
 
-        val signingHierarchy = signer.getSigningHierarchy()
+        val submissionHierarchy = signer.getSigningHierarchy()
 
-        return SingleSubmission(extrinsic, submissionOrigin, feePayment, signer.callExecutionType(), signingHierarchy)
+        return SingleSubmission(extrinsic, submissionOrigin, feePayment, signer.callExecutionType(), submissionHierarchy)
     }
 
     private fun SubmissionOptions.toBuilderFactoryOptions(): ExtrinsicBuilderFactory.Options {

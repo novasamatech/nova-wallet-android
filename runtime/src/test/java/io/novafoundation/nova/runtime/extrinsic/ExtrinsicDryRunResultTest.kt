@@ -20,15 +20,15 @@ class ExtrinsicDryRunResultTest {
     @Before
     fun setUp() {
         val nullReference = TypeReference(Null)
-        val dispatch = DictEnum("DispatchError", listOf(DictEnum.Entry("Token", nullReference)))
-        val invalid = DictEnum("InvalidTransaction", listOf(DictEnum.Entry("BadProof", nullReference)))
-        val invalidReference = TypeReference(invalid)
-        val validity = DictEnum("TransactionValidityError", listOf(DictEnum.Entry("Invalid", invalidReference)))
-        val dispatchReference = TypeReference(dispatch)
-        val validityReference = TypeReference(validity)
+        val dispatchErrorType = DictEnum("DispatchError", listOf(DictEnum.Entry("Token", nullReference)))
+        val invalidTransactionType = DictEnum("InvalidTransaction", listOf(DictEnum.Entry("BadProof", nullReference)))
+        val invalidTransactionReference = TypeReference(invalidTransactionType)
+        val transactionValidityType = DictEnum("TransactionValidityError", listOf(DictEnum.Entry("Invalid", invalidTransactionReference)))
+        val dispatchErrorReference = TypeReference(dispatchErrorType)
+        val transactionValidityReference = TypeReference(transactionValidityType)
         val resolver = DynamicTypeResolver()
         val registry = TypeRegistry(
-            mapOf("DispatchError" to dispatchReference, "TransactionValidityError" to validityReference),
+            mapOf("DispatchError" to dispatchErrorReference, "TransactionValidityError" to transactionValidityReference),
             resolver
         )
         `when`(runtime.typeRegistry).thenReturn(registry)
@@ -38,7 +38,10 @@ class ExtrinsicDryRunResultTest {
     fun `only exact outer and inner success is accepted`() {
         assertEquals(ExtrinsicDryRunResult.Success, decodeExtrinsicDryRunResult("0x0000", runtime))
         for (response in listOf("", "0x", "0x00", "0x000000", "0x02", "0xGG", "0x01", "0x0001")) {
-            assertTrue(response, runCatching { decodeExtrinsicDryRunResult(response, runtime) }.isFailure)
+            assertTrue(
+                response,
+                runCatching { decodeExtrinsicDryRunResult(response, runtime) }.isFailure
+            )
         }
     }
 
@@ -61,7 +64,10 @@ class ExtrinsicDryRunResultTest {
     @Test
     fun `unknown result discriminants and malformed errors are rejected`() {
         for (response in listOf("0x0002", "0x02", "0x000101", "0x010100", "0x0100")) {
-            assertTrue(response, runCatching { decodeExtrinsicDryRunResult(response, runtime) }.isFailure)
+            assertTrue(
+                response,
+                runCatching { decodeExtrinsicDryRunResult(response, runtime) }.isFailure
+            )
         }
     }
 }

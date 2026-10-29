@@ -28,17 +28,26 @@ class BittensorSubnetCatalogueRepository(
 
     suspend fun catalogue(): BittensorSubnetCatalogueRemote = mutex.withLock {
         val url = infrastructureUrls.bittensorBackendUrl("subnets")
-        cached?.takeIf { it.url == url && nanoTime() < it.deadlineNanos }?.let { return@withLock it.catalogue }
-        val startedAt = nanoTime()
+        val cachedCatalogue = cached
+        if (cachedCatalogue != null && cachedCatalogue.url == url && nanoTime() < cachedCatalogue.deadlineNanos) {
+            return@withLock cachedCatalogue.catalogue
+        }
+
+        val requestStartedAtNanos = nanoTime()
         val response = api.subnets(url)
         if (!response.isSuccessful) throw HttpException(response)
         val catalogue = requireNotNull(response.body())
-        if (isAdmissible(catalogue)) cached = Cached(url, catalogue, startedAt + bittensorCacheLifetimeNanos(response))
+        if (isAdmissible(catalogue)) {
+            val deadlineNanos = requestStartedAtNanos + bittensorCacheLifetimeNanos(response)
+            cached = Cached(url, catalogue, deadlineNanos)
+        }
         catalogue
     }
 
     private fun isAdmissible(catalogue: BittensorSubnetCatalogueRemote): Boolean = runCatching {
-        mapBittensorBackendCatalogue(catalogue)
+        val subnets = mapBittensorBackendCatalogue(catalogue)
+        // The browse mapper requires TAO reserves; an incomplete response must remain retryable for that reader.
+        require(subnets.all { it.taoReserveInPlanks != null }) { "Missing subnet TAO reserve" }
         mapBittensorSubnetPrices(catalogue)
     }.isSuccess
 }
@@ -54,12 +63,16 @@ internal fun mapBittensorSubnetPrices(response: BittensorSubnetCatalogueRemote):
             if (netuid !is BittensorNetuid.Subnet || !seenSubnets.add(netuid)) continue
 
             val reportedPrice = subnet.taoPerAlpha ?: continue
-            val price = reportedPrice
-                .toBigDecimal()
-                .multiply(BittensorProtocolUnits.RAO_PER_TAO.toBigDecimal())
-                .toBigIntegerExact()
-            require(price.isNonNegative) { "Negative subnet price" }
+            val price = mapBittensorPriceInRao(reportedPrice)
             if (price.isPositive()) put(netuid, price)
         }
     }
+}
+
+private fun mapBittensorPriceInRao(reportedPrice: String): BigInteger {
+    val priceInRao = reportedPrice.toBigDecimal()
+        .multiply(BittensorProtocolUnits.RAO_PER_TAO.toBigDecimal())
+        .toBigIntegerExact()
+    require(priceInRao.isNonNegative) { "Negative subnet price" }
+    return priceInRao
 }

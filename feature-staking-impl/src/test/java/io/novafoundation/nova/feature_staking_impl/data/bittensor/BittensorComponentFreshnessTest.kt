@@ -11,8 +11,8 @@ class BittensorComponentFreshnessTest {
         val fresh = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
         val stale = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
 
-        assertTrue(requireAvailableBittensorComponent(fresh, "Prices"))
-        assertFalse(requireAvailableBittensorComponent(stale, "Prices"))
+        assertTrue(requireAvailableBittensorComponent(fresh, name = "Prices"))
+        assertFalse(requireAvailableBittensorComponent(stale, name = "Prices"))
     }
 
     @Test
@@ -25,7 +25,9 @@ class BittensorComponentFreshnessTest {
         )
 
         for (component in rejected) {
-            assertTrue(runCatching { requireAvailableBittensorComponent(component, "Prices") }.exceptionOrNull() is IllegalArgumentException)
+            val failure = runCatching { requireAvailableBittensorComponent(component, name = "Prices") }.exceptionOrNull()
+
+            assertTrue(failure is IllegalArgumentException)
         }
     }
 }

@@ -23,17 +23,17 @@ class RealBittensorPortfolioPriceRepository(
 
     override suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
         if (heldSubnets.isEmpty()) return emptyMap()
-        val backend = loadPrices("backend") {
+        val backendPrices = loadPrices(source = "backend") {
             val response = catalogueRepository.catalogue()
             mapBittensorPortfolioPrices(response)
         }
             .filterKeys { it in heldSubnets }
-        val missing = heldSubnets - backend.keys
-        if (missing.isEmpty()) return backend
+        val missingSubnets = heldSubnets - backendPrices.keys
+        if (missingSubnets.isEmpty()) return backendPrices
 
-        val fallback = loadPrices("runtime") { runtimePrices.prices(chainId) }
-            .filterKeys { it in missing }
-        return backend + fallback
+        val fallbackPrices = loadPrices(source = "runtime") { runtimePrices.prices(chainId) }
+            .filterKeys { it in missingSubnets }
+        return backendPrices + fallbackPrices
     }
 
     private suspend fun loadPrices(
@@ -60,6 +60,6 @@ class RealBittensorPortfolioPriceRepository(
 
 /** Holdings are valued only at FRESH backend prices (iOS `freshTaoPerAlpha`); STALE ones yield to live runtime prices. */
 internal fun mapBittensorPortfolioPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
-    val fresh = requireAvailableBittensorComponent(response.meta?.components?.alphaPrices, "Portfolio prices")
-    return if (fresh) mapBittensorSubnetPrices(response) else emptyMap()
+    val isFresh = requireAvailableBittensorComponent(response.meta?.components?.alphaPrices, name = "Portfolio prices")
+    return if (isFresh) mapBittensorSubnetPrices(response) else emptyMap()
 }

@@ -6,23 +6,16 @@ import java.math.BigInteger
 
 /** Rates are annual percentages; amounts are native-token planks. Null never means zero. */
 data class BittensorDashboardDetails(
-    /** Null while pricing is loading or when any held position cannot be valued. */
-    val totalStakeInPlanks: BigInteger?,
+    val totalStake: StakingDashboardValue<BigInteger>,
     /** Null when no root component is known; zero can represent root rewards alongside subnet positions. */
     val rootStakeInPlanks: BigInteger?,
     val subnetCount: Int,
-    val rootAnnualPercentageYield: BigDecimal?,
-    val subnetAnnualPercentageYield: BigDecimal?,
-    val maximumAnnualPercentageYield: BigDecimal?,
-    val pricing: Pricing,
-    val rootYieldLoading: Boolean = false,
-    val subnetYieldLoading: Boolean = false,
-    val maximumYieldLoading: Boolean = false,
+    val rootAnnualPercentageYield: StakingDashboardValue<BigDecimal>,
+    val subnetAnnualPercentageYield: StakingDashboardValue<BigDecimal>,
+    val maximumAnnualPercentageYield: StakingDashboardValue<BigDecimal>,
     /** Root rewards meeting the claim minimum. */
     val claimableRootRewardsInPlanks: BigInteger? = null
 ) {
-
-    enum class Pricing { LOADING, KNOWN, UNKNOWN }
 
     enum class Composition { NONE, ROOT, SUBNETS, MIXED }
 
@@ -42,24 +35,18 @@ data class BittensorDashboardDetails(
     val showsRootPanel: Boolean
         get() = rootStakeInPlanks != null || subnetCount == 0
 
-    val panelStakeInPlanks: BigInteger?
+    val panelStake: StakingDashboardValue<BigInteger>
         get() = when {
-            showsClaimableRewardsPanel -> claimableRootRewardsInPlanks
-            showsRootPanel -> rootStakeInPlanks
-            else -> totalStakeInPlanks
+            showsClaimableRewardsPanel -> StakingDashboardValue.Known(requireNotNull(claimableRootRewardsInPlanks))
+            showsRootPanel -> rootStakeInPlanks?.let { StakingDashboardValue.Known(it) }
+                ?: if (totalStake is StakingDashboardValue.Loading) StakingDashboardValue.Loading else StakingDashboardValue.Unavailable
+            else -> totalStake
         }
 
-    val panelAnnualPercentageYield: BigDecimal?
+    val panelAnnualPercentageYield: StakingDashboardValue<BigDecimal>
         get() = when {
-            showsClaimableRewardsPanel -> null
+            showsClaimableRewardsPanel -> StakingDashboardValue.Unavailable
             showsRootPanel -> rootAnnualPercentageYield
             else -> subnetAnnualPercentageYield
-        }
-
-    val panelYieldLoading: Boolean
-        get() = when {
-            showsClaimableRewardsPanel -> false
-            showsRootPanel -> rootYieldLoading
-            else -> subnetYieldLoading
         }
 }

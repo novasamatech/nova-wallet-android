@@ -60,7 +60,10 @@ private const val CONFIG_TIMEOUT_MILLIS = 30_000L
 // Decimal rate: 0.003 means 0.3%, not 0.003%.
 private val DEFAULT_COMMISSION_FRACTION = BigDecimal("0.003")
 
-internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(DEFAULT_COMMISSION_FRACTION), emptyMap())
+internal fun fallbackBittensorConfig() = BittensorConfig(
+    commission = BittensorSubnetCommission(DEFAULT_COMMISSION_FRACTION),
+    subnetLogos = emptyMap()
+)
 
 internal fun mapBittensorConfig(remote: BittensorConfigRemote): BittensorConfig {
     val commission = mapBittensorCommission(remote.swapFee)
@@ -70,13 +73,13 @@ internal fun mapBittensorConfig(remote: BittensorConfigRemote): BittensorConfig 
 }
 
 private fun mapBittensorCommission(fee: BittensorSwapFeeRemote?): BittensorSubnetCommission {
-    val fraction = when (fee) {
+    val commissionFraction = when (fee) {
         is BittensorSwapFeeRemote.Value -> fee.fraction.inFraction
         BittensorSwapFeeRemote.Invalid, null -> DEFAULT_COMMISSION_FRACTION
     }
 
     return try {
-        BittensorSubnetCommission(fraction)
+        BittensorSubnetCommission(commissionFraction)
     } catch (_: IllegalArgumentException) {
         // Only an invalid field in a successfully decoded config may use the established default.
         BittensorSubnetCommission(DEFAULT_COMMISSION_FRACTION)
@@ -85,10 +88,12 @@ private fun mapBittensorCommission(fee: BittensorSwapFeeRemote?): BittensorSubne
 
 private fun mapBittensorSubnetLogos(subnets: List<BittensorConfigRemote.Subnet?>): Map<BittensorNetuid.Subnet, String> = buildMap {
     for (subnet in subnets.filterNotNull()) {
-        val netuid = subnet.netuid ?: continue
-        val subnetId = runCatching { BittensorNetuid.Subnet(netuid) }
+        val rawNetuid = subnet.netuid ?: continue
+        val subnetId = runCatching { BittensorNetuid.Subnet(rawNetuid) }
             .getOrNull() ?: continue
-        val logo = subnet.logo?.toHttpUrlOrNull()?.takeIf { it.isHttps } ?: continue
+        val logo = subnet.logo
+            ?.toHttpUrlOrNull()
+            ?.takeIf { it.isHttps } ?: continue
         if (!containsKey(subnetId)) put(subnetId, logo.toString())
     }
 }

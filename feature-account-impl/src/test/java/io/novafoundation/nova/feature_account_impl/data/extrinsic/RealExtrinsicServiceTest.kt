@@ -30,6 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicW
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.eq
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
@@ -42,6 +43,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -101,13 +103,15 @@ class RealExtrinsicServiceTest {
 
     private val options = ExtrinsicService.SubmissionOptions()
 
+    private val builderOptions = ExtrinsicBuilderFactory.Options(options.batchMode)
+
     private val origin = TransactionOrigin.WalletWithId(42L)
 
-    private val accountId = byteArrayOf(1, 2, 3)
+    private val accountId: AccountId = byteArrayOf(1, 2, 3)
 
-    private val signingAccountId = byteArrayOf(4, 5, 6)
+    private val signingAccountId: AccountId = byteArrayOf(4, 5, 6)
 
-    private val inBlock = ExtrinsicStatus.InBlock("block", "hash")
+    private val inBlock = ExtrinsicStatus.InBlock(blockHash = "block", extrinsicHash = "hash")
 
     private val formExtrinsic: FormExtrinsicWithOrigin = { call(confirmedCall) }
 
@@ -135,10 +139,15 @@ class RealExtrinsicServiceTest {
             `when`(signer.submissionSignerAccountId(chain)).thenReturn(signingAccountId)
             `when`(signer.getSigningHierarchy()).thenReturn(hierarchy)
             `when`(signer.callExecutionType()).thenReturn(CallExecutionType.IMMEDIATE)
-            `when`(builderFactory.create(eq(chain), any())).thenReturn(builder)
+            `when`(
+                builderFactory.create(
+                    eq<Chain?>(chain) ?: chain,
+                    any<ExtrinsicBuilderFactory.Options?>() ?: builderOptions
+                )
+            ).thenReturn(builder)
             `when`(builder.buildExtrinsic()).thenReturn(extrinsic)
             `when`(feeRegistry.providerFor("chain")).thenReturn(feeProvider)
-            `when`(feeProvider.feePaymentFor(options.feePaymentCurrency, null)).thenReturn(feePayment)
+            `when`(feeProvider.feePaymentFor(options.feePaymentCurrency, coroutineScope = null)).thenReturn(feePayment)
             `when`(signingContextFactory.default(chain)).thenReturn(signingContext)
             `when`(chainRegistry.getRuntimeProvider("chain")).thenReturn(runtimeProvider)
             `when`(runtimeProvider.get()).thenReturn(runtime)
@@ -161,6 +170,8 @@ class RealExtrinsicServiceTest {
         assertSame(accountId, result.submissionOrigin.executingAccount)
         assertSame(signingAccountId, result.submissionOrigin.signingAccount)
         assertSame(hierarchy, result.submissionHierarchy)
+        assertEquals("hash", result.hash)
+        assertEquals(CallExecutionType.IMMEDIATE, result.callExecutionType)
         verify(builder).call(confirmedCall)
         verify(feePayment).modifyExtrinsic(builder)
         with(builder) { verify(signer).setSignerDataForSubmission(signingContext) }
@@ -184,6 +195,20 @@ class RealExtrinsicServiceTest {
         `when`(rpcCalls.submitExtrinsic("chain", extrinsic)).thenThrow(cancellation)
 
         assertCancellation(cancellation) { service.submitExtrinsic(chain, origin, options, formExtrinsic) }
+    }
+
+    @Test
+    fun `signing cancellation propagates without sending or building a signed extrinsic`() = runBlocking<Unit> {
+        val cancellation = CancellationException("Signing cancelled")
+        with(builder) {
+            `when`(signer.setSignerDataForSubmission(signingContext)).thenThrow(cancellation)
+        }
+
+        assertCancellation(cancellation) { service.submitExtrinsic(chain, origin, options, formExtrinsic) }
+        assertCancellation(cancellation) { service.submitAndWatchExtrinsic(chain, origin, options, formExtrinsic) }
+
+        verify(builder, never()).buildExtrinsic()
+        verifyNoInteractions(rpcCalls)
     }
 
     @Test
@@ -251,6 +276,8 @@ class RealExtrinsicServiceTest {
 
                 assertSame(ExtrinsicDispatch.Unknown, result.outcome)
                 assertSame(hierarchy, result.submissionHierarchy)
+                assertEquals("hash", result.extrinsicHash)
+                assertEquals("block", result.blockHash)
                 assertFalse(Result.success(result).requireOk().isSuccess)
             }
         }
@@ -260,7 +287,7 @@ class RealExtrinsicServiceTest {
     fun `dispatch outcomes retain events on both success and failure`() = runBlocking<Unit> {
         givenInclusion()
         val successEvent = event("ExtrinsicSuccess")
-        val dispatchError = DictEnum.Entry("Token", null)
+        val dispatchError = DictEnum.Entry("Token", value = null)
         val failureEvent = event("ExtrinsicFailed", listOf(dispatchError))
         val includedExtrinsic = mock(Extrinsic.Instance::class.java)
         val successful = ExtrinsicWithEvents(includedExtrinsic, "hash", listOf(successEvent))

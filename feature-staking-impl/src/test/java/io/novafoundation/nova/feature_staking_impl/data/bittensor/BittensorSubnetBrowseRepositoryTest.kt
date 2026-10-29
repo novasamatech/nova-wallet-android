@@ -25,7 +25,7 @@ class BittensorSubnetBrowseRepositoryTest {
 
     @Test
     fun `manual catalogue requires runtime registration and price and backend membership`() {
-        val runtime = listOf(subnet(1, 10, 1), subnet(2, 11, 1), subnet(3, 10, null), subnet(4, 10, 1))
+        val runtime = listOf(subnet(1, 10, 1), subnet(2, 11, 1), subnet(3, 10, price = null), subnet(4, 10, 1))
         val rows = (1..3).map { id -> BittensorSubnetCatalogueRemote.Subnet(id, "1", "Backend $id", "S$id", 10.toBigInteger(), "2000") }
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
         val components = BittensorSubnetCatalogueRemote.Components(component, component)
@@ -44,7 +44,9 @@ class BittensorSubnetBrowseRepositoryTest {
         val runtime = listOf(subnet(42, 10, 1))
         val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(42, "1", "Unknown", "S42", 10.toBigInteger(), "2000"))
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
-        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
+        val components = BittensorSubnetCatalogueRemote.Components(component, component)
+        val meta = BittensorSubnetCatalogueRemote.Meta(components)
+        val response = BittensorSubnetCatalogueRemote(rows, meta)
 
         assertEquals("", mapBittensorBrowseSubnets(response, runtime).single().name)
         assertEquals("", normalizeBittensorSubnetName(" unknown "))
@@ -58,16 +60,15 @@ class BittensorSubnetBrowseRepositoryTest {
         val stale = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
         val unavailable = BittensorRecommendationsRemote.Component("UNAVAILABLE", "STALE")
 
-        val listed = mapBittensorBrowseSubnets(
-            BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(stale, stale))),
-            runtime
-        )
-        val rejected = runCatching {
-            mapBittensorBrowseSubnets(
-                BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(stale, unavailable))),
-                runtime
-            )
-        }
+        val staleComponents = BittensorSubnetCatalogueRemote.Components(stale, stale)
+        val staleMeta = BittensorSubnetCatalogueRemote.Meta(staleComponents)
+        val staleResponse = BittensorSubnetCatalogueRemote(rows, staleMeta)
+        val unavailableComponents = BittensorSubnetCatalogueRemote.Components(stale, unavailable)
+        val unavailableMeta = BittensorSubnetCatalogueRemote.Meta(unavailableComponents)
+        val unavailableResponse = BittensorSubnetCatalogueRemote(rows, unavailableMeta)
+
+        val listed = mapBittensorBrowseSubnets(staleResponse, runtime)
+        val rejected = runCatching { mapBittensorBrowseSubnets(unavailableResponse, runtime) }
 
         assertEquals(listOf(1), listed.map { it.id.value })
         assertTrue(rejected.exceptionOrNull() is IllegalArgumentException)
@@ -75,10 +76,12 @@ class BittensorSubnetBrowseRepositoryTest {
 
     @Test
     fun `backend catalogue standing in for a slow node lists rows at the stale backend price`() {
-        val fallback = listOf(subnet(1, 10, null))
+        val fallback = listOf(subnet(1, 10, price = null))
         val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend 1", "S1", 10.toBigInteger(), "2000"))
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
-        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
+        val components = BittensorSubnetCatalogueRemote.Components(component, component)
+        val meta = BittensorSubnetCatalogueRemote.Meta(components)
+        val response = BittensorSubnetCatalogueRemote(rows, meta)
 
         val listed = mapBittensorBrowseSubnets(response, fallback, chainVerified = false)
 
@@ -119,7 +122,8 @@ class BittensorSubnetBrowseRepositoryTest {
     @Test
     fun `reopening the picker offline serves the catalogue loaded before`() = runBlocking<Unit> {
         val api = SwitchableCatalogueApi()
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java))
+        val storageDelegate = mock(StorageDataSource::class.java)
+        val storage = SwitchableStorage(storageDelegate)
         val logger = RecordingLogger()
         val repository = browseRepository(api, storage, logger = logger)
         val online = repository.subnets()
@@ -138,8 +142,11 @@ class BittensorSubnetBrowseRepositoryTest {
 
     @Test
     fun `a chain read that waits for a reconnecting node serves the catalogue loaded before`() = runBlocking<Unit> {
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java))
-        val repository = browseRepository(SwitchableCatalogueApi(), storage, timeoutMillis = 100L)
+        val api = SwitchableCatalogueApi()
+        val storageDelegate = mock(StorageDataSource::class.java)
+        val storage = SwitchableStorage(storageDelegate)
+        val logger = RecordingLogger()
+        val repository = browseRepository(api, storage, logger, timeoutMillis = 100L)
         val online = repository.subnets()
 
         storage.offline = true
@@ -150,8 +157,10 @@ class BittensorSubnetBrowseRepositoryTest {
     @Test
     fun `without a loaded catalogue an offline read fails instead of waiting`() = runBlocking<Unit> {
         val api = SwitchableCatalogueApi()
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java)).apply { offline = true }
-        val repository = browseRepository(api, storage, timeoutMillis = 100L)
+        val storageDelegate = mock(StorageDataSource::class.java)
+        val storage = SwitchableStorage(storageDelegate).apply { offline = true }
+        val logger = RecordingLogger()
+        val repository = browseRepository(api, storage, logger, timeoutMillis = 100L)
 
         val slowNode = runCatching { withTimeout(5_000L) { repository.subnets() } }.exceptionOrNull()
         api.failure = IOException("Unable to resolve host")
@@ -163,8 +172,11 @@ class BittensorSubnetBrowseRepositoryTest {
 
     @Test
     fun `an inner timeout without a loaded catalogue is reported as a slow read, not a cancellation`() = runBlocking<Unit> {
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java)).apply { innerTimeout = true }
-        val repository = browseRepository(SwitchableCatalogueApi(), storage)
+        val api = SwitchableCatalogueApi()
+        val storageDelegate = mock(StorageDataSource::class.java)
+        val storage = SwitchableStorage(storageDelegate).apply { innerTimeout = true }
+        val logger = RecordingLogger()
+        val repository = browseRepository(api, storage, logger)
 
         val failure = runCatching { repository.subnets() }.exceptionOrNull()
 
@@ -177,7 +189,8 @@ class BittensorSubnetBrowseRepositoryTest {
         val api = SwitchableCatalogueApi()
         val storageDelegate = mock(StorageDataSource::class.java)
         val storage = SwitchableStorage(storageDelegate)
-        val repository = browseRepository(api, storage)
+        val logger = RecordingLogger()
+        val repository = browseRepository(api, storage, logger)
         repository.subnets()
         storage.offline = true
 
@@ -200,15 +213,15 @@ class BittensorSubnetBrowseRepositoryTest {
         ): R = emptyMap<BittensorNetuid.Subnet, Boolean>() as R
     }
 
-    private fun browseRepository(
+    private suspend fun browseRepository(
         api: BittensorSubnetCatalogueApi,
         storage: StorageDataSource,
-        timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT,
-        logger: Logger = RecordingLogger()
+        logger: Logger,
+        timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT
     ): BittensorSubnetBrowseRepository {
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val runtime = mock(BittensorSubnetRepository::class.java)
-        runBlocking { `when`(runtime.catalogue()).thenReturn(BittensorSubnetCatalogue(listOf(subnet(1, 10, 1)), fromChain = true)) }
+        `when`(runtime.catalogue()).thenReturn(BittensorSubnetCatalogue(listOf(subnet(1, 10, 1)), fromChain = true))
         val availability = BittensorSubnetTradingAvailabilityRepository(storage)
         val catalogueRepository = BittensorSubnetCatalogueRepository(api, urls)
         return BittensorSubnetBrowseRepository(catalogueRepository, runtime, availability, logger, timeoutMillis)
@@ -233,7 +246,8 @@ class BittensorSubnetBrowseRepositoryTest {
             failure?.let { throw it }
             val row = BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend", "S", 10.toBigInteger(), "2000")
             val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
-            val meta = BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component))
+            val components = BittensorSubnetCatalogueRemote.Components(component, component)
+            val meta = BittensorSubnetCatalogueRemote.Meta(components)
             return Response.success(BittensorSubnetCatalogueRemote(listOf(row), meta))
         }
     }
@@ -262,7 +276,7 @@ class BittensorSubnetBrowseRepositoryTest {
         BittensorNetuid.Subnet(id),
         "Runtime $id",
         "S$id",
-        null,
+        logoUrl = null,
         priceInRao = price?.toBigInteger(),
         registrationBlock = registration.toBigInteger()
     )

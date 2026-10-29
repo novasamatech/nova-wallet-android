@@ -41,7 +41,7 @@ class BittensorQuickPickInteractorTest {
 
     private val subnetId = BittensorNetuid.Subnet(1)
 
-    private val subnet = BittensorSubnet(subnetId, "Subnet", "α", null, registrationBlock = BigInteger.TEN)
+    private val subnet = BittensorSubnet(subnetId, "Subnet", "α", logoUrl = null, registrationBlock = BigInteger.TEN)
 
     private val reference = BittensorSubnetReference(subnetId, BigInteger.TEN)
 
@@ -152,7 +152,7 @@ class BittensorQuickPickInteractorTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `removed subnet is unavailable`() = runBlocking<Unit> {
-        interactor.resolve(emptyList(), reference)
+        interactor.resolve(subnets = emptyList(), reference)
     }
 
     @Test(expected = IllegalArgumentException::class)

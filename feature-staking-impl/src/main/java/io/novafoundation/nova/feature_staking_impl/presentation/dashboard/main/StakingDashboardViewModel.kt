@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboardValue
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
@@ -259,8 +260,11 @@ class StakingDashboardViewModel(
             null
         }
         val stake = formatters.maskableValueFormatter.format {
-            hasStake.stakingState.stake?.let { amountFormatter.formatAmountToAmountModel(it, hasStake.token) } ?: AmountModel("—", null)
-        }.syncingIf(isSyncingSecondary)
+            when (val valuation = hasStake.stakingState.stake) {
+                is StakingDashboardValue.Known -> amountFormatter.formatAmountToAmountModel(valuation.value, hasStake.token)
+                StakingDashboardValue.Loading, StakingDashboardValue.Unavailable -> AmountModel(token = "—", fiat = null)
+            }
+        }.syncingIf(isSyncingSecondary || hasStake.stakingState.stake is StakingDashboardValue.Loading)
 
         return StakingDashboardModel.HasStakeItem(
             assetLabel = resourceManager.getString(R.string.staking_rewards, hasStake.token.configuration.name).syncingIf(isSyncingPrimary),

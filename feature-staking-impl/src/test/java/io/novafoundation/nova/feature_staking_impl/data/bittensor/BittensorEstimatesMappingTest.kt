@@ -55,7 +55,7 @@ class BittensorEstimatesMappingTest {
                 .isFailure
         )
         assertTrue(
-            runCatching { mapBittensorReportedOperation(operation(null)) }
+            runCatching { mapBittensorReportedOperation(operation(netuid = null)) }
                 .isFailure
         )
     }
@@ -78,7 +78,7 @@ class BittensorEstimatesMappingTest {
         val missing = BittensorAlphaYieldsRemote.Item(
             1,
             address,
-            null,
+            reportedRate = null,
             "ALPHA_VALIDATOR_APY"
         )
         val malformed = BittensorAlphaYieldsRemote.Item(
@@ -118,7 +118,7 @@ class BittensorEstimatesMappingTest {
         )
         assertEquals(
             BigDecimal("79.56"),
-            mapBittensorValidatorYield(item("79.56", null), chain, subnetId)?.annualPercentageYield
+            mapBittensorValidatorYield(item("79.56", verdict = null), chain, subnetId)?.annualPercentageYield
         )
     }
 
@@ -155,10 +155,10 @@ class BittensorEstimatesMappingTest {
 
     @Test
     fun `unexpected subnet or metric is rejected even when the yield is unusable`() {
-        val wrongSubnet = BittensorAlphaYieldsRemote.Item(2, null, null, "ALPHA_VALIDATOR_APY")
-        val missingSubnet = BittensorAlphaYieldsRemote.Item(null, null, null, "ALPHA_VALIDATOR_APY")
-        val wrongMetric = BittensorAlphaYieldsRemote.Item(1, null, null, "OTHER")
-        val missingMetric = BittensorAlphaYieldsRemote.Item(1, null, null, null)
+        val wrongSubnet = BittensorAlphaYieldsRemote.Item(2, hotkey = null, reportedRate = null, "ALPHA_VALIDATOR_APY")
+        val missingSubnet = BittensorAlphaYieldsRemote.Item(netuid = null, hotkey = null, reportedRate = null, "ALPHA_VALIDATOR_APY")
+        val wrongMetric = BittensorAlphaYieldsRemote.Item(1, hotkey = null, reportedRate = null, "OTHER")
+        val missingMetric = BittensorAlphaYieldsRemote.Item(1, hotkey = null, reportedRate = null, metricKind = null)
 
         for (remote in listOf(wrongSubnet, missingSubnet, wrongMetric, missingMetric)) {
             val failure = runCatching { mapBittensorValidatorYield(remote, chain, subnetId) }.exceptionOrNull()

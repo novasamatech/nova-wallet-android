@@ -33,7 +33,7 @@ class RemoteToLocalChainMappersTest {
 
     @Test
     fun `integral config numbers and numeric strings retain their values`() {
-        for (value in listOf(12, 12L, 12.0, 12f, BigInteger.valueOf(12), BigDecimal("12.00"), "12")) {
+        for (value in listOf(12.toByte(), 12.toShort(), 12, 12L, 12.0, 12f, BigInteger.valueOf(12), BigDecimal("12.00"), "12")) {
             val additional = mapNumericAdditional(value)
 
             assertEquals(value.toString(), 12, additional.stakingMaxElectingVoters)
@@ -88,7 +88,22 @@ class RemoteToLocalChainMappersTest {
 
     @Test
     fun `fractional non finite and malformed numbers remain unavailable`() {
-        val values = listOf(null, 1.5, -1.5, Double.NaN, Double.POSITIVE_INFINITY, BigDecimal("1.1"), "1.0", "bad", true)
+        val values = listOf(
+            null,
+            1.5,
+            -1.5,
+            1.5f,
+            Double.NaN,
+            Double.POSITIVE_INFINITY,
+            Double.NEGATIVE_INFINITY,
+            Float.NaN,
+            Float.POSITIVE_INFINITY,
+            Float.NEGATIVE_INFINITY,
+            BigDecimal("1.1"),
+            "1.0",
+            "bad",
+            true
+        )
 
         for (value in values) {
             val additional = mapNumericAdditional(value)
@@ -120,7 +135,7 @@ class RemoteToLocalChainMappersTest {
             "sessionsPerEra" to "6",
             "timelineChain" to "timeline"
         )
-        val oldChain = mapRemoteChainToLocal(remote, null, ChainLocal.Source.DEFAULT, gson)
+        val oldChain = mapRemoteChainToLocal(remote, oldChain = null, ChainLocal.Source.DEFAULT, gson)
             .copy(connectionState = ChainLocal.ConnectionStateLocal.DISABLED)
         val local = mapRemoteChainToLocal(remote.copy(additional = additional), oldChain, ChainLocal.Source.CUSTOM, gson)
         val mapped = gson.fromJson(local.additional, Chain.Additional::class.java)
@@ -147,7 +162,7 @@ class RemoteToLocalChainMappersTest {
 
     @Test
     fun `absent additional and malformed feature flags retain their contracts`() {
-        val local = mapRemoteChainToLocal(remote, null, ChainLocal.Source.DEFAULT, gson)
+        val local = mapRemoteChainToLocal(remote, oldChain = null, ChainLocal.Source.DEFAULT, gson)
         assertNull(gson.fromJson(local.additional, Chain.Additional::class.java))
 
         val additional = mapAdditional(mapOf("newFeatures" to "staking", "sessionLength" to 10.0))
@@ -179,7 +194,7 @@ class RemoteToLocalChainMappersTest {
     }
 
     private fun mapAdditional(additional: Map<String, Any?>): Chain.Additional {
-        val local = mapRemoteChainToLocal(remote.copy(additional = additional), null, ChainLocal.Source.DEFAULT, gson)
+        val local = mapRemoteChainToLocal(remote.copy(additional = additional), oldChain = null, ChainLocal.Source.DEFAULT, gson)
         return gson.fromJson(local.additional, Chain.Additional::class.java)
     }
 }

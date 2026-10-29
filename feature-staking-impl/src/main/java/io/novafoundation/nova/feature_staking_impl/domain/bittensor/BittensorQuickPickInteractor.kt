@@ -33,9 +33,11 @@ class BittensorQuickPickInteractor(
                     val reference = selected ?: select(catalogue, order)
                     selected = reference
                     resolve(catalogue, reference)
-                }.withSafeLoading().onEach { state ->
-                    if (state is ExtendedLoadingState.Error && state.exception is CancellationException) throw state.exception
                 }
+                    .withSafeLoading()
+                    .onEach { state ->
+                        if (state is ExtendedLoadingState.Error && state.exception is CancellationException) throw state.exception
+                    }
             }
         )
     }

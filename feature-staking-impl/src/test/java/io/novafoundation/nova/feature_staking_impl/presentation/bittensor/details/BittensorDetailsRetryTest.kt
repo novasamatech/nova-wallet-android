@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -52,6 +51,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -100,8 +101,6 @@ class BittensorDetailsRetryTest {
 
     private val analyticsService = RecordingBittensorAnalytics()
 
-    private val analytics = analyticsService
-
     private val accountRepository = mock(AccountRepository::class.java)
 
     private val metaAccount = mock(MetaAccount::class.java)
@@ -130,7 +129,7 @@ class BittensorDetailsRetryTest {
 
     private val rootPosition = BittensorRootPosition(hotkey, BigInteger.TEN.pow(9))
 
-    private val positions = BittensorPortfolioPositions(listOf(rootPosition), emptyList(), emptyMap())
+    private val positions = BittensorPortfolioPositions(listOf(rootPosition), subnets = emptyList(), subnetPrices = emptyMap())
 
     private val coinRate = mock(CoinRateChange::class.java)
 
@@ -146,7 +145,7 @@ class BittensorDetailsRetryTest {
 
     private val portfolioLoads = AtomicInteger()
 
-    private val priceLoads = AtomicInteger()
+    private val historyLoads = AtomicInteger()
 
     private var failFirstPortfolio = false
 
@@ -158,7 +157,7 @@ class BittensorDetailsRetryTest {
 
     private val requestedPeriods = mutableListOf<String>()
 
-    private val prices = object : CoinPriceRepository {
+    private val coinPriceRepository = object : CoinPriceRepository {
         override suspend fun getCoinPriceAtTime(priceId: String, currency: Currency, timestamp: Duration): HistoricalCoinRate? = null
 
         override suspend fun getLastHistoryForPeriod(priceId: String, currency: Currency, range: PricePeriod): List<HistoricalCoinRate> {
@@ -169,7 +168,7 @@ class BittensorDetailsRetryTest {
     private val historyApi = object : BittensorPortfolioHistoryApi {
         override suspend fun history(url: String, accountSubject: String, period: String): BittensorPortfolioHistoryRemote {
             requestedPeriods += period
-            val attempt = priceLoads.incrementAndGet()
+            val attempt = historyLoads.incrementAndGet()
             if (timeoutFirstChart && attempt == 1) withTimeout(1L) { awaitCancellation() }
             check(!failFirstChart || attempt > 1) { "Chart unavailable" }
             return portfolioHistoryResponse(period = period, freshness = if (staleHistory) "STALE" else "FRESH")
@@ -178,7 +177,7 @@ class BittensorDetailsRetryTest {
 
     private val urls = InfrastructureUrls { "https://infra.example".toHttpUrl() }
 
-    private val historyRepository = BittensorPortfolioHistoryRepository(historyApi, urls, prices)
+    private val historyRepository = BittensorPortfolioHistoryRepository(historyApi, urls, coinPriceRepository)
 
     private val chartCalculator = BittensorPortfolioChartCalculator()
 
@@ -186,7 +185,13 @@ class BittensorDetailsRetryTest {
 
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry, positionUpdates)
+    private val portfolioChartInteractor = BittensorPortfolioChartInteractor(
+        historyRepository,
+        chartCalculator,
+        accountRepository,
+        chainRegistry,
+        positionUpdates
+    )
 
     private val automaticInteractionGate = mock(AutomaticInteractionGate::class.java)
 
@@ -197,8 +202,6 @@ class BittensorDetailsRetryTest {
     private val portfolioReopenCommunicator = mock(BittensorPortfolioReopenCommunicator::class.java)
 
     private val portfolioReopenings = MutableSharedFlow<BittensorPortfolioReopenCommunicator.Response>(extraBufferCapacity = 1)
-
-    private val assetIconProvider = mock(AssetIconProvider::class.java)
 
     private val rowMapper = mock(BittensorPortfolioRowMapper::class.java)
 
@@ -236,7 +239,7 @@ class BittensorDetailsRetryTest {
         accountRepository,
         chainRegistry,
         resources,
-        analytics,
+        analyticsService,
         actionLauncherFactory
     )
 
@@ -249,6 +252,9 @@ class BittensorDetailsRetryTest {
         `when`(chain.id).thenReturn("chain")
         `when`(chain.name).thenReturn("Bittensor")
         `when`(chainRegistry.getChain("chain")).thenReturn(chain)
+        `when`(chainRegistry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
+        `when`(chain.assets).thenReturn(listOf(chainAsset))
+        `when`(chainAsset.id).thenReturn(UTILITY_ASSET_ID)
         `when`(metaAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(accountRepository.getMetaAccount(1L)).thenReturn(metaAccount)
         `when`(accountRepository.getMetaAccount(2L)).thenReturn(metaAccount)
@@ -256,6 +262,8 @@ class BittensorDetailsRetryTest {
         `when`(accountRepository.selectedMetaAccountFlow()).thenReturn(flowOf(metaAccount))
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(resources.getString(anyInt())).thenReturn("Message")
+        `when`(resources.getString(R.string.bittensor_staking_wallet_unsupported_title, "Message")).thenReturn("Title")
+        `when`(resources.getString(R.string.bittensor_staking_wallet_unsupported_message, "NATIVE")).thenReturn("Message")
         `when`(asset.token).thenReturn(token)
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(token.currency).thenReturn(currency)
@@ -273,13 +281,13 @@ class BittensorDetailsRetryTest {
             }
         )
         `when`(subnetRepository.subnets()).thenReturn(emptyList())
-        val claims = BittensorRootClaims(emptyList(), BigInteger.ONE)
-        val claimState = BittensorRootClaimState(1L, hotkey, chain, asset, claims, true)
+        val claims = BittensorRootClaims(previews = emptyList(), BigInteger.ONE)
+        val claimState = BittensorRootClaimState(metaId = 1L, hotkey, chain, asset, claims, supportsImmediateOperations = true)
         rootClaims = MutableStateFlow(claimState)
         val otherClaims = flowOf(claimState.copy(metaId = 2L))
         `when`(rootClaimInteractor.observe(1L)).thenReturn(rootClaims)
         `when`(rootClaimInteractor.observe(2L)).thenReturn(otherClaims)
-        `when`(rowInteractor.weeklyChanges("native", emptySet())).thenReturn(emptyMap())
+        `when`(rowInteractor.weeklyChanges("native", subnetIds = emptySet())).thenReturn(emptyMap())
         `when`(portfolioReopenCommunicator.responseFlow).thenReturn(portfolioReopenings)
     }
 
@@ -299,13 +307,13 @@ class BittensorDetailsRetryTest {
             val rewarded = rootClaims.value.copy(claims = BittensorRootClaims(listOf(preview), BigInteger.ONE))
             rootClaims.value = rewarded
             viewModel.empty.first { !it }
-            rootClaims.value = rewarded.copy(claims = BittensorRootClaims(emptyList(), BigInteger.ONE))
+            rootClaims.value = rewarded.copy(claims = BittensorRootClaims(previews = emptyList(), BigInteger.ONE))
             viewModel.empty.first { it }
             rootClaims.value = rewarded
             viewModel.empty.first { !it }
             portfolioUpdates.value = portfolioUpdates.value.copy(metaId = 2L)
             viewModel.empty.first { it }
-            rootClaims.value = rewarded.copy(claims = BittensorRootClaims(emptyList(), BigInteger.ONE))
+            rootClaims.value = rewarded.copy(claims = BittensorRootClaims(previews = emptyList(), BigInteger.ONE))
             rootClaims.value = rewarded
             assertNull(withTimeoutOrNull(100L) { viewModel.empty.first { !it } })
         }
@@ -327,7 +335,7 @@ class BittensorDetailsRetryTest {
             viewModel.canAddStake.first { it }
             viewModel.priceChartModels.first { models -> models.any { it is PriceChartModel.Chart } }
             assertEquals(2, portfolioLoads.get())
-            assertEquals(1, priceLoads.get())
+            assertEquals(1, historyLoads.get())
         }
     }
 
@@ -357,7 +365,7 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `chart dialog retries prices without restarting portfolio`() = runBlocking {
+    fun `chart dialog retries history without restarting portfolio`() = runBlocking {
         failFirstChart = true
         createViewModel()
 
@@ -369,7 +377,7 @@ class BittensorDetailsRetryTest {
             retry.onRetry()
 
             viewModel.priceChartModels.first { models -> models.any { it is PriceChartModel.Chart } }
-            assertEquals(2, priceLoads.get())
+            assertEquals(2, historyLoads.get())
             assertEquals(1, portfolioLoads.get())
         }
     }
@@ -398,7 +406,7 @@ class BittensorDetailsRetryTest {
             val retry = viewModel.retryEvents.first()
             retry.onRetry()
             viewModel.priceChartModels.first { models -> models.any { it is PriceChartModel.Chart } }
-            assertEquals(2, priceLoads.get())
+            assertEquals(2, historyLoads.get())
             assertEquals(1, portfolioLoads.get())
         }
     }
@@ -419,26 +427,6 @@ class BittensorDetailsRetryTest {
         }
     }
 
-    private fun portfolioOpenedSources() = analyticsService.events.toList().filter { it.name == "staking_portfolio_opened" }.map { it.properties["source"] }
-
-    private fun createViewModel() {
-        viewModel = BittensorDetailsViewModel(
-            analytics, bittensorPortfolioInteractor = portfolioInteractor,
-            router = router,
-            portfolioReopenCommunicator = portfolioReopenCommunicator,
-            resources = resources,
-            amountFormatter = amountFormatter,
-            rowMapper = rowMapper,
-            externalActions = externalActions,
-            bittensorPortfolioChartInteractor = priceChartInteractor,
-            retryController = retryController,
-            chartAxisFormatterFactory = axisFormatterFactory,
-            rowInteractor = rowInteractor,
-            rootClaimInteractor = rootClaimInteractor,
-            walletGate = walletGate
-        )
-    }
-
     @Test
     fun `add position opens the earn landing for the portfolio asset`() = runBlocking {
         createViewModel()
@@ -448,7 +436,9 @@ class BittensorDetailsRetryTest {
 
         val captor = ArgumentCaptor.forClass(StartStakingLandingPayload::class.java)
         // Mockito's capture() returns null; the placeholder only satisfies Kotlin's non-null parameter.
-        verify(router, timeout(3_000L)).openBittensorStartStaking(captor.capture() ?: StartStakingLandingPayload(AvailableStakingOptionsPayload("", 0, emptyList())))
+        val placeholderOptions = AvailableStakingOptionsPayload(chainId = "", assetId = 0, stakingTypes = emptyList())
+        val placeholderPayload = StartStakingLandingPayload(placeholderOptions)
+        verify(router, timeout(3_000L)).openBittensorStartStaking(captor.capture() ?: placeholderPayload)
         val options = captor.value.availableStakingOptions
         assertEquals("chain", options.chainId)
         assertEquals(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT), options.stakingTypes)
@@ -489,7 +479,7 @@ class BittensorDetailsRetryTest {
             viewModel.priceChartModels.first { models ->
                 models.filterIsInstance<PriceChartModel.Chart>().any { it.priceChart.last().price.compareTo(BigDecimal(2)) == 0 }
             }
-            assertEquals(1, priceLoads.get())
+            assertEquals(1, historyLoads.get())
         }
     }
 
@@ -510,7 +500,16 @@ class BittensorDetailsRetryTest {
         createViewModel()
         withTimeout(3_000L) {
             viewModel.priceChartModels.first { models -> models.any { it is PriceChartModel.Chart } }
-            val euro = Currency("EUR", "Euro", "€", Currency.Category.FIAT, true, 2, "eur", true)
+            val euro = Currency(
+                code = "EUR",
+                name = "Euro",
+                symbol = "€",
+                category = Currency.Category.FIAT,
+                popular = true,
+                id = 2,
+                coingeckoId = "eur",
+                selected = true
+            )
             val newAsset = mock(Asset::class.java)
             val newToken = mock(Token::class.java)
             `when`(newAsset.token).thenReturn(newToken)
@@ -518,7 +517,7 @@ class BittensorDetailsRetryTest {
             `when`(newToken.currency).thenReturn(euro)
             `when`(newToken.coinRate).thenReturn(coinRate)
             portfolioUpdates.value = portfolioUpdates.value.copy(asset = newAsset)
-            viewModel.priceChartModels.first { models -> priceLoads.get() == 2 && models.any { it is PriceChartModel.Chart } }
+            viewModel.priceChartModels.first { models -> historyLoads.get() == 2 && models.any { it is PriceChartModel.Chart } }
             assertEquals(1, portfolioLoads.get())
         }
     }
@@ -543,9 +542,31 @@ class BittensorDetailsRetryTest {
             portfolioUpdates.value = portfolioUpdates.value.copy(metaId = 2L)
 
             viewModel.priceChartModels.first { models ->
-                priceLoads.get() == 2 && models.any { it is PriceChartModel.Chart }
+                historyLoads.get() == 2 && models.any { it is PriceChartModel.Chart }
             }
         }
     }
-}
 
+    private fun portfolioOpenedSources() = analyticsService.events.toList()
+        .filter { it.name == "staking_portfolio_opened" }
+        .map { it.properties["source"] }
+
+    private fun createViewModel() {
+        viewModel = BittensorDetailsViewModel(
+            analytics = analyticsService,
+            bittensorPortfolioInteractor = portfolioInteractor,
+            router = router,
+            portfolioReopenCommunicator = portfolioReopenCommunicator,
+            resources = resources,
+            amountFormatter = amountFormatter,
+            rowMapper = rowMapper,
+            externalActions = externalActions,
+            bittensorPortfolioChartInteractor = portfolioChartInteractor,
+            retryController = retryController,
+            chartAxisFormatterFactory = axisFormatterFactory,
+            rowInteractor = rowInteractor,
+            rootClaimInteractor = rootClaimInteractor,
+            walletGate = walletGate
+        )
+    }
+}

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboardValue
 import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.InMemoryPreferences
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +35,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -67,7 +68,7 @@ class BittensorDashboardDetailsSourceTest {
 
     private val token = mock(Token::class.java)
 
-    private val coldKey = ByteArray(32)
+    private val coldKey: AccountId = ByteArray(32)
 
     private val hotkey = AccountIdKey(ByteArray(32) { 1 })
 
@@ -107,19 +108,19 @@ class BittensorDashboardDetailsSourceTest {
             source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) }
         }
         runCurrent()
-        assertEquals(BigInteger.TEN, emitted.last().totalStakeInPlanks)
-        assertNull(emitted.last().rootAnnualPercentageYield)
-        assertFalse(emitted.last().rootYieldLoading)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), emitted.last().totalStake)
+        assertSame(StakingDashboardValue.Unavailable, emitted.last().rootAnnualPercentageYield)
+        assertTrue(emitted.last().rootAnnualPercentageYield !is StakingDashboardValue.Loading)
 
         advanceTimeBy(120_000)
         runCurrent()
-        assertNull(emitted.last().rootAnnualPercentageYield)
+        assertSame(StakingDashboardValue.Unavailable, emitted.last().rootAnnualPercentageYield)
         verify(validators, times(1)).yields(BittensorNetuid.Root)
 
         val twoValidators = listOf(BittensorRootPosition(hotkey, BigInteger.TEN), BittensorRootPosition(otherHotkey, BigInteger.TEN))
         portfolioState.value = BittensorPortfolioState(portfolio.copy(root = twoValidators), BittensorDataStatus.Fresh)
         runCurrent()
-        assertEquals(0, BigDecimal("5.5").compareTo(emitted.last().rootAnnualPercentageYield))
+        assertKnownYieldEquals(BigDecimal("5.5"), emitted.last().rootAnnualPercentageYield)
         verify(validators, times(2)).yields(BittensorNetuid.Root)
         job.cancel()
     }
@@ -156,9 +157,11 @@ class BittensorDashboardDetailsSourceTest {
     fun `wallet without account still receives maximum yield without position reads`() = runTest {
         prepare()
         `when`(account.accountIdIn(chain)).thenReturn(null)
-        val details = source.observe(account, listOf(chain)).first { it["chain"]?.maximumAnnualPercentageYield != null }.getValue("chain")
-        assertEquals(BigInteger.ZERO, details.totalStakeInPlanks)
-        assertEquals(BigDecimal.ONE, details.maximumAnnualPercentageYield)
+        val details = source.observe(account, listOf(chain))
+            .first { it["chain"]?.maximumAnnualPercentageYield is StakingDashboardValue.Known }
+            .getValue("chain")
+        assertEquals(StakingDashboardValue.Known(BigInteger.ZERO), details.totalStake)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), details.maximumAnnualPercentageYield)
         verifyNoInteractions(positions)
     }
 
@@ -184,13 +187,13 @@ class BittensorDashboardDetailsSourceTest {
         runCurrent()
         advanceTimeBy(120_000)
         runCurrent()
-        assertNull(emitted.last().maximumAnnualPercentageYield)
-        assertFalse(emitted.last().maximumYieldLoading)
+        assertSame(StakingDashboardValue.Unavailable, emitted.last().maximumAnnualPercentageYield)
+        assertTrue(emitted.last().maximumAnnualPercentageYield !is StakingDashboardValue.Loading)
         verify(recommendations, times(1)).maximumYields()
 
         source.refreshMaximumYield()
         runCurrent()
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), emitted.last().maximumAnnualPercentageYield)
         verify(recommendations, times(2)).maximumYields()
         job.cancel()
     }
@@ -202,7 +205,7 @@ class BittensorDashboardDetailsSourceTest {
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), emitted.last().maximumAnnualPercentageYield)
         verify(recommendations, times(1)).maximumYields()
 
         snapshots.saveClaimableRootRewards("chain", coldKey, BigInteger.TEN)
@@ -231,11 +234,62 @@ class BittensorDashboardDetailsSourceTest {
         `when`(validators.yields(BittensorNetuid.Root)).thenThrow(IllegalStateException("offline"))
         val details = source.observe(account, listOf(chain)).first().getValue("chain")
 
-        assertEquals(BittensorDashboardDetails.Pricing.KNOWN, details.pricing)
-        assertEquals(BigInteger.TEN, details.totalStakeInPlanks)
-        assertEquals(BigInteger.TEN, details.panelStakeInPlanks)
-        assertEquals(0, BigDecimal.TEN.compareTo(details.panelAnnualPercentageYield))
-        assertFalse(details.panelYieldLoading)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), details.totalStake)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), details.panelStake)
+        assertKnownYieldEquals(BigDecimal.TEN, details.panelAnnualPercentageYield)
+        assertTrue(details.panelAnnualPercentageYield !is StakingDashboardValue.Loading)
+    }
+
+    @Test
+    fun `known zero snapshot remains a value while positions reload`() = runTest {
+        prepare()
+        portfolioState.value = BittensorPortfolioState(emptyPositions, BittensorDataStatus.Fresh)
+        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        runCurrent()
+        first.cancel()
+
+        portfolioState.value = BittensorPortfolioState(positions = null, status = BittensorDataStatus.Loading)
+        val details = source.observe(account, listOf(chain)).first().getValue("chain")
+
+        assertEquals(StakingDashboardValue.Known(BigInteger.ZERO), details.totalStake)
+        assertEquals(BigInteger.ZERO, snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
+    }
+
+    @Test
+    fun `another coldkey does not restore the previous account valuation`() = runTest {
+        prepare()
+        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        runCurrent()
+        first.cancel()
+
+        val otherColdKey: AccountId = ByteArray(32) { 3 }
+        `when`(account.accountIdIn(chain)).thenReturn(otherColdKey)
+        `when`(positions.observePortfolio("chain", otherColdKey)).thenReturn(portfolioState)
+        portfolioState.value = BittensorPortfolioState(positions = null, status = BittensorDataStatus.Loading)
+        val details = source.observe(account, listOf(chain)).first().getValue("chain")
+
+        assertSame(StakingDashboardValue.Loading, details.totalStake)
+        assertNull(details.rootStakeInPlanks)
+        assertNull(snapshots.snapshot("chain", otherColdKey))
+    }
+
+    @Test
+    fun `missing snapshot yield loads with positions and settles unavailable on failure`() = runTest {
+        prepare()
+        `when`(validators.yields(BittensorNetuid.Root)).thenThrow(IllegalStateException("offline"))
+        val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
+        runCurrent()
+        first.cancel()
+
+        portfolioState.value = BittensorPortfolioState(positions = null, status = BittensorDataStatus.Loading)
+        val pending = source.observe(account, listOf(chain)).first().getValue("chain")
+        assertSame(StakingDashboardValue.Loading, pending.rootAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), pending.totalStake)
+
+        portfolioState.value = BittensorPortfolioState(positions = null, status = BittensorDataStatus.Stale(IllegalStateException("offline")))
+        val settled = source.observe(account, listOf(chain)).first().getValue("chain")
+        assertSame(StakingDashboardValue.Unavailable, settled.rootAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), settled.totalStake)
     }
 
     @Test
@@ -250,12 +304,12 @@ class BittensorDashboardDetailsSourceTest {
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, emitted.last().pricing)
+        assertEquals(StakingDashboardValue.Loading, emitted.last().totalStake)
         assertEquals(BigInteger.TEN, snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
 
         portfolioState.value = BittensorPortfolioState(withSubnet, BittensorDataStatus.Fresh, pricesPending = false)
         runCurrent()
-        assertEquals(BittensorDashboardDetails.Pricing.UNKNOWN, emitted.last().pricing)
+        assertEquals(StakingDashboardValue.Unavailable, emitted.last().totalStake)
         assertNull(snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
         job.cancel()
     }
@@ -273,13 +327,13 @@ class BittensorDashboardDetailsSourceTest {
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
-        assertFalse(emitted.last().maximumYieldLoading)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), emitted.last().maximumAnnualPercentageYield)
+        assertTrue(emitted.last().maximumAnnualPercentageYield !is StakingDashboardValue.Loading)
 
         `when`(recommendations.maximumYields()).thenThrow(IllegalStateException("offline"))
         portfolioState.value = noStake
         runCurrent()
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), emitted.last().maximumAnnualPercentageYield)
         assertEquals(BigDecimal.ONE, snapshots.snapshot("chain", coldKey)?.maximumAnnualPercentageYield)
         verify(recommendations, times(2)).maximumYields()
         job.cancel()
@@ -330,14 +384,14 @@ class BittensorDashboardDetailsSourceTest {
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), emitted.last().maximumAnnualPercentageYield)
 
         `when`(recommendations.maximumYields()).thenReturn(emptyMap())
         source.refreshMaximumYield()
         runCurrent()
 
-        assertNull(emitted.last().maximumAnnualPercentageYield)
-        assertFalse(emitted.last().maximumYieldLoading)
+        assertSame(StakingDashboardValue.Unavailable, emitted.last().maximumAnnualPercentageYield)
+        assertTrue(emitted.last().maximumAnnualPercentageYield !is StakingDashboardValue.Loading)
         assertNull(snapshots.snapshot("chain", coldKey)?.maximumAnnualPercentageYield)
         verify(recommendations, times(2)).maximumYields()
         job.cancel()
@@ -350,17 +404,17 @@ class BittensorDashboardDetailsSourceTest {
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
-        assertTrue(emitted.last().maximumYieldLoading)
+        assertSame(StakingDashboardValue.Loading, emitted.last().maximumAnnualPercentageYield)
         verifyNoInteractions(recommendations)
 
         portfolioState.value = BittensorPortfolioState(positions = null, BittensorDataStatus.Stale(IllegalStateException("offline")))
         runCurrent()
-        assertFalse(emitted.last().maximumYieldLoading)
+        assertTrue(emitted.last().maximumAnnualPercentageYield !is StakingDashboardValue.Loading)
         verifyNoInteractions(recommendations)
 
         portfolioState.value = BittensorPortfolioState(emptyPositions, BittensorDataStatus.Fresh)
         runCurrent()
-        assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
+        assertEquals(StakingDashboardValue.Known(BigDecimal.ONE), emitted.last().maximumAnnualPercentageYield)
         verify(recommendations, times(1)).maximumYields()
         job.cancel()
     }
@@ -370,7 +424,7 @@ class BittensorDashboardDetailsSourceTest {
         prepare()
         portfolioState.value = BittensorPortfolioState(positions = null, BittensorDataStatus.Loading)
         val details = source.observe(account, listOf(chain)).first().getValue("chain")
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, details.pricing)
+        assertEquals(StakingDashboardValue.Loading, details.totalStake)
     }
 
     @Test
@@ -380,7 +434,7 @@ class BittensorDashboardDetailsSourceTest {
         val stakingState = AggregatedStakingDashboardOption.HasStake(
             showStakingType = false,
             stakingType = Chain.Asset.StakingType.BITTENSOR_ROOT,
-            stake = BigInteger.TEN,
+            stake = StakingDashboardValue.Known(BigInteger.TEN),
             stats = ExtendedLoadingState.Loading
         )
         val option = AggregatedStakingDashboardOption(chain, token, stakingState, AggregatedStakingDashboardOption.SyncingStage.SYNCED)
@@ -393,34 +447,32 @@ class BittensorDashboardDetailsSourceTest {
             }
         }
         runCurrent()
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, emitted.last().pricing)
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, dashboardDetails.last().pricing)
+        assertEquals(StakingDashboardValue.Loading, emitted.last().totalStake)
+        assertEquals(StakingDashboardValue.Loading, dashboardDetails.last().totalStake)
 
         portfolioState.value = BittensorPortfolioState(positions = null, BittensorDataStatus.Stale(IllegalStateException("offline")))
         runCurrent()
         val unavailable = emitted.last()
-        assertEquals(BittensorDashboardDetails.Pricing.UNKNOWN, unavailable.pricing)
-        assertEquals(BittensorDashboardDetails.Pricing.UNKNOWN, dashboardDetails.last().pricing)
+        assertEquals(StakingDashboardValue.Unavailable, dashboardDetails.last().totalStake)
         assertSame(unavailable, dashboardDetails.last())
-        assertNull(unavailable.totalStakeInPlanks)
+        assertSame(StakingDashboardValue.Unavailable, unavailable.totalStake)
         assertNull(unavailable.rootStakeInPlanks)
-        assertNull(unavailable.panelStakeInPlanks)
-        assertFalse(unavailable.rootYieldLoading)
-        assertFalse(unavailable.subnetYieldLoading)
-        assertFalse(unavailable.maximumYieldLoading)
+        assertSame(StakingDashboardValue.Unavailable, unavailable.panelStake)
+        assertTrue(unavailable.rootAnnualPercentageYield !is StakingDashboardValue.Loading)
+        assertTrue(unavailable.subnetAnnualPercentageYield !is StakingDashboardValue.Loading)
+        assertTrue(unavailable.maximumAnnualPercentageYield !is StakingDashboardValue.Loading)
         assertNull(snapshots.snapshot("chain", coldKey))
         verifyNoInteractions(validators, recommendations)
 
         portfolioState.value = BittensorPortfolioState(positions = null, BittensorDataStatus.Loading)
         runCurrent()
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, emitted.last().pricing)
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, dashboardDetails.last().pricing)
+        assertEquals(StakingDashboardValue.Loading, emitted.last().totalStake)
+        assertEquals(StakingDashboardValue.Loading, dashboardDetails.last().totalStake)
 
         portfolioState.value = BittensorPortfolioState(portfolio, BittensorDataStatus.Fresh)
         runCurrent()
-        assertEquals(BittensorDashboardDetails.Pricing.KNOWN, emitted.last().pricing)
         assertSame(emitted.last(), dashboardDetails.last())
-        assertEquals(BigInteger.TEN, emitted.last().totalStakeInPlanks)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), emitted.last().totalStake)
         assertEquals(BigInteger.TEN, snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
         verify(validators, times(1)).yields(BittensorNetuid.Root)
         verifyNoInteractions(recommendations)
@@ -435,21 +487,25 @@ class BittensorDashboardDetailsSourceTest {
         val emitted = mutableListOf<BittensorDashboardDetails>()
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
-        assertEquals(BittensorDashboardDetails.Pricing.LOADING, emitted.last().pricing)
+        assertEquals(StakingDashboardValue.Loading, emitted.last().totalStake)
 
         portfolioState.value = BittensorPortfolioState(positions = null, BittensorDataStatus.Stale(IllegalStateException("offline")))
         runCurrent()
         val unavailable = emitted.last()
-        assertEquals(BittensorDashboardDetails.Pricing.UNKNOWN, unavailable.pricing)
-        assertNull(unavailable.totalStakeInPlanks)
+        assertSame(StakingDashboardValue.Unavailable, unavailable.totalStake)
         assertNull(unavailable.rootStakeInPlanks)
         assertTrue(unavailable.showsClaimableRewardsPanel)
-        assertEquals(BigInteger.TEN, unavailable.panelStakeInPlanks)
-        assertNull(unavailable.panelAnnualPercentageYield)
-        assertFalse(unavailable.panelYieldLoading)
+        assertEquals(StakingDashboardValue.Known(BigInteger.TEN), unavailable.panelStake)
+        assertSame(StakingDashboardValue.Unavailable, unavailable.panelAnnualPercentageYield)
+        assertTrue(unavailable.panelAnnualPercentageYield !is StakingDashboardValue.Loading)
         assertNull(snapshots.snapshot("chain", coldKey))
         verifyNoInteractions(validators, recommendations)
         job.cancel()
+    }
+
+    private fun assertKnownYieldEquals(expected: BigDecimal, actual: StakingDashboardValue<BigDecimal>) {
+        val knownYield = actual as StakingDashboardValue.Known<BigDecimal>
+        assertEquals(0, expected.compareTo(knownYield.value))
     }
 
     private suspend fun prepare() {

@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboardValue
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.BittensorDashboardDetailsSource
@@ -59,24 +60,45 @@ import org.mockito.Mockito.`when`
 class StakingDashboardDeepLinkTest {
 
     private val interactor = mock(StakingDashboardInteractor::class.java)
+
+    private val bittensorDetailsSource = mock(BittensorDashboardDetailsSource::class.java)
+
     private val accountUseCase = mock(SelectedAccountUseCase::class.java)
+
     private val resourceManager = mock(ResourceManager::class.java)
+
     private val updateSystem = mock(StakingDashboardUpdateSystem::class.java)
+
     private val dashboardRouter = mock(StakingDashboardRouter::class.java)
+
     private val router = mock(StakingRouter::class.java)
+
     private val startRouter = mock(StartMultiStakingRouter::class.java)
+
     private val sharedState = StakingSharedState()
+
     private val mapperFactory = mock(StakingDashboardPresentationMapperFactory::class.java)
+
     private val formatterProvider = mock(MaskableValueFormatterProvider::class.java)
+
     private val amountFormatter = mock(AmountFormatter::class.java)
+
     private val iconProvider = mock(AssetIconProvider::class.java)
+
     private val announcements = mock(StakingAnnouncementsUseCase::class.java)
+
     private val analytics = RecordingBittensorAnalytics()
+
     private val chain = mock(Chain::class.java)
+
     private val asset = mock(Chain.Asset::class.java)
+
     private val token = mock(Token::class.java)
+
     private val target = StakingDeepLinkTarget("chain", 0)
+
     private val dashboardState = MutableStateFlow<ExtendedLoadingState<StakingDashboard>>(ExtendedLoadingState.Loading)
+
     private val noStake = NoStake(
         ExtendedLoadingState.Loading,
         NoStake.FlowType.Single(Chain.Asset.StakingType.BITTENSOR_ROOT, false),
@@ -103,7 +125,7 @@ class StakingDashboardDeepLinkTest {
 
         viewModel = StakingDashboardViewModel(
             interactor = interactor,
-            bittensorDetailsSource = mock(BittensorDashboardDetailsSource::class.java),
+            bittensorDetailsSource = bittensorDetailsSource,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             stakingDashboardUpdateSystem = updateSystem,
@@ -154,7 +176,7 @@ class StakingDashboardDeepLinkTest {
 
     @Test
     fun `existing Bittensor stake deep link opens portfolio instead of introductory landing`() {
-        val state = HasStake(false, Chain.Asset.StakingType.BITTENSOR_ROOT, null, ExtendedLoadingState.Loading)
+        val state = HasStake(showStakingType = false, Chain.Asset.StakingType.BITTENSOR_ROOT, StakingDashboardValue.Unavailable, ExtendedLoadingState.Loading)
         val option = AggregatedStakingDashboardOption(chain, token, state, SyncingStage.SYNCED)
         val destination = StakingDeepLinkDestination(target, option)
         viewModel.setDeepLinkTarget(target)

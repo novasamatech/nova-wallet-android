@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboardValue
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreStakingOptions
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
@@ -399,7 +400,7 @@ class RealStakingDashboardInteractor(
                 showStakingType = showStakingType,
                 stats = item.stakeState.stats.map(::mapItemStatsToOptionStats),
                 stakingType = item.stakingType,
-                stake = item.stakeState.stake
+                stake = item.stakeState.stake?.let { StakingDashboardValue.Known(it) } ?: StakingDashboardValue.Unavailable
             ),
             syncingStage = syncingStageMap.getSyncingStage(StakingOptionId(chain.id, chainAsset.id, item.stakingType))
         )
@@ -422,8 +423,8 @@ class RealStakingDashboardInteractor(
     private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
             compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.chain.id == ChainGeneses.BITTENSOR }
-                .thenByDescending { option -> option.stakingState.stake?.let(option.token::planksToFiat) }
-                .thenByDescending { it.stakingState.stake }
+                .thenByDescending { option -> (option.stakingState.stake as? StakingDashboardValue.Known<Balance>)?.value?.let(option.token::planksToFiat) }
+                .thenByDescending { (it.stakingState.stake as? StakingDashboardValue.Known<Balance>)?.value }
                 .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }
         )

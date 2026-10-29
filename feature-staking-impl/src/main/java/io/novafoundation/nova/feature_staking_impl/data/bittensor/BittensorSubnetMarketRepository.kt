@@ -37,14 +37,17 @@ class BittensorSubnetMarketRepository(
     }
 
     private suspend fun markets(): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> {
-        cached?.takeIf { nanoTime() - it.loadedAtNanos < MARKET_CACHE_VALIDITY.inWholeNanoseconds }?.let { return it.rows }
+        val cachedMarkets = cached
+        if (cachedMarkets != null && nanoTime() - cachedMarkets.loadedAtNanos < MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
+            return cachedMarkets.rows
+        }
 
-        val requestStartedAt = nanoTime()
+        val requestStartedAtNanos = nanoTime()
         val response = loadMarkets()
         val markets = mapBittensorMarkets(response)
         // No listed subnet is a degraded response, not every subnet unlisted, so the read fails.
         require(markets.isNotEmpty()) { "Empty subnet markets" }
-        cached = CachedMarkets(markets, requestStartedAt)
+        cached = CachedMarkets(markets, requestStartedAtNanos)
         return markets
     }
 
@@ -54,27 +57,35 @@ class BittensorSubnetMarketRepository(
         for (page in 1..MAX_MARKET_PAGES) {
             val response = api.markets(perPage = MARKET_PAGE_SIZE, page = page)
             require(response.size <= MARKET_PAGE_SIZE) { "Oversized subnet markets page" }
-            val pageIds = response.mapNotNull { it.id?.trim() }
-            require(pageIds.all { seenMarketIds.add(it) }) { "Duplicate subnet market id" }
+            requireUniqueMarketIds(response, seenMarketIds)
             markets.addAll(response)
             if (response.size < MARKET_PAGE_SIZE) return@withTimeoutOrNull markets
         }
         error("Incomplete subnet markets pagination")
     } ?: throw BittensorTimeoutException("Subnet markets")
+
+    private fun requireUniqueMarketIds(rows: List<BittensorSubnetMarketRemote>, seenMarketIds: MutableSet<String>) {
+        val pageIds = rows.mapNotNull { it.id?.trim() }
+        require(pageIds.all { seenMarketIds.add(it) }) { "Duplicate subnet market id" }
+    }
 }
 
 internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> =
     mapBittensorMarkets(rows).mapValues { (_, market) -> requireNotNull(market.id) }
 
 private fun mapBittensorMarkets(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> = buildMap {
-    rows.forEach { row ->
-        val symbol = row.symbol?.trim()?.lowercase() ?: return@forEach
-        if (!symbol.matches(SUBNET_SYMBOL_PATTERN)) return@forEach
-        val netuid = symbol.drop(2)
-            .toIntOrNull() ?: return@forEach
-        val subnetId = runCatching { BittensorNetuid.Subnet(netuid) }
-            .getOrNull() ?: return@forEach
-        val id = row.id?.trim()?.takeIf { it.matches(MARKET_ID_PATTERN) } ?: return@forEach
-        if (subnetId !in this) put(subnetId, row.copy(id = id))
+    for (row in rows) {
+        val subnetId = mapBittensorMarketSubnetId(row.symbol) ?: continue
+        val marketId = row.id
+            ?.trim()
+            ?.takeIf { it.matches(MARKET_ID_PATTERN) } ?: continue
+        if (subnetId !in this) put(subnetId, row.copy(id = marketId))
     }
+}
+
+private fun mapBittensorMarketSubnetId(rawSymbol: String?): BittensorNetuid.Subnet? {
+    val symbol = rawSymbol?.trim()?.lowercase() ?: return null
+    if (!symbol.matches(SUBNET_SYMBOL_PATTERN)) return null
+    val rawNetuid = symbol.drop(2).toIntOrNull() ?: return null
+    return runCatching { BittensorNetuid.Subnet(rawNetuid) }.getOrNull()
 }

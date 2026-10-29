@@ -24,7 +24,7 @@ class BittensorSubnetMarketRepositoryTest {
             BittensorSubnetMarketRemote("last-subnet", "sn65535"),
             BittensorSubnetMarketRemote("invalid/id", "sn9"),
             BittensorSubnetMarketRemote("duplicate", "sn8"),
-            BittensorSubnetMarketRemote(null, "sn10")
+            BittensorSubnetMarketRemote(id = null, "sn10")
         )
 
         val expected = mapOf(BittensorNetuid.Subnet(8) to "vanta", BittensorNetuid.Subnet(65535) to "last-subnet")
@@ -70,7 +70,7 @@ class BittensorSubnetMarketRepositoryTest {
 
     @Test
     fun `full page is followed by the requested next page before caching`() = runTest {
-        val api = MarketsApi(emptyList())
+        val api = MarketsApi(rows = emptyList())
         api.pages = mapOf(1 to page(1), 2 to listOf(BittensorSubnetMarketRemote("last-market", "sn251")))
         val repository = BittensorSubnetMarketRepository(api)
 
@@ -81,7 +81,7 @@ class BittensorSubnetMarketRepositoryTest {
 
     @Test
     fun `full final page is incomplete and must not cache omitted subnets as unlisted`() = runTest {
-        val api = MarketsApi(emptyList())
+        val api = MarketsApi(rows = emptyList())
         api.pages = (1..4).associateWith { page(it) }
         val repository = BittensorSubnetMarketRepository(api)
 
@@ -95,7 +95,7 @@ class BittensorSubnetMarketRepositoryTest {
     @Test
     fun `repeated and oversized pages fail without cache admission`() = runTest {
         for (pages in listOf(mapOf(1 to page(1), 2 to page(1)), mapOf(1 to page(1) + page(2).first()))) {
-            val api = MarketsApi(emptyList())
+            val api = MarketsApi(rows = emptyList())
             api.pages = pages
             val repository = BittensorSubnetMarketRepository(api)
 
@@ -110,7 +110,10 @@ class BittensorSubnetMarketRepositoryTest {
     fun `cache expires at the request start deadline including when the clock starts at zero`() = runTest {
         var now = 0L
         val api = MarketsApi(listOf(BittensorSubnetMarketRemote("vanta", "sn8")))
-        val repository = BittensorSubnetMarketRepository(api, nanoTime = { now })
+        val repository = BittensorSubnetMarketRepository(
+            api,
+            nanoTime = { now }
+        )
         val subnetId = BittensorNetuid.Subnet(8)
 
         repository.priceId(subnetId)
@@ -129,7 +132,10 @@ class BittensorSubnetMarketRepositoryTest {
         var now = 0L
         val api = MarketsApi(listOf(BittensorSubnetMarketRemote("vanta", "sn8")))
         api.beforeResponse = { now += 5.minutes.inWholeNanoseconds }
-        val repository = BittensorSubnetMarketRepository(api, nanoTime = { now })
+        val repository = BittensorSubnetMarketRepository(
+            api,
+            nanoTime = { now }
+        )
 
         repository.weeklyMarkets()
         repository.weeklyMarkets()
@@ -156,8 +162,8 @@ class BittensorSubnetMarketRepositoryTest {
     }
 
     private fun page(number: Int): List<BittensorSubnetMarketRemote> = (1..250).map { offset ->
-        val id = (number - 1) * 250 + offset
-        BittensorSubnetMarketRemote("market-$id", "sn$id")
+        val netuid = (number - 1) * 250 + offset
+        BittensorSubnetMarketRemote("market-$netuid", "sn$netuid")
     }
 
     private class MarketsApi(var rows: List<BittensorSubnetMarketRemote>) : BittensorSubnetMarketsApi {

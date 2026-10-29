@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavorites
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigDecimal
 import java.util.Locale
@@ -12,7 +14,7 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `pool age and APY orders retain unknown yields last`() {
-        val rows = listOf(subnet(1, 30, 3), subnet(2, 10, 1), subnet(3, 20, 2))
+        val rows = listOf(subnet(id = 1, pool = 30, registration = 3), subnet(id = 2, pool = 10, registration = 1), subnet(id = 3, pool = 20, registration = 2))
         assertEquals(listOf(1, 3, 2), sort(rows, BittensorSubnetSorting.POOL_DEPTH))
         assertEquals(listOf(2, 3, 1), sort(rows, BittensorSubnetSorting.AGE))
         val rates = mapOf(rows[0].id to BigDecimal.ONE, rows[2].id to BigDecimal.TEN)
@@ -21,18 +23,18 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `unknown registration sorts after known ages`() {
-        val newer = subnet(1, 10, 20)
-        val unknown = subnet(2, 10, 1).copy(registrationBlock = null)
-        val older = subnet(3, 10, 10)
+        val newer = subnet(id = 1, pool = 10, registration = 20)
+        val unknown = subnet(id = 2, pool = 10, registration = 1).copy(registrationBlock = null)
+        val older = subnet(id = 3, pool = 10, registration = 10)
 
         assertEquals(listOf(3, 1, 2), sort(listOf(newer, unknown, older), BittensorSubnetSorting.AGE))
     }
 
     @Test
     fun `age sorting keeps favorites first before sorting unknown registration last`() {
-        val favorite = subnet(1, 10, 20)
-        val unknown = subnet(2, 10, 1).copy(registrationBlock = null)
-        val older = subnet(3, 10, 10)
+        val favorite = subnet(id = 1, pool = 10, registration = 20)
+        val unknown = subnet(id = 2, pool = 10, registration = 1).copy(registrationBlock = null)
+        val older = subnet(id = 3, pool = 10, registration = 10)
         val favorites = BittensorSubnetFavorites(metaId = 1, setOf(BittensorSubnetReference(favorite.id, requireNotNull(favorite.registrationBlock))))
 
         val sorted = sortBittensorSubnets(
@@ -52,9 +54,9 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `thin threshold is inclusive and only matching registration favorite bypasses it`() {
-        val thin = subnet(1, 1, 1)
-        val boundary = subnet(2, 2000, 1)
-        val replaced = subnet(3, 1, 2)
+        val thin = subnet(id = 1, pool = 1, registration = 1)
+        val boundary = subnet(id = 2, pool = 2000, registration = 1)
+        val replaced = subnet(id = 3, pool = 1, registration = 2)
         val favorites = BittensorSubnetFavorites(
             metaId = 1,
             setOf(BittensorSubnetReference(thin.id, 1.toBigInteger()), BittensorSubnetReference(replaced.id, 1.toBigInteger()))
@@ -75,7 +77,7 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `equal metrics preserve previous identity order`() {
-        val rows = listOf(subnet(1, 10, 1), subnet(2, 10, 1))
+        val rows = listOf(subnet(id = 1, pool = 10, registration = 1), subnet(id = 2, pool = 10, registration = 1))
         val previous = rows.reversed().map { BittensorSubnetReference(it.id, requireNotNull(it.registrationBlock)) }
         val favorites = BittensorSubnetFavorites(metaId = 1, subnets = emptySet())
         val sorted = sortBittensorSubnets(
@@ -94,13 +96,24 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `name order compares shown titles case-insensitively with numeric digit runs`() {
-        val rows = listOf(named(1, "beta"), named(2, ""), named(3, "Alpha"), named(10, "  "), named(4, "Subnet 3"))
+        val rows = listOf(
+            named(1, "beta"),
+            named(id = 2, name = ""),
+            named(3, "Alpha"),
+            named(id = 10, name = "  "),
+            named(4, "Subnet 3")
+        )
         assertEquals(listOf(3, 1, 2, 4, 10), sort(rows, BittensorSubnetSorting.NAME))
     }
 
     @Test
     fun `weekly changes sort descending with missing values after negative values`() {
-        val rows = listOf(subnet(1, 10, 1), subnet(2, 10, 1), subnet(3, 10, 1), subnet(4, 10, 1))
+        val rows = listOf(
+            subnet(id = 1, pool = 10, registration = 1),
+            subnet(id = 2, pool = 10, registration = 1),
+            subnet(id = 3, pool = 10, registration = 1),
+            subnet(id = 4, pool = 10, registration = 1)
+        )
         val weekly = mapOf(rows[0].id to BigDecimal.ZERO, rows[2].id to BigDecimal.ONE, rows[3].id to BigDecimal("-1"))
         val favorites = BittensorSubnetFavorites(metaId = 1, subnets = emptySet())
 
@@ -121,22 +134,22 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `missing pool reserve sorts last and is hidden unless favorited`() {
-        val unknown = subnet(1, 10, 1).copy(taoReserveInPlanks = null)
-        val known = subnet(2, 2000, 1)
+        val unknown = subnet(id = 1, pool = 10, registration = 1).copy(taoReserveInPlanks = null)
+        val known = subnet(id = 2, pool = 2000, registration = 1)
         val rows = listOf(unknown, known)
         assertEquals(listOf(2, 1), sort(rows, BittensorSubnetSorting.POOL_DEPTH))
         val noFavorites = BittensorSubnetFavorites(metaId = 1, subnets = emptySet())
         val favoriteReference = BittensorSubnetReference(unknown.id, requireNotNull(unknown.registrationBlock))
         val favorites = BittensorSubnetFavorites(metaId = 1, setOf(favoriteReference))
 
-        assertEquals(false, passesBittensorThinPoolFilter(unknown, noFavorites))
-        assertEquals(true, passesBittensorThinPoolFilter(unknown, favorites))
-        assertEquals(true, passesBittensorThinPoolFilter(known, noFavorites))
+        assertFalse(passesBittensorThinPoolFilter(unknown, noFavorites))
+        assertTrue(passesBittensorThinPoolFilter(unknown, favorites))
+        assertTrue(passesBittensorThinPoolFilter(known, noFavorites))
     }
 
     @Test
     fun `selected metric takes priority over the previous order`() {
-        val rows = listOf(subnet(1, 10, 1), subnet(2, 20, 1))
+        val rows = listOf(subnet(id = 1, pool = 10, registration = 1), subnet(id = 2, pool = 20, registration = 1))
         val previous = rows.map { BittensorSubnetReference(it.id, requireNotNull(it.registrationBlock)) }
         val favorites = BittensorSubnetFavorites(metaId = 1, subnets = emptySet())
 
@@ -157,9 +170,9 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `previous order does not attach to a replaced or unknown registration`() {
-        val replaced = subnet(1, 10, 2)
-        val retained = subnet(2, 10, 1)
-        val unknown = subnet(3, 10, 1).copy(registrationBlock = null)
+        val replaced = subnet(id = 1, pool = 10, registration = 2)
+        val retained = subnet(id = 2, pool = 10, registration = 1)
+        val unknown = subnet(id = 3, pool = 10, registration = 1).copy(registrationBlock = null)
         val previous = listOf(
             BittensorSubnetReference(replaced.id, 1.toBigInteger()),
             BittensorSubnetReference(unknown.id, 1.toBigInteger()),
@@ -184,10 +197,10 @@ class BittensorSubnetSortingTest {
 
     @Test
     fun `unranked ties are resolved by subnet id and then registration`() {
-        val older = subnet(1, 10, 1)
-        val newer = subnet(1, 10, 2)
+        val older = subnet(id = 1, pool = 10, registration = 1)
+        val newer = subnet(id = 1, pool = 10, registration = 2)
         val unknown = older.copy(registrationBlock = null)
-        val other = subnet(2, 10, 1)
+        val other = subnet(id = 2, pool = 10, registration = 1)
         val favorites = BittensorSubnetFavorites(metaId = 1, subnets = emptySet())
 
         val sorted = sortBittensorSubnets(
@@ -220,7 +233,7 @@ class BittensorSubnetSortingTest {
         ).map { it.id.value }
     }
 
-    private fun named(id: Int, name: String) = subnet(id, 10, id.toLong()).copy(name = name)
+    private fun named(id: Int, name: String) = subnet(id, pool = 10, registration = id.toLong()).copy(name = name)
 
     private fun subnet(id: Int, pool: Long, registration: Long) = BittensorSubnet(
         BittensorNetuid.Subnet(id),

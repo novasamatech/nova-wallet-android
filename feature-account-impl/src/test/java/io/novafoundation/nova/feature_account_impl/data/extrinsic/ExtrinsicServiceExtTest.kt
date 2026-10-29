@@ -35,8 +35,8 @@ class ExtrinsicServiceExtTest {
         val failures = listOf(
             ExtrinsicStatus.Invalid(extrinsicHash),
             ExtrinsicStatus.Dropped(extrinsicHash),
-            ExtrinsicStatus.Usurped("0xreplacement", extrinsicHash),
-            ExtrinsicStatus.FinalityTimeout("0xblock", extrinsicHash)
+            ExtrinsicStatus.Usurped(replacementHash = "0xreplacement", extrinsicHash),
+            ExtrinsicStatus.FinalityTimeout(blockHash = "0xblock", extrinsicHash)
         )
 
         for (failure in failures) {
@@ -51,7 +51,7 @@ class ExtrinsicServiceExtTest {
                 }
             }
 
-            val result = withTimeout(1_000) { Result.success(updates).awaitInBlock() }
+            val result = withTimeout(timeMillis = 1_000) { Result.success(updates).awaitInBlock() }
             val error = result.exceptionOrNull() as ExtrinsicWatchException
             assertSame(failure, error.status)
             assertEquals(extrinsicHash, error.status.extrinsicHash)
@@ -61,7 +61,7 @@ class ExtrinsicServiceExtTest {
 
     @Test
     fun `inclusion returns original status and hierarchy and releases subscription`() = runBlocking {
-        val included = ExtrinsicStatus.InBlock("0xblock", extrinsicHash)
+        val included = ExtrinsicStatus.InBlock(blockHash = "0xblock", extrinsicHash)
         var released = false
         val updates = flow {
             try {
@@ -84,8 +84,8 @@ class ExtrinsicServiceExtTest {
 
     @Test
     fun `finality timeout after inclusion cannot satisfy finalized waiter`() = runBlocking {
-        val timeout = ExtrinsicStatus.FinalityTimeout("0xblock", extrinsicHash)
-        val updates = flowOf(watch(ExtrinsicStatus.InBlock("0xblock", extrinsicHash)), watch(timeout))
+        val timeout = ExtrinsicStatus.FinalityTimeout(blockHash = "0xblock", extrinsicHash)
+        val updates = flowOf(watch(ExtrinsicStatus.InBlock(blockHash = "0xblock", extrinsicHash)), watch(timeout))
 
         try {
             updates.awaitStatus<ExtrinsicStatus.Finalized>()
@@ -97,8 +97,8 @@ class ExtrinsicServiceExtTest {
 
     @Test
     fun `actual finalized status still satisfies finalized waiter`() = runBlocking {
-        val finalized = ExtrinsicStatus.Finalized("0xblock", extrinsicHash)
-        val updates = flowOf(watch(ExtrinsicStatus.InBlock("0xblock", extrinsicHash)), watch(finalized))
+        val finalized = ExtrinsicStatus.Finalized(blockHash = "0xblock", extrinsicHash)
+        val updates = flowOf(watch(ExtrinsicStatus.InBlock(blockHash = "0xblock", extrinsicHash)), watch(finalized))
 
         val result = updates.awaitStatus<ExtrinsicStatus.Finalized>()
 
@@ -108,7 +108,7 @@ class ExtrinsicServiceExtTest {
 
     @Test
     fun `unmatched terminal status ends wait without inventing inclusion`() = runBlocking {
-        val finalized = ExtrinsicStatus.Finalized("0xblock", extrinsicHash)
+        val finalized = ExtrinsicStatus.Finalized(blockHash = "0xblock", extrinsicHash)
         val updates = flowOf(watch(finalized))
 
         val result = Result.success(updates).awaitInBlock()

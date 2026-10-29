@@ -19,8 +19,7 @@ class AggregatedStakingDashboardOption<out S>(
     class HasStake(
         val showStakingType: Boolean,
         val stakingType: Chain.Asset.StakingType,
-        /** Null when the full stake valuation is unavailable, rather than a zero balance. */
-        val stake: Balance?,
+        val stake: StakingDashboardValue<Balance>,
         val stats: ExtendedLoadingState<Stats>,
     ) {
 

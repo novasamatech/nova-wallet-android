@@ -19,7 +19,7 @@ import retrofit2.Response
 
 class BittensorPortfolioPriceRepositoryTest {
 
-    private val runtime = mock(BittensorRuntimePriceSource::class.java)
+    private val runtimePriceSource = mock(BittensorRuntimePriceSource::class.java)
 
     private val logger = mock(Logger::class.java)
 
@@ -44,7 +44,7 @@ class BittensorPortfolioPriceRepositoryTest {
 
     private val catalogueRepository = BittensorSubnetCatalogueRepository(api, urls)
 
-    private val repository = RealBittensorPortfolioPriceRepository(catalogueRepository, runtime, logger)
+    private val repository = RealBittensorPortfolioPriceRepository(catalogueRepository, runtimePriceSource, logger)
 
     private val subnet = BittensorNetuid.Subnet(1)
 
@@ -53,41 +53,42 @@ class BittensorPortfolioPriceRepositoryTest {
     @Test
     fun `complete fresh backend skips runtime`() = runTest {
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet)))
-        verifyNoInteractions(runtime)
+        verifyNoInteractions(runtimePriceSource)
     }
 
     @Test
     fun `batch runtime fills missing held prices without replacing backend or adding unheld ids`() = runTest {
-        `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.ONE, missing to BigInteger.TEN, BittensorNetuid.Subnet(3) to BigInteger.ONE))
+        val runtimePrices = mapOf(subnet to BigInteger.ONE, missing to BigInteger.TEN, BittensorNetuid.Subnet(3) to BigInteger.ONE)
+        `when`(runtimePriceSource.prices("chain")).thenReturn(runtimePrices)
 
         val prices = repository.prices("chain", setOf(subnet, missing))
 
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000), missing to BigInteger.TEN), prices)
-        verify(runtime).prices("chain")
+        verify(runtimePriceSource).prices("chain")
     }
 
     @Test
     fun `backend timeout leaves a separate runtime fallback budget`() = runTest {
         backendHangs = true
-        `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
+        `when`(runtimePriceSource.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
 
         assertEquals(mapOf(subnet to BigInteger.TEN), repository.prices("chain", setOf(subnet)))
-        verify(runtime).prices("chain")
+        verify(runtimePriceSource).prices("chain")
     }
 
     @Test
     fun `missing backend price field does not discard another fresh price`() = runTest {
         val present = BittensorSubnetCatalogueRemote.Subnet(1, "0.5")
-        val absent = BittensorSubnetCatalogueRemote.Subnet(2, null)
+        val absent = BittensorSubnetCatalogueRemote.Subnet(2, taoPerAlpha = null)
         backendResponse = BittensorSubnetCatalogueRemote(listOf(present, absent), backendResponse.meta)
-        `when`(runtime.prices("chain")).thenReturn(mapOf(missing to BigInteger.TEN))
+        `when`(runtimePriceSource.prices("chain")).thenReturn(mapOf(missing to BigInteger.TEN))
 
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000), missing to BigInteger.TEN), repository.prices("chain", setOf(subnet, missing)))
     }
 
     @Test
     fun `backend error or stale metadata uses runtime`() = runTest {
-        `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
+        `when`(runtimePriceSource.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
         backendFailure = IllegalStateException("Offline")
         assertEquals(mapOf(subnet to BigInteger.TEN), repository.prices("chain", setOf(subnet)))
         backendFailure = null
@@ -97,7 +98,7 @@ class BittensorPortfolioPriceRepositoryTest {
 
     @Test
     fun `runtime failure retains partial backend and both failures return unknown prices`() = runTest {
-        `when`(runtime.prices("chain")).thenThrow(IllegalStateException("Offline"))
+        `when`(runtimePriceSource.prices("chain")).thenThrow(IllegalStateException("Offline"))
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet, missing)))
         backendFailure = IllegalStateException("Offline")
         assertTrue(repository.prices("chain", setOf(subnet)).isEmpty())
@@ -105,16 +106,16 @@ class BittensorPortfolioPriceRepositoryTest {
 
     @Test
     fun `cancellation never starts fallback and empty holdings require neither source`() = runTest {
-        assertTrue(repository.prices("chain", emptySet()).isEmpty())
+        assertTrue(repository.prices("chain", heldSubnets = emptySet()).isEmpty())
         assertEquals(0, backendCalls)
         backendFailure = CancellationException("Cancelled")
         assertTrue(runCatching { repository.prices("chain", setOf(subnet)) }.exceptionOrNull() is CancellationException)
-        verifyNoInteractions(runtime)
+        verifyNoInteractions(runtimePriceSource)
     }
 
     @Test
     fun `runtime cancellation is not converted to a partial success`() = runTest {
-        `when`(runtime.prices("chain")).thenThrow(CancellationException("Cancelled"))
+        `when`(runtimePriceSource.prices("chain")).thenThrow(CancellationException("Cancelled"))
         assertTrue(runCatching { repository.prices("chain", setOf(subnet, missing)) }.exceptionOrNull() is CancellationException)
     }
 

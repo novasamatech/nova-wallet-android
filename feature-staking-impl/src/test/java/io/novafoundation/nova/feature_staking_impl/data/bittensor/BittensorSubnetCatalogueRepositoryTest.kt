@@ -26,7 +26,11 @@ class BittensorSubnetCatalogueRepositoryTest {
 
     private val api = CatalogueApi(catalogue())
 
-    private val repository = BittensorSubnetCatalogueRepository(api, urls, nanoTime = { now })
+    private val repository = BittensorSubnetCatalogueRepository(
+        api,
+        urls,
+        nanoTime = { now }
+    )
 
     @Test
     fun `malformed metadata and reserves reach the reader but cannot seed cache`() = runTest {
@@ -35,6 +39,7 @@ class BittensorSubnetCatalogueRepositoryTest {
             row(symbol = null),
             row(registration = null),
             row(registration = -BigInteger.ONE),
+            row(taoReserve = null),
             row(taoReserve = "broken"),
             row(taoReserve = "-1"),
             row(alphaReserve = "-1"),
@@ -64,6 +69,29 @@ class BittensorSubnetCatalogueRepositoryTest {
     }
 
     @Test
+    fun `missing TAO reserve leaves fresh prices readable and a corrected browse response retryable`() = runTest {
+        api.body = catalogue(listOf(row(taoReserve = null)))
+
+        val incomplete = repository.catalogue()
+        val runtimeSubnets = mapBittensorBackendCatalogue(incomplete)
+        val browseFailure = runCatching { mapBittensorBrowseSubnets(incomplete, runtimeSubnets) }.exceptionOrNull()
+
+        assertTrue(browseFailure is IllegalArgumentException)
+        assertEquals(
+            mapOf(BittensorNetuid.Subnet(1) to BigInteger.valueOf(500_000_000)),
+            mapBittensorPortfolioPrices(incomplete)
+        )
+
+        api.body = catalogue()
+        val corrected = repository.catalogue()
+
+        assertSame(api.body, corrected)
+        assertEquals(1, mapBittensorBrowseSubnets(corrected, runtimeSubnets).size)
+        assertSame(corrected, repository.catalogue())
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
     fun `stale but available valid catalogue can be reused without valuing holdings`() = runTest {
         api.body = catalogue(freshness = "STALE")
 
@@ -76,12 +104,13 @@ class BittensorSubnetCatalogueRepositoryTest {
 
     @Test
     fun `unavailable missing and empty catalogue bodies are not admitted`() = runTest {
-        for (body in listOf(
+        val rejectedBodies = listOf(
             catalogue(availability = "UNAVAILABLE"),
-            BittensorSubnetCatalogueRemote(null, catalogue().meta),
-            BittensorSubnetCatalogueRemote(listOf(row()), null),
-            catalogue(emptyList())
-        )) {
+            BittensorSubnetCatalogueRemote(items = null, catalogue().meta),
+            BittensorSubnetCatalogueRemote(listOf(row()), meta = null),
+            catalogue(rows = emptyList())
+        )
+        for (body in rejectedBodies) {
             api.body = body
             val previousRequests = api.requests.size
 

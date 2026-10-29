@@ -20,9 +20,9 @@ class RuntimeCallsApiTest {
     @Test
     fun `runtime call failure retains its cause`() = runBlocking {
         val failure = IllegalStateException("Unavailable runtime call")
-        `when`(runtimeCalls.call("Api", "method", arguments, binding)).thenThrow(failure)
+        `when`(runtimeCalls.call(section = "Api", method = "method", arguments, binding)).thenThrow(failure)
 
-        val result = runtimeCalls.callCatching("Api", "method", arguments, binding)
+        val result = runtimeCalls.callCatching(section = "Api", method = "method", arguments, binding)
 
         assertSame(failure, result.exceptionOrNull())
     }
@@ -30,10 +30,10 @@ class RuntimeCallsApiTest {
     @Test
     fun `runtime call cancellation propagates`() = runBlocking {
         val cancellation = CancellationException("Caller cancelled")
-        `when`(runtimeCalls.call("Api", "method", arguments, binding)).thenThrow(cancellation)
+        `when`(runtimeCalls.call(section = "Api", method = "method", arguments, binding)).thenThrow(cancellation)
 
         try {
-            runtimeCalls.callCatching("Api", "method", arguments, binding)
+            runtimeCalls.callCatching(section = "Api", method = "method", arguments, binding)
             fail("Cancellation must propagate")
         } catch (error: CancellationException) {
             assertSame(cancellation, error)
@@ -42,8 +42,8 @@ class RuntimeCallsApiTest {
 
     @Test
     fun `runtime call result is retained`() = runBlocking {
-        `when`(runtimeCalls.call("Api", "method", arguments, binding)).thenReturn("decoded")
+        `when`(runtimeCalls.call(section = "Api", method = "method", arguments, binding)).thenReturn("decoded")
 
-        assertEquals("decoded", runtimeCalls.callCatching("Api", "method", arguments, binding).getOrThrow())
+        assertEquals("decoded", runtimeCalls.callCatching(section = "Api", method = "method", arguments, binding).getOrThrow())
     }
 }

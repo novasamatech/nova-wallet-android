@@ -59,21 +59,10 @@ class RealAnalyticsService(
     override var isEnabled: Boolean
         get() = synchronized(consentLock) { session != null }
         set(value) {
-            synchronized(consentLock) {
-                if (value) {
-                    if (session == null) {
-                        val job = Job()
-                        session = ConsentSession(job, erasure)
-                    }
-                } else {
-                    session?.job?.cancel()
-                    session = null
-
-                    // A later consent waits for erasure. Shared authentication is never reset here.
-                    val pendingErasure = ConsentErasure()
-                    erasure = pendingErasure
-                    scope.launch(dispatcher) { eraseConsent(pendingErasure) }
-                }
+            if (value) {
+                enableAnalytics()
+            } else {
+                disableAnalytics()
             }
         }
 
@@ -108,6 +97,23 @@ class RealAnalyticsService(
         }
     }
 
+    private fun enableAnalytics() = synchronized(consentLock) {
+        if (session == null) {
+            val job = Job()
+            session = ConsentSession(job, erasure)
+        }
+    }
+
+    private fun disableAnalytics() = synchronized(consentLock) {
+        session?.job?.cancel()
+        session = null
+
+        // A later consent waits for cleanup. Shared authentication is never reset here.
+        val pendingErasure = ConsentErasure()
+        erasure = pendingErasure
+        scope.launch(dispatcher) { clearWithdrawnAnalytics(pendingErasure) }
+    }
+
     private suspend fun flushWithConsent(consent: ConsentSession, reason: AnalyticsFlushReason) {
         // One flush at a time; a flush already running sends whatever this one would have
         if (!flushMutex.tryLock()) {
@@ -133,7 +139,7 @@ class RealAnalyticsService(
         val work = async(start = CoroutineStart.LAZY) {
             consent.job.ensureActive()
             val pendingErasure = consent.erasure
-            if (pendingErasure != null && eraseConsent(pendingErasure) != ErasureStatus.COMPLETE) return@async
+            if (pendingErasure != null && clearWithdrawnAnalytics(pendingErasure) != ErasureStatus.COMPLETE) return@async
             consent.job.ensureActive()
             action()
         }
@@ -146,7 +152,7 @@ class RealAnalyticsService(
         }
     }
 
-    private suspend fun eraseConsent(pendingErasure: ConsentErasure): ErasureStatus = queueMutex.withLock {
+    private suspend fun clearWithdrawnAnalytics(pendingErasure: ConsentErasure): ErasureStatus = queueMutex.withLock {
         // Delayed work from an older withdrawal must not clear a newer session's events.
         if (synchronized(consentLock) { erasure !== pendingErasure }) return@withLock ErasureStatus.RETRY_REQUIRED
         if (pendingErasure.status == ErasureStatus.COMPLETE) return@withLock ErasureStatus.COMPLETE
@@ -186,5 +192,8 @@ class RealAnalyticsService(
     // Accessed only under queueMutex; completion opens the gate for this consent generation.
     private class ConsentErasure(var status: ErasureStatus = ErasureStatus.RETRY_REQUIRED)
 
-    private enum class ErasureStatus { RETRY_REQUIRED, COMPLETE }
+    private enum class ErasureStatus {
+        RETRY_REQUIRED,
+        COMPLETE
+    }
 }

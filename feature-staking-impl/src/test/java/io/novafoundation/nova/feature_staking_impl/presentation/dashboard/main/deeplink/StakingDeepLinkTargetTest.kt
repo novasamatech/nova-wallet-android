@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.SyncingStage
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboardValue
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import org.junit.Assert.assertEquals
@@ -33,7 +34,12 @@ class StakingDeepLinkTargetTest {
         BigInteger.ZERO
     )
 
-    private val hasStake = HasStake(false, Chain.Asset.StakingType.BITTENSOR_ROOT, null, ExtendedLoadingState.Loading)
+    private val hasStake = HasStake(
+        showStakingType = false,
+        Chain.Asset.StakingType.BITTENSOR_ROOT,
+        StakingDashboardValue.Unavailable,
+        ExtendedLoadingState.Loading
+    )
 
     @Before
     fun prepare() {
@@ -85,7 +91,7 @@ class StakingDeepLinkTargetTest {
 
     @Test
     fun `existing stake opens without waiting for synchronization`() {
-        val state = HasStake(false, Chain.Asset.StakingType.RELAYCHAIN, null, ExtendedLoadingState.Loading)
+        val state = HasStake(showStakingType = false, Chain.Asset.StakingType.RELAYCHAIN, StakingDashboardValue.Unavailable, ExtendedLoadingState.Loading)
         val option = AggregatedStakingDashboardOption(chain, token, state, SyncingStage.SYNCING_ALL)
         val dashboard = StakingDashboard(listOf(option), emptyList())
 

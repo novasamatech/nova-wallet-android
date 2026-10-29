@@ -39,7 +39,7 @@ class AnalyticsConsentTest {
     fun `disabled launch erases persisted analytics without resolving an upload URL`() = runTest {
         val fixture = Fixture(this)
         val oldId = fixture.identity.installId()
-        val event = QueuedEvent("old", "session_started", 0L, emptyMap())
+        val event = QueuedEvent(id = "old", name = "session_started", timestamp = 0L, props = emptyMap())
         fixture.queue.enqueue(event)
 
         fixture.service.isEnabled = false
@@ -171,7 +171,7 @@ class AnalyticsConsentTest {
         fixture.service.isEnabled = false
         runCurrent()
         assertEquals(1, dao.clearAttempts)
-        assertEquals(listOf("session_started"), fixture.queue.peek(50).map { it.name })
+        assertEquals(listOf("session_started"), fixture.queue.peek(limit = 50).map { it.name })
         assertEquals(oldId, fixture.identity.installId())
 
         fixture.service.isEnabled = true
@@ -210,7 +210,7 @@ class AnalyticsConsentTest {
 
         assertEquals(3, dao.clearAttempts)
         assertTrue(fixture.service.isEnabled)
-        assertEquals(listOf("session_started"), fixture.queue.peek(50).map { it.name })
+        assertEquals(listOf("session_started"), fixture.queue.peek(limit = 50).map { it.name })
         assertEquals(oldId, fixture.identity.installId())
         assertTrue(fixture.api.requests.isEmpty())
         assertEquals(0, fixture.urlReads)
@@ -234,7 +234,7 @@ class AnalyticsConsentTest {
         dao.beforeClear = { if (dao.clearAttempts == 1) throw IOException("storage unavailable") }
         val fixture = Fixture(this, dao)
         val oldId = fixture.identity.installId()
-        val oldEvent = QueuedEvent("old", "session_started", 0L, emptyMap())
+        val oldEvent = QueuedEvent(id = "old", name = "session_started", timestamp = 0L, props = emptyMap())
         fixture.queue.enqueue(oldEvent)
         fixture.service.isEnabled = false
         runCurrent()
@@ -258,8 +258,8 @@ class AnalyticsConsentTest {
     @Test
     fun `superseded erasure cannot clear events admitted after current erasure`() = runTest {
         val fixture = Fixture(this)
-        val oldEvent = QueuedEvent("old", "session_started", 0L, emptyMap())
-        val newEvent = QueuedEvent("new", "wallet_creation_started", 0L, emptyMap())
+        val oldEvent = QueuedEvent(id = "old", name = "session_started", timestamp = 0L, props = emptyMap())
+        val newEvent = QueuedEvent(id = "new", name = "wallet_creation_started", timestamp = 0L, props = emptyMap())
         fixture.queue.enqueue(oldEvent)
         fixture.service.isEnabled = false
         fixture.service.isEnabled = false
@@ -274,7 +274,7 @@ class AnalyticsConsentTest {
         }
         runCurrent()
 
-        assertEquals(listOf("new"), fixture.queue.peek(50).map { it.id })
+        assertEquals(listOf("new"), fixture.queue.peek(limit = 50).map { it.id })
         fixture.service.flush(AnalyticsFlushReason.LAUNCH)
         assertEquals(listOf("new"), fixture.api.requests.single().events.map { it.id })
     }
@@ -292,7 +292,7 @@ class AnalyticsConsentTest {
         }
         val fixture = Fixture(this, suppliedIdentity = identity)
         val oldId = identity.installId()
-        val oldEvent = QueuedEvent("old", "session_started", 0L, emptyMap())
+        val oldEvent = QueuedEvent(id = "old", name = "session_started", timestamp = 0L, props = emptyMap())
         fixture.queue.enqueue(oldEvent)
         fixture.service.isEnabled = false
         runCurrent()
@@ -422,7 +422,7 @@ class AnalyticsConsentTest {
             "https://example.test/".toHttpUrl()
         }
 
-        private val uploader = AnalyticsUploader(api, urls, identity, queue, "test", batchSize = 2)
+        private val uploader = AnalyticsUploader(api, urls, identity, queue, appVersion = "test", batchSize = 2)
 
         private val dispatcher = StandardTestDispatcher(scope.testScheduler)
 

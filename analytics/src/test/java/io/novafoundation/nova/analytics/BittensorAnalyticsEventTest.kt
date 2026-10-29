@@ -9,10 +9,10 @@ class BittensorAnalyticsEventTest {
     @Test
     fun `selection retains wire name and string netuid`() {
         val event = BittensorAnalyticsEvent.TypeSelected(
-            "Bittensor",
+            network = "Bittensor",
             StakingAnalyticsTarget.SUBNET,
             StakingAnalyticsSelectionMethod.PICKER_SUBNET,
-            42
+            netuid = 42
         )
 
         assertEquals("staking_type_selected", event.name)
@@ -31,15 +31,15 @@ class BittensorAnalyticsEventTest {
     @Test
     fun `optional staking properties are omitted or included without changing values`() {
         val withoutOptionals = BittensorAnalyticsEvent.Initiated(
-            "Bittensor",
+            network = "Bittensor",
             StakingAnalyticsTarget.SUBNET,
             StakingMode.BUY_MORE,
             StakingValidatorSource.MANUAL,
-            null,
-            null
+            slippage = null,
+            amount = null
         )
         val withOptionals = BittensorAnalyticsEvent.Initiated(
-            "Bittensor",
+            network = "Bittensor",
             StakingAnalyticsTarget.SUBNET,
             StakingMode.BUY_MORE,
             StakingValidatorSource.MANUAL,
@@ -58,8 +58,18 @@ class BittensorAnalyticsEventTest {
 
     @Test
     fun `unknown claimed amount is omitted but false is preserved`() {
-        val unknown = BittensorAnalyticsEvent.ClaimCompleted("Bittensor", null, DurationBucket.UNDER_5S, null)
-        val nonZero = BittensorAnalyticsEvent.ClaimCompleted("Bittensor", null, DurationBucket.UNDER_5S, false)
+        val unknown = BittensorAnalyticsEvent.ClaimCompleted(
+            network = "Bittensor",
+            amount = null,
+            DurationBucket.UNDER_5S,
+            claimedZero = null
+        )
+        val nonZero = BittensorAnalyticsEvent.ClaimCompleted(
+            network = "Bittensor",
+            amount = null,
+            DurationBucket.UNDER_5S,
+            claimedZero = false
+        )
 
         assertEquals("rewards_claim_completed", unknown.name)
         assertEquals(
@@ -79,13 +89,13 @@ class BittensorAnalyticsEventTest {
         expectedNames.forEach { (flow, name) ->
             val event = BittensorAnalyticsEvent.Failed(
                 flow,
-                "Bittensor",
+                network = "Bittensor",
                 StakingAnalyticsTarget.ROOT,
-                null,
-                null,
+                mode = null,
+                unstakeMode = null,
                 BittensorTransactionFailureReason.NOT_SUBMITTED,
                 StakingFailureStage.NOT_SUBMITTED,
-                false
+                retryable = false
             )
             assertEquals(name, event.name)
             assertFalse(event.properties.containsKey("mode"))
@@ -94,23 +104,23 @@ class BittensorAnalyticsEventTest {
 
         val unstake = BittensorAnalyticsEvent.Failed(
             StakingFlow.UNSTAKE,
-            "Bittensor",
+            network = "Bittensor",
             StakingAnalyticsTarget.ROOT,
-            null,
+            mode = null,
             UnstakeMode.FULL,
             BittensorTransactionFailureReason.NOT_SUBMITTED,
             StakingFailureStage.NOT_SUBMITTED,
-            true
+            retryable = true
         )
         val stake = BittensorAnalyticsEvent.Failed(
             StakingFlow.STAKE,
-            "Bittensor",
+            network = "Bittensor",
             StakingAnalyticsTarget.ROOT,
             StakingMode.ADD_STAKE,
             UnstakeMode.FULL,
             BittensorTransactionFailureReason.NOT_SUBMITTED,
             StakingFailureStage.NOT_SUBMITTED,
-            true
+            retryable = true
         )
         assertEquals("full", unstake.properties["mode"])
         assertEquals("add_stake", stake.properties["mode"])
@@ -119,7 +129,7 @@ class BittensorAnalyticsEventTest {
     @Test
     fun `count buckets retain boundaries`() {
         mapOf(-1 to "0", 0 to "0", 1 to "1", 2 to "2", 3 to "3_plus", 10 to "3_plus").forEach { (count, bucket) ->
-            val event = BittensorAnalyticsEvent.ClaimInitiated("Bittensor", null, count)
+            val event = BittensorAnalyticsEvent.ClaimInitiated(network = "Bittensor", amount = null, count)
             assertEquals(bucket, event.properties["validators_count_bucket"])
         }
     }
