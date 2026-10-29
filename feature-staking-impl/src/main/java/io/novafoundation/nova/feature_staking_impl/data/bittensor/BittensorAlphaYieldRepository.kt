@@ -14,40 +14,43 @@ class BittensorAlphaYieldRepository(
     private val infrastructureUrls: InfrastructureUrls
 ) {
 
-    private data class CachedYields(val yields: Map<AccountIdKey, BittensorValidatorYield>, val validUntilNanos: Long)
+    private data class CachedYields(val yieldsByHotkey: Map<AccountIdKey, BittensorValidatorYield>, val validUntilNanos: Long)
 
     private val mutex = Mutex()
 
-    private val yields = mutableMapOf<String, CachedYields>()
+    private val yieldCache = mutableMapOf<String, CachedYields>()
 
     /** The reported rate is an annual percent; validator commission is already accounted for. */
     suspend fun alphaYields(chain: Chain, subnet: BittensorNetuid.Subnet, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         val cacheKey = "$baseUrl:${subnet.value}"
-        val cached = mutex.withLock { yields[cacheKey] }
-        if (cached != null && System.nanoTime() < cached.validUntilNanos) return cached.yields.rates(includeUnreliable)
+        val cached = mutex.withLock { yieldCache[cacheKey] }
+        if (cached != null && System.nanoTime() < cached.validUntilNanos) return cached.yieldsByHotkey.annualPercentages(includeUnreliable)
 
-        val pages = try {
+        val snapshot = try {
             remoteSource.yields(baseUrl, chain, subnet)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            return cached?.yields?.rates(includeUnreliable) ?: throw e
+            return cached?.yieldsByHotkey?.annualPercentages(includeUnreliable) ?: throw e
         }
-        val rates = buildMap {
-            pages.items.forEach { yield ->
-                if (yield.hotkey !in this) put(yield.hotkey, yield)
-            }
-        }
+        val yieldsByHotkey = snapshot.items.firstByHotkey()
         mutex.withLock {
-            if (yields.size >= YIELD_CACHE_LIMIT) yields.clear()
-            yields[cacheKey] = CachedYields(rates, pages.validUntilNanos)
+            if (yieldCache.size >= YIELD_CACHE_LIMIT) yieldCache.clear()
+            yieldCache[cacheKey] = CachedYields(yieldsByHotkey, snapshot.validUntilNanos)
         }
-        return rates.rates(includeUnreliable)
+        return yieldsByHotkey.annualPercentages(includeUnreliable)
     }
 
-    private fun Map<AccountIdKey, BittensorValidatorYield>.rates(includeUnreliable: Boolean): Map<AccountIdKey, BigDecimal> =
-        filterValues { includeUnreliable || it.reliable }.mapValues { it.value.annualPercentageYield }
+    private fun List<BittensorValidatorYield>.firstByHotkey(): Map<AccountIdKey, BittensorValidatorYield> = buildMap {
+        for (yield in this@firstByHotkey) {
+            if (yield.hotkey !in this) put(yield.hotkey, yield)
+        }
+    }
+
+    private fun Map<AccountIdKey, BittensorValidatorYield>.annualPercentages(includeUnreliable: Boolean): Map<AccountIdKey, BigDecimal> =
+        filterValues { includeUnreliable || it.reliable }
+            .mapValues { it.value.annualPercentageYield }
 
     private companion object {
         const val YIELD_CACHE_LIMIT = 64

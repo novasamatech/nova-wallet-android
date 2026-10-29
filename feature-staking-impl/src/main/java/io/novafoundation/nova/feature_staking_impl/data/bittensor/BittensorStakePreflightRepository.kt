@@ -3,12 +3,13 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.numberConstant
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorColdkey
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorHotkey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflight
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import java.math.BigInteger
@@ -17,7 +18,7 @@ import kotlinx.coroutines.coroutineScope
 
 interface BittensorStakePreflightRepository {
 
-    suspend fun load(chainId: String, netuid: BittensorNetuid, coldKey: AccountId, hotkey: AccountId): BittensorStakePreflight
+    suspend fun load(chainId: String, netuid: BittensorNetuid, coldKey: BittensorColdkey, hotkey: BittensorHotkey): BittensorStakePreflight
 }
 
 class RealBittensorStakePreflightRepository(
@@ -28,8 +29,8 @@ class RealBittensorStakePreflightRepository(
     override suspend fun load(
         chainId: String,
         netuid: BittensorNetuid,
-        coldKey: AccountId,
-        hotkey: AccountId
+        coldKey: BittensorColdkey,
+        hotkey: BittensorHotkey
     ): BittensorStakePreflight {
         val blockHash = rpc.getBlockHash(chainId)
         return storage.query(chainId, at = blockHash, applyStorageDefault = false) {
@@ -40,8 +41,8 @@ class RealBittensorStakePreflightRepository(
 
 internal suspend fun StorageQueryContext.loadPreflight(
     netuid: BittensorNetuid,
-    coldKey: AccountId,
-    hotkey: AccountId
+    coldKey: BittensorColdkey,
+    hotkey: BittensorHotkey
 ): BittensorStakePreflight = coroutineScope {
     val pallet = runtime.metadata.module("SubtensorModule")
     val storageNetuid = netuid.value.toBigInteger()

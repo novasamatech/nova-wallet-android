@@ -2,11 +2,11 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorColdkey
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
@@ -30,16 +30,16 @@ data class BittensorDashboardSnapshot(
  */
 interface BittensorDashboardSnapshotRepository {
 
-    fun snapshot(chainId: ChainId, coldKey: AccountId): BittensorDashboardSnapshot?
+    fun snapshot(chainId: ChainId, coldKey: BittensorColdkey): BittensorDashboardSnapshot?
 
-    fun saveSnapshot(chainId: ChainId, coldKey: AccountId, snapshot: BittensorDashboardSnapshot)
+    fun saveSnapshot(chainId: ChainId, coldKey: BittensorColdkey, snapshot: BittensorDashboardSnapshot)
 
-    fun claimableRootRewards(chainId: ChainId, coldKey: AccountId): BigInteger?
+    fun claimableRootRewards(chainId: ChainId, coldKey: BittensorColdkey): BigInteger?
 
-    fun claimableRootRewardsFlow(chainId: ChainId, coldKey: AccountId): Flow<BigInteger?>
+    fun claimableRootRewardsFlow(chainId: ChainId, coldKey: BittensorColdkey): Flow<BigInteger?>
 
     /** Null or zero clears the value. */
-    fun saveClaimableRootRewards(chainId: ChainId, coldKey: AccountId, amount: BigInteger?)
+    fun saveClaimableRootRewards(chainId: ChainId, coldKey: BittensorColdkey, amount: BigInteger?)
 }
 
 class RealBittensorDashboardSnapshotRepository(
@@ -56,7 +56,7 @@ class RealBittensorDashboardSnapshotRepository(
         val maxRate: String?
     )
 
-    override fun snapshot(chainId: ChainId, coldKey: AccountId): BittensorDashboardSnapshot? {
+    override fun snapshot(chainId: ChainId, coldKey: BittensorColdkey): BittensorDashboardSnapshot? {
         val raw = preferences.getString(snapshotKey(chainId, coldKey)) ?: return null
         return runCatching {
             val stored = gson.fromJson(raw, StoredSnapshot::class.java)
@@ -71,7 +71,7 @@ class RealBittensorDashboardSnapshotRepository(
         }.getOrNull()
     }
 
-    override fun saveSnapshot(chainId: ChainId, coldKey: AccountId, snapshot: BittensorDashboardSnapshot) {
+    override fun saveSnapshot(chainId: ChainId, coldKey: BittensorColdkey, snapshot: BittensorDashboardSnapshot) {
         val stored = StoredSnapshot(
             total = snapshot.totalStakeInPlanks?.toString(),
             root = snapshot.rootStakeInPlanks?.toString(),
@@ -83,30 +83,30 @@ class RealBittensorDashboardSnapshotRepository(
         preferences.putString(snapshotKey(chainId, coldKey), gson.toJson(stored))
     }
 
-    override fun claimableRootRewards(chainId: ChainId, coldKey: AccountId): BigInteger? {
-        return parseAmount(preferences.getString(claimableKey(chainId, coldKey)))
+    override fun claimableRootRewards(chainId: ChainId, coldKey: BittensorColdkey): BigInteger? {
+        return parsePositiveAmount(preferences.getString(claimableKey(chainId, coldKey)))
     }
 
-    override fun claimableRootRewardsFlow(chainId: ChainId, coldKey: AccountId): Flow<BigInteger?> {
+    override fun claimableRootRewardsFlow(chainId: ChainId, coldKey: BittensorColdkey): Flow<BigInteger?> {
         val key = claimableKey(chainId, coldKey)
         return preferences.keyFlow(key)
-            .map { parseAmount(preferences.getString(key)) }
+            .map { parsePositiveAmount(preferences.getString(key)) }
             .distinctUntilChanged()
     }
 
-    override fun saveClaimableRootRewards(chainId: ChainId, coldKey: AccountId, amount: BigInteger?) {
+    override fun saveClaimableRootRewards(chainId: ChainId, coldKey: BittensorColdkey, amount: BigInteger?) {
         val key = claimableKey(chainId, coldKey)
         val value = amount?.takeIf { it.isPositive() }?.toString()
         if (preferences.getString(key) == value) return
         if (value == null) preferences.removeField(key) else preferences.putString(key, value)
     }
 
-    private fun parseAmount(raw: String?): BigInteger? = raw?.toBigIntegerOrNull()?.takeIf { it.isPositive() }
+    private fun parsePositiveAmount(raw: String?): BigInteger? = raw?.toBigIntegerOrNull()?.takeIf { it.isPositive() }
 
-    private fun snapshotKey(chainId: ChainId, coldKey: AccountId) = "bittensor_dashboard_snapshot_${accountKey(chainId, coldKey)}"
+    private fun snapshotKey(chainId: ChainId, coldKey: BittensorColdkey) = "bittensor_dashboard_snapshot_${accountKey(chainId, coldKey)}"
 
-    private fun claimableKey(chainId: ChainId, coldKey: AccountId) = "bittensor_dashboard_claimable_${accountKey(chainId, coldKey)}"
+    private fun claimableKey(chainId: ChainId, coldKey: BittensorColdkey) = "bittensor_dashboard_claimable_${accountKey(chainId, coldKey)}"
 
     // Preferences are plain text on disk; do not store the account identifier itself.
-    private fun accountKey(chainId: ChainId, coldKey: AccountId) = (chainId.toByteArray() + coldKey).blake2b256().toHexString()
+    private fun accountKey(chainId: ChainId, coldKey: BittensorColdkey) = (chainId.toByteArray() + coldKey).blake2b256().toHexString()
 }

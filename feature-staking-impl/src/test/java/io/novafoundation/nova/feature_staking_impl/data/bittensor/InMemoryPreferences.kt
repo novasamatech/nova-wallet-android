@@ -28,11 +28,13 @@ class InMemoryPreferences : Preferences {
 
     override fun getString(field: String): String? = values[field]
 
-    override fun removeField(field: String) = putString(field, null)
+    override fun removeField(field: String) = putString(field, value = null)
 
-    override fun keyFlow(key: String): Flow<String> = changes.filter { it == key }.onStart { emit(key) }
+    override fun keyFlow(key: String): Flow<String> = keysFlow(key).map { it.first() }
 
-    override fun keysFlow(vararg keys: String): Flow<List<String>> = changes.filter { it in keys }.map { listOf(it) }
+    override fun keysFlow(vararg keys: String): Flow<List<String>> = changes.filter { it in keys }
+        .map { listOf(it) }
+        .onStart { emit(keys.toList()) }
 
     override fun putBoolean(field: String, value: Boolean) = unsupported()
 
