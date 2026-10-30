@@ -67,8 +67,20 @@ class ChooseAmountInputView @JvmOverloads constructor(
         binder.chooseAmountInputImage.setTokenIcon(icon, imageLoader)
     }
 
+    fun setAssetIconRounded(rounded: Boolean) {
+        binder.chooseAmountInputImage.clipToOutline = rounded
+    }
+
     fun setAssetName(name: String) {
         binder.chooseAmountInputToken.text = name
+    }
+
+    /** Makes the asset icon and name tappable, e.g. to open the asset's details; `null` restores the plain label. */
+    fun setAssetClickListener(listener: View.OnClickListener?) {
+        for (view in listOf(binder.chooseAmountInputImage, binder.chooseAmountInputToken)) {
+            view.setOnClickListener(listener)
+            view.isClickable = listener != null
+        }
     }
 
     fun setFiatAmount(priceAmount: CharSequence?) {

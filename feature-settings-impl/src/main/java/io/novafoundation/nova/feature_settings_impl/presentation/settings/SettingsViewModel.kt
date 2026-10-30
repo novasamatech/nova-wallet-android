@@ -55,7 +55,8 @@ class SettingsViewModel(
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val maskingModeUseCase: MaskingModeUseCase
+    private val maskingModeUseCase: MaskingModeUseCase,
+    private val debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -116,6 +117,18 @@ class SettingsViewModel(
     init {
         setupBiometric()
     }
+
+    fun isClaimDebugEnabled() = debugSettings.bittensorClaimEnabled()
+
+    fun nodeLogsDisabled() = debugSettings.nodeLogsDisabled()
+
+    fun setNodeLogsDisabled(disabled: Boolean) = debugSettings.setNodeLogsDisabled(disabled)
+
+    fun isClaimButtonDebugEnabled() = debugSettings.bittensorClaimButtonEnabled()
+
+    fun setClaimButtonDebugEnabled(enabled: Boolean) = debugSettings.setBittensorClaimButtonEnabled(enabled)
+
+    fun setClaimDebugEnabled(enabled: Boolean) = debugSettings.setBittensorClaimEnabled(enabled)
 
     fun walletsClicked() {
         router.openWallets()

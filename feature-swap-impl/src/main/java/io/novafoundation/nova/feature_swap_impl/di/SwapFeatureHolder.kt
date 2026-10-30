@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class SwapFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: SwapRouter,
+    private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -34,6 +36,6 @@ class SwapFeatureHolder @Inject constructor(
             .build()
 
         return DaggerSwapFeatureComponent.factory()
-            .create(accountFeatureDependencies, router)
+            .create(accountFeatureDependencies, router, slippageSettingsCommunicator)
     }
 }

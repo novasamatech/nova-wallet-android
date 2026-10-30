@@ -15,6 +15,9 @@ import io.novasama.substrate_sdk_android.runtime.metadata.decodeOutput
 import io.novasama.substrate_sdk_android.runtime.metadata.method
 import io.novasama.substrate_sdk_android.runtime.metadata.runtimeApi
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
+import io.novasama.substrate_sdk_android.wsrpc.executeAsync
+import io.novasama.substrate_sdk_android.wsrpc.mappers.pojo
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.RuntimeRequest
 import io.novasama.substrate_sdk_android.wsrpc.request.runtime.state.StateCallRequest
 
 typealias RuntimeTypeName = String
@@ -43,6 +46,15 @@ interface RuntimeCallsApi {
     ): R
 
     suspend fun <R> call(
+        section: String,
+        method: String,
+        arguments: Map<String, Any?>,
+        returnBinding: (Any?) -> R
+    ): R
+
+    /** Metadata-driven state_call pinned to an explicit block. */
+    suspend fun <R> callAt(
+        blockHash: String,
         section: String,
         method: String,
         arguments: Map<String, Any?>,
@@ -106,6 +118,22 @@ internal class RealRuntimeCallsApi(
 
     override fun isSupported(section: String, method: String): Boolean {
         return runtime.metadata.hasDetectedRuntimeApi(section, method)
+    }
+
+    override suspend fun <R> callAt(
+        blockHash: String,
+        section: String,
+        method: String,
+        arguments: Map<String, Any?>,
+        returnBinding: (Any?) -> R
+    ): R {
+        val apiMethod = runtime.metadata.runtimeApi(section).method(method)
+        val request = apiMethod.createRequest(runtime, arguments)
+        val atBlock = RuntimeRequest(request.method, request.params + blockHash)
+        val response = socketService.executeAsync(atBlock, mapper = pojo<String>()).result
+        val decoded = response?.let { apiMethod.decodeOutput(runtime, it) }
+
+        return returnBinding(decoded)
     }
 
     private fun decodeResponse(responseHex: String?, returnTypeName: String): Any? {

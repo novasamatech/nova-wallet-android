@@ -158,12 +158,13 @@ sealed class AnalyticsEvent(
 
     // Staking
 
-    class StakingFlowOpened(network: String, source: String) : AnalyticsEvent(
+    class StakingFlowOpened(network: String, source: String, hasNewBadge: Boolean? = null) : AnalyticsEvent(
         name = "staking_flow_opened",
-        properties = mapOf(
-            "network" to network,
-            "source" to source
-        )
+        properties = buildMap {
+            put("network", network)
+            put("source", source)
+            if (hasNewBadge != null) put("has_new_badge", hasNewBadge)
+        }
     )
 
     class StakingTypeSelected(stakingType: String, network: String) : AnalyticsEvent(

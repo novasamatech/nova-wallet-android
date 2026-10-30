@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitStatus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
@@ -34,8 +36,8 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
-import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
@@ -44,6 +46,8 @@ import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.wi
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
+import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -60,8 +64,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class RealExtrinsicService(
@@ -76,6 +78,18 @@ class RealExtrinsicService(
     private val signingContextFactory: SigningContext.Factory,
     private val coroutineScope: CoroutineScope? // TODO: Make it non-nullable
 ) : ExtrinsicService {
+
+    override suspend fun dryRunExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        submissionOptions: SubmissionOptions,
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): ExtrinsicDryRunResult {
+        check(BuildConfig.DEBUG) { "Dry run is debug-only" }
+        rpcCalls.requireDryRunSupported(chain.id)
+        val submission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        return rpcCalls.dryRunExtrinsic(chain.id, submission.extrinsic)
+    }
 
     override suspend fun submitExtrinsic(
         chain: Chain,
@@ -103,9 +117,8 @@ class RealExtrinsicService(
             },
             listProcessing = { (extrinsic, submission) ->
                 rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
-                    .filterIsInstance<ExtrinsicStatus.InBlock>()
                     .map { ExtrinsicWatchResult(it, submission.submissionHierarchy) }
-                    .first()
+                    .awaitStatus<ExtrinsicStatus.InBlock>()
             }
         )
     }
@@ -234,7 +247,7 @@ class RealExtrinsicService(
             val errorEvent = events.findExtrinsicFailureOrThrow()
             val dispatchError = parseErrorEvent(errorEvent, runtimeSnapshot)
 
-            ExtrinsicDispatch.Failed(dispatchError)
+            ExtrinsicDispatch.Failed(dispatchError, events)
         }
     }
 

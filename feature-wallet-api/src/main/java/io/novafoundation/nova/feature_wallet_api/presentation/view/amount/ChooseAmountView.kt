@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view.amount
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
@@ -37,12 +38,20 @@ class ChooseAmountView @JvmOverloads constructor(
         binder.chooseAmountInput.loadAssetImage(icon)
     }
 
+    fun setAssetIconRounded(rounded: Boolean) {
+        binder.chooseAmountInput.setAssetIconRounded(rounded)
+    }
+
     fun setTitle(title: String?) {
         binder.chooseAmountTitle.setTextOrHide(title)
     }
 
     fun setAssetName(name: String) {
         binder.chooseAmountInput.setAssetName(name)
+    }
+
+    fun setAssetClickListener(listener: View.OnClickListener?) {
+        binder.chooseAmountInput.setAssetClickListener(listener)
     }
 
     override fun setEnabled(enabled: Boolean) {

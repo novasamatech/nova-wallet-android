@@ -280,6 +280,15 @@
                 app:title="@string/about_privacy" />
         </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
+        <io.novafoundation.nova.common.view.settings.SettingsItemView
+            android:id="@+id/settingsDebug"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:icon="@drawable/ic_settings_outline"
+            app:title="@string/debug_settings_title" />
+
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"

@@ -56,6 +56,15 @@
             android:layout_height="wrap_content"
             android:text="@string/start_staking_fragment_start_staking" />
 
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/startStakingLandingAllOptions"
+            style="@style/Widget.Nova.Button.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/bittensor_quick_all_options"
+            android:visibility="gone" />
+
         <TextView
             android:id="@+id/startStakingLandingAvailableBalance"
             style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"

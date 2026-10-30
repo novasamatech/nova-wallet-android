@@ -136,7 +136,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/balanceDetailsBalances" />
 
-                        <io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartsView
+                        <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
                             android:id="@+id/priceChartView"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

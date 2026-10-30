@@ -356,7 +356,7 @@ private class AssetConversionExchange(
 
         override suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction {
             return SwapMaxAdditionalAmountDeduction(
-                fromCountedTowardsEd = deductionUseCase.invoke(fromAsset, toAsset)
+                fromCountedTowardsEd = deductionUseCase.invoke(fromAsset, toAsset, keepAlive = true)
             )
         }
 
@@ -524,7 +524,7 @@ private class AssetConversionExchange(
             val path = listOf(fromAsset, toAsset)
                 .map { asset -> multiLocationConverter.encodableMultiLocationOf(asset, assetIdXcmVersion) }
 
-            val keepAlive = false
+            val keepAlive = true
 
             when (swapLimit) {
                 is SwapLimit.SpecifiedIn -> call(

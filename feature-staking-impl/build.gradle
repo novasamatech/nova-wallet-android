@@ -5,11 +5,9 @@ apply from: '../scripts/secrets.gradle'
 android {
 
     defaultConfig {
-
-
-
         buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config_dev.json\""
         buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators_dev.json\""
+        buildConfigField "String", "BITTENSOR_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/bittensor/v1/config.json\""
     }
 
     buildTypes {
@@ -32,7 +30,9 @@ dependencies {
     implementation project(':core-db')
     implementation project(':common')
     implementation project(':analytics')
+    implementation project(':infrastructure')
     implementation project(':feature-staking-api')
+    implementation project(':feature-swap-api')
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
     implementation project(':feature-currency-api')
@@ -49,6 +49,7 @@ dependencies {
     implementation materialDep
     implementation cardViewDep
     implementation constraintDep
+    implementation swipeRefershLayout
 
     implementation permissionsDep
 
@@ -72,6 +73,7 @@ dependencies {
 
     testImplementation jUnitDep
     testImplementation mockitoDep
+    testImplementation coroutinesTestDep
 
     implementation substrateSdkDep
     compileOnly wsDep
@@ -80,4 +82,5 @@ dependencies {
     implementation retrofitDep
 
     implementation shimmerDep
+    implementation flexBoxDep
 }

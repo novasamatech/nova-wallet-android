@@ -41,6 +41,7 @@ class DashboardHasStakeAdapter(
         resolvePayload(holder, position, payloads) {
             when (it) {
                 HasStakeItem::stake -> holder.bindStake(item)
+                HasStakeItem::stakeTitle -> holder.bindStake(item)
                 HasStakeItem::rewards -> holder.bindRewards(item)
                 HasStakeItem::status -> holder.bindStatus(item)
                 HasStakeItem::earnings -> holder.bindEarnings(item)
@@ -98,6 +99,7 @@ class DashboardHasStakeViewHolder(
     }
 
     fun bindStake(model: HasStakeItem) {
+        card.setStakeTitle(model.stakeTitle)
         card.setStake(model.stake)
     }
 
@@ -130,6 +132,7 @@ private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem
     private val payloadGenerator = PayloadGenerator(
         HasStakeItem::assetLabel,
         HasStakeItem::stake,
+        HasStakeItem::stakeTitle,
         HasStakeItem::earnings,
         HasStakeItem::status,
         HasStakeItem::rewards,

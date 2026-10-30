@@ -60,4 +60,5 @@ dependencies {
 
     testImplementation jUnitDep
     testImplementation mockitoDep
+    testImplementation coroutinesTestDep
 }

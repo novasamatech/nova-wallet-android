@@ -172,7 +172,7 @@ fun ChainId.chainIdHexPrefix16(): String {
 
 enum class StakingTypeGroup {
 
-    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, UNSUPPORTED
+    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, BITTENSOR, UNSUPPORTED
 }
 
 fun Chain.Asset.StakingType.group(): StakingTypeGroup {
@@ -181,6 +181,7 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
         RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
         PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
         MYTHOS -> StakingTypeGroup.MYTHOS
+        Chain.Asset.StakingType.BITTENSOR_ROOT -> StakingTypeGroup.BITTENSOR
         NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
     }
 }
@@ -414,6 +415,8 @@ private inline fun Chain.Explorer.format(
 }
 
 object ChainGeneses {
+
+    const val BITTENSOR = "2f0555cc76fc2840a25a6ea3b9637146806f1f44b090c175ffde2a7e5ab36c03"
 
     const val KUSAMA = "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"

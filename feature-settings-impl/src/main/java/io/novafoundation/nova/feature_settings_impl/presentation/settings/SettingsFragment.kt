@@ -4,6 +4,8 @@ import android.content.Intent
 import android.provider.Settings
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
+import io.novafoundation.nova.feature_settings_impl.BuildConfig
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -26,6 +28,20 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
     }
 
     override fun initViews() {
+        binder.settingsDebug.isVisible = BuildConfig.DEBUG
+        binder.settingsDebug.setOnClickListener {
+            if (BuildConfig.DEBUG) {
+                DebugSettingsBottomSheet(
+                    requireContext(),
+                    viewModel.isClaimDebugEnabled(),
+                    viewModel::setClaimDebugEnabled,
+                    viewModel.isClaimButtonDebugEnabled(),
+                    viewModel::setClaimButtonDebugEnabled,
+                    viewModel.nodeLogsDisabled(),
+                    viewModel::setNodeLogsDisabled
+                ).show()
+            }
+        }
         binder.accountView.setWholeClickListener { viewModel.accountActionsClicked() }
 
         binder.settingsWallets.setOnClickListener { viewModel.walletsClicked() }

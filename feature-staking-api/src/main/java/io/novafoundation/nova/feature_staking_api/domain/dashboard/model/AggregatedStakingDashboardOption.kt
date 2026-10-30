@@ -12,13 +12,14 @@ class AggregatedStakingDashboardOption<out S>(
     val chain: Chain,
     val token: Token,
     val stakingState: S,
-    val syncingStage: SyncingStage
+    val syncingStage: SyncingStage,
+    val bittensorDetails: BittensorDashboardDetails? = null
 ) {
 
     class HasStake(
         val showStakingType: Boolean,
         val stakingType: Chain.Asset.StakingType,
-        val stake: Balance,
+        val stake: Balance?,
         val stats: ExtendedLoadingState<Stats>,
     ) {
 

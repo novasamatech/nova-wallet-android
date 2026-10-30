@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra
 
+import io.novasama.substrate_sdk_android.hash.isPositive
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -235,7 +236,7 @@ class RealHydrationOraclePriceConverter @Inject constructor(
         val entry = entries.firstOrNull { it.key.third == period }?.value
             ?: error("No $period oracle entry for ($lower, $higher)")
 
-        require(entry.numerator.signum() > 0 && entry.denominator.signum() > 0) {
+        require(entry.numerator.isPositive() && entry.denominator.isPositive()) {
             "Degenerate oracle price for ($lower, $higher): ${entry.numerator}/${entry.denominator}"
         }
 

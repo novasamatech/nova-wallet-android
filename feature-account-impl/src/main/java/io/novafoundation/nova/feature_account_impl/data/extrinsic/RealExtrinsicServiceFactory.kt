@@ -35,7 +35,7 @@ class RealExtrinsicServiceFactory(
             feePaymentProviderRegistry = registry,
             eventsRepository = eventsRepository,
             coroutineScope = feeConfig.coroutineScope,
-            signingContextFactory = signingContextFactory
+            signingContextFactory = signingContextFactory,
         )
     }
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
@@ -109,12 +110,12 @@ fun buildSwapSegments(fees: List<AtomicSwapOperationFee>, operations: List<Atomi
         // Map the actual incoming amount through this segment's own rate, then skim its commission (zero unless
         // it is the charging operation). First segment has no predecessor, so it keeps its own quoted input.
         val amountIn = incomingAmount ?: grossIn
-        val ratedOut = if (grossIn.signum() > 0) amountIn * grossOut / grossIn else grossOut
+        val ratedOut = if (grossIn.isPositive()) amountIn * grossOut / grossIn else grossOut
         val amountOut = (ratedOut - commission).atLeastZero()
 
         // Reduce the worst-case floor by the same commission proportion this segment ends up with, without
         // compounding slippage across segments (each floor stays independent, matching existing behavior).
-        val amountOutMin = if (grossOut.signum() > 0) limit.amountOutMin * amountOut / grossOut else limit.amountOutMin
+        val amountOutMin = if (grossOut.isPositive()) limit.amountOutMin * amountOut / grossOut else limit.amountOutMin
 
         incomingAmount = amountOut
 

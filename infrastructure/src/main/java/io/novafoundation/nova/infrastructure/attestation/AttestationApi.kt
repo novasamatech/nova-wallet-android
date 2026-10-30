@@ -1,6 +1,7 @@
 package io.novafoundation.nova.infrastructure.attestation
 
 import androidx.annotation.Keep
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Url
@@ -40,5 +41,5 @@ interface AttestationApi {
     suspend fun challenge(@Url url: String, @Body request: AttestationChallengeRequest): AttestationChallengeResponse
 
     @POST
-    suspend fun register(@Url url: String, @Body request: AttestationRegisterRequest)
+    suspend fun register(@Url url: String, @Body request: AttestationRegisterRequest): Response<Unit>
 }

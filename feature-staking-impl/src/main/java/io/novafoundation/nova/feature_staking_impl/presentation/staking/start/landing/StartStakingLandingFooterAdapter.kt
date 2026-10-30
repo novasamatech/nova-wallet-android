@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemStartStakingLandingFooterBinding
 
@@ -77,7 +78,7 @@ class StartStakingLandingFooterViewHolder(
 
     fun bind(title: CharSequence) {
         with(binder) {
-            itemStakingLandingFooterMoreInfo.text = title
+            itemStakingLandingFooterMoreInfo.setTextOrHide(title.takeIf { it.isNotEmpty() })
         }
     }
 }

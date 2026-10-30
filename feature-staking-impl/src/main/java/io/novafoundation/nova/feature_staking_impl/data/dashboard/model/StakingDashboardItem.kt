@@ -17,7 +17,7 @@ class StakingDashboardItem(
         val stats: ExtendedLoadingState<CommonStats>
 
         class HasStake(
-            val stake: Balance,
+            val stake: Balance?,
             override val stats: ExtendedLoadingState<Stats>,
         ) : StakeState {
 

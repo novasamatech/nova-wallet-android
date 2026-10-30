@@ -1,5 +1,7 @@
 package io.novafoundation.nova.infrastructure.attestation
 
+import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.PROFILE
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.Purpose
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.base64
@@ -8,8 +10,7 @@ import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.sha2
 import java.io.IOException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import io.novafoundation.nova.infrastructure.resolve
+import okhttp3.HttpUrl
 import retrofit2.HttpException
 
 const val HEADER_PROFILE = "X-Attestation-Profile"
@@ -29,6 +30,15 @@ private const val NO_APP_ATTEST_ENVIRONMENT = ""
 
 private const val HTTP_FORBIDDEN = 403
 private const val HTTP_SERVER_ERRORS = 500
+private const val HTTP_UNAUTHORIZED = 401
+private const val HTTP_CONFLICT = 409
+private const val HTTP_NO_CONTENT = 204
+private const val HTTP_TOO_MANY_REQUESTS = 429
+private const val HTTP_SERVICE_UNAVAILABLE = 503
+private const val MIN_COOLDOWN_SECONDS = 1L
+private const val MAX_COOLDOWN_SECONDS = 905L
+private const val DEFAULT_COOLDOWN_SECONDS = 30L
+private const val NANOS_PER_SECOND = 1_000_000_000L
 
 /** The backend rejected this client's attestation; retrying will not help until the app restarts. */
 class AttestationFailedException(message: String) : IOException(message)
@@ -38,7 +48,26 @@ class AttestationFailedException(message: String) : IOException(message)
  * key failed - so the request was not sent. Unlike [AttestationFailedException] it says nothing about
  * whether this client is accepted, so it is worth retrying later.
  */
-class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
+open class AttestationUnavailableException(message: String, cause: Throwable? = null) : IOException(message, cause)
+
+/**
+ * This device cannot attest at all - it has no Play Store or Play services - so retrying will not help.
+ * Callers should explain the device limitation instead of offering a retry. A backend refusal is an [AttestationRefusedException].
+ */
+class AttestationUnsupportedException(message: String, cause: Throwable? = null) : AttestationUnavailableException(message, cause)
+
+/**
+ * The backend refused this client's bootstrap with [status] and [code]. It is not asked again for the rest of the process,
+ * so retrying will not help; the code tells a device the backend does not trust from a request it does not accept.
+ */
+class AttestationRefusedException(
+    val status: Int,
+    val code: String?,
+    message: String,
+    cause: Throwable? = null
+) : AttestationUnavailableException(message, cause)
+
+fun Throwable.isAttestationUnsupported(): Boolean = generateSequence(this) { it.cause }.any { it is AttestationUnsupportedException }
 
 /** Produces a Play Integrity token bound to [requestHash]. */
 fun interface IntegrityTokenSource {
@@ -70,9 +99,11 @@ interface ClientAttestationService {
 
     /**
      * Drops the client id and its key, so the next registration happens as a new installation that
-     * cannot be linked to the previous one. Mirrors iOS, which forgets the client on analytics opt-out.
+     * cannot be linked to the previous one.
      */
     suspend fun forgetClient()
+
+    suspend fun recordResponse(context: AttestationSigning.RequestContext, status: Int, code: String?, retryAfter: String?) = Unit
 }
 
 class RealClientAttestationService(
@@ -81,27 +112,68 @@ class RealClientAttestationService(
     private val keyPairStore: AttestationKeyPairStore,
     private val integrityTokens: IntegrityTokenSource,
     private val appPackage: String,
-    private val urls: InfrastructureUrls
+    private val urls: InfrastructureUrls,
+    private val monotonicNanos: () -> Long = System::nanoTime
 ) : ClientAttestationService {
 
     private val registrationMutex = Mutex()
 
-    @Volatile
-    private var rejected = false
+    private val rejectedOrigins = mutableSetOf<String>()
+
+    private val cooldownDeadlines = mutableMapOf<String, Long>()
 
     @Volatile
     private var clientCreationAllowed = true
 
     override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String> {
-        val (clientId, challenge) = requestChallenge()
-        val digest = requestDigest(Purpose.REQUEST, challenge, clientId, context, sha256(body))
+        // Capture once: remote config may change while bootstrap is suspended.
+        val base = urls.baseUrl() ?: throw InfrastructureUrlMissingException()
+        val origin = origin(context)
+        val configuredContext = signedContext(context.method, base, context.contentType)
+        val originMatches = base.scheme == context.scheme && base.port.toString() == context.port && origin == origin(configuredContext)
+        if (!originMatches) {
+            throw AttestationUnavailableException("Infrastructure origin changed before attestation")
+        }
+        return registrationMutex.withLock {
+            checkCooldown(origin)
+            val proof = requestChallenge(base, origin)
+            val digest = requestDigest(Purpose.REQUEST, proof.challenge, proof.clientId, context, sha256(body))
+            val signature = try {
+                keyPairStore.sign(proof.clientId, digest)
+            } catch (error: AttestationKeyMissingException) {
+                identity.reset()
+                throw AttestationUnavailableException("Signing key disappeared; retry with a new installation", error)
+            }
+            requireClientAllowed()
+            mapOf(
+                HEADER_PROFILE to PROFILE.toString(),
+                HEADER_CLIENT_ID to proof.clientId,
+                HEADER_CHALLENGE to proof.challenge,
+                HEADER_SIGNATURE to base64(signature)
+            )
+        }
+    }
 
-        return mapOf(
-            HEADER_PROFILE to PROFILE.toString(),
-            HEADER_CLIENT_ID to clientId,
-            HEADER_CHALLENGE to challenge,
-            HEADER_SIGNATURE to base64(keyPairStore.sign(clientId, digest))
-        )
+    override suspend fun recordResponse(context: AttestationSigning.RequestContext, status: Int, code: String?, retryAfter: String?) {
+        if (status != HTTP_TOO_MANY_REQUESTS && !(status == HTTP_SERVICE_UNAVAILABLE && code == "attestation_unavailable")) return
+        registrationMutex.withLock { applyCooldown(origin(context), retryAfter) }
+    }
+
+    private fun origin(context: AttestationSigning.RequestContext): String = "${context.scheme}://${context.authority}"
+
+    private fun checkCooldown(origin: String) {
+        val deadline = cooldownDeadlines[origin] ?: return
+        if (deadline - monotonicNanos() > 0) throw AttestationUnavailableException("Attestation origin is cooling down")
+        cooldownDeadlines.remove(origin)
+    }
+
+    private fun applyCooldown(origin: String, retryAfter: String?) {
+        val seconds = retryAfter?.takeIf { it.isNotEmpty() && it.all { character -> character in '0'..'9' } }
+            ?.toLongOrNull()?.coerceIn(MIN_COOLDOWN_SECONDS, MAX_COOLDOWN_SECONDS) ?: DEFAULT_COOLDOWN_SECONDS
+        val now = monotonicNanos()
+        val delay = seconds * NANOS_PER_SECOND
+        val previousRemaining = cooldownDeadlines[origin]?.minus(now) ?: 0L
+        cooldownDeadlines[origin] = now + maxOf(delay, previousRemaining)
     }
 
     override suspend fun forgetRegistration(clientId: String) {
@@ -126,39 +198,49 @@ class RealClientAttestationService(
     }
 
     /** A request-purpose challenge together with the identity it was issued to. */
-    private suspend fun requestChallenge(): Pair<String, String> {
-        ensureAttested()
+    private suspend fun requestChallenge(base: HttpUrl, origin: String): RequestProof {
+        ensureAttested(base, origin)
         val clientId = identity.clientId()
 
         return try {
-            clientId to challenge(clientId, Purpose.REQUEST)
+            val challenge = challenge(base, clientId, Purpose.REQUEST)
+            if (identity.attestedOrigin() == null) {
+                // A shipped registration has no origin metadata. Adopt only the origin that
+                // just acknowledged this client; do not re-attest or guess its former origin.
+                requireClientAllowed()
+                identity.markAttested(origin)
+            }
+            RequestProof(clientId, challenge)
         } catch (exception: HttpException) {
             val error = exception.backendError()
-            if (error.code != ERROR_UNKNOWN_CLIENT) throw challengeFailure(exception, error)
+            if (error.status != HTTP_UNAUTHORIZED || error.code != ERROR_UNKNOWN_CLIENT) throw challengeFailure(exception, error, origin)
 
             attestationWarn("challenge: the backend does not know this installation - registering it again")
-            forgetRegistration(clientId)
-            ensureAttested()
+            identity.clearAttested()
+            ensureAttested(base, origin)
 
             val current = identity.clientId()
             try {
-                current to challenge(current, Purpose.REQUEST)
+                RequestProof(current, challenge(base, current, Purpose.REQUEST))
             } catch (retryException: HttpException) {
-                throw challengeFailure(retryException, retryException.backendError())
+                throw challengeFailure(retryException, retryException.backendError(), origin)
             }
         }
     }
 
-    private suspend fun challenge(clientId: String, purpose: Purpose): String {
+    private suspend fun challenge(base: HttpUrl, clientId: String, purpose: Purpose): String {
         val request = AttestationChallengeRequest(client_id = clientId, purpose = purpose.wireName, profile = PROFILE)
 
-        return api.challenge(urls.resolve(CHALLENGES_PATH).toString(), request).challenge
+        return api.challenge(requireNotNull(base.resolve(CHALLENGES_PATH)).toString(), request).challenge
     }
 
-    private fun challengeFailure(exception: HttpException, error: BackendError): IOException {
+    private fun challengeFailure(exception: HttpException, error: BackendError, origin: String): IOException {
+        if (error.status == HTTP_TOO_MANY_REQUESTS || (error.status == HTTP_SERVICE_UNAVAILABLE && error.code == "attestation_unavailable")) {
+            applyCooldown(origin, exception.response()?.headers()?.get("Retry-After"))
+        }
         // app_not_allowed / binding_not_allowed: policy, not a transient fault - stop asking
         return if (error.status == HTTP_FORBIDDEN) {
-            rejected = true
+            rejectedOrigins.add(origin)
             attestationWarn("challenge refused with $error - signing is off until restart")
             AttestationFailedException("Challenge refused: $error")
         } else {
@@ -167,22 +249,24 @@ class RealClientAttestationService(
         }
     }
 
-    private suspend fun ensureAttested() {
-        if (rejected) {
+    private suspend fun ensureAttested(base: HttpUrl, origin: String) {
+        if (origin in rejectedOrigins) {
             attestationWarn("refusing to sign: attestation was rejected earlier in this process")
             throw AttestationFailedException("Attestation was rejected by the backend")
         }
         requireClientAllowed()
-        if (identity.isAttested()) return
-
-        registrationMutex.withLock {
-            requireClientAllowed()
-            if (identity.isAttested()) return
-
-            register(identity.clientId())
-            identity.markAttested()
-            attestationLog("registered package=$appPackage")
+        val existing = identity.existingClientId()
+        if (existing != null && identity.isAttested() && !keyPairStore.contains(existing)) {
+            // The backend cannot rebind an existing id to a different key.
+            identity.reset()
         }
+        val registeredOrigin = identity.attestedOrigin()
+        if (identity.isAttested() && (registeredOrigin == null || registeredOrigin == origin)) return
+        identity.clearAttested()
+        register(base, origin, identity.clientId())
+        requireClientAllowed()
+        identity.markAttested(origin)
+        attestationLog("registered package=$appPackage")
     }
 
     // Checked before touching the identity: reading the client id would mint a new one
@@ -193,9 +277,9 @@ class RealClientAttestationService(
         throw AttestationUnavailableException("Client creation is not allowed")
     }
 
-    private suspend fun register(clientId: String) {
+    private suspend fun register(base: HttpUrl, origin: String, clientId: String) {
         // The signed context must name exactly the URL the request goes to, so both come from here
-        val url = urls.resolve(REGISTER_PATH)
+        val url = requireNotNull(base.resolve(REGISTER_PATH))
         val keyReference = base64(keyPairStore.publicKey(clientId))
 
         attestationLog("registering package=$appPackage")
@@ -204,7 +288,7 @@ class RealClientAttestationService(
         var step = "challenge"
 
         try {
-            val challenge = challenge(clientId, Purpose.REGISTER)
+            val challenge = challenge(base, clientId, Purpose.REGISTER)
             val binding = AttestationSigning.registrationPreimage(
                 platform = PLATFORM_ANDROID,
                 appId = appPackage,
@@ -216,7 +300,7 @@ class RealClientAttestationService(
             val digest = requestDigest(Purpose.REGISTER, challenge, clientId, context, sha256(binding))
 
             step = "register"
-            api.register(
+            val response = api.register(
                 url.toString(),
                 AttestationRegisterRequest(
                     profile = PROFILE,
@@ -231,19 +315,28 @@ class RealClientAttestationService(
                     signature = base64(keyPairStore.sign(clientId, digest))
                 )
             )
+            if (!response.isSuccessful) throw HttpException(response)
+            if (response.code() != HTTP_NO_CONTENT) {
+                throw AttestationUnavailableException("Unexpected registration acknowledgement: HTTP ${response.code()}")
+            }
         } catch (exception: HttpException) {
-            throw registrationFailure(exception, clientId, step)
+            throw registrationFailure(exception, clientId, step, origin)
         }
     }
 
     /** Called with [registrationMutex] held. */
-    private fun registrationFailure(exception: HttpException, clientId: String, step: String): IOException {
+    private fun registrationFailure(exception: HttpException, clientId: String, step: String, origin: String): IOException {
         val error = exception.backendError()
         val code = error.code
-        val status = "$error on $step"
+        val status = "$error on $step with message: ${exception.message()}"
 
         return when {
-            code == ERROR_CLIENT_ALREADY_REGISTERED -> {
+            error.status == HTTP_TOO_MANY_REQUESTS || (error.status == HTTP_SERVICE_UNAVAILABLE && code == "attestation_unavailable") -> {
+                applyCooldown(origin, exception.response()?.headers()?.get("Retry-After"))
+                AttestationUnavailableException("Attestation temporarily throttled: $status", exception)
+            }
+
+            error.status == HTTP_CONFLICT && code == ERROR_CLIENT_ALREADY_REGISTERED -> {
                 // This id is bound to another key - ours was lost while the id survived. A binding is never
                 // overwritten, so the only way forward is to start over as a new installation.
                 identity.reset()
@@ -260,8 +353,8 @@ class RealClientAttestationService(
             else -> {
                 // attestation_failed, app_not_allowed, invalid_request...: repeating it would only burn the
                 // backend's daily Play Integrity budget
-                rejected = true
-                attestationWarn("registration rejected with $status - signing is off until restart")
+                rejectedOrigins.add(origin)
+                attestationWarn("registration rejected with \"$status\" - signing is off until restart")
                 AttestationFailedException("Attestation rejected: $status")
             }
         }
@@ -274,4 +367,6 @@ class RealClientAttestationService(
 
         override fun toString() = "HTTP $status" + code?.let { " $it" }.orEmpty()
     }
+
+    private class RequestProof(val clientId: String, val challenge: String)
 }

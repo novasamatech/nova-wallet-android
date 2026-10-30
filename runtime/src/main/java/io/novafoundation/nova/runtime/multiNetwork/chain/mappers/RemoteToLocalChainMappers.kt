@@ -74,7 +74,8 @@ fun mapRemoteChainToLocal(
             disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
             sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull(),
             sessionsPerEra = it[SESSIONS_PER_ERA].asGsonParsedIntOrNull(),
-            timelineChain = it[TIMELINE_CHAIN] as? ChainId
+            timelineChain = it[TIMELINE_CHAIN] as? ChainId,
+            newFeatures = mapNewChainFeatures(it["newFeatures"])
         )
     }
 
@@ -251,6 +252,7 @@ fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingTy
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
         "mythos" -> Chain.Asset.StakingType.MYTHOS
+        "subtensor", "bittensor-root" -> Chain.Asset.StakingType.BITTENSOR_ROOT
         else -> Chain.Asset.StakingType.UNSUPPORTED
     }
 }
@@ -265,6 +267,7 @@ fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String?
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
         Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pools"
         Chain.Asset.StakingType.MYTHOS -> "mythos"
+        Chain.Asset.StakingType.BITTENSOR_ROOT -> "bittensor-root"
     }
 }
 

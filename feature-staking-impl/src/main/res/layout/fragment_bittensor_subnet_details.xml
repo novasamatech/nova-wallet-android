@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/secondary_screen_background" >
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true" >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp" >
+            <TextView
+                android:id="@+id/priceTitle"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary" />
+
+            <!-- The fiat follows the price and wraps under it when both do not fit (large font scales). -->
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:alignItems="baseline"
+                app:flexWrap="wrap">
+
+                <TextView
+                    android:id="@+id/price"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="—" />
+
+                <TextView
+                    android:id="@+id/priceFiat"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone" />
+            </com.google.android.flexbox.FlexboxLayout>
+            <TextView
+                android:id="@+id/change"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_positive"
+                android:text="—" />
+            <TextView
+                android:id="@+id/chartDate"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/bittensor_parameters"
+                android:textColor="@color/text_secondary" />
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:childrenPaddingStart="16dp"
+                app:childrenPaddingEnd="16dp"
+                app:drawDividers="true" >
+                <include
+                    android:id="@+id/poolSplit"
+                    layout="@layout/view_bittensor_subnet_pool_split" />
+
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/age"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    app:title="@string/bittensor_subnet_age"
+                    app:primaryValue="—" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/validatorCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    app:title="@string/bittensor_validators_count"
+                    app:primaryValue="—" />
+                <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/pool"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    app:title="@string/bittensor_quick_pick_pool"
+                    app:primaryValue="—" />
+            </io.novafoundation.nova.common.view.TableView>
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/bittensor_available_validators"
+                android:textAllCaps="true"
+                android:textColor="@color/text_secondary" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/availableValidators"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <LinearLayout
+                android:id="@+id/chooseValidator"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:background="@drawable/bg_primary_list_item_corner_12_solid"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/text_primary"
+                    android:text="@string/bittensor_select_validator" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/icon_secondary" />
+            </LinearLayout>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:childrenPaddingStart="16dp"
+                app:childrenPaddingEnd="16dp" >
+                <LinearLayout
+                    android:id="@+id/more"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/bittensor_more_details"
+                        android:textColor="@color/text_secondary" />
+
+                    <ImageView
+                        android:id="@+id/moreArrow"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_up"
+                        app:tint="@color/icon_secondary" />
+                </LinearLayout>
+                <io.novafoundation.nova.common.view.TableView
+                    android:id="@+id/moreDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:showBackground="false"
+                    app:drawDividers="true"
+                    app:childrenPaddingStart="0dp"
+                    app:childrenPaddingEnd="0dp"
+                    app:childrenPaddingTop="0dp"
+                    app:childrenPaddingBottom="0dp">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/subnetNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        app:title="@string/bittensor_subnet_id" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/nativePool"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/bittensor_native_pool" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/alphaPool"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/bittensor_alpha_in_pool" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/emission"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        app:title="@string/bittensor_emission" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/website"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:visibility="gone"
+                        app:title="@string/bittensor_subnet_website"
+                        app:primaryValueStyle="link" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/github"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:visibility="gone"
+                        app:title="@string/bittensor_subnet_github"
+                        app:primaryValueStyle="link" />
+                </io.novafoundation.nova.common.view.TableView>
+            </io.novafoundation.nova.common.view.TableView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="84dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@color/solid_navigation_background" >
+        <ImageButton
+            android:id="@+id/favorite"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_primary_list_item_corner_12_solid"
+            android:src="@drawable/ic_favorite_heart_outline"
+            android:contentDescription="@string/bittensor_add_favorite" />
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/useSubnet"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:text="@string/bittensor_use_subnet" />
+    </LinearLayout>
+</LinearLayout>

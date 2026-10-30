@@ -9,10 +9,11 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
-import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -38,6 +39,15 @@ class ExtrinsicBuildingContext(
 private val DEFAULT_BATCH_MODE = BatchMode.BATCH_ALL
 
 interface ExtrinsicService {
+
+    /** Debug-only simulation. Must never fall back to transaction submission. */
+    suspend fun dryRunExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        submissionOptions: SubmissionOptions = SubmissionOptions(),
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): ExtrinsicDryRunResult =
+        throw UnsupportedOperationException("Dry run is not supported by this service")
 
     interface Factory {
 

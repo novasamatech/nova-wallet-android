@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bittensor_quick_pool_start">#473B5E</color>
+    <color name="bittensor_quick_pool_middle">#272033</color>
+    <color name="bittensor_quick_pool_end">#151318</color>
+    <color name="bittensor_quick_pool_border">#9989B7</color>
+    <color name="bittensor_quick_age_start">#2C4462</color>
+    <color name="bittensor_quick_age_middle">#182535</color>
+    <color name="bittensor_quick_age_end">#101419</color>
+    <color name="bittensor_quick_age_border">#8CA7CA</color>
+    <color name="bittensor_quick_apy_start">#10504D</color>
+    <color name="bittensor_quick_apy_end">#0D1716</color>
+    <color name="bittensor_quick_apy_border">#59A6A1</color>
+    <color name="bittensor_quick_root_start">#424649</color>
+    <color name="bittensor_quick_root_end">#141515</color>
+    <color name="bittensor_quick_root_border">#898E92</color>
+</resources>

@@ -9,7 +9,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface AssetInAdditionalSwapDeductionUseCase {
 
-    suspend fun invoke(assetIn: Chain.Asset, assetOut: Chain.Asset): Balance
+    suspend fun invoke(assetIn: Chain.Asset, assetOut: Chain.Asset, keepAlive: Boolean = false): Balance
 }
 
 class RealAssetInAdditionalSwapDeductionUseCase(
@@ -17,7 +17,11 @@ class RealAssetInAdditionalSwapDeductionUseCase(
     private val chainRegistry: ChainRegistry
 ) : AssetInAdditionalSwapDeductionUseCase {
 
-    override suspend fun invoke(assetIn: Chain.Asset, assetOut: Chain.Asset): Balance {
+    override suspend fun invoke(assetIn: Chain.Asset, assetOut: Chain.Asset, keepAlive: Boolean): Balance {
+        // A following call in the same atomic swap batch can still need the source account.
+        // Current consumer counts or a sufficient output asset do not make reaping safe for that batch.
+        if (keepAlive) return assetSourceRegistry.existentialDepositInPlanks(assetIn)
+
         val assetInBalanceCanDropBelowEd = assetSourceRegistry.sourceFor(assetIn)
             .transfers
             .totalCanDropBelowMinimumBalance(assetIn)

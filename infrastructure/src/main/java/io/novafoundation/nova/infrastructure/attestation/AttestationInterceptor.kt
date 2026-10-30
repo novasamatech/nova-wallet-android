@@ -1,7 +1,14 @@
 package io.novafoundation.nova.infrastructure.attestation
 
 import java.io.IOException
+import java.io.InterruptedIOException
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -10,6 +17,10 @@ import okio.Buffer
 
 private const val HTTP_UNAUTHORIZED = 401
 private const val ERROR_PEEK_BYTES = 1024L
+private const val DEFAULT_BOOTSTRAP_TIMEOUT_MILLIS = 110_000L
+private const val CANCELLATION_POLL_INTERVAL_MILLIS = 50L
+private const val HTTP_TOO_MANY_REQUESTS = 429
+private const val HTTP_SERVICE_UNAVAILABLE = 503
 
 /**
  * Attaches a profile 2 proof to every request passing through. Attach to the OkHttp client of any backend
@@ -21,7 +32,8 @@ private const val ERROR_PEEK_BYTES = 1024L
  * requests without proof headers and only the final response. The NovaAttestation tag shows the rest.
  */
 class AttestationInterceptor(
-    private val attestationService: ClientAttestationService
+    private val attestationService: ClientAttestationService,
+    private val bootstrapTimeoutMillis: Long = DEFAULT_BOOTSTRAP_TIMEOUT_MILLIS
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -41,9 +53,10 @@ class AttestationInterceptor(
         val request = original.newBuilder().method(original.method, body?.let { bodyBytes.toRequestBody(contentType) }).build()
         val context = signedContext(request.method, request.url, contentType?.toString().orEmpty())
 
-        val headers = attest(target) { attestationService.proofHeaders(context, bodyBytes) }
+        val headers = attest(chain, target) { attestationService.proofHeaders(context, bodyBytes) }
 
         val response = chain.proceed(request.signedWith(headers))
+        recordResponse(chain, target, context, response)
         attestationLog("$target: ${response.describe()}")
 
         if (response.code != HTTP_UNAUTHORIZED) return response
@@ -54,7 +67,12 @@ class AttestationInterceptor(
 
             ERROR_UNKNOWN_CLIENT -> {
                 attestationWarn("$target: the backend does not know this installation, registering it again")
-                attest(target) { attestationService.forgetRegistration(headers.getValue(HEADER_CLIENT_ID)) }
+                try {
+                    attest(chain, target) { attestationService.forgetRegistration(headers.getValue(HEADER_CLIENT_ID)) }
+                } catch (error: IOException) {
+                    response.close()
+                    throw error
+                }
             }
 
             // invalid_proof, attestation_failed...: another attempt would fail the same way
@@ -66,9 +84,10 @@ class AttestationInterceptor(
 
         response.close()
 
-        val retryHeaders = attest(target) { attestationService.proofHeaders(context, bodyBytes) }
+        val retryHeaders = attest(chain, target) { attestationService.proofHeaders(context, bodyBytes) }
 
         return chain.proceed(request.signedWith(retryHeaders)).also {
+            recordResponse(chain, target, context, it)
             attestationLog("$target: retry ${it.describe()}")
         }
     }
@@ -81,15 +100,58 @@ class AttestationInterceptor(
      * dies. A backend error while fetching a challenge is exactly such an exception - Retrofit reports
      * HTTP errors as HttpException - so a single 5xx, or a 415, used to crash the app.
      */
-    private fun <T> attest(target: String, work: suspend () -> T): T {
+    private fun <T> attest(chain: Interceptor.Chain, target: String, work: suspend () -> T): T {
         return try {
-            runBlocking { work() }
+            runBlocking {
+                withTimeout(bootstrapTimeoutMillis) {
+                    if (chain.call().isCanceled()) throw CancellationException("HTTP call cancelled")
+                    val result = async {
+                        try {
+                            Result.success(work())
+                        } catch (error: CancellationException) {
+                            throw error
+                        } catch (error: Exception) {
+                            Result.failure(error)
+                        }
+                    }
+                    // OkHttp exposes cancellation state, not a listener. Poll only while bootstrap owns this call.
+                    val cancellation = launch {
+                        while (isActive) {
+                            if (chain.call().isCanceled()) {
+                                result.cancel(CancellationException("HTTP call cancelled"))
+                                break
+                            }
+                            delay(CANCELLATION_POLL_INTERVAL_MILLIS)
+                        }
+                    }
+                    try {
+                        result.await()
+                    } finally {
+                        cancellation.cancel()
+                    }
+                }
+            }.getOrThrow()
+        } catch (error: CancellationException) {
+            throw InterruptedIOException("Attestation cancelled or timed out").apply { initCause(error) }
         } catch (error: IOException) {
             attestationWarn("$target: could not sign - ${error.describe()}")
             throw error
         } catch (error: Exception) {
             attestationWarn("$target: could not sign - ${error.describe()}")
             throw AttestationUnavailableException("Could not attest $target: ${error.describe()}", error)
+        }
+    }
+
+    private fun recordResponse(chain: Interceptor.Chain, target: String, context: AttestationSigning.RequestContext, response: Response) {
+        if (response.code != HTTP_TOO_MANY_REQUESTS && response.code != HTTP_SERVICE_UNAVAILABLE) return
+        try {
+            val code = errorCodeOf(response.peekBody(ERROR_PEEK_BYTES).string())
+            attest(chain, target) {
+                attestationService.recordResponse(context, response.code, code, response.header("Retry-After"))
+            }
+        } catch (error: IOException) {
+            response.close()
+            throw error
         }
     }
 
