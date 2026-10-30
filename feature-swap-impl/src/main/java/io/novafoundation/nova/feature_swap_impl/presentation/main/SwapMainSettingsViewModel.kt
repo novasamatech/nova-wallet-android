@@ -69,7 +69,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
@@ -100,7 +100,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.ext.fullId
@@ -158,7 +157,7 @@ class SwapMainSettingsViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapRateFormatter: SwapRateFormatter,
     private val swapRouteFormatter: SwapRouteFormatter,
-    private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val maxActionProviderFactory: SwapMaxActionProviderFactory,
     private val swapStateStoreProvider: SwapStateStoreProvider,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
@@ -482,9 +481,10 @@ class SwapMainSettingsViewModel(
 
     private fun createMaxActionProvider(): MaxActionProvider {
         return maxActionProviderFactory.create(
-            viewModelScope = viewModelScope,
-            assetInFlow = assetInFlow.filterNotNull(),
-            feeLoaderMixin = feeMixin,
+            scope = viewModelScope,
+            assets = assetInFlow.filterNotNull(),
+            outputAssets = swapSettings.map { it.assetOut },
+            fees = feeMixin.fee,
         )
     }
 

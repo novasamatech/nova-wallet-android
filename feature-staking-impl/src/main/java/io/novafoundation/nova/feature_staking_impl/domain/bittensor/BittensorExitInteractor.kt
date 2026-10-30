@@ -276,16 +276,27 @@ class BittensorExitInteractor(
     }
 
     suspend fun execute(draft: BittensorExitDraft): BittensorOperationResult {
+        val traceId = java.util.UUID.randomUUID().toString().take(8)
+        val started = System.nanoTime()
+        fun trace(stage: String) {
+            logger.log("[BittensorExitTrace][$traceId][${(System.nanoTime() - started) / 1_000_000}ms] $stage")
+        }
+        trace("Checking operation wallet")
         val position = draft.position
         requireWallet(position.metaId, position.coldkey, position.chain)
+        trace("Wallet checked; capturing history context")
         // Submit the exact reviewed amount, price limit and service-fee transfer.
         val historyRequest = if (position.isRoot) null else costBasisInteractor.ownTradeRequest(position.metaId, position.chain)
+        trace("History context captured; entering submission executor")
         val result = submissionExecutor.execute(
             position.metaId,
             position.chain,
-            draft.operation.outcomeTarget()
+            draft.operation.outcomeTarget(),
+            onStage = ::trace
         ) { draft.operation.build(this) }
+        trace("Executor returned ${result.javaClass.simpleName}; invalidating history")
         costBasisInteractor.onTradeResult(historyRequest, result)
+        trace("Returning result")
         return result
     }
 
@@ -330,15 +341,7 @@ class BittensorExitInteractor(
     private fun BittensorExitPreflight.withWithdrawalFloor(
         netuid: BittensorNetuid,
         slippageFraction: BigDecimal = slippage.fraction
-    ): BittensorExitPreflight {
-        val marginalPrice = withdrawalPrice ?: return this
-        val selectedSlippage = BittensorSlippage(slippageFraction)
-        val limit = if (netuid.isRoot()) marginalPrice else selectedSlippage.limitPrice(marginalPrice, BittensorSwapDirection.ALPHA_TO_TAO)
-        return copy(
-            withdrawalFloor = bittensorWithdrawalFloor(minStake, limit, swapFeeRate),
-            sweepFloor = bittensorWithdrawalFloor(minNominatorStake, limit, BigInteger.ZERO)
-        )
-    }
+    ): BittensorExitPreflight = withWithdrawalFloors(netuid, slippageFraction)
 
     private fun rootQuote(amount: BigInteger, fullExit: Boolean): BittensorExitQuote = BittensorExitQuote(
         netuid = BittensorNetuid.Root,

@@ -11,13 +11,17 @@ class DebugSettingsBottomSheet(
     private val claimEnabled: Boolean,
     private val onClaimChanged: (Boolean) -> Unit,
     private val claimButtonEnabled: Boolean,
-    private val onClaimButtonChanged: (Boolean) -> Unit
+    private val onClaimButtonChanged: (Boolean) -> Unit,
+    private val nodeLogsDisabled: Boolean,
+    private val onNodeLogsChanged: (Boolean) -> Unit
 ) : BaseBottomSheet<BottomSheetDebugSettingsBinding>(context) {
 
     override val binder = BottomSheetDebugSettingsBinding.inflate(LayoutInflater.from(context))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binder.disableNodeLogs.field.isChecked = nodeLogsDisabled
+        binder.disableNodeLogs.field.setOnCheckedChangeListener { _, disabled -> onNodeLogsChanged(disabled) }
         binder.claimDebug.field.isChecked = claimEnabled
         binder.claimButtonDebug.field.isChecked = claimButtonEnabled
         binder.claimDebug.field.setOnCheckedChangeListener { _, enabled ->

@@ -650,7 +650,25 @@ class BittensorExitReviewViewModel(
                     priceMoveBanner.takeAcknowledgement()
                     confirmedPurchaseTotals = settledPurchaseTotals(saleCostBasis.replayCache.lastOrNull()?.dataOrNull)
                     execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
-                    launchUnit { submit(signedDraft(draft, validated)) }
+                    logger.log("[BittensorExitTrace] UI running; scheduling submission")
+                    // A warning can resume this callback after confirmClicked's coroutine has completed.
+                    // Submission belongs to the ViewModel, not that captured validation coroutine.
+                    this@BittensorExitReviewViewModel.launchUnit {
+                        logger.log("[BittensorExitTrace] Submission coroutine started; preparing signed draft")
+                        try {
+                            val signed = signedDraft(draft, validated)
+                            logger.log("[BittensorExitTrace] Signed draft prepared")
+                            submit(signed)
+                        } catch (e: CancellationException) {
+                            logger.log("[BittensorExitTrace] Submission coroutine cancelled: ${e.javaClass.simpleName}")
+                            throw e
+                        } catch (e: Exception) {
+                            logger.log("[BittensorExitTrace] Submission coroutine failed: ${e.javaClass.simpleName}")
+                            throw e
+                        } finally {
+                            logger.log("[BittensorExitTrace] Submission coroutine finished; state=${execution.value.javaClass.simpleName}")
+                        }
+                    }
                 }
             }
         } catch (e: CancellationException) {
@@ -694,7 +712,9 @@ class BittensorExitReviewViewModel(
         try {
             operationAnalytics.startOperation()
             val result = bittensorExitInteractor.execute(draft)
+            logger.log("[BittensorExitTrace] Interactor returned ${result.javaClass.simpleName}; tracking outcome")
             trackOutcome(result, draft)
+            logger.log("[BittensorExitTrace] Outcome tracked; updating UI")
             when (result) {
                 is BittensorOperationResult.Success -> execution.value = ExitExecution.Success(
                     System.currentTimeMillis(),

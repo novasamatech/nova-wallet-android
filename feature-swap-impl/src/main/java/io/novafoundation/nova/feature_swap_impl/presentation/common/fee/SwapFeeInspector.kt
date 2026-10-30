@@ -11,7 +11,7 @@ class SwapFeeInspector : FeeInspector<SwapFee> {
     override fun inspectFeeAmount(fee: SwapFee): InspectedFeeAmount {
         return InspectedFeeAmount(
             checkedAgainstMinimumBalance = fee.initialSubmissionFee.amountByExecutingAccount,
-            deductedFromTransferable = fee.maxAmountDeductionFor(fee.initialSubmissionFee.asset)
+            deductedFromTransferable = fee.totalFeeAmount(fee.initialSubmissionFee.asset)
         )
     }
 

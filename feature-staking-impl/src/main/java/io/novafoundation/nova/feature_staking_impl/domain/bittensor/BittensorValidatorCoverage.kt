@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorListedSubnets
@@ -11,17 +12,19 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeoutOrNull
 
-/** How many of the listed subnets the validator holds a permit on ("Subnets validated", as on iOS). */
+/** Listed subnets with a validator permit or parent/child link ("Subnets validated", as on iOS). */
 data class BittensorValidatorCoverage(val permitted: Int, val total: Int)
 
 internal fun bittensorValidatorCoverage(
     permits: Set<BittensorNetuid.Subnet>?,
-    listed: Set<BittensorNetuid.Subnet>
-): BittensorValidatorCoverage? = permits?.let { BittensorValidatorCoverage(it.intersect(listed).size, listed.size) }
+    listed: Set<BittensorNetuid.Subnet>,
+    linked: Set<BittensorNetuid.Subnet> = emptySet()
+): BittensorValidatorCoverage? = permits?.let { BittensorValidatorCoverage((it + linked).intersect(listed).size, listed.size) }
 
 class BittensorValidatorCoverageInteractor(
     private val delegates: BittensorDelegateSource,
     private val catalogue: BittensorSubnetCatalogueRepository,
+    private val validators: BittensorSubnetValidatorRepository,
     private val timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT
 ) {
 
@@ -31,7 +34,8 @@ class BittensorValidatorCoverageInteractor(
             coroutineScope {
                 val permits = async { delegates.validatorPermits(ChainGeneses.BITTENSOR, hotkey) }
                 val listed = async { mapBittensorListedSubnets(catalogue.catalogue()) }
-                CoverageResult(bittensorValidatorCoverage(permits.await(), listed.await()))
+                val linked = validators.linkedSubnets(ChainGeneses.BITTENSOR, hotkey, listed.await())
+                CoverageResult(bittensorValidatorCoverage(permits.await(), listed.await(), linked))
             }
         } ?: throw BittensorTimeoutException("Validator coverage")
         return result.coverage

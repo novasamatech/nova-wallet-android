@@ -139,21 +139,6 @@
                 </io.novafoundation.nova.common.view.TableView>
             </LinearLayout>
 
-            <ProgressBar
-                android:id="@+id/withdrawalLoading"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="16dp" />
-
-            <TextView
-                android:id="@+id/withdrawalHint"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone" />
-
             <TextView
                 android:id="@+id/positionError"
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -217,6 +202,38 @@
                 android:layout_marginTop="16dp" />
 
 
+
+            <ProgressBar
+                android:id="@+id/withdrawalLoading"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp" />
+
+            <LinearLayout
+                android:id="@+id/withdrawalHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_block_12"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/withdrawalTitle"
+                    style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:id="@+id/withdrawalMessage"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/validators"

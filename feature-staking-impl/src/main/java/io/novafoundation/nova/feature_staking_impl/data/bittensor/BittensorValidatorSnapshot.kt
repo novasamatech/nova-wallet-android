@@ -20,7 +20,8 @@ internal data class BittensorValidatorSnapshot(
     val permits: List<Boolean>,
     val lastUpdates: List<BigInteger>,
     val activeThreshold: BigInteger,
-    val registeredAt: BigInteger? = null
+    val registeredAt: BigInteger? = null,
+    val linkedHotkeys: Set<AccountIdKey> = emptySet()
 )
 
 /**
@@ -51,7 +52,8 @@ private fun mapBittensorValidator(
         selectable = !inactive,
         inactive = inactive,
         // Buy more on an inactive validator asks to accept the warning instead.
-        canAddToExistingPosition = true
+        canAddToExistingPosition = true,
+        isViaChildKeys = !netuid.isRoot() && snapshot.uids[validator.hotkey] == null && validator.hotkey in snapshot.linkedHotkeys
     )
 }
 
@@ -76,7 +78,7 @@ internal fun BittensorValidatorSnapshot.passesBittensorRecommendationGates(
 
 internal fun BittensorValidatorSnapshot.isInactive(netuid: BittensorNetuid, hotkey: AccountIdKey): Boolean {
     if (netuid.isRoot()) return false
-    val uid = uids[hotkey] ?: return true
+    val uid = uids[hotkey] ?: return hotkey !in linkedHotkeys
     val hasPermit = permits.getOrNull(uid) ?: return false
     val lastUpdate = lastUpdates.getOrNull(uid) ?: return false
     return !hasPermit || lastUpdate < activeThreshold

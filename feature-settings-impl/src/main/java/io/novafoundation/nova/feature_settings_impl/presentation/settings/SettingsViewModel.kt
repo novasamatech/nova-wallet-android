@@ -120,6 +120,10 @@ class SettingsViewModel(
 
     fun isClaimDebugEnabled() = debugSettings.bittensorClaimEnabled()
 
+    fun nodeLogsDisabled() = debugSettings.nodeLogsDisabled()
+
+    fun setNodeLogsDisabled(disabled: Boolean) = debugSettings.setNodeLogsDisabled(disabled)
+
     fun isClaimButtonDebugEnabled() = debugSettings.bittensorClaimButtonEnabled()
 
     fun setClaimButtonDebugEnabled(enabled: Boolean) = debugSettings.setBittensorClaimButtonEnabled(enabled)

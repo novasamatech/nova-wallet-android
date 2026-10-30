@@ -36,7 +36,9 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
                     viewModel.isClaimDebugEnabled(),
                     viewModel::setClaimDebugEnabled,
                     viewModel.isClaimButtonDebugEnabled(),
-                    viewModel::setClaimButtonDebugEnabled
+                    viewModel::setClaimButtonDebugEnabled,
+                    viewModel.nodeLogsDisabled(),
+                    viewModel::setNodeLogsDisabled
                 ).show()
             }
         }

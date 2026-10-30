@@ -28,7 +28,8 @@ import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
 import io.novasama.substrate_sdk_android.wsrpc.request.RequestExecutor
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import io.novafoundation.nova.common.data.network.DebugHttpLoggingInterceptor
+import io.novafoundation.nova.common.data.storage.DebugSettings
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -78,7 +79,8 @@ class NetworkModule {
     @Provides
     @ApplicationScope
     fun provideOkHttpClient(
-        context: Context
+        context: Context,
+        loggingInterceptor: DebugHttpLoggingInterceptor
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
@@ -89,7 +91,7 @@ class NetworkModule {
             .addInterceptor(TimeHeaderInterceptor())
 
         if (BuildConfig.DEBUG) {
-            builder.addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            builder.addInterceptor(loggingInterceptor)
         }
 
         return builder.build()
@@ -97,7 +99,7 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
-    fun provideLogger(): Logger = AndroidLogger(debug = BuildConfig.DEBUG)
+    fun provideLogger(settings: DebugSettings): Logger = AndroidLogger(debug = BuildConfig.DEBUG, settings = settings)
 
     @Provides
     @ApplicationScope
