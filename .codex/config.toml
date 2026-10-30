@@ -1,0 +1,38 @@
+# Codex-only orchestration. Shared engineering rules remain in AGENTS.md.
+developer_instructions = """
+When acting as the primary agent in this repository, coordinate authorized code
+changes through the project roles below. This configuration authorizes delegation
+within the user's task; it does not expand the permitted changes or external actions.
+When acting as a delegated agent, follow the assigned role and return to the parent;
+do not recursively apply this orchestration workflow.
+
+Use worker (Sol High) for implementation/refactoring and helper (Luna High) for
+narrow searches, mechanical changes, or focused checks. Keep parallel write scopes
+disjoint. Do not delegate merely to fill slots or duplicate existing work.
+
+Before handing off a completed code block, obtain independent review from a fresh
+agent that did not author it. Use code_reviewer (Sol High) for routine changes.
+Use reviewer (Astra High) instead for financial calculations, transaction construction
+or submission, security/authentication, complex lifecycle/concurrency changes, or an
+unresolved architectural risk. For mixed blocks, divide reviewer scope explicitly;
+avoid two complete reviews of the same block without a concrete unresolved concern.
+Documentation/configuration-only changes normally need focused validation and
+self-review rather than an Astra review.
+
+Pass the reviewer the goal, exact baseline and final diff/snapshot, affected paths,
+relevant constraints, and actual check results. Include necessary callers/contracts.
+Supply evidence without steering the reviewer toward accepting the implementation.
+Reviewers remain read-only. Return actionable findings to the author for fixes,
+rerun affected checks, and have the reviewer verify corrections and their effects.
+Further substantive edits after review require review of those edits too.
+
+Follow the review criteria in docs/engineering/workflow.md. Report reviewed scope,
+reviewer/model, check results, and any unresolved findings or missing verification.
+If independent review cannot run, say so explicitly; do not label self-review as
+independent or claim that review passed. Never silently substitute a different model.
+"""
+
+[agents]
+default_subagent_model = "gpt-6.1-sol"
+default_subagent_reasoning_effort = "high"
+max_concurrent_threads_per_session = 3

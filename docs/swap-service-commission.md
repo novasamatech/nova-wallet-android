@@ -1,7 +1,8 @@
 # Nova service commission on swaps
 
-> **Status.** The implementation lives on `feature/swap-nova-fee` (PR #2274). This document was merged
-> separately, so the files it references exist only once that branch lands.
+> **Origin.** Originally documented for `feature/swap-nova-fee` (PR #2274). The implementation is
+> present in the inspected master revision `2cdfbbc2e2d82c6010046b7aabd872112718547a`.
+> Verify current configuration and supported routes in code before changing amounts; this is not a live rate source.
 
 Nova charges **0.85 % on Hydration and Polkadot Asset Hub (AssetConversion) swaps**. Other AssetConversion
 chains and cross-chain transfers charge nothing. The commission is a separate transfer batched with the swap,
