@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.data.signer.secrets
 
-import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getChainAccountKeypair
 import io.novafoundation.nova.common.data.secrets.v2.getMetaAccountKeypair
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ethereumAccountId
@@ -31,11 +29,12 @@ class SecretsSignerFactory @Inject constructor(
 ) {
 
     fun create(metaAccount: MetaAccount): SecretsSigner {
+        val authorization = SecretsSigningAuthorization(twoFactorVerificationService)
         return SecretsSigner(
             metaAccount = metaAccount,
             secretStoreV2 = secretStoreV2,
             chainRegistry = chainRegistry,
-            twoFactorVerificationService = twoFactorVerificationService
+            authorization = authorization
         )
     }
 }
@@ -44,21 +43,25 @@ class SecretsSigner(
     metaAccount: MetaAccount,
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
-    private val twoFactorVerificationService: TwoFactorVerificationService,
+    private val authorization: SecretsSigningAuthorization,
 ) : LeafSigner(metaAccount) {
+
+    override suspend fun preAuthorizeSignatures(count: Int) = authorization.preAuthorize(count)
+
+    override fun clearSigningAuthorization() = authorization.clear()
 
     override suspend fun signInheritedImplication(
         inheritedImplication: InheritedImplication,
         accountId: AccountId
     ): SignatureWrapper {
-        runTwoFactorVerificationIfEnabled()
+        authorization.authorizeSignature()
 
         val delegate = createDelegate(accountId)
         return delegate.signInheritedImplication(inheritedImplication, accountId)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
-        runTwoFactorVerificationIfEnabled()
+        authorization.authorizeSignature()
 
         val delegate = createDelegate(payload.accountId)
         return delegate.signRaw(payload)
@@ -66,15 +69,6 @@ class SecretsSigner(
 
     override suspend fun maxCallsPerTransaction(): Int? {
         return null
-    }
-
-    private suspend fun runTwoFactorVerificationIfEnabled() {
-        if (twoFactorVerificationService.isEnabled()) {
-            val confirmationResult = twoFactorVerificationService.requestConfirmationIfEnabled()
-            if (confirmationResult != TwoFactorVerificationResult.CONFIRMED) {
-                throw SigningCancelledException()
-            }
-        }
     }
 
     private suspend fun createDelegate(accountId: AccountId): KeyPairSigner {

@@ -3203,4 +3203,11 @@
     <string name="bittensor_claim_dry_run_cancelled">Signing cancelled. No dry-run request or transaction was sent.</string>
     <string name="debug_disable_node_logs">Disable node logs</string>
     <string name="debug_disable_node_logs_description">Hide socket, state-machine and HTTP logs immediately. Operation logs and exception traces stay enabled.</string>
+    <string name="bittensor_mev_title">MEV protection</string>
+    <string name="bittensor_mev_description">Keeps your order encrypted in the public mempool to help prevent front-running.</string>
+    <string name="bittensor_mev_unavailable">MEV protection is unavailable for this order.</string>
+    <string name="bittensor_mev_not_executed">Order not executed</string>
+    <string name="bittensor_mev_unchanged">Your order wasn\'t executed. Your stake is unchanged, please try again.</string>
+    <string name="bittensor_mev_nothing_spent">Nothing was spent.</string>
+    <string name="bittensor_mev_fee_may_be_charged">A network fee may have been charged.</string>
 </resources>

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -91,7 +92,13 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val positionUpdates = BittensorPositionUpdates()
 
-    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates) { _, _ -> extrinsicService.result.getOrThrow() }
+    private val mev = mock(BittensorMevService::class.java) { invocation ->
+        if (invocation.method.name == "feeOrClear") invocation.getArgument<Fee>(2) else org.mockito.Answers.RETURNS_DEFAULTS.answer(invocation)
+    }
+
+    private val resolver = BittensorExtrinsicOutcomeResolver { _, _ -> extrinsicService.result.getOrThrow() }
+
+    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates, resolver, mev)
 
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
@@ -133,6 +140,12 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val costBasis = mock(BittensorCostBasisInteractor::class.java)
 
+    private val blockState = mock(ChainStateRepository::class.java)
+
+    private val blockLogger = mock(Logger::class.java)
+
+    private val blockRequotes = BittensorBlockRequotes(blockState, blockLogger)
+
     private val subnetStakingInteractor = BittensorSubnetStakingInteractor(
         chainRegistry,
         wallets,
@@ -142,7 +155,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
         submission,
         costBasis,
-        BittensorBlockRequotes(mock(ChainStateRepository::class.java), mock(Logger::class.java))
+        blockRequotes,
+        mev
     )
 
     private val subnetId = BittensorNetuid.Subnet(1)

@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotExecuted
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevCarrier
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotReady
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorFailureStage
@@ -28,6 +31,27 @@ fun BittensorOperationResult.Failure.mapResult(
 ): BittensorStakeResultUi {
     if (stage == BittensorFailureStage.UNKNOWN || stage == BittensorFailureStage.DISPATCHED && transactionHash == null) {
         return BittensorOperationResult.Unknown(transactionHash).mapResult(resources, landingActions)
+    }
+
+    if (cause is BittensorMevNotReady) {
+        return BittensorStakeResultUi.Failure(
+            title = resources.getString(R.string.bittensor_mev_not_executed),
+            description = resources.getString(R.string.bittensor_mev_unchanged) + " " + resources.getString(R.string.bittensor_mev_nothing_spent),
+            error = resources.getString(R.string.bittensor_mev_unavailable)
+        )
+    }
+    val shieldFailure = cause as? BittensorMevNotExecuted
+    if (shieldFailure != null) {
+        val message = when (shieldFailure.carrier) {
+            BittensorMevCarrier.ABSENT -> R.string.bittensor_mev_nothing_spent
+            BittensorMevCarrier.INCLUDED -> R.string.bittensor_result_dispatched_failure
+            BittensorMevCarrier.UNKNOWN -> R.string.bittensor_mev_fee_may_be_charged
+        }
+        return BittensorStakeResultUi.Failure(
+            title = resources.getString(R.string.bittensor_mev_not_executed),
+            description = resources.getString(R.string.bittensor_mev_unchanged) + " " + resources.getString(message),
+            error = transactionHash.orEmpty()
+        )
     }
 
     return BittensorStakeResultUi.Failure(

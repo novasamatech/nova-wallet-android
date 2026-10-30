@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevReview
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 
@@ -37,6 +40,9 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 class BittensorSubnetReviewModule {
 
     @Provides
+    fun provideMevReview(service: BittensorMevService, logger: Logger) = BittensorMevReview(service, logger)
+
+    @Provides
     @IntoMap
     @ViewModelKey(BittensorSubnetReviewViewModel::class)
     fun provideViewModel(
@@ -57,6 +63,7 @@ class BittensorSubnetReviewModule {
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        mevReview: BittensorMevReview,
         estimatesMixin: BittensorEstimatesMixin,
         tokenFormatter: TokenFormatter,
         fiatFormatter: FiatFormatter,
@@ -81,6 +88,7 @@ class BittensorSubnetReviewModule {
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
+            mevReview = mevReview,
             estimatesMixin = estimatesMixin,
             tokenFormatter = tokenFormatter,
             fiatFormatter = fiatFormatter,

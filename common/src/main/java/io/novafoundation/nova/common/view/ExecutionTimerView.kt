@@ -40,7 +40,7 @@ class ExecutionTimerView @JvmOverloads constructor(
 
         object Error : State
 
-        class CountdownTimer(val duration: Duration) : State
+        class CountdownTimer(val duration: Duration, val repeatInterval: Duration? = null) : State
     }
 
     private val binder = ViewExecutionTimerBinding.inflate(inflater(), this)
@@ -85,8 +85,18 @@ class ExecutionTimerView @JvmOverloads constructor(
                 val middleOfAnimation = SECOND_MILLIS / 2
                 val switchAnimationOffset = slideTopOutAnimation.duration / 2
                 val delay = middleOfAnimation - switchAnimationOffset
-                currentTimer = CountdownSwitcherTimer(binder.executionTimeSwitcher, state.duration)
+                val repeatInterval = state.repeatInterval?.takeIf { it.isPositive() }
+                val duration = if (state.duration.isPositive()) state.duration else repeatInterval ?: state.duration
+                currentTimer = countdownTimer(duration, repeatInterval)
                 runTimerWithDelay(delay, currentTimer!!)
+            }
+        }
+    }
+
+    private fun countdownTimer(duration: Duration, repeatInterval: Duration?): CountDownTimer {
+        return CountdownSwitcherTimer(binder.executionTimeSwitcher, duration, repeatInterval != null) {
+            if (repeatInterval != null) {
+                currentTimer = countdownTimer(repeatInterval, repeatInterval).also { it.start() }
             }
         }
     }
@@ -217,7 +227,12 @@ private class StartSpeedAccelerateDecelerateInterpolator : BaseInterpolator() {
     }
 }
 
-private class CountdownSwitcherTimer(val switcher: TextSwitcher, duration: Duration) :
+private class CountdownSwitcherTimer(
+    val switcher: TextSwitcher,
+    duration: Duration,
+    private val keepsWaiting: Boolean,
+    private val onFinished: () -> Unit
+) :
     CountDownTimer(
         duration.inWholeMilliseconds + SECOND_MILLIS,
         // Add a seconds to show max value to user
@@ -230,7 +245,7 @@ private class CountdownSwitcherTimer(val switcher: TextSwitcher, duration: Durat
 
     override fun onTick(millisUntilFinished: Long) {
         val duration = millisUntilFinished.milliseconds
-        val seconds = duration.inWholeSeconds.toString()
+        val seconds = (if (keepsWaiting) duration.inWholeSeconds.coerceAtLeast(1) else duration.inWholeSeconds).toString()
 
         if (shouldPlayAnimation(seconds)) {
             switcher.setText(seconds)
@@ -238,7 +253,7 @@ private class CountdownSwitcherTimer(val switcher: TextSwitcher, duration: Durat
     }
 
     override fun onFinish() {
-        // Nothing to do
+        onFinished()
     }
 
     private fun shouldPlayAnimation(seconds: String): Boolean {

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotExecuted
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevCarrier
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorTransactionFailureReason
@@ -29,10 +31,16 @@ internal fun mapBittensorOperationAnalytics(
     slippage: SlippageBucket?
 ): AnalyticsEvent? {
     val network = BittensorAnalyticsEvent.NETWORK
-    val knownFailure = result is BittensorOperationResult.Failure &&
-        (result.stage == BittensorFailureStage.NOT_SUBMITTED || result.stage == BittensorFailureStage.DISPATCHED && result.transactionHash != null)
+    val knownFailure = result is BittensorOperationResult.Failure && when (result.stage) {
+        BittensorFailureStage.NOT_SUBMITTED, BittensorFailureStage.NOT_EXECUTED -> true
+        BittensorFailureStage.DISPATCHED -> result.transactionHash != null
+        BittensorFailureStage.UNKNOWN -> false
+    }
     if (result is BittensorOperationResult.Failure && knownFailure) {
-        val stage = if (result.stage == BittensorFailureStage.NOT_SUBMITTED) StakingFailureStage.NOT_SUBMITTED else StakingFailureStage.DISPATCHED
+        val shieldFailure = result.cause as? BittensorMevNotExecuted
+        val notSent = result.stage == BittensorFailureStage.NOT_SUBMITTED ||
+            shieldFailure?.carrier == BittensorMevCarrier.ABSENT
+        val stage = if (notSent) StakingFailureStage.NOT_SUBMITTED else StakingFailureStage.DISPATCHED
         val reason = when {
             result.cause is SigningCancelledException -> BittensorTransactionFailureReason.USER_CANCELLED
             result.cause is IOException -> BittensorTransactionFailureReason.NETWORK_ERROR

@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bindMevProtection
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setSelectable
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showTitleInfo
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showValidator
+import kotlinx.coroutines.flow.combine
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -13,7 +15,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -53,6 +54,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
 
     override fun initViews() {
         binder.projectedAveragePrice.isVisible = viewModel.existingPosition
+        binder.mevProtection.background = requireContext().getBlockDrawable()
         binder.execution.stepContainer.background = requireContext()
             .getBlockDrawable()
         binder.confirm.prepareForProgress(viewLifecycleOwner)
@@ -86,6 +88,9 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetReviewViewModel) = with(binder) {
+        combine(viewModel.mevProtection, viewModel.canChangeMevProtection, ::Pair).observe { (state, editable) ->
+            mevProtection.bindMevProtection(state, editable, viewModel::mevProtectionChanged)
+        }
         observeValidations(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         observeRetries(viewModel.feeLoaderMixin)
@@ -119,7 +124,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         }
         viewModel.isExecuting.observe { running ->
             if (running) {
-                execution.timer.setState(ExecutionTimerView.State.CountdownTimer(viewModel.remainingExecutionTime()))
+                execution.timer.setState(viewModel.executionTimerState())
                 execution.title.setText(R.string.common_do_not_close_app)
                 execution.operationLabel.setText(R.string.bittensor_subnet_execution_operation)
             }

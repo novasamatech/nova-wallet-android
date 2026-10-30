@@ -1,5 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevExecution
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotExecuted
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevCarrier
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotReady
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -39,7 +45,8 @@ class BittensorSubmissionExecutor(
     private val extrinsicService: ExtrinsicService,
     private val accountRepository: AccountRepository,
     private val positionUpdates: BittensorPositionUpdates,
-    private val outcomeResolver: BittensorExtrinsicOutcomeResolver
+    private val outcomeResolver: BittensorExtrinsicOutcomeResolver,
+    private val mevService: BittensorMevService
 ) {
 
     private val mutex = Mutex()
@@ -49,25 +56,53 @@ class BittensorSubmissionExecutor(
         chain: Chain,
         target: BittensorOutcomeTarget? = null,
         onStage: (String) -> Unit = {},
+        mevProtection: Boolean = false,
+        onUnconfirmed: (String) -> Unit = {},
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
         try {
-            onStage("Submission lock acquired; building and signing")
-            val watch = buildAndSign(metaId, chain, formExtrinsic)
-                ?: return@withLock BittensorBuildTimeoutException().mapBittensorPreSubmissionError()
+            var carrierExecution: ExtrinsicExecutionResult? = null
+            var carrierState = BittensorMevCarrier.ABSENT
+            val execution = if (mevProtection) {
+                val shielded = try {
+                    require(target != null && !target.netuid.isRoot()) { "Only subnet orders support MEV protection" }
+                    mevService.submit(chain, metaId, formExtrinsic, onUnconfirmed)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    val cause = if (e is SigningCancelledException) e else BittensorMevNotReady(e)
+                    return@withLock cause.mapBittensorPreSubmissionError()
+                }
+                when (shielded) {
+                    is BittensorMevExecution.Executed -> {
+                        carrierExecution = shielded.carrier
+                        carrierState = shielded.carrierState
+                        shielded.inner
+                    }
+                    is BittensorMevExecution.Unconfirmed -> return@withLock BittensorOperationResult.Unknown(shielded.innerHash)
+                    is BittensorMevExecution.NotExecuted -> return@withLock BittensorOperationResult.Failure(
+                        BittensorMevNotExecuted(shielded.carrier, shielded.carrierExecution?.let { carrierFee(it, requireNotNull(target), chain) }),
+                        shielded.carrierHash,
+                        BittensorFailureStage.NOT_EXECUTED
+                    )
+                }
+            } else {
+                val watch = buildAndSign(metaId, chain, formExtrinsic)
+                    ?: return@withLock BittensorBuildTimeoutException().mapBittensorPreSubmissionError()
 
-            var lastSeenHash: String? = null
-            onStage("Build/sign finished; collecting submission watch")
-            val execution = withTimeoutOrNull(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT) {
-                val inBlock = watch.onEach {
-                    lastSeenHash = it.status.extrinsicHash
-                    onStage("Watch status=${it.status.javaClass.simpleName}; hash=$lastSeenHash")
-                }.awaitStatus<ExtrinsicStatus.InBlock>()
-                onStage("Included in block; resolving dispatch events")
-                outcomeResolver.resolve(chain, inBlock)
-            } ?: run {
-                onStage("Inclusion/events timeout; outcome unknown; hash=$lastSeenHash")
-                return@withLock BittensorOperationResult.Unknown(lastSeenHash)
+                var lastSeenHash: String? = null
+                onStage("Build/sign finished; collecting submission watch")
+                withTimeoutOrNull(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT) {
+                    val inBlock = watch.onEach {
+                        lastSeenHash = it.status.extrinsicHash
+                        onStage("Watch status=${it.status.javaClass.simpleName}; hash=$lastSeenHash")
+                    }.awaitStatus<ExtrinsicStatus.InBlock>()
+                    onStage("Included in block; resolving dispatch events")
+                    outcomeResolver.resolve(chain, inBlock)
+                } ?: run {
+                    onStage("Inclusion/events timeout; outcome unknown; hash=$lastSeenHash")
+                    return@withLock BittensorOperationResult.Unknown(lastSeenHash)
+                }
             }
 
             onStage("Dispatch resolved; mapping result")
@@ -81,10 +116,26 @@ class BittensorSubmissionExecutor(
                 is ExtrinsicDispatch.Failed -> dispatch.emittedEvents
                 ExtrinsicDispatch.Unknown -> emptyList()
             }
-            val outcome = if (target != null && coldkey != null) {
+            val innerOutcome = if (target != null && coldkey != null) {
                 bindBittensorOperationOutcome(events, target, coldkey, payer, execution.blockHash)
             } else {
                 null
+            }
+            val outcome = if (mevProtection && innerOutcome != null) {
+                val carrierEvents = when (val dispatch = carrierExecution?.outcome) {
+                    is ExtrinsicDispatch.Ok -> dispatch.emittedEvents
+                    is ExtrinsicDispatch.Failed -> dispatch.emittedEvents
+                    else -> emptyList()
+                }
+                val carrierOutcome = bindBittensorOperationOutcome(carrierEvents, requireNotNull(target), innerOutcome.coldkey, payer, innerOutcome.blockHash)
+                val networkFee = when (carrierState) {
+                    BittensorMevCarrier.ABSENT -> innerOutcome.networkFee
+                    BittensorMevCarrier.UNKNOWN -> null
+                    BittensorMevCarrier.INCLUDED -> innerOutcome.networkFee?.let { innerFee -> carrierOutcome.networkFee?.let { innerFee + it } }
+                }
+                innerOutcome.copy(networkFee = networkFee)
+            } else {
+                innerOutcome
             }
             if (result is BittensorOperationResult.Success) positionUpdates.confirmed(metaId, chain.id, coldkey)
             when (result) {
@@ -100,6 +151,16 @@ class BittensorSubmissionExecutor(
         } catch (e: Exception) {
             e.mapBittensorSubmissionError()
         }
+    }
+
+    private fun carrierFee(execution: ExtrinsicExecutionResult, target: BittensorOutcomeTarget, chain: Chain): java.math.BigInteger? {
+        val accountId = execution.submissionHierarchy.path.firstOrNull()?.account?.accountIdIn(chain)?.let(::AccountIdKey) ?: return null
+        val events = when (val dispatch = execution.outcome) {
+            is ExtrinsicDispatch.Ok -> dispatch.emittedEvents
+            is ExtrinsicDispatch.Failed -> dispatch.emittedEvents
+            ExtrinsicDispatch.Unknown -> return null
+        }
+        return bindBittensorOperationOutcome(events, target, accountId, accountId, execution.blockHash).networkFee
     }
 
     /**

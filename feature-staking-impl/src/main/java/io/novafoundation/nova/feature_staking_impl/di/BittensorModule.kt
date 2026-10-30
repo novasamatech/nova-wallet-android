@@ -1,5 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mev.BittensorMevSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mev.RemoteBittensorMevSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mev.BittensorMevSealer
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mev.BittensorMevFeeSignerFactory
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mev.BittensorMevExtrinsics
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevTracker
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExtrinsicOutcomeResolver
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import java.security.SecureRandom
 import com.google.gson.Gson
 import android.os.SystemClock
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
@@ -332,7 +342,8 @@ class BittensorModule {
         @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String,
         submission: BittensorSubmissionExecutor,
         costBasis: BittensorCostBasisInteractor,
-        blockRequotes: BittensorBlockRequotes
+        blockRequotes: BittensorBlockRequotes,
+        mevService: BittensorMevService
     ) = BittensorSubnetStakingInteractor(
         chainRegistry,
         wallets,
@@ -342,7 +353,8 @@ class BittensorModule {
         beneficiaryAddress,
         submission,
         costBasis,
-        blockRequotes
+        blockRequotes,
+        mevService
     )
 
     @Provides
@@ -498,18 +510,56 @@ class BittensorModule {
     ) = BittensorEstimatesMixin(costBasisInteractor, alphaYieldRepository, logger)
 
     @Provides
+    fun provideMevRandom(): SecureRandom = SecureRandom()
+
+    @Provides
+    fun provideMevSealer(random: SecureRandom) = BittensorMevSealer(random)
+
+    @Provides
+    fun provideMevFeeSigners() = BittensorMevFeeSignerFactory()
+
+    @Provides
+    fun provideMevExtrinsics(builders: ExtrinsicBuilderFactory, rpc: RpcCalls, feeSigners: BittensorMevFeeSignerFactory) =
+        BittensorMevExtrinsics(builders, rpc, feeSigners)
+
+    @Provides
+    fun provideMevSource(@Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource, rpc: RpcCalls): BittensorMevSource =
+        RemoteBittensorMevSource(storage, rpc)
+
+    @Provides
+    fun provideBittensorOutcomeResolver(events: EventsRepository, chains: ChainRegistry): BittensorExtrinsicOutcomeResolver =
+        RealBittensorExtrinsicOutcomeResolver(events, chains)
+
+    @Provides
+    fun provideMevTracker(rpc: RpcCalls, resolver: BittensorExtrinsicOutcomeResolver, logger: Logger) =
+        BittensorMevTracker(rpc, resolver, logger)
+
+    @Provides
+    fun provideMevService(
+        accounts: AccountRepository,
+        signers: SignerProvider,
+        source: BittensorMevSource,
+        extrinsics: BittensorMevExtrinsics,
+        sealer: BittensorMevSealer,
+        tracker: BittensorMevTracker,
+        chainState: ChainStateRepository,
+        logger: Logger
+    ) = BittensorMevService(accounts, signers, source, extrinsics, sealer, tracker, chainState, logger)
+
+    @Provides
     @FeatureScope
     fun provideBittensorSubmissionExecutor(
         extrinsics: ExtrinsicService,
         accountRepository: AccountRepository,
         positionUpdates: BittensorPositionUpdates,
-        eventsRepository: EventsRepository,
-        chainRegistry: ChainRegistry
+        outcomeResolver: BittensorExtrinsicOutcomeResolver,
+        mevService: BittensorMevService
     ) = BittensorSubmissionExecutor(
         extrinsics,
         accountRepository,
         positionUpdates,
-        RealBittensorExtrinsicOutcomeResolver(eventsRepository, chainRegistry)
+        outcomeResolver,
+        mevService
     )
 
     @Provides

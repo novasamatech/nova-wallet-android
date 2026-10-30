@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevReview
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
@@ -41,7 +43,8 @@ class BittensorSubnetStakingInteractor(
     private val beneficiaryAddress: String,
     private val submissionExecutor: BittensorSubmissionExecutor,
     private val costBasisInteractor: BittensorCostBasisInteractor,
-    private val blockRequotes: BittensorBlockRequotes
+    private val blockRequotes: BittensorBlockRequotes,
+    private val mevService: BittensorMevService
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
@@ -86,8 +89,9 @@ class BittensorSubnetStakingInteractor(
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         val quote = bittensorSubnetInteractor.quote(subnetId, asset.transferableInPlanks, slippage)
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
-        val networkFee = estimateFee(chain, metaId, operation)
-            .maxAmountDeductionFor(asset.token.configuration)
+        val clearFee = estimateFee(chain, metaId, operation)
+        val fee = mevService.feeOrClear(chain, metaId, clearFee) { operation.build(this) }
+        val networkFee = fee.maxAmountDeductionFor(asset.token.configuration)
         val maximumStake = maximumBittensorStake(asset.transferableInPlanks, networkFee)
         maximumStake
     }
@@ -125,7 +129,11 @@ class BittensorSubnetStakingInteractor(
         return BittensorSubnetStakeDraft(metaId, validator, operation)
     }
 
-    suspend fun execute(draft: BittensorSubnetStakeDraft): BittensorOperationResult {
+    suspend fun execute(
+        draft: BittensorSubnetStakeDraft,
+        mevProtection: Boolean = false,
+        onUnconfirmed: (String) -> Unit = {}
+    ): BittensorOperationResult {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         if (draft.existingPosition) {
             val row = validatorRepository.existingPositionValidator(chain, draft.operation.quote.subnetId, draft.validator)
@@ -142,7 +150,12 @@ class BittensorSubnetStakingInteractor(
                 draft.operation.quote.subnetId,
                 setOf(draft.operation.hotkey),
                 draft.operation.beneficiary
-            )
+            ),
+            mevProtection = mevProtection,
+            onUnconfirmed = { hash ->
+                costBasisInteractor.onTradeResult(historyRequest, BittensorOperationResult.Unknown(hash))
+                onUnconfirmed(hash)
+            }
         ) { draft.operation.build(this) }
         costBasisInteractor.onTradeResult(historyRequest, result)
         return result
@@ -164,9 +177,20 @@ class BittensorSubnetStakingInteractor(
         )
     }
 
+    suspend fun estimateReviewFee(
+        draft: BittensorSubnetStakeDraft,
+        enabled: Boolean,
+        review: BittensorMevReview
+    ): Fee {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        val clearFee = estimateFee(chain, draft.metaId, draft.operation)
+        return review.estimate(chain, draft.metaId, enabled, clearFee) { draft.operation.build(this) }
+    }
+
     suspend fun estimateFee(draft: BittensorSubnetStakeDraft): Fee {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        return estimateFee(chain, draft.metaId, draft.operation)
+        val clearFee = estimateFee(chain, draft.metaId, draft.operation)
+        return mevService.feeOrClear(chain, draft.metaId, clearFee) { draft.operation.build(this) }
     }
 
     private suspend fun estimateFee(chain: Chain, metaId: Long, operation: BittensorSubnetStakeOperation): Fee {

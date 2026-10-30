@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevReview
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -198,6 +199,18 @@ class BittensorExitInteractor(
         return BittensorExitFailureLimits(maximum, holdDuration)
     }
 
+    suspend fun estimateReviewFee(
+        request: BittensorExitRequest,
+        enabled: Boolean,
+        review: BittensorMevReview
+    ): Fee {
+        val position = request.position
+        val clearFee = estimateFee(position, request.quote)
+        if (position.isRoot) return clearFee
+        val operation = operation(position, request.quote)
+        return review.estimate(position.chain, position.metaId, enabled, clearFee) { operation.build(this) }
+    }
+
     suspend fun estimateFee(position: BittensorExitPosition, quote: BittensorExitQuote): Fee {
         // iOS estimates the gross request once. Preparation applies the loaded fee to a
         // stake-funded root partial; it does not feed that adjustment back into estimation.
@@ -275,7 +288,11 @@ class BittensorExitInteractor(
         return position.asset.transferableInPlanks < fee.maxAmountDeductionFor(position.asset.token.configuration) + position.existentialDeposit
     }
 
-    suspend fun execute(draft: BittensorExitDraft): BittensorOperationResult {
+    suspend fun execute(
+        draft: BittensorExitDraft,
+        mevProtection: Boolean = false,
+        onUnconfirmed: (String) -> Unit = {}
+    ): BittensorOperationResult {
         val traceId = java.util.UUID.randomUUID().toString().take(8)
         val started = System.nanoTime()
         fun trace(stage: String) {
@@ -292,7 +309,12 @@ class BittensorExitInteractor(
             position.metaId,
             position.chain,
             draft.operation.outcomeTarget(),
-            onStage = ::trace
+            onStage = ::trace,
+            mevProtection = mevProtection && !position.isRoot,
+            onUnconfirmed = { hash ->
+                costBasisInteractor.onTradeResult(historyRequest, BittensorOperationResult.Unknown(hash))
+                onUnconfirmed(hash)
+            }
         ) { draft.operation.build(this) }
         trace("Executor returned ${result.javaClass.simpleName}; invalidating history")
         costBasisInteractor.onTradeResult(historyRequest, result)

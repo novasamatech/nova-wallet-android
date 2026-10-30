@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
@@ -49,10 +50,16 @@ class BittensorSubmissionExecutorTimeoutTest {
 
     private val extrinsics = FakeExtrinsicService()
 
-    private val executor = BittensorSubmissionExecutor(extrinsics, accounts, BittensorPositionUpdates()) { _, inBlock ->
+    private val positionUpdates = BittensorPositionUpdates()
+
+    private val mev = mock(BittensorMevService::class.java)
+
+    private val resolver = BittensorExtrinsicOutcomeResolver { _, inBlock ->
         assertEquals(HASH, inBlock.status.extrinsicHash)
         execution
     }
+
+    private val executor = BittensorSubmissionExecutor(extrinsics, accounts, positionUpdates, resolver, mev)
 
     @Test
     fun `build that never completes is a retryable not submitted failure and releases the lock`() = runTest {

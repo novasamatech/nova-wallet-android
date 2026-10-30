@@ -14,6 +14,13 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadR
 
 interface NovaSigner : Signer {
 
+    /** Authorize a short local sequence before its mortality clock starts. Unsupported signers refuse it. */
+    suspend fun preAuthorizeSignatures(count: Int) {
+        throw UnsupportedOperationException("This signer does not support preauthorization")
+    }
+
+    fun clearSigningAuthorization() = Unit
+
     /**
      * Determines execution type of the actual call (e.g. transfer)
      * Implementation node: signers that delegate signing to nested signers should intersect their execution type with the nested one

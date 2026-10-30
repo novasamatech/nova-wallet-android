@@ -47,7 +47,7 @@ buildscript {
         robolectricVersion = '4.1'
         allureVersion = '2.4.0'
 
-        bouncyCastleVersion = '1.78.1'
+        bouncyCastleVersion = '1.82'
 
         web3jVersion = '4.9.5'
 

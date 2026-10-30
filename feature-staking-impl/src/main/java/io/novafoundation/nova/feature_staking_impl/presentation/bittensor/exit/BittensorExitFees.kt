@@ -27,6 +27,6 @@ internal fun FeeStatus<BittensorFeeEstimate<BittensorExitRequest>, *>.exitDraft(
         this is FeeStatus.Error || this is FeeStatus.NoFee -> ExtendedLoadingState.Loaded(null)
         estimate == null || estimate.request != feeRequest -> ExtendedLoadingState.Loading
         quote == null -> ExtendedLoadingState.Loaded(null)
-        else -> ExtendedLoadingState.Loaded(interactor.prepare(feeRequest.position, quote, estimate))
+        else -> ExtendedLoadingState.Loaded(interactor.prepare(feeRequest.position, quote, estimate.fee))
     }
 }
