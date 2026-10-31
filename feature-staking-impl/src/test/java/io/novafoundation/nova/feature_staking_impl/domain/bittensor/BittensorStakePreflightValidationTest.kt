@@ -142,10 +142,10 @@ class BittensorStakePreflightValidationTest {
     }
 
     @Test
-    fun `ledger and proxied wallets are refused before loading transaction data`() = runBlocking {
+    fun `proxied and delayed multisig wallets are refused before loading transaction data`() = runBlocking {
         val refusals = mapOf(
-            BittensorWalletSupport.LEDGER_NOT_SUPPORTED to BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED,
-            BittensorWalletSupport.PROXIED_NOT_SUPPORTED to BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED
+            BittensorWalletSupport.PROXIED_NOT_SUPPORTED to BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED,
+            BittensorWalletSupport.DELAYED_EXECUTION to BittensorStakeValidationFailure.DELAYED_EXECUTION
         )
         for ((support, expected) in refusals) {
             `when`(immediateExecution.support(account)).thenReturn(support)

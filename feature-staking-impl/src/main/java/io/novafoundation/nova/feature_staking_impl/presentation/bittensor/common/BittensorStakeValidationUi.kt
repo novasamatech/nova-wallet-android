@@ -45,7 +45,6 @@ fun BittensorStakeValidationFailure.titleAndMessage(resources: ResourceManager, 
             R.string.bittensor_validation_minimum_stake,
             format.requiredAmount(requiredAmountInPlanks)
         )
-        BittensorStakeValidationFailure.LEDGER_NOT_SUPPORTED -> resources.bittensorLedgerNotSupported()
         BittensorStakeValidationFailure.PROXIED_NOT_SUPPORTED -> resources.bittensorWalletNotSupported(R.string.account_proxied, format.nativeSymbol)
         BittensorStakeValidationFailure.DELAYED_EXECUTION -> resources.bittensorWalletNotSupported(R.string.account_multisig, format.nativeSymbol)
         BittensorStakeValidationFailure.NON_POSITIVE_AMOUNT -> error(R.string.common_enter_amount)
