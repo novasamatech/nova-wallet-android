@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
+
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -34,6 +36,8 @@ import org.mockito.Mockito.verify
 
 class BittensorPositionRepositoryTest {
 
+    private val responseCache = createBittensorTestCache()
+
     private val positionSource = mock(BittensorPositionSource::class.java)
 
     private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
@@ -50,7 +54,7 @@ class BittensorPositionRepositoryTest {
 
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger, positionUpdates)
+    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger, positionUpdates, responseCache = responseCache)
 
     private val blocks = MutableStateFlow(BigInteger.ONE)
 
@@ -153,8 +157,9 @@ class BittensorPositionRepositoryTest {
             chainStateRepository,
             computationalCache,
             logger,
-            positionUpdates
-        )
+            positionUpdates,
+        responseCache = responseCache
+    )
         val portfolioJob = launch { sharedPositions.observePortfolio("chain", coldKey).collect {} }
         try {
             withTimeout(3_000L) {
@@ -202,7 +207,7 @@ class BittensorPositionRepositoryTest {
             }
         }
         val loader = BittensorPortfolioLoader(slowPrices, logger)
-        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates)
+        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates, responseCache = responseCache)
         val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
         val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
         try {
@@ -257,7 +262,7 @@ class BittensorPositionRepositoryTest {
             }
         }
         val loader = BittensorPortfolioLoader(slowPrices, logger)
-        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates)
+        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates, responseCache = responseCache)
         val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
         val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
         try {

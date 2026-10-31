@@ -38,7 +38,7 @@ class BittensorPortfolioPriceRepositoryTest {
             backendCalls++
             backendFailure?.let { throw it }
             if (backendHangs) awaitCancellation()
-            return Response.success(backendResponse)
+            return Response.success(backendResponse, okhttp3.Headers.headersOf("Cache-Control", "max-age=60"))
         }
     }
 
@@ -75,8 +75,8 @@ class BittensorPortfolioPriceRepositoryTest {
 
     @Test
     fun `missing backend price field does not discard another fresh price`() = runTest {
-        val present = BittensorSubnetCatalogueRemote.Subnet(1, "0.5")
-        val absent = BittensorSubnetCatalogueRemote.Subnet(2, null)
+        val present = BittensorSubnetCatalogueRemote.Subnet(1, "0.5", "Subnet 1", "S1", BigInteger.ONE, "100")
+        val absent = BittensorSubnetCatalogueRemote.Subnet(2, null, "Subnet 2", "S2", BigInteger.ONE, "100")
         backendResponse = BittensorSubnetCatalogueRemote(listOf(present, absent), backendResponse.meta)
         `when`(runtime.prices("chain")).thenReturn(mapOf(missing to BigInteger.TEN))
 
@@ -94,11 +94,11 @@ class BittensorPortfolioPriceRepositoryTest {
     }
 
     @Test
-    fun `runtime failure retains partial backend and both failures return unknown prices`() = runTest {
+    fun `runtime failure and later network loss retain an HTTP fresh backend price`() = runTest {
         `when`(runtime.prices("chain")).thenThrow(IllegalStateException("Offline"))
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet, missing)))
         backendFailure = IllegalStateException("Offline")
-        assertTrue(repository.prices("chain", setOf(subnet)).isEmpty())
+        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet)))
     }
 
     @Test
@@ -157,9 +157,9 @@ class BittensorPortfolioPriceRepositoryTest {
         freshness: String = "FRESH",
         availability: String = "AVAILABLE"
     ): BittensorSubnetCatalogueRemote {
-        val subnet = BittensorSubnetCatalogueRemote.Subnet(1, price)
+        val subnet = BittensorSubnetCatalogueRemote.Subnet(1, price, "Subnet 1", "S1", BigInteger.ONE, "100")
         val component = BittensorRecommendationsRemote.Component(availability, freshness)
-        val components = BittensorSubnetCatalogueRemote.Components(component)
+        val components = BittensorSubnetCatalogueRemote.Components(component, component)
         val meta = BittensorSubnetCatalogueRemote.Meta(components)
         return BittensorSubnetCatalogueRemote(listOf(subnet), meta)
     }

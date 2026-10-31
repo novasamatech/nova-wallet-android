@@ -1,5 +1,7 @@
 package io.novafoundation.nova.core_db.di
 
+import io.novafoundation.nova.core_db.dao.BittensorCacheDao
+
 import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
@@ -37,6 +39,8 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 
 interface DbApi {
+
+    fun bittensorCacheDao(): BittensorCacheDao
 
     val analyticsEventsDao: AnalyticsEventsDao
 

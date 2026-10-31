@@ -1,39 +1,44 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import retrofit2.HttpException
+import kotlinx.coroutines.flow.Flow
 
-/**
- * The backend `/subnets` catalogue for every reader; a response is reused only while it is HTTP-fresh and only once it passed
- * validation. A rejected response still reaches its reader, which reports the failure, and the next read fetches again.
- */
+/** One persistent catalogue shared by discovery, pricing and validator coverage. */
 class BittensorSubnetCatalogueRepository(
     private val api: BittensorSubnetCatalogueApi,
-    private val infrastructureUrls: InfrastructureUrls,
-    private val nanoTime: () -> Long = System::nanoTime
+    private val cache: BittensorResponseCache
 ) {
 
-    private class Cached(val url: String, val catalogue: BittensorSubnetCatalogueRemote, val deadlineNanos: Long)
+    suspend fun catalogue(): BittensorSubnetCatalogueRemote = cache.get(
+        path = "subnets",
+        type = BittensorSubnetCatalogueRemote::class.java,
+        allowStale = true,
+        validate = ::validate,
+        fetch = api::subnets
+    ).forDisplay()
 
-    private val mutex = Mutex()
+    suspend fun cached(): BittensorCachedResponse<BittensorSubnetCatalogueRemote>? =
+        cache.peek("subnets", BittensorSubnetCatalogueRemote::class.java, validate = ::validate)
 
-    private var cached: Cached? = null
+    fun observe(): Flow<BittensorCachedResponse<BittensorSubnetCatalogueRemote>> = cache.observe(
+        path = "subnets",
+        type = BittensorSubnetCatalogueRemote::class.java,
+        validate = ::validate,
+        fetch = api::subnets
+    )
 
-    suspend fun catalogue(): BittensorSubnetCatalogueRemote = mutex.withLock {
-        val url = infrastructureUrls.bittensorBackendUrl("subnets")
-        cached?.takeIf { it.url == url && nanoTime() < it.deadlineNanos }?.let { return@withLock it.catalogue }
-        val startedAt = nanoTime()
-        val response = api.subnets(url)
-        if (!response.isSuccessful) throw HttpException(response)
-        val catalogue = requireNotNull(response.body())
-        if (isAdmissible(catalogue)) cached = Cached(url, catalogue, startedAt + bittensorCacheLifetimeNanos(response))
-        catalogue
-    }
-
-    private fun isAdmissible(catalogue: BittensorSubnetCatalogueRemote): Boolean = runCatching {
+    private fun validate(catalogue: BittensorSubnetCatalogueRemote) {
         mapBittensorListedSubnets(catalogue)
         mapBittensorSubnetPrices(catalogue)
-    }.isSuccess
+        mapBittensorBackendCatalogue(catalogue)
+    }
 }
+
+private fun BittensorCachedResponse<BittensorSubnetCatalogueRemote>.forDisplay(): BittensorSubnetCatalogueRemote {
+    if (!stale) return value
+    val components = value.meta?.components
+    val staleComponents = BittensorSubnetCatalogueRemote.Components(components?.alphaPrices?.asStale(), components?.subnetMetadata?.asStale())
+    return BittensorSubnetCatalogueRemote(value.items, BittensorSubnetCatalogueRemote.Meta(staleComponents))
+}
+
+internal fun BittensorRecommendationsRemote.Component.asStale() =
+    BittensorRecommendationsRemote.Component(availability, "STALE", asOf, availabilityReason)

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
+
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -41,6 +43,8 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verifyNoInteractions
 
 class StakingDashboardBittensorUpdaterTest {
+
+    private val responseCache = createBittensorTestCache()
 
     private val chain = mock(Chain::class.java)
 
@@ -123,7 +127,8 @@ class StakingDashboardBittensorUpdaterTest {
         chainStateRepository,
         computationalCache,
         logger,
-        positionUpdates
+        positionUpdates,
+        responseCache = responseCache
     )
 
     private fun updater() = StakingDashboardBittensorUpdater(

@@ -40,11 +40,12 @@ class BittensorSubnetStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val beneficiaryAddress: String,
     private val submissionExecutor: BittensorSubmissionExecutor,
-    private val costBasisInteractor: BittensorCostBasisInteractor,
     private val blockRequotes: BittensorBlockRequotes
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+
+    fun observeSubnetLogos() = bittensorSubnetInteractor.observeSubnetLogos()
 
     /** The subnet stake setup and review re-quote on each block after the current one while [active], and on each of [immediate]. */
     fun requotes(active: Flow<Boolean>, immediate: Flow<Unit>): Flow<Unit> = blockRequotes.requotes(active, immediate)
@@ -133,7 +134,6 @@ class BittensorSubnetStakingInteractor(
         } else {
             validatorRepository.validate(chain, draft.operation.quote.subnetId, draft.validator)
         }
-        val historyRequest = costBasisInteractor.ownTradeRequest(draft.metaId, chain)
         val result = submissionExecutor.execute(
             draft.metaId,
             chain,
@@ -144,7 +144,6 @@ class BittensorSubnetStakingInteractor(
                 draft.operation.beneficiary
             )
         ) { draft.operation.build(this) }
-        costBasisInteractor.onTradeResult(historyRequest, result)
         return result
     }
 

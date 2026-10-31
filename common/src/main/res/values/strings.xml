@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="bittensor_result_price_moved">Order cancelled · price moved beyond your limit</string>
+    <string name="bittensor_result_price_moved_format">Order cancelled · price moved &gt; %1$s</string>
+    <string name="bittensor_result_fee_charged">Only the network fee was charged.</string>
+    <string name="bittensor_result_nothing_spent">Nothing was spent.</string>
+
     <string name="bittensor_result_paid_by">Paid by: %1$s</string>
 
     <string name="bittensor_result_unconfirmed_title">Outcome not confirmed</string>

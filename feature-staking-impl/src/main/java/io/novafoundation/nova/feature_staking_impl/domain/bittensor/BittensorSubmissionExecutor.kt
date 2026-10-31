@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorCacheInvalidator
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -39,6 +43,7 @@ class BittensorSubmissionExecutor(
     private val extrinsicService: ExtrinsicService,
     private val accountRepository: AccountRepository,
     private val positionUpdates: BittensorPositionUpdates,
+    private val cacheInvalidator: BittensorCacheInvalidator,
     private val outcomeResolver: BittensorExtrinsicOutcomeResolver
 ) {
 
@@ -51,6 +56,8 @@ class BittensorSubmissionExecutor(
         onStage: (String) -> Unit = {},
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
+        val cacheRequest = cacheInvalidator.capture(metaId, chain)
+        var handedOff = false
         try {
             onStage("Submission lock acquired; building and signing")
             val watch = buildAndSign(metaId, chain, formExtrinsic)
@@ -58,6 +65,7 @@ class BittensorSubmissionExecutor(
 
             var lastSeenHash: String? = null
             onStage("Build/sign finished; collecting submission watch")
+            handedOff = true
             val execution = withTimeoutOrNull(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT) {
                 val inBlock = watch.onEach {
                     lastSeenHash = it.status.extrinsicHash
@@ -67,6 +75,7 @@ class BittensorSubmissionExecutor(
                 outcomeResolver.resolve(chain, inBlock)
             } ?: run {
                 onStage("Inclusion/events timeout; outcome unknown; hash=$lastSeenHash")
+                cacheInvalidator.submitted(cacheRequest)
                 return@withLock BittensorOperationResult.Unknown(lastSeenHash)
             }
 
@@ -86,6 +95,7 @@ class BittensorSubmissionExecutor(
             } else {
                 null
             }
+            if (result is BittensorOperationResult.Success || result is BittensorOperationResult.Unknown) cacheInvalidator.submitted(cacheRequest)
             if (result is BittensorOperationResult.Success) positionUpdates.confirmed(metaId, chain.id, coldkey)
             when (result) {
                 is BittensorOperationResult.Success -> result.copy(outcome = outcome)
@@ -96,8 +106,10 @@ class BittensorSubmissionExecutor(
         } catch (e: SigningCancelledException) {
             e.mapBittensorPreSubmissionError()
         } catch (e: CancellationException) {
+            if (handedOff) withContext(NonCancellable) { cacheInvalidator.submitted(cacheRequest) }
             throw e
         } catch (e: Exception) {
+            if (handedOff) cacheInvalidator.submitted(cacheRequest)
             e.mapBittensorSubmissionError()
         }
     }

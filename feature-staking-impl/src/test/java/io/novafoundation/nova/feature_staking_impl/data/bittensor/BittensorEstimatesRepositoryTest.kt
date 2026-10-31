@@ -28,9 +28,12 @@ class BittensorEstimatesRepositoryTest {
 
     private val infrastructureUrls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
+    private val responseCache = createBittensorTestCache(infrastructureUrls)
+
+    private val remoteSource = BittensorEstimatesRemoteSource(api, spacingMillis = 0L, cache = responseCache)
+
     private val chain = mock(Chain::class.java)
 
-    private val remoteSource = BittensorEstimatesRemoteSource(api, spacingMillis = 0L)
 
     private val computationalCache = mock(ComputationalCache::class.java)
 
@@ -92,7 +95,6 @@ class BittensorEstimatesRepositoryTest {
             listOf(
                 1,
                 2,
-                1,
                 2
             ),
             api.historyPages
@@ -226,7 +228,7 @@ class BittensorEstimatesRepositoryTest {
 
     @Test
     fun `yield snapshot does not inherit operation history throttling`() = runTest {
-        val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L)
+        val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L, cache = responseCache)
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
 
         val pages = throttledSource.yields(baseUrl, chain, BittensorNetuid.Subnet(1))
@@ -238,7 +240,7 @@ class BittensorEstimatesRepositoryTest {
 
     @Test
     fun `operation history retains its page throttling`() = runTest {
-        val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L)
+        val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L, cache = responseCache)
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         api.nextHistoryPage = { if (it == 1) 2 else null }
 
@@ -326,7 +328,7 @@ class BittensorEstimatesRepositoryTest {
         repeat(2) {
             assertEquals(first, yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1)))
         }
-        assertEquals(3, api.yieldRequests.size)
+        assertEquals(1, api.yieldRequests.size)
     }
 
     private suspend fun history(): io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory {

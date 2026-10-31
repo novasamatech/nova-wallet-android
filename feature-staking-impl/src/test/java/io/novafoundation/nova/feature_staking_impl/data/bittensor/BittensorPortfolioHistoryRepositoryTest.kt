@@ -36,12 +36,12 @@ class BittensorPortfolioHistoryRepositoryTest {
     private var responseDelay = 0L
 
     private val api = object : BittensorPortfolioHistoryApi {
-        override suspend fun history(url: String, accountSubject: String, period: String): BittensorPortfolioHistoryRemote {
+        override suspend fun history(url: String, accountSubject: String, period: String): retrofit2.Response<BittensorPortfolioHistoryRemote> {
             assertEquals("https://infra.example/v1/bittensor/portfolio/history/search", url)
             subjects += accountSubject
             kotlinx.coroutines.delay(responseDelay)
             failure?.let { throw it }
-            return portfolioHistoryResponse(period = period, freshness = if (stale) "STALE" else "FRESH")
+            return retrofit2.Response.success(portfolioHistoryResponse(period = period, freshness = if (stale) "STALE" else "FRESH"))
         }
     }
 
@@ -58,7 +58,9 @@ class BittensorPortfolioHistoryRepositoryTest {
 
     private val urls = InfrastructureUrls { "https://infra.example".toHttpUrl() }
 
-    private val repository = BittensorPortfolioHistoryRepository(api, urls, prices)
+    private val responseCache = createBittensorTestCache(urls)
+
+    private val repository = BittensorPortfolioHistoryRepository(api, prices, responseCache)
 
     @Test
     fun `USD uses backend history without FX request`() = runBlocking<Unit> {
@@ -88,7 +90,7 @@ class BittensorPortfolioHistoryRepositoryTest {
         assertTrue(result.account.status.stale)
         assertTrue(result.account.points.isEmpty())
         failure = IllegalStateException("Offline")
-        assertTrue(runCatching { repository.load(request, "account-one") }.isFailure)
+        assertTrue(repository.load(request, "account-one").account.status.stale)
     }
 
     @Test

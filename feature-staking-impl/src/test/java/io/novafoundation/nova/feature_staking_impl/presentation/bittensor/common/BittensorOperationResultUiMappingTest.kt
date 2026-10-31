@@ -13,6 +13,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -20,6 +21,16 @@ import org.mockito.Mockito.`when`
 class BittensorOperationResultUiMappingTest {
 
     private val resources = mock(ResourceManager::class.java)
+
+    @Before
+    fun setup() {
+        `when`(resources.getString(R.string.common_failed)).thenReturn("Failed")
+        `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Unable to complete operation")
+        `when`(resources.getString(R.string.bittensor_result_fee_charged)).thenReturn("Only the network fee was charged.")
+        `when`(resources.getString(R.string.bittensor_result_price_moved)).thenReturn("Order cancelled · price moved beyond your limit")
+        `when`(resources.getString(R.string.bittensor_result_price_moved_format, "0.5%"))
+            .thenReturn("Order cancelled · price moved > 0.5%")
+    }
 
     @Test
     fun `unstaged failure cannot claim nothing spent or enable retry`() {
@@ -66,7 +77,7 @@ class BittensorOperationResultUiMappingTest {
     @Test
     fun `pre submission explanation never exposes raw exception`() {
         `when`(resources.getString(R.string.common_failed)).thenReturn("Failed")
-        `when`(resources.getString(R.string.bittensor_result_not_submitted)).thenReturn("Not submitted; nothing spent")
+        `when`(resources.getString(R.string.bittensor_result_nothing_spent)).thenReturn("Not submitted; nothing spent")
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Unable to complete operation")
         val cause = IllegalStateException("raw endpoint details")
         val evidence = BittensorOperationResult.Failure(cause, stage = BittensorFailureStage.NOT_SUBMITTED)
@@ -80,23 +91,22 @@ class BittensorOperationResultUiMappingTest {
     @Test
     fun `dispatch failure uses possible fee statement not nothing spent`() {
         `when`(resources.getString(R.string.common_failed)).thenReturn("Failed")
-        `when`(resources.getString(R.string.bittensor_result_dispatched_failure)).thenReturn("Execution failed; fee may have been charged")
-        `when`(resources.getString(R.string.bittensor_result_transaction_hash, "hash")).thenReturn("Transaction hash: hash")
+        `when`(resources.getString(R.string.bittensor_result_fee_charged)).thenReturn("Execution failed; fee may have been charged")
         val cause = IllegalStateException("raw dispatch details")
         val evidence = BittensorOperationResult.Failure(cause, "hash", BittensorFailureStage.DISPATCHED)
 
         val result = evidence.mapResult(resources) as BittensorStakeResultUi.Failure
 
         assertEquals("Execution failed; fee may have been charged", result.description)
-        assertEquals("Transaction hash: hash", result.error)
+        assertEquals("Unable to complete operation", result.error)
+        assertFalse(result.error.contains("hash"))
         assertEquals(listOf(BittensorResultAction.CLOSE, BittensorResultAction.TRY_AGAIN), result.actions)
     }
 
     @Test
     fun `dispatch error a retry cannot change offers only close`() {
         `when`(resources.getString(R.string.common_failed)).thenReturn("Failed")
-        `when`(resources.getString(R.string.bittensor_result_dispatched_failure)).thenReturn("Execution failed; fee may have been charged")
-        `when`(resources.getString(R.string.bittensor_result_transaction_hash, "hash")).thenReturn("Transaction hash: hash")
+        `when`(resources.getString(R.string.bittensor_result_fee_charged)).thenReturn("Execution failed; fee may have been charged")
         val module = mock(Module::class.java)
         `when`(module.name).thenReturn("SubtensorModule")
         val error = mock(ErrorMetadata::class.java)
@@ -107,6 +117,46 @@ class BittensorOperationResultUiMappingTest {
 
         assertFalse(result.canRetry)
         assertEquals(listOf(BittensorResultAction.CLOSE), result.actions)
+    }
+
+    @Test
+    fun `price limit failure shows the chosen tolerance without the transaction hash`() {
+        val failure = dispatchFailure("Swap", "PriceLimitExceeded")
+
+        val state = failure.toSubmissionState(resources, slippage = "0.5%") as BittensorSubmissionState.Failed
+        val result = state.result as BittensorStakeResultUi.Failure
+
+        assertEquals("Order cancelled · price moved > 0.5%", result.error)
+        assertEquals("Only the network fee was charged.", result.description)
+        assertFalse(result.error.contains("transaction-hash"))
+        assertFalse(result.description.contains("transaction-hash"))
+        org.junit.Assert.assertTrue(result.canRetry)
+    }
+
+    @Test
+    fun `slippage failure without a display tolerance still explains the price limit`() {
+        val failure = dispatchFailure("SubtensorModule", "SlippageTooHigh")
+
+        val result = failure.mapResult(resources) as BittensorStakeResultUi.Failure
+
+        assertEquals("Order cancelled · price moved beyond your limit", result.error)
+    }
+
+    @Test
+    fun `unrelated pallet error is not presented as a price move`() {
+        val failure = dispatchFailure("OtherPallet", "PriceLimitExceeded")
+
+        val result = failure.mapResult(resources, slippage = "0.5%") as BittensorStakeResultUi.Failure
+
+        assertEquals("OtherPallet.PriceLimitExceeded", result.error)
+    }
+
+    private fun dispatchFailure(pallet: String, name: String): BittensorOperationResult.Failure {
+        val module = mock(Module::class.java)
+        `when`(module.name).thenReturn(pallet)
+        val metadata = mock(ErrorMetadata::class.java)
+        `when`(metadata.name).thenReturn(name)
+        return BittensorOperationResult.Failure(DispatchError.Module(module, metadata), "transaction-hash", BittensorFailureStage.DISPATCHED)
     }
 
     @Test

@@ -6,6 +6,10 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.io.IOException
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -20,6 +24,36 @@ class BittensorConfigRepositoryTest {
     private val gson = Gson()
 
     private val logger = mock(Logger::class.java)
+
+    @Test
+    fun `all logo observers share one config load and late observers immediately receive cached urls`() = runBlocking<Unit> {
+        withTimeout(5_000) {
+            val started = CompletableDeferred<Unit>()
+            val response = CompletableDeferred<BittensorConfigRemote>()
+            var requests = 0
+            val api = object : BittensorConfigApi {
+                override suspend fun config(url: String): BittensorConfigRemote {
+                    requests += 1
+                    started.complete(Unit)
+                    return response.await()
+                }
+            }
+            val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+            val first = async { repository.observeSubnetLogos().first { it.isNotEmpty() } }
+            val second = async { repository.observeSubnetLogos().first { it.isNotEmpty() } }
+            started.await()
+            assertTrue(repository.observeSubnetLogos().first().isEmpty())
+            response.complete(document("""{"swapFee":0.003,"subnets":[{"netuid":105,"logo":"https://logos.test/beam.png"}]}"""))
+
+            val expected = mapOf(BittensorNetuid.Subnet(105) to "https://logos.test/beam.png")
+            assertEquals(expected, first.await())
+            assertEquals(expected, second.await())
+            assertEquals(expected, repository.observeSubnetLogos().first())
+            assertEquals(expected, repository.cachedSubnetLogos())
+            assertEquals(BigDecimal("0.003"), repository.config().commission.fraction)
+            assertEquals(1, requests)
+        }
+    }
 
     @Test
     fun `canonical iOS config supplies the fee and only valid HTTPS subnet logos`() {

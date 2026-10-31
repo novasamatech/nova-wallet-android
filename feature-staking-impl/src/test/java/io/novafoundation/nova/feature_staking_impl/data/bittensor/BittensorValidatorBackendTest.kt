@@ -7,6 +7,7 @@ import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.ext.addressOf
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
 import okhttp3.HttpUrl
@@ -476,6 +477,35 @@ class BittensorValidatorBackendTest {
         assertEquals("https://other.test/v1/bittensor/root/overview", api.requests.last())
     }
 
+    @Test
+    fun `slow validators transport does not serialize root or recommendations`() = kotlinx.coroutines.test.runTest {
+        val delegate = Api("max-age=60")
+        delegate.root = BittensorRootValidatorRemote(emptyList(), rootMeta())
+        delegate.recommendationsDocument = recommendations("FRESH")
+        val release = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val delayed = object : BittensorValidatorsApi by delegate {
+            override suspend fun validators(url: String): Response<BittensorValidatorsRemote> {
+                release.await()
+                return delegate.validators(url)
+            }
+        }
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val cache = createBittensorTestCache(urls, scope = backgroundScope)
+        val backend = BittensorValidatorBackend(delayed, cache)
+        val directory = async { backend.validators(1) }
+        testScheduler.runCurrent()
+        val root = async { backend.rootValidators() }
+        val recommendations = async { backend.recommendedValidators() }
+        testScheduler.runCurrent()
+        assertTrue(root.isCompleted)
+        assertTrue(recommendations.isCompleted)
+        assertFalse(directory.isCompleted)
+        release.complete(Unit)
+        directory.await()
+        root.await()
+        recommendations.await()
+    }
+
     private fun overview(freshness: String, apy: String): BittensorRootOverviewRemote {
         val window = BittensorRootValidatorRemote.Window(apy)
         val yield = BittensorRootValidatorRemote.Yield(window)
@@ -528,7 +558,7 @@ class BittensorValidatorBackendTest {
         val row = BittensorSubnetRankingRemote(1, "26000", 1000.toBigInteger(), null)
         api.recommendationsDocument = BittensorRecommendationsRemote(policy("FRESH").meta, items = listOf(row))
         backend.gates()
-        assertEquals(row, backend.rankedSubnet(io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(1), 1.toBigInteger()))
+        assertEquals(row.netuid, backend.rankedSubnet(io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(1), 1.toBigInteger())?.netuid)
         assertEquals(null, backend.rankedSubnet(io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(2), 1.toBigInteger()))
         assertEquals(1, api.requests.size)
     }

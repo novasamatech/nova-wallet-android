@@ -101,10 +101,30 @@ class BittensorCostBasisInteractorTest {
 
         val states = interactor.observeUpdates(contexts).toList()
 
-        assertEquals(listOf(false, true, true, false), states.map { it.isSettling })
+        assertEquals(listOf(false, true, true, false), states.map { it.isProvisional })
         assertEquals(BittensorCostBasisState.Loading, states[1].state)
         assertTrue(states[2].state is BittensorCostBasisState.Loaded)
         assertTrue(states[3].state is BittensorCostBasisState.Loaded)
+    }
+
+    @Test
+    fun `cached history stays provisional after trade settlement until fresh history arrives`() = runTest {
+        val staleResult = Result.success(ledger.copy(stale = true))
+        val historyStates = MutableStateFlow(BittensorHistoryState(staleResult, isSettling = true))
+        `when`(history.observeState(chain.addressOf(coldKey))).thenReturn(historyStates)
+        val contexts = flowOf(context)
+        val states = mutableListOf<BittensorCostBasisUpdate>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            interactor.observeUpdates(contexts).toList(states)
+        }
+
+        assertTrue(states.last().isProvisional)
+        historyStates.value = BittensorHistoryState(staleResult, isSettling = false)
+        assertTrue(states.last().isProvisional)
+        historyStates.value = BittensorHistoryState(Result.success(ledger), isSettling = false)
+
+        assertEquals(false, states.last().isProvisional)
+        assertTrue(states.drop(1).all { it.state is BittensorCostBasisState.Loaded })
     }
 
     @Test
@@ -153,7 +173,7 @@ class BittensorCostBasisInteractorTest {
     }
 
     @Test
-    fun `success unknown and unconfirmed failure invalidate but atomic failures do not`() {
+    fun `success unknown and unconfirmed failure invalidate but atomic failures do not`() = kotlinx.coroutines.runBlocking {
         interactor.onTradeResult(request, BittensorOperationResult.Success("hash"))
         interactor.onTradeResult(request, BittensorOperationResult.Unknown(null))
         interactor.onTradeResult(request, BittensorOperationResult.Failure(IllegalStateException("unknown")))

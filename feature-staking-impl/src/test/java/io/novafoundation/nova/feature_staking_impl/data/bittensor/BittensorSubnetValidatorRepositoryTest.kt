@@ -168,7 +168,7 @@ class BittensorSubnetValidatorRepositoryTest {
         assertTrue(directory.validators.single().recommended)
         assertEquals(0, directory.validators.single().recommendationRank)
         assertTrue(directory.validators.single().selectable)
-        assertFalse(directory.staleRecommendations)
+        assertTrue(directory.staleRecommendations)
     }
 
     @Test

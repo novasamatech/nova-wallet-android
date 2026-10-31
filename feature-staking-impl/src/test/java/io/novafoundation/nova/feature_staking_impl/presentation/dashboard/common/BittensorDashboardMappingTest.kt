@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Test
+import io.novafoundation.nova.common.utils.formatting.format
 import java.math.BigInteger
 
 class BittensorDashboardMappingTest {
@@ -20,6 +21,22 @@ class BittensorDashboardMappingTest {
         maximumAnnualPercentageYield = null,
         pricing = BittensorDashboardDetails.Pricing.KNOWN
     )
+
+    @Test
+    fun `cached dashboard keeps the same maximum yield text as live data`() {
+        val resources = org.mockito.Mockito.mock(io.novafoundation.nova.common.resources.ResourceManager::class.java)
+        val details = root.copy(maximumAnnualPercentageYield = java.math.BigDecimal("10"))
+        val percent = io.novafoundation.nova.common.utils.Percent(10.0).format()
+        org.mockito.Mockito.`when`(
+            resources.getString(io.novafoundation.nova.feature_staking_impl.R.string.bittensor_dashboard_max_apy, percent)
+        ).thenReturn("Max. APY 10%")
+
+        val live = mapBittensorMaximumYield(details, resources).dataOrNull?.data
+        val cached = mapBittensorMaximumYield(details.copy(stale = true), resources).dataOrNull?.data
+
+        assertEquals("Max. APY 10%", live)
+        assertEquals(live, cached)
+    }
 
     @Test
     fun `positive root stake stops shimmer when yield request settles without a rate`() {

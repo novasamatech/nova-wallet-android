@@ -53,6 +53,8 @@ import org.mockito.Mockito.verifyNoInteractions
 @RunWith(Parameterized::class)
 class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
+    private val cacheInvalidator = mock(io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorCacheInvalidator::class.java)
+
     enum class StakingType { ROOT, SUBNET }
 
     private val accounts = mock(AccountRepository::class.java)
@@ -91,7 +93,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val positionUpdates = BittensorPositionUpdates()
 
-    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates) { _, _ -> extrinsicService.result.getOrThrow() }
+    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates, cacheInvalidator) { _, _ -> extrinsicService.result.getOrThrow() }
 
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
@@ -141,7 +143,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         extrinsicService,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
         submission,
-        costBasis,
         BittensorBlockRequotes(mock(ChainStateRepository::class.java), mock(Logger::class.java))
     )
 

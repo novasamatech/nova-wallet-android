@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import kotlinx.coroutines.flow.channelFlow
+
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
@@ -18,7 +20,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.HttpUrl
 
 data class BittensorHistoryRequest internal constructor(
@@ -79,14 +85,23 @@ class BittensorOperationHistoryRepository(
     }
 
     /** Explicit cache command after a submitted own trade (success or unknown), never on signing. */
-    fun ownTradeSubmitted(request: BittensorHistoryRequest) = synchronized(lock) {
+    suspend fun ownTradeSubmitted(request: BittensorHistoryRequest) {
         val key = HistoryKey(request.baseUrl, request.address)
-        val state = accountHistory(key)
-        cachedHistories.remove(key)
-        state.seedBlockedUntilNanos = nowNanos() + SETTLEMENT_NANOS
-        state.generation.value += 1
-        // The indexer lag outlives the process, so a restart inside the window must still settle.
-        preferences.putLong(settlementField(key), nowMillis() + SETTLEMENT_MILLIS)
+        synchronized(lock) {
+            val state = accountHistory(key)
+            cachedHistories.remove(key)
+            state.seedBlockedUntilNanos = nowNanos() + SETTLEMENT_NANOS
+            preferences.putLong(settlementField(key), nowMillis() + SETTLEMENT_MILLIS)
+        }
+        try {
+            remoteSource.invalidateHistory(request.baseUrl, request.address)
+        } finally {
+            synchronized(lock) {
+                // Publish only after durable invalidation, so the replacement flight gets the new cache revision.
+                cachedHistories.remove(key)
+                accountHistory(key).generation.value += 1
+            }
+        }
     }
 
     /** Shared while observed. Null means loading, never an unavailable or empty ledger. */
@@ -129,25 +144,41 @@ class BittensorOperationHistoryRepository(
         }
     }
 
-    private fun refreshHistory(request: BittensorHistoryRequest): Flow<Snapshot> = flow {
-        emit(Snapshot(request, null, isSettling(request)))
-        while (true) {
-            val startedDuringSettlement = synchronized(lock) {
-                val deadline = histories.getValue(HistoryKey(request.baseUrl, request.address)).seedBlockedUntilNanos
-                deadline != null && nowNanos() < deadline
+    private fun refreshHistory(request: BittensorHistoryRequest): Flow<Snapshot> = channelFlow {
+        val foreground = Channel<Unit>(Channel.CONFLATED)
+        val observer = launch { remoteSource.foregroundRefreshes.drop(1).collect { foreground.trySend(Unit) } }
+        checkOrigin(request)
+        val restored = if (!isSettling(request)) remoteSource.cachedHistory(request.address) else null
+        var lastResult: Result<BittensorOperationHistory>? = restored?.let {
+            Result.success(
+                BittensorOperationHistory(it.items, it.allPagesRead, stale = nowNanos() >= it.validUntilNanos)
+            )
+        }
+        send(Snapshot(request, lastResult, isSettling(request)))
+        try {
+            while (true) {
+                val startedDuringSettlement = synchronized(lock) {
+                    val key = HistoryKey(request.baseUrl, request.address)
+                    val deadline = histories.getValue(key).seedBlockedUntilNanos
+                    deadline != null && nowNanos() < deadline
+                }
+                val result = try {
+                    Result.success(history(request))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    lastResult?.map { it.copy(stale = true) } ?: Result.failure(e)
+                }
+                lastResult = result.takeIf { it.isSuccess } ?: lastResult
+                send(Snapshot(request, result, startedDuringSettlement || isSettling(request)))
+                // A shared stream never migrates to another origin under its original cache key.
+                if (result.exceptionOrNull() is OriginChanged) awaitCancellation()
+                // Delay after completion: a ten-page request is not cancelled by a refresh tick.
+                withTimeoutOrNull(refreshDelayMillis(request)) { foreground.receive() }
             }
-            val result = try {
-                Result.success(history(request))
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-            emit(Snapshot(request, result, startedDuringSettlement || isSettling(request)))
-            // A shared stream never migrates to another origin under its original cache key.
-            if (result.exceptionOrNull() is OriginChanged) awaitCancellation()
-            // Delay after completion: a ten-page request is not cancelled by a refresh tick.
-            delay(refreshDelayMillis(request))
+        } finally {
+            observer.cancel()
+            foreground.close()
         }
     }
 
@@ -168,10 +199,10 @@ class BittensorOperationHistoryRepository(
             state.latestFlight += 1
             CacheAdmission(seedAllowed, state.latestFlight)
         }
-        val pages = remoteSource.history(request.baseUrl, request.address)
+        val pages = remoteSource.history(request.baseUrl, request.address, persist = admission.mayCache)
         currentCoroutineContext().ensureActive()
         checkOrigin(request)
-        val history = BittensorOperationHistory(pages.items, pages.allPagesRead)
+        val history = BittensorOperationHistory(pages.items, pages.allPagesRead, stale = nowNanos() >= pages.validUntilNanos)
         synchronized(lock) {
             val state = requireCurrent(key, request)
             if (admission.mayCache) state.settledGeneration = request.generation
@@ -192,12 +223,14 @@ class BittensorOperationHistoryRepository(
     }
 
     private fun refreshDelayMillis(request: BittensorHistoryRequest): Long = synchronized(lock) {
-        val deadline = histories.getValue(HistoryKey(request.baseUrl, request.address)).seedBlockedUntilNanos
+        val key = HistoryKey(request.baseUrl, request.address)
+        val cachedRemaining = cachedHistories[key]?.validUntilNanos?.minus(nowNanos()) ?: 0L
+        val deadline = histories.getValue(key).seedBlockedUntilNanos
         val remaining = deadline?.minus(nowNanos()) ?: 0L
         if (remaining > 0) {
             ((remaining + 999_999L) / 1_000_000L).coerceAtMost(REFRESH_INTERVAL_MILLIS)
         } else {
-            REFRESH_INTERVAL_MILLIS
+            (cachedRemaining / NANOS_PER_MILLI).coerceIn(30_000L, 300_000L)
         }
     }
 

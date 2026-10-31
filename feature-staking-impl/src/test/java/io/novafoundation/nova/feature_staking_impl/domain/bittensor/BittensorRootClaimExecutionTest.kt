@@ -37,6 +37,8 @@ import org.mockito.Mockito.RETURNS_DEFAULTS
 
 class BittensorRootClaimExecutionTest {
 
+    private val cacheInvalidator = mock(io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorCacheInvalidator::class.java)
+
     private val clock = BittensorClaimClock { 0L }
 
     private val pending = BittensorPendingClaims(clock)
@@ -231,7 +233,7 @@ class BittensorRootClaimExecutionTest {
             }
         }
         val positionUpdates = BittensorPositionUpdates()
-        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, accounts, positionUpdates) { _, _ -> error("Not included") }
+        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, accounts, positionUpdates, cacheInvalidator) { _, _ -> error("Not included") }
         val cancellingInteractor = BittensorRootClaimInteractor(
             chains, accounts, wallets, source, cancellingExtrinsics, realExecutor, constants, immediate, pending, positions, validators
         )

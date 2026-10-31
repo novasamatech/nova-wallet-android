@@ -30,16 +30,16 @@ class BittensorEstimatesMixinTest {
         val basis = BittensorEstimatedCostBasis(emptyList(), false)
         val failure = IllegalStateException("offline")
         val states = flowOf(
-            BittensorCostBasisUpdate(BittensorCostBasisState.Loading, true),
-            BittensorCostBasisUpdate(BittensorCostBasisState.Loaded(basis), true),
-            BittensorCostBasisUpdate(BittensorCostBasisState.Failed(failure), true),
-            BittensorCostBasisUpdate(BittensorCostBasisState.Loaded(basis), false)
+            BittensorCostBasisUpdate(state = BittensorCostBasisState.Loading, isProvisional = true),
+            BittensorCostBasisUpdate(state = BittensorCostBasisState.Loaded(basis), isProvisional = true),
+            BittensorCostBasisUpdate(state = BittensorCostBasisState.Failed(failure), isProvisional = true),
+            BittensorCostBasisUpdate(state = BittensorCostBasisState.Loaded(basis), isProvisional = false)
         )
         `when`(interactor.observeUpdates(context)).thenReturn(states)
 
         val actual = mixin.observePositionCostBasis(context).toList()
 
-        assertEquals(listOf(true, true, true, false), actual.map { it.isSettling })
+        assertEquals(listOf(true, true, true, false), actual.map { it.isProvisional })
         assertTrue(actual[0].state is ExtendedLoadingState.Loading)
         assertTrue(actual[1].state is ExtendedLoadingState.Loaded)
         assertTrue(actual[2].state is ExtendedLoadingState.Error)

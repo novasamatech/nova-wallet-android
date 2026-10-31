@@ -2,7 +2,7 @@
 
 Read .editorconfig and the current Gradle lint configuration; they are the executable formatting baseline.
 The root ktlint task uses Android rules and scans main sources, not tests. Do not introduce a second formatter.
-Do not reorder imports or rename files just to enforce rules disabled by this project.
+Do not reorder imports or rename files just to enforce rules disabled by this project. Do not chain calls from a parenthesized `if`/`when` expression; select the value into a descriptively named variable, then apply the call chain.
 Context receivers are already used; do not migrate language features as incidental cleanup.
 
 Use existing numeric sign extensions (`isPositive`, `isNegative`, `isZero`, `isNonNegative`, and `isNonPositive`) instead of inline `signum()` comparisons or local duplicates. Respect their existing property/function syntax for each numeric type. Apply the established project conventions proactively when reviewing nearby code, not only to explicitly reported lines.
@@ -30,5 +30,7 @@ Model finite UI choices with enums or sealed types instead of magic integers. Ke
 Refactor to solve a concrete correctness, ownership, consistency, duplication, testability, or complexity problem, not personal stylistic preference. Inspect existing implementations first. Keep authoritative state in one place and derive dependent values; inject dependencies rather than constructing them inside consumers. Distinguish unavailable data from zero or empty data, and do not disguise mocks or incomplete integrations as working functionality.
 
 Prioritize operation correctness, then state and error handling, then architecture and duplication, then readability. For each change, identify the problem, the intended improvement, and the verification. Separate behavior changes from behavior-preserving refactoring. Avoid unrelated cleanup and speculative abstractions in `common`.
+
+Use named Boolean arguments when the meaning is not obvious at the call site. Give compound conditions descriptive names and keep their domain reasons explicit; the receiving field must describe the full condition.
 
 Prefer named models for meaningful requests and load results over positional `Pair`/`Triple` values. Use scope functions for short transformations; keep validation, mutation and operation sequencing explicit. Do not manufacture zero-valued data merely to call a formatter and erase the result afterwards.

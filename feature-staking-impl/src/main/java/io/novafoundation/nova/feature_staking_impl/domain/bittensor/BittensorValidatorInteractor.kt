@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.utils.flowOfAll
+import kotlinx.coroutines.flow.Flow
+
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
@@ -9,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRo
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootYields
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -66,6 +70,16 @@ class BittensorValidatorInteractor(
             }
         }
     }
+
+    fun observeYields(netuid: BittensorNetuid): Flow<Map<AccountIdKey, BigDecimal>> =
+        flowOfAll {
+            val chain = chain()
+            if (netuid is BittensorNetuid.Subnet) {
+                alphaYields.observeAlphaYields(chain, netuid)
+            } else {
+                backend.observeRootValidators().map { mapBittensorRootYields(chain, it) }
+            }
+        }
 
     suspend fun yields(netuid: BittensorNetuid, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {
         val chain = chain()

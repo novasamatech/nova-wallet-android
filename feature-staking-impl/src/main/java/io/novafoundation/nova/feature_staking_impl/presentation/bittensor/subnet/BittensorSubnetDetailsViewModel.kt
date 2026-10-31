@@ -93,6 +93,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformWhile
@@ -155,7 +156,10 @@ class BittensorSubnetDetailsViewModel(
     }
         .shareInBackground()
 
-    val subnet = subnetState.mapNotNull { it.dataOrNull }
+    val subnet = combine(subnetState, bittensorSubnetInteractor.observeSubnetLogos()) { state, logos ->
+        state.dataOrNull?.let { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
+    }
+        .filterNotNull()
         .shareInBackground()
 
     private val period = MutableStateFlow(BittensorSubnetChartPeriod.WEEK)

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.core_db.di
 
+import io.novafoundation.nova.core_db.dao.BittensorCacheDao
+
 import android.content.Context
 import dagger.Module
 import dagger.Provides
@@ -42,6 +44,10 @@ import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 
 @Module
 class DbModule {
+
+    @Provides
+    @ApplicationScope
+    fun provideBittensorCacheDao(db: AppDatabase): BittensorCacheDao = db.bittensorCacheDao()
 
     @Provides
     @ApplicationScope

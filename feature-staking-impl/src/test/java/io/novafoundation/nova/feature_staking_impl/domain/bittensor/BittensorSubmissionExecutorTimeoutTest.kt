@@ -35,6 +35,8 @@ import org.mockito.Mockito.mock
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorSubmissionExecutorTimeoutTest {
 
+    private val cacheInvalidator = mock(io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorCacheInvalidator::class.java)
+
     private val chain = mock(Chain::class.java).also { `when`(it.id).thenReturn("bittensor") }
 
     private val account = mock(MetaAccount::class.java)
@@ -49,7 +51,7 @@ class BittensorSubmissionExecutorTimeoutTest {
 
     private val extrinsics = FakeExtrinsicService()
 
-    private val executor = BittensorSubmissionExecutor(extrinsics, accounts, BittensorPositionUpdates()) { _, inBlock ->
+    private val executor = BittensorSubmissionExecutor(extrinsics, accounts, BittensorPositionUpdates(), cacheInvalidator) { _, inBlock ->
         assertEquals(HASH, inBlock.status.extrinsicHash)
         execution
     }

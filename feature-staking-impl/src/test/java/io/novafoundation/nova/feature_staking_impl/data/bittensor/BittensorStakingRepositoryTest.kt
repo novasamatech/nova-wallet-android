@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
+
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -42,6 +44,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
 class BittensorStakingRepositoryTest {
+
+    private val responseCache = createBittensorTestCache()
 
     private val chainRegistry = mock(ChainRegistry::class.java)
 
@@ -109,7 +113,8 @@ class BittensorStakingRepositoryTest {
         chainStateRepository,
         computationalCache,
         logger,
-        positionUpdates
+        positionUpdates,
+        responseCache = responseCache
     )
 
     private val repository = RealBittensorStakingRepository(

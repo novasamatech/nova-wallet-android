@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.merge
+
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -21,6 +25,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import io.novafoundation.nova.common.address.AccountIdKey
 import kotlinx.coroutines.flow.SharingStarted
@@ -57,13 +62,19 @@ class RealBittensorPositionRepository(
     private val chainStateRepository: ChainStateRepository,
     private val computationalCache: ComputationalCache,
     private val logger: Logger,
-    private val positionUpdates: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
+    private val positionUpdates: BittensorPositionUpdates,
+    private val responseCache: BittensorResponseCache
 ) : BittensorPositionRepository {
+
+    private data class StoredPrice(val netuid: Int, val price: String)
+
+    private data class StoredPrices(val items: List<StoredPrice>)
 
     private data class PortfolioPrices(
         val heldSubnets: Set<BittensorNetuid.Subnet>,
         val prices: Map<BittensorNetuid.Subnet, BigInteger>,
-        val loaded: Boolean
+        val loaded: Boolean,
+        val stale: Boolean = false
     )
 
     override fun observePositions(chainId: ChainId, coldKey: AccountId): Flow<BittensorPositionState> = flow {
@@ -90,14 +101,21 @@ class RealBittensorPositionRepository(
     }
 
     private fun refreshPositions(chainId: ChainId, coldKey: AccountId): Flow<BittensorPositionState> = flow {
-        var cachedPositions: BittensorStakePositions? = null
-        emit(BittensorPositionState(null, BittensorDataStatus.Loading))
+        var cachedPositions = responseCache.peek(
+            "runtime/positions/$chainId",
+            BittensorStakePositions::class.java,
+            coldKey.toHexString()
+        )?.value
+        val initialStatus = if (cachedPositions == null) BittensorDataStatus.Loading else BittensorDataStatus.Stale(BittensorCacheStaleException())
+        emit(BittensorPositionState(cachedPositions, initialStatus))
 
         val confirmed = positionUpdates.updates
             .filter { it.chainId == chainId && it.coldkey == AccountIdKey(coldKey) }
             .map { Unit }
-        kotlinx.coroutines.flow.merge(
-            flowOfAll { chainStateRepository.currentRemoteBlockNumberFlow(chainId) }.map { Unit },
+        merge(
+            flowOf(Unit),
+            responseCache.foregroundRefreshes.drop(1),
+            flowOfAll { chainStateRepository.currentRemoteBlockNumberFlow(chainId) }.drop(1).map { Unit },
             confirmed
         )
             .conflate()
@@ -120,7 +138,11 @@ class RealBittensorPositionRepository(
         coldKey: AccountId,
         cachedPositions: BittensorStakePositions?
     ): BittensorPositionState = try {
+        val ticket = responseCache.snapshotTicket(coldKey.toHexString())
         val positions = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { positionSource.positions(chainId, coldKey) }
+        check(responseCache.saveSnapshot("runtime/positions/$chainId", coldKey.toHexString(), positions, ticket)) {
+            "Position request was invalidated"
+        }
         BittensorPositionState(positions, BittensorDataStatus.Fresh)
     } catch (e: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
@@ -141,12 +163,14 @@ class RealBittensorPositionRepository(
         coroutineScope {
             val positions = observePositions(chainId, coldKey)
                 .shareIn(this, SharingStarted.Eagerly, replay = 1)
-            val prices = observePrices(chainId, positions)
+            val prices = observePrices(chainId, coldKey, positions)
             emitAll(combine(positions, prices, ::valueLatestPositions))
         }
     }
 
-    private fun observePrices(chainId: ChainId, positions: Flow<BittensorPositionState>): Flow<PortfolioPrices> = channelFlow {
+    private fun observePrices(chainId: ChainId, coldKey: AccountId, positions: Flow<BittensorPositionState>): Flow<PortfolioPrices> = channelFlow {
+        val restored = responseCache.peek("runtime/prices/$chainId", StoredPrices::class.java, coldKey.toHexString())?.value
+            ?.items.orEmpty().associate { BittensorNetuid.Subnet(it.netuid) to it.price.toBigInteger() }
         var requestedSubnets = emptySet<BittensorNetuid.Subnet>()
         var priceJob: Job? = null
         send(PortfolioPrices(emptySet(), emptyMap(), loaded = false))
@@ -157,15 +181,27 @@ class RealBittensorPositionRepository(
                 priceJob?.cancel()
                 priceJob = null
                 requestedSubnets = heldSubnets
-                send(PortfolioPrices(heldSubnets, emptyMap(), loaded = false))
+                send(
+                    PortfolioPrices(
+                        heldSubnets,
+                        restored.filterKeys { it in heldSubnets },
+                        loaded = restored.keys.containsAll(heldSubnets),
+                        stale = restored.isNotEmpty()
+                    )
+                )
             }
 
             // Keep an in-flight request for the same held set. Amount/status updates
             // reach the independent combine immediately, without waiting for prices.
             if (state.status is BittensorDataStatus.Fresh && heldSubnets.isNotEmpty() && priceJob?.isActive != true) {
                 priceJob = launch {
+                    val ticket = responseCache.snapshotTicket(coldKey.toHexString())
                     val prices = portfolioLoader.loadPrices(chainId, heldSubnets)
                     ensureActive()
+                    if (prices.keys.containsAll(heldSubnets)) {
+                        val stored = StoredPrices(prices.map { (subnet, price) -> StoredPrice(subnet.value, price.toString()) })
+                        if (!responseCache.saveSnapshot("runtime/prices/$chainId", coldKey.toHexString(), stored, ticket)) return@launch
+                    }
                     send(PortfolioPrices(heldSubnets, prices, loaded = true))
                 }
             }
@@ -176,8 +212,13 @@ class RealBittensorPositionRepository(
         val heldSubnets = portfolioLoader.heldSubnets(state.positions)
         val matching = heldSubnets == prices.heldSubnets
         val positions = state.positions?.let { portfolioLoader.value(it, if (matching) prices.prices else emptyMap()) }
-        val pricesPending = heldSubnets.isNotEmpty() && !(matching && prices.loaded)
-        return BittensorPortfolioState(positions, state.status, pricesPending)
+        val pricesPending = state.status !is BittensorDataStatus.Stale && heldSubnets.isNotEmpty() && !(matching && prices.loaded)
+        val status = if (matching && prices.stale && heldSubnets.isNotEmpty() && state.status is BittensorDataStatus.Fresh) {
+            BittensorDataStatus.Stale(BittensorCacheStaleException())
+        } else {
+            state.status
+        }
+        return BittensorPortfolioState(positions, status, pricesPending)
     }
 
     private companion object {

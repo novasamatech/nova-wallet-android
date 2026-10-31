@@ -87,12 +87,12 @@ class BittensorDashboardDetailsSource(
         // Only a successful request replaces the stored maximum yield.
         var latestMaximumYield = restored?.maximumAnnualPercentageYield
         val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(null)
-        // Yields are requested once per held set, never polled.
+        // Each held set observes cached yields; the shared HTTP cache owns refresh timing.
         val rootRates = portfolio
             .map { it.positions?.root.orEmpty().map { position -> position.validatorHotkey }.toSet() }
             .distinctUntilChanged()
             .flatMapLatest { hotkeys ->
-                if (hotkeys.isEmpty()) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else requested { validators.yields(BittensorNetuid.Root) }
+                if (hotkeys.isEmpty()) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else requested(validators.observeYields(BittensorNetuid.Root))
             }
         val subnetRates = combine(portfolio, claimable) { state, rewards -> subnetsShowingRate(state.positions, rewards) }
             .distinctUntilChanged()
@@ -129,7 +129,8 @@ class BittensorDashboardDetailsSource(
                 )
             }.copy(
                 maximumAnnualPercentageYield = latestMaximumYield,
-                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null
+                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null,
+                stale = snapshot != null || state.status is BittensorDataStatus.Stale || maximum is ExtendedLoadingState.Error
             )
 
             if (coldKey != null && state.status is BittensorDataStatus.Fresh && details.pricing != BittensorDashboardDetails.Pricing.LOADING) {
@@ -194,7 +195,7 @@ class BittensorDashboardDetailsSource(
         subnets: Set<BittensorNetuid.Subnet>
     ): Flow<SubnetRates> {
         if (subnets.isEmpty()) return flowOf(SubnetRates(emptyMap(), false))
-        val sources = subnets.map { subnet -> requested { validators.yields(subnet) }.map { subnet to it } }
+        val sources = subnets.map { subnet -> requested(validators.observeYields(subnet)).map { subnet to it } }
         return combine(sources) { results ->
             SubnetRates(
                 values = results.associate { it.first to it.second.dataOrNull.orEmpty() },
@@ -229,6 +230,22 @@ class BittensorDashboardDetailsSource(
             ExtendedLoadingState.Error(failure)
         }
         emit(result)
+    }
+
+    private fun <T> requested(source: Flow<T>): Flow<ExtendedLoadingState<T>> = flow {
+        emit(ExtendedLoadingState.Loading)
+        try {
+            source.collect { emit(ExtendedLoadingState.Loaded(it)) }
+        } catch (timeout: TimeoutCancellationException) {
+            currentCoroutineContext().ensureActive()
+            logFailure(timeout)
+            emit(ExtendedLoadingState.Error(timeout))
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (failure: Exception) {
+            logFailure(failure)
+            emit(ExtendedLoadingState.Error(failure))
+        }
     }
 
     private fun logFailure(failure: Throwable) {

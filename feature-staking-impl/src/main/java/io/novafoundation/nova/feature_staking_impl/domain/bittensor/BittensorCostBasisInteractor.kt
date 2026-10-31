@@ -23,7 +23,8 @@ sealed interface BittensorCostBasisState {
     data class Failed(val cause: Throwable) : BittensorCostBasisState
 }
 
-data class BittensorCostBasisUpdate(val state: BittensorCostBasisState, val isSettling: Boolean)
+/** A provisional basis uses stale history or history that may not include a recently submitted trade yet. */
+data class BittensorCostBasisUpdate(val state: BittensorCostBasisState, val isProvisional: Boolean)
 
 class BittensorCostBasisInteractor(
     private val historyRepository: BittensorOperationHistoryRepository,
@@ -36,7 +37,7 @@ class BittensorCostBasisInteractor(
     fun observeUpdates(context: Flow<BittensorEstimateContext?>): Flow<BittensorCostBasisUpdate> =
         context.distinctUntilChanged()
             .flatMapLatest { current ->
-                if (current == null) flowOf(BittensorCostBasisUpdate(BittensorCostBasisState.Unavailable, false)) else observeAccount(current)
+                if (current == null) flowOf(BittensorCostBasisUpdate(state = BittensorCostBasisState.Unavailable, isProvisional = false)) else observeAccount(current)
             }
 
     suspend fun ownTradeRequest(metaId: Long, chain: Chain): BittensorHistoryRequest? {
@@ -52,7 +53,7 @@ class BittensorCostBasisInteractor(
         }
     }
 
-    fun onTradeResult(request: BittensorHistoryRequest?, result: BittensorOperationResult) {
+    suspend fun onTradeResult(request: BittensorHistoryRequest?, result: BittensorOperationResult) {
         val submitted = when (result) {
             is BittensorOperationResult.Success, is BittensorOperationResult.Unknown -> true
             is BittensorOperationResult.Failure -> result.stage == BittensorFailureStage.UNKNOWN
@@ -73,8 +74,13 @@ class BittensorCostBasisInteractor(
                             onSuccess = { BittensorCostBasisState.Loaded(BittensorEstimatedCostBasis(it.operations, it.allProviderPagesRead)) },
                             onFailure = { BittensorCostBasisState.Failed(it) }
                         ) ?: BittensorCostBasisState.Loading
-                        BittensorCostBasisUpdate(state, update.isSettling)
+                        val isHistoryStale = update.result?.getOrNull()?.stale == true
+                        val isAwaitingIndexedTrade = update.isSettling
+                        BittensorCostBasisUpdate(
+                            state = state,
+                            isProvisional = isAwaitingIndexedTrade || isHistoryStale
+                        )
                     }
-                    .onStart { emit(BittensorCostBasisUpdate(BittensorCostBasisState.Loading, false)) }
+                    .onStart { emit(BittensorCostBasisUpdate(state = BittensorCostBasisState.Loading, isProvisional = false)) }
             }
 }

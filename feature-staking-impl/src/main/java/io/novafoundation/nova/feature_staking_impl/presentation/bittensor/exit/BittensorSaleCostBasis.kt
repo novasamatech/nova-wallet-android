@@ -49,7 +49,7 @@ internal fun BittensorEstimatesMixin.observeSaleCostBasis(
     val context = positions.map { position -> position.takeUnless { it.isRoot }?.let { BittensorEstimateContext(it.metaId, it.chain) } }
         .distinctUntilChanged()
     return observePositionCostBasis(context)
-        .onStart { emit(BittensorPositionCostBasis(ExtendedLoadingState.Loading, isSettling = false)) }
+        .onStart { emit(BittensorPositionCostBasis(ExtendedLoadingState.Loading, isProvisional = false)) }
         .map { resolveSaleCostBasis(it, netuid, carried) }
 }
 
@@ -64,12 +64,12 @@ fun resolveSaleCostBasis(
         is ExtendedLoadingState.Error -> ExtendedLoadingState.Loaded(carriedBasis ?: BittensorSaleCostBasis.Unknown)
         is ExtendedLoadingState.Loaded -> {
             val basis = state.data
-            val live = basis?.forSubnet(netuid)?.let { BittensorSaleCostBasis.Known(it, settled = !update.isSettling) }
+            val live = basis?.forSubnet(netuid)?.let { BittensorSaleCostBasis.Known(it, settled = !update.isProvisional) }
             val resolved = when {
                 live != null && live.settled -> live
                 carriedBasis != null -> carriedBasis
                 live != null -> live
-                basis?.canEstimate(netuid) == true && !update.isSettling -> BittensorSaleCostBasis.NoPurchases
+                basis?.canEstimate(netuid) == true && !update.isProvisional -> BittensorSaleCostBasis.NoPurchases
                 else -> BittensorSaleCostBasis.Unknown
             }
             ExtendedLoadingState.Loaded(resolved)

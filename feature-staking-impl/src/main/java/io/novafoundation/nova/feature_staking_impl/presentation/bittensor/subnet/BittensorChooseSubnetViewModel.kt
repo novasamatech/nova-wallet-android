@@ -115,11 +115,12 @@ class BittensorChooseSubnetViewModel(
         analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
-        flowOf { browseRepository.subnets() }
+        browseRepository.observe()
     }
         .shareInBackground()
 
     private val catalogue = catalogueState.filterLoaded()
+        .map { it.subnets }
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
@@ -176,8 +177,8 @@ class BittensorChooseSubnetViewModel(
         .shareInBackground()
 
     // Null without a native price id. A subnet missing from the map has no market listing; a null summary is listed without a computable change.
-    private val weeklySummariesState = combine(catalogue, asset) { catalogue, asset ->
-        WeeklySummaryRequest(asset.token.configuration.priceId, catalogue.map { it.id }.toSet())
+    private val weeklySummariesState = combine(catalogueState.filterLoaded(), asset) { catalogue, asset ->
+        WeeklySummaryRequest(asset.token.configuration.priceId.takeUnless { catalogue.stale }, catalogue.subnets.map { it.id }.toSet())
     }
         .distinctUntilChanged()
         .flatMapLatest { request ->
@@ -250,9 +251,9 @@ class BittensorChooseSubnetViewModel(
 
     val subnetCount = combine(orderedCatalogue, hideThinPools, favorites, query, catalogueState) { ordered, hideThin, favorites, query, state ->
         // Count only once the sorted list is the loaded catalogue, so neither "0 of 0" nor "0 of N" flashes while it settles.
-        if (state is ExtendedLoadingState.Loaded && ordered.size == state.data.size && ordered.toSet() == state.data.toSet()) {
+        if (state is ExtendedLoadingState.Loaded && ordered.size == state.data.subnets.size && ordered.toSet() == state.data.subnets.toSet()) {
             val shown = ordered.count { it.matchesQuery(query) && (!hideThin || passesBittensorThinPoolFilter(it, favorites)) }
-            resources.getString(R.string.bittensor_subnet_count, shown, state.data.size)
+            resources.getString(R.string.bittensor_subnet_count, shown, state.data.subnets.size)
         } else {
             resources.getString(R.string.bittensor_subnet_count_loading)
         }

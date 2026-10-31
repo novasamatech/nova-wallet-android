@@ -38,11 +38,14 @@ class BittensorOperationHistorySettlementTest {
 
     private val api = BittensorEstimatesRepositoryTest.EstimatesApi()
 
-    private val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0)
 
     private var baseUrl = "https://infra.test/".toHttpUrl()
 
     private val urls = InfrastructureUrls { baseUrl }
+
+    private val responseCache = createBittensorTestCache(urls, nanoTime = { nowNanos }, nowMillis = { nowMillis })
+
+    private val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0, cache = responseCache)
 
     private val cache = mock(ComputationalCache::class.java)
 
@@ -95,7 +98,7 @@ class BittensorOperationHistorySettlementTest {
         api.failure = IllegalStateException("offline")
         advanceTimeBy(60_000)
         runCurrent()
-        assertTrue(updates.last().result!!.isFailure)
+        assertTrue(updates.last().result!!.getOrThrow().stale)
         assertTrue(updates.last().isSettling)
 
         api.failure = null
@@ -354,7 +357,7 @@ class BittensorOperationHistorySettlementTest {
         api.failure = IllegalStateException("offline")
         advanceTimeBy(60_000)
         runCurrent()
-        assertTrue(updates.last()!!.isFailure)
+        assertTrue(updates.last()!!.getOrThrow().stale)
         api.failure = null
         advanceTimeBy(60_000)
         runCurrent()
@@ -386,7 +389,7 @@ class BittensorOperationHistorySettlementTest {
     }
 
     @Test
-    fun `cancelled noncooperative transport cannot seed cache`() = runTest {
+    fun `screen cancellation does not cancel a shared validated response`() = runTest {
         val initial = request()
         val started = CompletableDeferred<Unit>()
         val release = CompletableDeferred<Unit>()
@@ -402,7 +405,7 @@ class BittensorOperationHistorySettlementTest {
         assertTrue(flight.isCancelled)
         api.beforeHistoryResponse = {}
         repository.history(initial)
-        assertEquals(2, api.historyPages.size)
+        assertEquals(1, api.historyPages.size)
     }
 
     private suspend fun request(address: String = "account") = requireNotNull(repository.request(address))
@@ -423,26 +426,23 @@ class BittensorOperationHistorySettlementTest {
         assertSame(retained, repository.history(oldest))
         assertEquals(nextOldest, request("next-oldest"))
         assertNotSame(evicted, repository.history(nextOldest))
-        assertEquals(10, api.historyPages.size)
+        assertEquals(9, api.historyPages.size)
     }
 
     @Test
-    fun `older concurrent flight in same generation cannot replace newer cached result`() = runTest {
+    fun `concurrent history readers share transport and cannot race separate snapshots`() = runTest {
         val initial = request()
         val started = CompletableDeferred<Unit>()
         val release = CompletableDeferred<Unit>()
-        api.beforeHistoryResponse = {
-            if (api.historyPages.size == 1) {
-                started.complete(Unit)
-                release.await()
-            }
-        }
-        val old = async { repository.history(initial) }
+        api.beforeHistoryResponse = { started.complete(Unit); release.await() }
+        val first = async { repository.history(initial) }
         started.await()
-        val newer = repository.history(initial)
+        val second = async { repository.history(initial) }
+        runCurrent()
+        assertEquals(1, api.historyPages.size)
         release.complete(Unit)
-        assertNotSame(newer, old.await())
-        assertSame(newer, repository.history(initial))
+        assertEquals(first.await(), second.await())
+        assertEquals(second.await(), repository.history(initial))
     }
 
     @Test

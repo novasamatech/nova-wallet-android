@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
+
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -40,6 +42,8 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 
 class BittensorPortfolioRepositoryTest {
+
+    private val responseCache = createBittensorTestCache()
 
     private val registry = mock(ChainRegistry::class.java)
 
@@ -217,7 +221,8 @@ class BittensorPortfolioRepositoryTest {
         chainStateRepository,
         computationalCache,
         logger,
-        positionUpdates
+        positionUpdates,
+        responseCache = responseCache
     )
 
     private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)

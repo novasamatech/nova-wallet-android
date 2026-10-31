@@ -361,8 +361,9 @@ class BittensorSubnetReviewViewModel(
 
     val assets = combine(
         nativeToken,
-        preparationState
-    ) { token, preparation -> mapAssets(token, preparation.dataOrNull) }
+        preparationState,
+        bittensorSubnetStakingInteractor.observeSubnetLogos()
+    ) { token, preparation, logos -> mapAssets(token, preparation.dataOrNull, logos[subnetId]) }
         .shareInBackground()
 
     private var executionStartedAt = 0L
@@ -610,7 +611,7 @@ class BittensorSubnetReviewViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = result.toSubmissionState(resources)
+                    submission.value = result.toSubmissionState(resources, slippage = slippage)
                 }
                 is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resources).toSubmissionState()
             }
@@ -648,9 +649,9 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
-    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetsView.Model = SwapAssetsView.Model(
+    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?, logoUrl: String?): SwapAssetsView.Model = SwapAssetsView.Model(
         assetIn = mapInputAsset(token),
-        assetOut = mapOutputAsset(token, prepared)
+        assetOut = mapOutputAsset(token, prepared, logoUrl)
     )
 
     private fun mapInputAsset(token: TokenBase): SwapAssetView.Model {
@@ -667,8 +668,8 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
-    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetView.Model = SwapAssetView.Model(
-        assetIcon = prepared?.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
+    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?, logoUrl: String?): SwapAssetView.Model = SwapAssetView.Model(
+        assetIcon = (logoUrl ?: prepared?.subnet?.logoUrl)?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
         amount = mapOutputAmount(token, prepared),
         iconSizeDp = 48,
         clipIconToOutline = true

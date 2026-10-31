@@ -155,7 +155,7 @@ class BittensorSubnetPositionViewModel(
         analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
-        flowOf { subnetMetadataInteractor.subnet(subnetId) }
+        subnetMetadataInteractor.observeSubnet(subnetId)
     }
         .shareInBackground()
 

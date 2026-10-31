@@ -11,5 +11,5 @@ interface BittensorPortfolioHistoryApi {
         @Url url: String,
         @Query("accountSubject") accountSubject: String,
         @Query("period") period: String
-    ): BittensorPortfolioHistoryRemote
+    ): retrofit2.Response<BittensorPortfolioHistoryRemote>
 }

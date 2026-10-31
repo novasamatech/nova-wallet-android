@@ -33,6 +33,8 @@ class BittensorSubnetInteractor(
 
     suspend fun commissionRate(): BigDecimal = configRepository.config().commission.fraction
 
+    fun observeSubnetLogos() = configRepository.observeSubnetLogos()
+
     suspend fun subnets() = repository.subnets()
 
     suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = repository.subnet(subnetId)

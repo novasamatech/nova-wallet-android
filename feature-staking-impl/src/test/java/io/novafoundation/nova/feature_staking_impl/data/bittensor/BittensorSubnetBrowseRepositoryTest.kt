@@ -6,17 +6,15 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
-import java.io.IOException
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import retrofit2.Response
 
 class BittensorSubnetBrowseRepositoryTest {
@@ -42,7 +40,8 @@ class BittensorSubnetBrowseRepositoryTest {
         val runtime = listOf(subnet(42, 10, 1))
         val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(42, "1", "Unknown", "S42", 10.toBigInteger(), "2000"))
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
-        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
+        val components = BittensorSubnetCatalogueRemote.Components(component, component)
+        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(components))
 
         assertEquals("", mapBittensorBrowseSubnets(response, runtime).single().name)
         assertEquals("", normalizeBittensorSubnetName(" unknown "))
@@ -76,7 +75,8 @@ class BittensorSubnetBrowseRepositoryTest {
         val fallback = listOf(subnet(1, 10, null))
         val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend 1", "S1", 10.toBigInteger(), "2000"))
         val component = BittensorRecommendationsRemote.Component("AVAILABLE", "STALE")
-        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
+        val components = BittensorSubnetCatalogueRemote.Components(component, component)
+        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(components))
 
         val listed = mapBittensorBrowseSubnets(response, fallback, chainVerified = false)
 
@@ -93,146 +93,104 @@ class BittensorSubnetBrowseRepositoryTest {
     }
 
     @Test
-    fun `manual buy excludes subtoken disabled entries`() = runBlocking<Unit> {
-        val api = mock(BittensorSubnetCatalogueApi::class.java)
-        val runtime = mock(BittensorSubnetRepository::class.java)
-        val storageDelegate = mock(StorageDataSource::class.java)
-        val storage = DisabledStorage(storageDelegate)
-        val availability = BittensorSubnetTradingAvailabilityRepository(storage)
-        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
-        val repository = BittensorSubnetBrowseRepository(BittensorSubnetCatalogueRepository(api, urls), runtime, availability, RecordingLogger())
-        val row = BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend", "S", 10.toBigInteger(), "2000")
-        val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
-        val components = BittensorSubnetCatalogueRemote.Components(component, component)
-        val meta = BittensorSubnetCatalogueRemote.Meta(components)
-        val response = BittensorSubnetCatalogueRemote(listOf(row), meta)
-        `when`(api.subnets("https://infra.test/v1/bittensor/subnets")).thenReturn(Response.success(response))
-        `when`(runtime.catalogue()).thenReturn(BittensorSubnetCatalogue(listOf(subnet(1, 10, 1)), fromChain = true))
-
-        assertEquals(emptyList<BittensorSubnet>(), repository.subnets())
-    }
-
-    @Test
-    fun `reopening the picker offline serves the catalogue loaded before`() = runBlocking<Unit> {
+    fun `a new picker instance renders persisted catalogue without any node dependency`() = runBlocking<Unit> {
         val api = SwitchableCatalogueApi()
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java))
-        val logger = RecordingLogger()
-        val repository = browseRepository(api, storage, logger = logger)
-        val online = repository.subnets()
-        val failure = IOException("Unable to resolve host")
-
-        api.failure = failure
-        storage.offline = true
-        val offline = withTimeout(5_000L) { repository.subnets() }
-
-        assertEquals(listOf(1), online.map { it.id.value })
-        assertEquals(online, offline)
-        // Coroutine stack-trace recovery may log a copy of the failure, so compare what it says.
-        assertEquals(listOf(failure.message), logger.failures.map { it.message })
-        assertTrue(logger.failures.single() is IOException)
-    }
-
-    @Test
-    fun `a chain read that waits for a reconnecting node serves the catalogue loaded before`() = runBlocking<Unit> {
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java))
-        val repository = browseRepository(SwitchableCatalogueApi(), storage, timeoutMillis = 100L)
-        val online = repository.subnets()
-
-        storage.offline = true
-
-        assertEquals(online, withTimeout(5_000L) { repository.subnets() })
-    }
-
-    @Test
-    fun `without a loaded catalogue an offline read fails instead of waiting`() = runBlocking<Unit> {
-        val api = SwitchableCatalogueApi()
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java)).apply { offline = true }
-        val repository = browseRepository(api, storage, timeoutMillis = 100L)
-
-        val slowNode = runCatching { withTimeout(5_000L) { repository.subnets() } }.exceptionOrNull()
-        api.failure = IOException("Unable to resolve host")
-        val noNetwork = runCatching { withTimeout(5_000L) { repository.subnets() } }.exceptionOrNull()
-
-        assertTrue(slowNode is BittensorTimeoutException)
-        assertTrue(noNetwork is IOException)
-    }
-
-    @Test
-    fun `an inner timeout without a loaded catalogue is reported as a slow read, not a cancellation`() = runBlocking<Unit> {
-        val storage = SwitchableStorage(mock(StorageDataSource::class.java)).apply { innerTimeout = true }
-        val repository = browseRepository(SwitchableCatalogueApi(), storage)
-
-        val failure = runCatching { repository.subnets() }.exceptionOrNull()
-
-        assertTrue(failure is BittensorTimeoutException)
-        assertTrue(failure?.cause is TimeoutCancellationException)
-    }
-
-    private class DisabledStorage(delegate: StorageDataSource) : StorageDataSource by delegate {
-
-        @Suppress("UNCHECKED_CAST")
-        override suspend fun <R> query(
-            chainId: String,
-            at: String?,
-            applyStorageDefault: Boolean,
-            query: suspend StorageQueryContext.() -> R
-        ): R = emptyMap<BittensorNetuid.Subnet, Boolean>() as R
-    }
-
-    private fun browseRepository(
-        api: BittensorSubnetCatalogueApi,
-        storage: StorageDataSource,
-        timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT,
-        logger: Logger = RecordingLogger()
-    ): BittensorSubnetBrowseRepository {
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
-        val runtime = mock(BittensorSubnetRepository::class.java)
-        runBlocking { `when`(runtime.catalogue()).thenReturn(BittensorSubnetCatalogue(listOf(subnet(1, 10, 1)), fromChain = true)) }
-        val availability = BittensorSubnetTradingAvailabilityRepository(storage)
-        return BittensorSubnetBrowseRepository(BittensorSubnetCatalogueRepository(api, urls), runtime, availability, logger, timeoutMillis)
+        val dao = InMemoryBittensorCacheDao()
+        val onlineCache = createBittensorTestCache(urls, dao = dao)
+        val onlineCatalogue = BittensorSubnetCatalogueRepository(api, onlineCache)
+        val config = BittensorConfigRepository { fallbackBittensorConfig() }
+        val online = BittensorSubnetBrowseRepository(onlineCatalogue, config)
+        assertEquals("Backend", online.observe().first().subnets.single().name)
+
+        api.failure = java.io.IOException("Offline")
+        val restartedCache = createBittensorTestCache(urls, dao = dao)
+        val offlineCatalogue = BittensorSubnetCatalogueRepository(api, restartedCache)
+        val offline = BittensorSubnetBrowseRepository(offlineCatalogue, config)
+        val snapshot = offline.observe().first()
+        assertEquals("Backend", snapshot.subnets.single().name)
+        assertTrue(snapshot.stale)
     }
 
-    private class RecordingLogger : Logger {
+    @Test
+    fun `logos arrive after the cached list without blocking its first render`() = runBlocking<Unit> {
+        withTimeout(5_000) {
+            val api = SwitchableCatalogueApi("public, max-age=270")
+            val cache = createBittensorTestCache()
+            val catalogue = BittensorSubnetCatalogueRepository(api, cache)
+            catalogue.catalogue()
+            val logos = CompletableDeferred<BittensorConfig>()
+            val config = BittensorConfigRepository { logos.await() }
+            val repository = BittensorSubnetBrowseRepository(catalogue, config)
+            val initial = CompletableDeferred<BittensorSubnetBrowseRepository.Catalogue>()
+            val decorated = async {
+                repository.observe().onEach { initial.complete(it) }
+                    .first { it.subnets.single().logoUrl != null }
+            }
 
-        val failures = mutableListOf<Throwable>()
+            assertEquals("Backend", initial.await().subnets.single().name)
+            assertEquals(null, initial.await().subnets.single().logoUrl)
+            assertTrue(!decorated.isCompleted)
+            val subnetId = BittensorNetuid.Subnet(1)
+            logos.complete(fallbackBittensorConfig().copy(subnetLogos = mapOf(subnetId to "https://logos.test/1.png")))
 
-        override fun log(message: String?) = Unit
-
-        override fun log(throwable: Throwable?) {
-            throwable?.let(failures::add)
+            assertEquals("https://logos.test/1.png", decorated.await().subnets.single().logoUrl)
+            assertEquals(1, api.requests)
         }
     }
 
-    private class SwitchableCatalogueApi : BittensorSubnetCatalogueApi {
+    @Test
+    fun `reopening browse restores logos from the shared config without refetching`() = runBlocking<Unit> {
+        val api = SwitchableCatalogueApi("public, max-age=270")
+        val cache = createBittensorTestCache()
+        val catalogue = BittensorSubnetCatalogueRepository(api, cache)
+        var configRequests = 0
+        val configApi = object : BittensorConfigApi {
+            override suspend fun config(url: String): BittensorConfigRemote {
+                configRequests += 1
+                return BittensorConfigRemote(null, listOf(BittensorConfigRemote.Subnet(1, "https://logos.test/1.png")))
+            }
+        }
+        val logger = mock(Logger::class.java)
+        val config = RemoteBittensorConfigRepository(configApi, "https://config.test/config.json", logger)
+        val first = BittensorSubnetBrowseRepository(catalogue, config)
+        val second = BittensorSubnetBrowseRepository(catalogue, config)
+
+        withTimeout(5_000) {
+            assertEquals("https://logos.test/1.png", first.observe().first { it.subnets.single().logoUrl != null }.subnets.single().logoUrl)
+            assertEquals("https://logos.test/1.png", second.observe().first { it.subnets.single().logoUrl != null }.subnets.single().logoUrl)
+        }
+        assertEquals(1, configRequests)
+        assertEquals(1, api.requests)
+    }
+
+    @Test
+    fun `reopening browse within max age reuses one backend request`() = runBlocking<Unit> {
+        val api = SwitchableCatalogueApi("public, max-age=270")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val cache = createBittensorTestCache(urls)
+        val catalogue = BittensorSubnetCatalogueRepository(api, cache)
+        val config = BittensorConfigRepository { fallbackBittensorConfig() }
+        val first = BittensorSubnetBrowseRepository(catalogue, config)
+        val second = BittensorSubnetBrowseRepository(catalogue, config)
+        first.observe().first()
+        second.observe().first()
+        assertEquals(1, api.requests)
+    }
+
+    private class SwitchableCatalogueApi(private val cacheControl: String = "no-store") : BittensorSubnetCatalogueApi {
 
         var failure: Exception? = null
 
+        var requests = 0
+
         override suspend fun subnets(url: String): Response<BittensorSubnetCatalogueRemote> {
+            requests += 1
             failure?.let { throw it }
             val row = BittensorSubnetCatalogueRemote.Subnet(1, "1", "Backend", "S", 10.toBigInteger(), "2000")
             val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
             val meta = BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component))
-            return Response.success(BittensorSubnetCatalogueRemote(listOf(row), meta))
-        }
-    }
-
-    /** Every subnet is enabled; offline, the read waits for the socket like a reconnecting node. */
-    private class SwitchableStorage(delegate: StorageDataSource) : StorageDataSource by delegate {
-
-        var offline = false
-
-        var innerTimeout = false
-
-        @Suppress("UNCHECKED_CAST")
-        override suspend fun <R> query(
-            chainId: String,
-            at: String?,
-            applyStorageDefault: Boolean,
-            query: suspend StorageQueryContext.() -> R
-        ): R {
-            if (offline) awaitCancellation()
-            if (innerTimeout) withTimeout(1L) { awaitCancellation() }
-            return mapOf(BittensorNetuid.Subnet(1) to true) as R
+            return Response.success(BittensorSubnetCatalogueRemote(listOf(row), meta), okhttp3.Headers.headersOf("Cache-Control", cacheControl))
         }
     }
 

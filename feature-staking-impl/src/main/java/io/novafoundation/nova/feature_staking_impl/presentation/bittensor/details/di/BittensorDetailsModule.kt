@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorResponseCache
+import io.novafoundation.nova.common.data.storage.DebugSettings
+
 import io.novafoundation.nova.analytics.AnalyticsService
 
 import androidx.fragment.app.Fragment
@@ -23,7 +28,6 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootV
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioRowInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
@@ -39,7 +43,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -66,8 +69,8 @@ class BittensorDetailsModule {
     fun providePortfolioHistoryRepository(
         prices: CoinPriceRepository,
         api: BittensorPortfolioHistoryApi,
-        urls: InfrastructureUrls
-    ) = BittensorPortfolioHistoryRepository(api, urls, prices)
+        cache: BittensorResponseCache
+    ) = BittensorPortfolioHistoryRepository(api, prices, cache)
 
     @Provides
     fun providePortfolioChartCalculator() = BittensorPortfolioChartCalculator()
@@ -77,9 +80,8 @@ class BittensorDetailsModule {
         historyRepository: BittensorPortfolioHistoryRepository,
         calculator: BittensorPortfolioChartCalculator,
         accounts: AccountRepository,
-        chainRegistry: ChainRegistry,
-        positionUpdates: BittensorPositionUpdates
-    ) = BittensorPortfolioChartInteractor(historyRepository, calculator, accounts, chainRegistry, positionUpdates)
+        chainRegistry: ChainRegistry
+    ) = BittensorPortfolioChartInteractor(historyRepository, calculator, accounts, chainRegistry)
 
     @Provides
     @IntoMap
@@ -132,11 +134,11 @@ class BittensorDetailsModule {
         retryController: BittensorRetryController,
         rootClaimInteractor: BittensorRootClaimInteractor,
         accountRepository: AccountRepository,
-        withdrawalInteractor: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor,
-        slippageSettings: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings,
+        withdrawalInteractor: BittensorPositionWithdrawalInteractor,
+        slippageSettings: BittensorSlippageSettings,
         rootValidatorSource: BittensorRootValidatorSource,
         rootHoldFormatter: BittensorRootHoldFormatter,
-        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings,
+        debugSettings: DebugSettings,
         walletGate: BittensorWalletGate
     ): ViewModel = BittensorRootDetailsViewModel(
         analytics, interactor,

@@ -45,12 +45,13 @@ class BittensorReadTimeoutTest {
     fun `history page timeout is recoverable and next request succeeds`() = runTest {
         val delegate = BittensorEstimatesRepositoryTest.EstimatesApi()
         val api = EstimatesApi(delegate)
-        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0)
+        val responseCache = createBittensorTestCache(scope = backgroundScope)
+        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0, cache = responseCache)
         val origin = "https://infra.test/".toHttpUrl()
 
         val failure = runCatching { source.history(origin, "account") }.exceptionOrNull()
         assertTrue(failure is BittensorTimeoutException)
-        assertEquals("Operation history page timed out", failure?.message)
+        assertEquals("Backend operations/search timed out", failure?.message)
 
         api.hang = false
         assertTrue(source.history(origin, "account").allPagesRead)
@@ -60,14 +61,15 @@ class BittensorReadTimeoutTest {
     fun `yield snapshot timeout is recoverable and next request succeeds`() = runTest {
         val delegate = BittensorEstimatesRepositoryTest.EstimatesApi()
         val api = EstimatesApi(delegate)
-        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0)
+        val responseCache = createBittensorTestCache(scope = backgroundScope)
+        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0, cache = responseCache)
         val origin = "https://infra.test/".toHttpUrl()
         val chain = mock(Chain::class.java)
         val subnet = BittensorNetuid.Subnet(1)
 
         val failure = runCatching { source.yields(origin, chain, subnet) }.exceptionOrNull()
         assertTrue(failure is BittensorTimeoutException)
-        assertEquals("Validator yield snapshot timed out", failure?.message)
+        assertEquals("Backend subnets/1/yields/alpha timed out", failure?.message)
 
         api.hang = false
         assertTrue(source.yields(origin, chain, subnet).allPagesRead)
@@ -77,7 +79,8 @@ class BittensorReadTimeoutTest {
     fun `caller timeout remains cancellation in both estimate endpoints`() = runTest {
         val delegate = BittensorEstimatesRepositoryTest.EstimatesApi()
         val api = EstimatesApi(delegate)
-        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0)
+        val responseCache = createBittensorTestCache(scope = backgroundScope)
+        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0, cache = responseCache)
         val origin = "https://infra.test/".toHttpUrl()
         val chain = mock(Chain::class.java)
         val subnet = BittensorNetuid.Subnet(1)

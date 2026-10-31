@@ -1,5 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorCacheInvalidator
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorResponseCache
+import io.novafoundation.nova.core_db.dao.BittensorCacheDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExtrinsicOutcomeResolver
 import com.google.gson.Gson
 import android.os.SystemClock
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
@@ -43,7 +51,6 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRunti
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetTradingAvailabilityRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
@@ -126,6 +133,30 @@ private const val SERVICE_FEE_BENEFICIARY = "BittensorServiceFeeBeneficiary"
 
 @Module(includes = [BittensorStakeValidationsModule::class, BittensorExitValidationsModule::class, BittensorClaimValidationsModule::class])
 class BittensorModule {
+
+    @Provides
+    @FeatureScope
+    @Named("BittensorCacheScope")
+    fun provideBittensorCacheScope(): CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorResponseCache(
+        dao: BittensorCacheDao,
+        gson: Gson,
+        urls: InfrastructureUrls,
+        @Named("BittensorCacheScope") scope: CoroutineScope,
+        interactionGate: AutomaticInteractionGate,
+        logger: Logger
+    ) = BittensorResponseCache(
+        dao,
+        gson,
+        urls,
+        scope,
+        interactionGate.isInteractionAllowedFlow,
+        logger
+    )
 
     @Provides
     fun provideClaimClock(): BittensorClaimClock = BittensorClaimClock(SystemClock::elapsedRealtime)
@@ -241,15 +272,12 @@ class BittensorModule {
         catalogueRepository: BittensorSubnetCatalogueRepository
     ): BittensorSubnetRepository = RealBittensorSubnetRepository(runtimeCalls, configRepository, swapSource, catalogueRepository)
 
-    // Feature-scoped so a reopened picker can still show the catalogue it loaded last when a read fails.
     @Provides
     @FeatureScope
     fun provideBittensorSubnetBrowseRepository(
         catalogueRepository: BittensorSubnetCatalogueRepository,
-        repository: BittensorSubnetRepository,
-        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
-        logger: Logger
-    ) = BittensorSubnetBrowseRepository(catalogueRepository, repository, BittensorSubnetTradingAvailabilityRepository(storage), logger)
+        configRepository: BittensorConfigRepository
+    ) = BittensorSubnetBrowseRepository(catalogueRepository, configRepository)
 
     @Provides
     @FeatureScope
@@ -315,8 +343,8 @@ class BittensorModule {
     @FeatureScope
     fun provideBittensorValidatorBackend(
         api: BittensorValidatorsApi,
-        infrastructureUrls: InfrastructureUrls
-    ) = BittensorValidatorBackend(api, infrastructureUrls)
+        cache: BittensorResponseCache
+    ) = BittensorValidatorBackend(api, cache)
 
     @Provides
     @Named(SERVICE_FEE_BENEFICIARY)
@@ -331,7 +359,6 @@ class BittensorModule {
         extrinsics: ExtrinsicService,
         @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String,
         submission: BittensorSubmissionExecutor,
-        costBasis: BittensorCostBasisInteractor,
         blockRequotes: BittensorBlockRequotes
     ) = BittensorSubnetStakingInteractor(
         chainRegistry,
@@ -341,7 +368,6 @@ class BittensorModule {
         extrinsics,
         beneficiaryAddress,
         submission,
-        costBasis,
         blockRequotes
     )
 
@@ -362,8 +388,10 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorSubnetCatalogueRepository(api: BittensorSubnetCatalogueApi, infrastructureUrls: InfrastructureUrls) =
-        BittensorSubnetCatalogueRepository(api, infrastructureUrls)
+    fun provideBittensorSubnetCatalogueRepository(
+        api: BittensorSubnetCatalogueApi,
+        cache: BittensorResponseCache
+    ) = BittensorSubnetCatalogueRepository(api, cache)
 
     @Provides
     @FeatureScope
@@ -389,14 +417,16 @@ class BittensorModule {
         chainStateRepository: ChainStateRepository,
         computationalCache: ComputationalCache,
         logger: Logger,
-        positionUpdates: BittensorPositionUpdates
+        positionUpdates: BittensorPositionUpdates,
+        responseCache: BittensorResponseCache
     ): BittensorPositionRepository = RealBittensorPositionRepository(
         positionSource,
         portfolioLoader,
         chainStateRepository,
         computationalCache,
         logger,
-        positionUpdates
+        positionUpdates,
+        responseCache
     )
 
     @Provides
@@ -463,8 +493,10 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorEstimatesSource(api: BittensorEstimatesApi): BittensorEstimatesRemoteSource =
-        BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L)
+    fun provideBittensorEstimatesSource(
+        api: BittensorEstimatesApi,
+        cache: BittensorResponseCache
+    ): BittensorEstimatesRemoteSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L, cache = cache)
 
     @Provides
     @FeatureScope
@@ -499,18 +531,27 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
+    fun provideBittensorOutcomeResolver(eventsRepository: EventsRepository, chainRegistry: ChainRegistry): BittensorExtrinsicOutcomeResolver =
+        RealBittensorExtrinsicOutcomeResolver(eventsRepository, chainRegistry)
+
+    @Provides
+    @FeatureScope
     fun provideBittensorSubmissionExecutor(
         extrinsics: ExtrinsicService,
         accountRepository: AccountRepository,
         positionUpdates: BittensorPositionUpdates,
-        eventsRepository: EventsRepository,
-        chainRegistry: ChainRegistry
-    ) = BittensorSubmissionExecutor(
-        extrinsics,
-        accountRepository,
-        positionUpdates,
-        RealBittensorExtrinsicOutcomeResolver(eventsRepository, chainRegistry)
-    )
+        outcomeResolver: BittensorExtrinsicOutcomeResolver,
+        cacheInvalidator: BittensorCacheInvalidator
+    ) = BittensorSubmissionExecutor(extrinsics, accountRepository, positionUpdates, cacheInvalidator, outcomeResolver)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorCacheInvalidator(
+        cache: BittensorResponseCache,
+        history: BittensorOperationHistoryRepository,
+        accounts: AccountRepository,
+        logger: Logger
+    ) = BittensorCacheInvalidator(cache, history, accounts, logger)
 
     @Provides
     @FeatureScope
@@ -603,7 +644,6 @@ class BittensorModule {
         constants: WalletConstants,
         logger: Logger,
         immediateExecution: BittensorImmediateExecution,
-        costBasis: BittensorCostBasisInteractor,
         chainState: ChainStateRepository,
         blockRequotes: BittensorBlockRequotes,
         @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String
@@ -622,7 +662,6 @@ class BittensorModule {
         beneficiaryAddress,
         logger,
         immediateExecution,
-        costBasis,
         chainState,
         blockRequotes
     )

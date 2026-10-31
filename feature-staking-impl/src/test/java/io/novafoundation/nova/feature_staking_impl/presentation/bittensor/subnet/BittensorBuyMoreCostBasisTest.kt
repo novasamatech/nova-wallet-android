@@ -16,7 +16,7 @@ class BittensorBuyMoreCostBasisTest {
     private val noPurchases = BittensorEstimatedCostBasis(emptyList(), true)
 
     private fun loaded(basis: BittensorEstimatedCostBasis?, settling: Boolean) =
-        BittensorPositionCostBasis(ExtendedLoadingState.Loaded(basis), settling)
+        BittensorPositionCostBasis(ExtendedLoadingState.Loaded(basis), isProvisional = settling)
 
     @Test
     fun `settled history without purchases still reads as no purchases`() {

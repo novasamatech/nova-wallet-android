@@ -223,6 +223,7 @@ class BittensorDashboardDetailsSourceTest {
         assertEquals(BigInteger.TEN, details.panelStakeInPlanks)
         assertEquals(0, BigDecimal.TEN.compareTo(details.panelAnnualPercentageYield))
         assertFalse(details.panelYieldLoading)
+        assertTrue(details.stale)
     }
 
     @Test
@@ -303,6 +304,8 @@ class BittensorDashboardDetailsSourceTest {
     }
 
     private suspend fun prepare() {
+        org.mockito.Mockito.`when`(validators.observeYields(org.mockito.ArgumentMatchers.any(BittensorNetuid::class.java) ?: BittensorNetuid.Root))
+            .thenAnswer { invocation -> kotlinx.coroutines.flow.flow { emit(validators.yields(invocation.getArgument(0))) } }
         `when`(chain.id).thenReturn("chain")
         `when`(chain.assets).thenReturn(listOf(asset))
         `when`(asset.staking).thenReturn(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT))

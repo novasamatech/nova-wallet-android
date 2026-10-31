@@ -104,7 +104,9 @@ class BittensorDetailsRetryTest {
 
     private val metaAccount = mock(MetaAccount::class.java)
 
-    private val resources = mock(ResourceManager::class.java)
+    private val resources = mock(ResourceManager::class.java) { invocation ->
+        if (invocation.method.returnType == String::class.java) "Message" else org.mockito.Answers.RETURNS_DEFAULTS.answer(invocation)
+    }
 
     private val logger = mock(Logger::class.java)
 
@@ -165,18 +167,20 @@ class BittensorDetailsRetryTest {
     }
 
     private val historyApi = object : BittensorPortfolioHistoryApi {
-        override suspend fun history(url: String, accountSubject: String, period: String): BittensorPortfolioHistoryRemote {
+        override suspend fun history(url: String, accountSubject: String, period: String): retrofit2.Response<BittensorPortfolioHistoryRemote> {
             requestedPeriods += period
             val attempt = priceLoads.incrementAndGet()
             if (timeoutFirstChart && attempt == 1) withTimeout(1L) { awaitCancellation() }
             check(!failFirstChart || attempt > 1) { "Chart unavailable" }
-            return portfolioHistoryResponse(period = period, freshness = if (staleHistory) "STALE" else "FRESH")
+            return retrofit2.Response.success(portfolioHistoryResponse(period = period, freshness = if (staleHistory) "STALE" else "FRESH"))
         }
     }
 
     private val urls = InfrastructureUrls { "https://infra.example".toHttpUrl() }
 
-    private val historyRepository = BittensorPortfolioHistoryRepository(historyApi, urls, prices)
+    private val responseCache = io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache(urls)
+
+    private val historyRepository = BittensorPortfolioHistoryRepository(historyApi, prices, responseCache)
 
     private val chartCalculator = BittensorPortfolioChartCalculator()
 
@@ -184,7 +188,7 @@ class BittensorDetailsRetryTest {
 
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry, positionUpdates)
+    private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry)
 
     private val retryController = BittensorRetryController(resources, logger, mock(AutomaticInteractionGate::class.java))
 
@@ -208,7 +212,9 @@ class BittensorDetailsRetryTest {
 
     private val fiatFormatter = mock(FiatFormatter::class.java)
 
-    private val tokenFormatter = mock(TokenFormatter::class.java)
+    private val tokenFormatter = mock(TokenFormatter::class.java) { invocation ->
+        if (invocation.method.returnType == CharSequence::class.java) "1 TAO" else org.mockito.Answers.RETURNS_DEFAULTS.answer(invocation)
+    }
 
     private val amountFormatter = BittensorAmountFormatter(tokenFormatter, fiatFormatter, resources)
 
@@ -236,6 +242,8 @@ class BittensorDetailsRetryTest {
         `when`(chain.id).thenReturn("chain")
         `when`(chain.name).thenReturn("Bittensor")
         `when`(chainRegistry.getChain("chain")).thenReturn(chain)
+        `when`(chainRegistry.getChain(io.novafoundation.nova.runtime.ext.ChainGeneses.BITTENSOR)).thenReturn(chain)
+        `when`(chain.assets).thenReturn(listOf(chainAsset))
         `when`(metaAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(accountRepository.getMetaAccount(1L)).thenReturn(metaAccount)
         `when`(accountRepository.getMetaAccount(2L)).thenReturn(metaAccount)
@@ -260,6 +268,7 @@ class BittensorDetailsRetryTest {
             }
         )
         `when`(subnetRepository.subnets()).thenReturn(emptyList())
+        `when`(subnetRepository.observeSubnets()).thenReturn(flowOf(emptyList()))
         val claims = BittensorRootClaims(emptyList(), BigInteger.ONE)
         val claimState = BittensorRootClaimState(1L, hotkey, chain, asset, claims, true)
         rootClaims = MutableStateFlow(claimState)
@@ -435,7 +444,9 @@ class BittensorDetailsRetryTest {
 
         val captor = ArgumentCaptor.forClass(StartStakingLandingPayload::class.java)
         // Mockito's capture() returns null; the placeholder only satisfies Kotlin's non-null parameter.
-        verify(router, timeout(3_000L)).openBittensorStartStaking(captor.capture() ?: StartStakingLandingPayload(AvailableStakingOptionsPayload("", 0, emptyList())))
+        val placeholderOptions = AvailableStakingOptionsPayload("", 0, emptyList())
+        val placeholderPayload = StartStakingLandingPayload(placeholderOptions)
+        verify(router, timeout(3_000L)).openBittensorStartStaking(captor.capture() ?: placeholderPayload)
         val options = captor.value.availableStakingOptions
         assertEquals("chain", options.chainId)
         assertEquals(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT), options.stakingTypes)
@@ -493,7 +504,7 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `currency change reloads history in the new context`() = runBlocking<Unit> {
+    fun `currency change reuses native history and recalculates FX in the new context`() = runBlocking<Unit> {
         createViewModel()
         withTimeout(3_000L) {
             viewModel.priceChartModels.first { models -> models.any { it is PriceChartModel.Chart } }
@@ -505,7 +516,7 @@ class BittensorDetailsRetryTest {
             `when`(newToken.currency).thenReturn(euro)
             `when`(newToken.coinRate).thenReturn(coinRate)
             portfolioUpdates.value = portfolioUpdates.value.copy(asset = newAsset)
-            viewModel.priceChartModels.first { models -> priceLoads.get() == 2 && models.any { it is PriceChartModel.Chart } }
+            viewModel.priceChartModels.first { models -> priceLoads.get() == 1 && models.any { it is PriceChartModel.Chart } }
             assertEquals(1, portfolioLoads.get())
         }
     }
@@ -522,7 +533,7 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `new account requires its own chart request`() = runBlocking<Unit> {
+    fun `another wallet with the same on chain account reuses its cached history`() = runBlocking<Unit> {
         createViewModel()
 
         withTimeout(3_000L) {
@@ -530,9 +541,8 @@ class BittensorDetailsRetryTest {
             portfolioUpdates.value = portfolioUpdates.value.copy(metaId = 2L)
 
             viewModel.priceChartModels.first { models ->
-                priceLoads.get() == 2 && models.any { it is PriceChartModel.Chart }
+                priceLoads.get() == 1 && models.any { it is PriceChartModel.Chart }
             }
         }
     }
 }
-
