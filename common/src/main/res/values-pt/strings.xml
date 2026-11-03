@@ -2461,4 +2461,20 @@
     <string name="deep_linking_staking_asset_not_found">O ativo neste link de staking não foi encontrado.</string>
     <string name="deep_linking_staking_not_supported">O staking não é compatível com este ativo.</string>
     <string name="staking_new_feature">NOVO</string>
+    <string name="bittensor_mev_description">Mantém sua ordem criptografada no mempool público para ajudar a evitar front-running.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Uma taxa de rede pode ter sido cobrada.</string>
+    <string name="bittensor_mev_not_executed">Ordem não executada</string>
+    <string name="bittensor_mev_nothing_spent">Nada foi gasto.</string>
+    <string name="bittensor_mev_title">Proteção contra MEV</string>
+    <string name="bittensor_mev_unavailable">A proteção contra MEV não está disponível para esta ordem.</string>
+    <string name="bittensor_mev_unchanged">Sua ordem não foi executada. Sua participação não foi alterada. Tente novamente.</string>
+    <string name="bittensor_result_fee_charged">Uma taxa de rede pode ter sido cobrada.</string>
+    <string name="bittensor_result_nothing_spent">Nada foi gasto.</string>
+    <string name="bittensor_result_price_moved">A ordem não foi executada porque o preço se moveu além da sua tolerância de slippage.</string>
+    <string name="bittensor_result_price_moved_format">A ordem não foi executada: o preço se moveu além da sua tolerância de slippage (%1$s). Você pode alterar o slippage usando o ícone de configurações na tela de entrada do valor de %2$s e tentar novamente.</string>
+    <string name="swap_get_token_alternatives_format">%1$s ou %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Abre no navegador</string>
+    <string name="swap_get_token_dapp_description">%s · abre no navegador</string>
+    <string name="swap_get_token_dapp_title">Trocar em %s</string>
+    <string name="swap_get_token_third_party">TERCEIROS</string>
 </resources>
