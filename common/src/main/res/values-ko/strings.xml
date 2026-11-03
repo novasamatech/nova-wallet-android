@@ -2463,4 +2463,5 @@
     <string name="swap_get_token_dapp_description">%s · 브라우저에서 열기</string>
     <string name="swap_get_token_dapp_title">%s에서 교환</string>
     <string name="swap_get_token_third_party">제3자</string>
+    <string name="bittensor_result_price_moved_with_tolerance">주문이 실행되지 않았습니다. 가격이 슬리피지 허용 범위(%1$s)를 초과하여 변동했습니다. 금액 입력 화면의 설정 아이콘을 사용하여 슬리피지를 변경한 후 다시 시도할 수 있습니다.</string>
 </resources>

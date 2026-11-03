@@ -2463,4 +2463,5 @@
     <string name="swap_get_token_dapp_description">%s · ブラウザで開きます</string>
     <string name="swap_get_token_dapp_title">%sで交換</string>
     <string name="swap_get_token_third_party">サードパーティ</string>
+    <string name="bittensor_result_price_moved_with_tolerance">注文は実行されませんでした。価格がスリッページ許容値（%1$s）を超えて変動しました。金額入力画面の設定アイコンからスリッページを変更して、もう一度お試しください。</string>
 </resources>

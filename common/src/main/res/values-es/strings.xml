@@ -2477,4 +2477,5 @@
     <string name="swap_get_token_dapp_description">%s · se abre en el navegador</string>
     <string name="swap_get_token_dapp_title">Intercambiar en %s</string>
     <string name="swap_get_token_third_party">TERCEROS</string>
+    <string name="bittensor_result_price_moved_with_tolerance">La orden no se ejecutó: el precio se movió más allá de tu tolerancia de deslizamiento (%1$s). Puedes cambiar el deslizamiento usando el icono de configuración en la pantalla de introducción del importe e intentarlo de nuevo.</string>
 </resources>

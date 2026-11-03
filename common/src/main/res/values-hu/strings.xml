@@ -2477,4 +2477,5 @@
     <string name="swap_get_token_dapp_description">%s · megnyitás a böngészőben</string>
     <string name="swap_get_token_dapp_title">Váltás itt: %s</string>
     <string name="swap_get_token_third_party">HARMADIK FÉL</string>
+    <string name="bittensor_result_price_moved_with_tolerance">A megbízás nem teljesült: az ár a csúszási toleranciádon (%1$s) túl változott. A csúszást az összegbeviteli képernyő beállításikonjával módosíthatod, majd próbáld újra.</string>
 </resources>

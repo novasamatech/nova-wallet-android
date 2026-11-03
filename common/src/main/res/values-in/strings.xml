@@ -2463,4 +2463,5 @@
     <string name="swap_get_token_dapp_description">%s · membuka di browser</string>
     <string name="swap_get_token_dapp_title">Tukar di %s</string>
     <string name="swap_get_token_third_party">PIHAK KETIGA</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Pesanan tidak dieksekusi: harga bergerak melampaui toleransi slippage Anda (%1$s). Anda dapat mengubah slippage menggunakan ikon pengaturan pada layar input jumlah, lalu mencoba lagi.</string>
 </resources>
