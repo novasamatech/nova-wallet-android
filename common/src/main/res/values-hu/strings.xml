@@ -2461,4 +2461,20 @@
     <string name="deep_linking_staking_asset_not_found">A stakinghivatkozásban szereplő eszköz nem található.</string>
     <string name="deep_linking_staking_not_supported">Ehhez az eszközhöz nem támogatott a staking.</string>
     <string name="staking_new_feature">ÚJ</string>
+    <string name="bittensor_mev_description">Titkosítva tartja a megbízását a nyilvános mempoolban, hogy segítsen megelőzni a front-running támadásokat.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Hálózati díj kerülhetett felszámításra.</string>
+    <string name="bittensor_mev_not_executed">A megbízás nem került végrehajtásra</string>
+    <string name="bittensor_mev_nothing_spent">Nem történt költés.</string>
+    <string name="bittensor_mev_title">MEV-védelem</string>
+    <string name="bittensor_mev_unavailable">Ehhez a megbízáshoz nem érhető el MEV-védelem.</string>
+    <string name="bittensor_mev_unchanged">A megbízása nem került végrehajtásra. A tétje változatlan, próbálja újra.</string>
+    <string name="bittensor_result_fee_charged">Hálózati díj kerülhetett felszámításra.</string>
+    <string name="bittensor_result_nothing_spent">Nem történt költés.</string>
+    <string name="bittensor_result_price_moved">A megbízás nem került végrehajtásra, mert az ár a csúszási toleranciáján túl változott.</string>
+    <string name="bittensor_result_price_moved_format">A megbízás nem került végrehajtásra: az ár a csúszási toleranciáján túl változott (%1$s). A csúszást a %2$s összegének megadására szolgáló képernyőn a beállítások ikonjával módosíthatja, majd próbálja újra.</string>
+    <string name="swap_get_token_alternatives_format">%1$s vagy %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Megnyitás a böngészőben</string>
+    <string name="swap_get_token_dapp_description">%s · megnyitás a böngészőben</string>
+    <string name="swap_get_token_dapp_title">Váltás itt: %s</string>
+    <string name="swap_get_token_third_party">HARMADIK FÉL</string>
 </resources>

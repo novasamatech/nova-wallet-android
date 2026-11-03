@@ -2461,4 +2461,20 @@
     <string name="deep_linking_staking_asset_not_found">L’actif de ce lien de staking est introuvable.</string>
     <string name="deep_linking_staking_not_supported">Le staking n’est pas pris en charge pour cet actif.</string>
     <string name="staking_new_feature">NOUVEAU</string>
+    <string name="bittensor_mev_description">Garde votre ordre chiffré dans le mempool public afin de contribuer à empêcher le front-running.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Des frais réseau peuvent avoir été prélevés.</string>
+    <string name="bittensor_mev_not_executed">Ordre non exécuté</string>
+    <string name="bittensor_mev_nothing_spent">Aucun montant n’a été dépensé.</string>
+    <string name="bittensor_mev_title">Protection MEV</string>
+    <string name="bittensor_mev_unavailable">La protection MEV n’est pas disponible pour cet ordre.</string>
+    <string name="bittensor_mev_unchanged">Votre ordre n’a pas été exécuté. Votre stake est inchangé, veuillez réessayer.</string>
+    <string name="bittensor_result_fee_charged">Des frais réseau peuvent avoir été prélevés.</string>
+    <string name="bittensor_result_nothing_spent">Aucun montant n’a été dépensé.</string>
+    <string name="bittensor_result_price_moved">L’ordre n’a pas été exécuté, car le prix a dépassé votre tolérance de slippage.</string>
+    <string name="bittensor_result_price_moved_format">L’ordre n’a pas été exécuté : le prix a dépassé votre tolérance de slippage (%1$s). Vous pouvez modifier le slippage à l’aide de l’icône des paramètres sur l’écran de saisie du montant de %2$s, puis réessayer.</string>
+    <string name="swap_get_token_alternatives_format">%1$s ou %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">S’ouvre dans le navigateur</string>
+    <string name="swap_get_token_dapp_description">%s · s’ouvre dans le navigateur</string>
+    <string name="swap_get_token_dapp_title">Échanger sur %s</string>
+    <string name="swap_get_token_third_party">TIERS</string>
 </resources>
