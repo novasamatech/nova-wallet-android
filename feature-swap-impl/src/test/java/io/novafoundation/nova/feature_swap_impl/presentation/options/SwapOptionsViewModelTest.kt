@@ -77,6 +77,8 @@ class SwapOptionsViewModelTest {
     @Test
     fun `reset then apply reports a reset`() = runBlocking<Unit> {
         val viewModel = createViewModel(payload(selected = 0.01))
+        // init fills the saved value asynchronously; resetting earlier lets that fill overwrite the reset.
+        withTimeout(5_000) { viewModel.slippageInput.first { it.isNotEmpty() } }
 
         viewModel.resetClicked()
         awaitEnabled(viewModel)
