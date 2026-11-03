@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.Bittenso
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMevFeeRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorMevSwitchState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forMevSelection
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.matchesMevSelection
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import kotlinx.coroutines.flow.onStart
 import io.novafoundation.nova.common.utils.images.Icon
@@ -574,6 +575,7 @@ class BittensorSubnetReviewViewModel(
             ?.takeIf { it.request == prepared } ?: return@launchUnit
         val token = walletContext.first().asset.token
         val subnet = preparedStake.first().dataOrNull?.subnet
+        if (!submission.value.canSubmit || validating.value || !fee.fee.matchesMevSelection(mevEnabled.value)) return@launchUnit
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
@@ -635,6 +637,11 @@ class BittensorSubnetReviewViewModel(
 
     private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
+        if (!fee.matchesMevSelection(mevEnabled.value)) {
+            // A warning can resume after the original confirmation coroutine has finished.
+            validating.value = false
+            return@launchUnit
+        }
         executionStartedAt = SystemClock.elapsedRealtime()
         executionPeriodMultiplier = if ((fee as? BittensorMevReviewFee)?.isProtected == true) 4 else 1
         submission.value = BittensorSubmissionState.Submitting(mapProgress())

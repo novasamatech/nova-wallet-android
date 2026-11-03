@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -29,6 +30,8 @@ fun ViewBittensorSubnetExecutionBinding.showFailure(failure: BittensorStakeResul
     if (failure == null) return
 
     timer.setState(ExecutionTimerView.State.Error)
+    failureIcon.setImageResource(R.drawable.ic_close)
+    failureIcon.setImageTintRes(R.color.text_negative)
     failureIcon.background = context.getRoundedCornerDrawable(R.color.error_block_background, cornerSizeInDp = 32)
     root.setPadding(0, 0, 0, 84.dp(context))
     title.text = failure.title

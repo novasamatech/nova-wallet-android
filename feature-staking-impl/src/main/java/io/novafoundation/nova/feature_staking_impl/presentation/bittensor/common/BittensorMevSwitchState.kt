@@ -19,6 +19,9 @@ fun bittensorMevSwitchState(supported: Boolean, requested: Boolean, fee: Fee?): 
 }
 
 internal fun <R, D> FeeStatus<BittensorFeeEstimate<R>, D>.forMevSelection(enabled: Boolean): FeeStatus<BittensorFeeEstimate<R>, D> {
-    val selectedFee = loadedFeeOrNull()?.fee as? BittensorMevReviewFee ?: return this
-    return if (selectedFee.requested == enabled) this else FeeStatus.Loading(visibleDuringProgress = true)
+    val selectedFee = loadedFeeOrNull()?.fee ?: return this
+    return if (selectedFee.matchesMevSelection(enabled)) this else FeeStatus.Loading(visibleDuringProgress = true)
 }
+
+/** Check the live selection at confirmation too: the displayed fee flow may still replay an earlier selection. */
+internal fun Fee.matchesMevSelection(enabled: Boolean): Boolean = this !is BittensorMevReviewFee || requested == enabled

@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.Bittenso
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMevFeeRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorMevSwitchState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forMevSelection
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.matchesMevSelection
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.resolvedValidatorNames
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
@@ -648,6 +649,7 @@ class BittensorExitReviewViewModel(
             priceMoveBanner.beginTap()
             if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
             val loaded = prepared.first().dataOrNull ?: return@launchUnit
+            if (!loaded.fee.matchesMevSelection(mevEnabled.value)) return@launchUnit
             // Confirm at the new rate acknowledges the latest quote; a crossing the banner does not show yet only raises it.
             val reviewed = when {
                 quotes.value.isPriceMoved -> {
@@ -692,6 +694,7 @@ class BittensorExitReviewViewModel(
                     )
                 }
             ) { validated ->
+                if (!draft.fee.matchesMevSelection(mevEnabled.value)) return@requireValid
                 val state = execution.value
                 val handedOff = state is ExitExecution.Running || state is ExitExecution.Success || state is ExitExecution.Unconfirmed
                 val current = validated.latestQuote?.let { verified ->
