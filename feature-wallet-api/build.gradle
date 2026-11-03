@@ -26,6 +26,7 @@ dependencies {
     implementation substrateSdkDep
 
     implementation constraintDep
+    implementation flexBoxDep
     implementation chartsDep
     implementation shimmerDep
 

@@ -9,11 +9,14 @@ import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProv
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.OnSuccessfulTradeStrategyType
+import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
+import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 
 class WalletNavigator(
     private val commonDelegate: Navigator,
+    private val dAppRouter: DAppRouter,
     navigationHoldersRegistry: NavigationHoldersRegistry
 ) : BaseNavigator(navigationHoldersRegistry), WalletRouter {
 
@@ -25,6 +28,10 @@ class WalletNavigator(
 
     override fun openReceive(assetPayload: AssetPayload) {
         commonDelegate.openReceive(assetPayload)
+    }
+
+    override fun openDAppBrowser(url: String) {
+        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url))
     }
 
     override fun openBuyToken(chainId: String, assetId: Int) {
