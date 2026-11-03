@@ -8,11 +8,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
+import io.novafoundation.nova.feature_staking_impl.data.cache.ResponseCache
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -91,6 +94,8 @@ class BittensorPositionRepositoryTest {
         val priceKey = BittensorCacheKeys.prices("chain", coldKey.toHexString())
         snapshots.saveSnapshot(positionKey, 1L, positions)
 
+        val repository = snapshotOnlyRepository()
+
         snapshots.withSnapshotTicket(positionKey, 1L) { positionTicket ->
             snapshots.withSnapshotTicket(priceKey, 1L) { priceTicket ->
                 snapshots.withSnapshotTicket(priceKey, 2L) { otherWalletTicket ->
@@ -109,6 +114,7 @@ class BittensorPositionRepositoryTest {
     fun `same coldkey in another meta account does not inherit the saved positions`() = runBlocking {
         val key = BittensorCacheKeys.positions("chain", coldKey.toHexString())
         snapshots.saveSnapshot(key, 1L, positions)
+        val repository = snapshotOnlyRepository()
         val other = repository.observePositions("chain", coldKey, metaAccountId = 2L).first()
         assertNull(other.positions)
         assertTrue(other.status is BittensorDataStatus.Loading)
@@ -122,18 +128,7 @@ class BittensorPositionRepositoryTest {
         val dao = InMemoryResponseCacheDao()
         val previousProcess = createResponseTestCache(dao)
         previousProcess.saveSnapshot(BittensorCacheKeys.positions("chain", coldKey.toHexString()), 1L, positions)
-        val restartedSnapshots = createResponseTestCache(dao)
-        val restartedPricesSource = BittensorPricesSource(priceSource, restartedSnapshots, computationalCache)
-        val sharedPositionSource = BittensorPositionSource(
-            positionSource,
-            chainStateRepository,
-            computationalCache,
-            logger,
-            positionUpdates,
-            restartedSnapshots
-        )
-
-        val restarted = RealBittensorPositionRepository(sharedPositionSource, restartedPricesSource)
+        val restarted = snapshotOnlyRepository(createResponseTestCache(dao))
         val state = withTimeout(3_000) { restarted.observePositions("chain", coldKey, metaAccountId = 1L).first() }
         assertEquals(positions, state.positions)
         assertTrue(state.status is BittensorDataStatus.Stale)
@@ -463,6 +458,18 @@ class BittensorPositionRepositoryTest {
             observer.cancelAndJoin()
             withTimeout(3_000L) { blocks.subscriptionCount.first { it == 0 } }
         }
+    }
+
+    /**
+     * Snapshot assertions read the first value of a replay-1 shared stream, so a chain answer must never overtake it.
+     * The request stays pending until the stream is released.
+     */
+    private fun snapshotOnlyRepository(cache: ResponseCache = snapshots): RealBittensorPositionRepository {
+        val pendingChain = object : BittensorPositionRemoteSource {
+            override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions = awaitCancellation()
+        }
+        val positionSource = BittensorPositionSource(pendingChain, chainStateRepository, computationalCache, logger, positionUpdates, cache)
+        return RealBittensorPositionRepository(positionSource, BittensorPricesSource(priceSource, cache, computationalCache))
     }
 
     private suspend fun prepare() {
