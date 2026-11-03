@@ -16,7 +16,7 @@ enum class LedgerDeviceType(
             notifyUuid = "13d63400-2c97-6004-0001-4c6564676572".toUuid(),
             writeUuid = "13d63400-2c97-6004-0002-4c6564676572".toUuid()
         ),
-        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 24576)
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productModelId = 0x60)
     ),
 
     FLEX(
@@ -25,7 +25,7 @@ enum class LedgerDeviceType(
             notifyUuid = "13d63400-2c97-3004-0001-4c6564676572".toUuid(),
             writeUuid = "13d63400-2c97-3004-0002-4c6564676572".toUuid()
         ),
-        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 28672)
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productModelId = 0x70)
     ),
 
     NANO_X(
@@ -34,17 +34,17 @@ enum class LedgerDeviceType(
             notifyUuid = "13d63400-2c97-0004-0001-4c6564676572".toUuid(),
             writeUuid = "13d63400-2c97-0004-0002-4c6564676572".toUuid()
         ),
-        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 16401)
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productModelId = 0x40)
     ),
 
     NANO_S_PLUS(
         BleDevice.NotSupported,
-        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 20480)
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productModelId = 0x50)
     ),
 
     NANO_S(
         BleDevice.NotSupported,
-        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 4113)
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productModelId = 0x10)
     ),
 
     NANO_GEN5(
@@ -60,7 +60,7 @@ enum class LedgerDeviceType(
                 writeUuid = "13d63400-2c97-9004-0002-4c6564676572".toUuid()
             )
         ),
-        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productId = 32768)
+        usbOptions = UsbDeviceInfo(vendorId = LEDGER_VENDOR_ID, productModelId = 0x80)
     )
 }
 
@@ -92,7 +92,16 @@ fun LedgerDeviceType.supportedBleSpecs(): List<BleDevice.Supported.Spec> {
         .orEmpty()
 }
 
+/**
+ * Ledger USB product id is encoded as MMII: MM is the device model, II is a bitfield of enabled USB interfaces,
+ * which depends on firmware and enabled apps (e.g. U2F). Only the model byte identifies the device.
+ */
 class UsbDeviceInfo(
     val vendorId: Int,
-    val productId: Int
+    val productModelId: Int
 )
+
+fun findLedgerDeviceTypeByUsb(vendorId: Int, productId: Int): LedgerDeviceType? {
+    return LedgerDeviceType.values()
+        .firstOrNull { it.usbOptions.vendorId == vendorId && it.usbOptions.productModelId == productId shr 8 }
+}
