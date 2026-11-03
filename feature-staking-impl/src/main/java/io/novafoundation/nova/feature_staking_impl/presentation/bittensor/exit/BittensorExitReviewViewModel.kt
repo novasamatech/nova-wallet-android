@@ -117,6 +117,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.sync.Mutex
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.hiddenWhileSigningOutsideApp
 
 private sealed interface ExitExecution {
     data object Idle : ExitExecution
@@ -529,6 +530,7 @@ class BittensorExitReviewViewModel(
             ExitExecution.Idle -> null
         }
     }
+        .hiddenWhileSigningOutsideApp(bittensorExitInteractor.signingOutsideApp)
         .shareInBackground()
 
     /** iOS done sheet: "You unstaked X", the root stake left after it, and the fee. */
