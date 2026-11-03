@@ -7,7 +7,6 @@ import io.novafoundation.nova.core_db.dao.ResponseCacheDao
 import io.novafoundation.nova.core_db.model.ResponseCacheKey
 import io.novafoundation.nova.core_db.model.ResponseCacheLocal
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -19,8 +18,11 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -54,7 +56,9 @@ class ResponseCache(
     private val nanoTime: () -> Long = System::nanoTime
 ) {
 
-    internal data class SnapshotTicket(val key: ResponseCacheKey, val version: Any)
+    internal class SnapshotTicket(val key: ResponseCacheKey) {
+        internal var invalidated = false
+    }
 
     private class RequestInvalidated : IllegalStateException("Response request was invalidated")
 
@@ -66,9 +70,7 @@ class ResponseCache(
     private var durableReadsAvailable = true
 
     private class Flight {
-        lateinit var result: Deferred<ResponseCacheLocal>
-
-        var deadline = 0L
+        lateinit var result: Deferred<CachedResponse<*>>
 
         var readers = 0
 
@@ -79,8 +81,10 @@ class ResponseCache(
 
     private val flights = mutableMapOf<ResponseCacheKey, Flight>()
 
-    // Object identity also guards snapshot writes: invalidation removes the state, rejecting every older ticket.
     private val states = linkedMapOf<ResponseCacheKey, EntryState>()
+
+    // Only active operations retain tickets. TTL bookkeeping eviction must not invalidate their results.
+    private val snapshotTickets = mutableMapOf<ResponseCacheKey, MutableSet<SnapshotTicket>>()
 
     private class Observer {
         val wake = Channel<Boolean>(Channel.CONFLATED)
@@ -102,9 +106,9 @@ class ResponseCache(
         type: Class<T>,
         metaAccountId: Long? = null,
         validate: (T) -> Unit = {}
-    ): CachedResponse<T>? = mutex.withLock {
+    ): CachedResponse<T>? {
         val key = ResponseCacheKey(normalizedResponseUrl(url), metaAccountId)
-        read(key, type, validate)
+        return read(key, type, validate)
     }
 
     suspend fun <T> get(
@@ -119,16 +123,17 @@ class ResponseCache(
         val cached = peek(url, type, metaAccountId, validate)
         if (cached != null && !cached.stale) return cached
         if (allowStale && cached != null) {
-            start(key, validate, fetch, background = true)
+            start(key, type, validate, fetch, background = true)
             return cached
         }
-        val flight = requireNotNull(start(key, validate, fetch, background = false))
+        val flight = requireNotNull(start(key, type, validate, fetch, background = false))
         try {
-            val row = flight.result.await()
+            val response = flight.result.await()
             return mutex.withLock {
                 if (flight.invalidated) throw RequestInvalidated()
                 requireOwnerExists(key)
-                decode(row, type, validate, flight.deadline)
+                @Suppress("UNCHECKED_CAST")
+                (response as CachedResponse<T>).copy(stale = nanoTime() >= response.freshUntilNanos)
             }
         } finally {
             withContext(NonCancellable) {
@@ -167,8 +172,9 @@ class ResponseCache(
                 if (!mayPublish()) continue
                 latest?.let { send(it) }
                 try {
-                    val recentlyAttempted = mutex.withLock { recentlyAttempted(key) }
-                    if (latest == null || !latest.stale || explicitRefresh || !recentlyAttempted) {
+                    val refreshAvailable = mutex.withLock { key in flights || !recentlyAttempted(key) }
+                    val needsRefresh = latest == null || latest.stale && (explicitRefresh || refreshAvailable)
+                    if (needsRefresh) {
                         latest = get(url, type, metaAccountId, validate = validate, fetch = fetch)
                         if (!mayPublish()) continue
                         send(latest)
@@ -212,17 +218,32 @@ class ResponseCache(
         type: Class<T>,
         metaAccountId: Long?,
         validate: (T) -> Unit = {}
-    ): T? = mutex.withLock {
-        read(ResponseCacheKey(key, metaAccountId), type, validate)?.value
-    }
+    ): T? = read(ResponseCacheKey(key, metaAccountId), type, validate)?.value
 
-    internal suspend fun snapshotTicket(key: String, metaAccountId: Long): SnapshotTicket = mutex.withLock {
-        val identity = ResponseCacheKey(key, metaAccountId)
-        SnapshotTicket(identity, state(identity))
-    }
+    /** Room owns change delivery, including foreign-key removal when the wallet is deleted. */
+    internal fun <T> observeSnapshot(
+        key: String,
+        type: Class<T>,
+        metaAccountId: Long?,
+        validate: (T) -> Unit = {}
+    ): Flow<T?> = dao.observe(key, metaAccountId)
+        .map { readSnapshot(key, type, metaAccountId, validate) }
+        .catch { error ->
+            if (error is CancellationException) throw error
+            logger.log("[ResponseCache] Snapshot observation unavailable")
+            logger.log(error)
+            emit(null)
+        }
+        .distinctUntilChanged()
+
+    internal suspend fun <T> withSnapshotTicket(
+        key: String,
+        metaAccountId: Long,
+        block: suspend (SnapshotTicket) -> T
+    ): T = withTicket(ResponseCacheKey(key, metaAccountId), block)
 
     internal suspend fun isSnapshotCurrent(ticket: SnapshotTicket): Boolean = mutex.withLock {
-        states[ticket.key] === ticket.version && ownerExists(ticket.key)
+        !ticket.invalidated && ownerExists(ticket.key)
     }
 
     /** True means the current snapshot was accepted; disk persistence is best effort. */
@@ -232,21 +253,25 @@ class ResponseCache(
         value: T,
         ticket: SnapshotTicket? = null,
         expiresAt: Long = 0L
-    ): Boolean = mutex.withLock {
+    ): Boolean {
         val identity = ResponseCacheKey(key, metaAccountId)
-        if (ticket != null && (ticket.key != identity || states[identity] !== ticket.version)) return@withLock false
-        persist(ResponseCacheLocal(key, metaAccountId, gson.toJson(value), nowMillis(), expiresAt))
-        true
+        val row = ResponseCacheLocal(key, metaAccountId, gson.toJson(value), nowMillis(), expiresAt)
+        return mutex.withLock {
+            if (ticket != null && (ticket.key != identity || ticket.invalidated)) return@withLock false
+            persist(row)
+            true
+        }
     }
 
     /** Detach matching flights before deleting. Kept snapshots stay visible, but old tickets can no longer write. */
     suspend fun invalidate(keepStale: Boolean = false, matches: (ResponseCacheKey) -> Boolean) {
         val result = mutex.withLock {
-            val knownKeys = (flights.keys + states.keys + observers.keys).distinct().filter(matches)
+            val knownKeys = (flights.keys + states.keys + observers.keys + snapshotTickets.keys).distinct().filter(matches)
             knownKeys.forEach { key ->
                 flights.remove(key)?.invalidated = true
                 states.remove(key)
                 observers[key]?.forEach { it.invalidate() }
+                snapshotTickets.remove(key)?.forEach { it.invalidated = true }
             }
             runCatching {
                 if (!keepStale) {
@@ -263,38 +288,64 @@ class ResponseCache(
     private suspend fun storedRow(key: ResponseCacheKey): ResponseCacheLocal? =
         if (durableReadsAvailable) accessStorage { dao.get(key.normalizedUrl, key.metaAccountId) } else null
 
-    private suspend fun <T> read(key: ResponseCacheKey, type: Class<T>, validate: (T) -> Unit): CachedResponse<T>? {
-        val row = storedRow(key) ?: return null
+    private suspend fun <T> withTicket(key: ResponseCacheKey, block: suspend (SnapshotTicket) -> T): T {
+        val ticket = SnapshotTicket(key)
+        mutex.withLock { snapshotTickets.getOrPut(key) { mutableSetOf() }.add(ticket) }
         return try {
-            decode(row, type, validate)
+            block(ticket)
+        } finally {
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    ticket.invalidated = true
+                    snapshotTickets[key]?.let { tickets ->
+                        tickets.remove(ticket)
+                        if (tickets.isEmpty()) snapshotTickets.remove(key)
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun <T> read(key: ResponseCacheKey, type: Class<T>, validate: (T) -> Unit): CachedResponse<T>? = withTicket(key) { ticket ->
+        val row = mutex.withLock { storedRow(key) } ?: return@withTicket null
+        val value = try {
+            decodePayload(row, type, validate)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             logger.log("[ResponseCache] Removing an incompatible snapshot")
             logger.log(e)
-            accessStorage { dao.delete(listOf(key.storageKey)) }
-            states.remove(key)
-            null
+            mutex.withLock {
+                if (!ticket.invalidated && storedRow(key) == row) {
+                    accessStorage { dao.delete(listOf(key.storageKey)) }
+                    states.remove(key)
+                }
+            }
+            return@withTicket null
+        }
+        mutex.withLock {
+            if (ticket.invalidated || accessStorage { ownerExists(key) } != true) return@withLock null
+            val remaining = (row.expiresAt - nowMillis()).coerceIn(0L, MAX_AGE_MILLIS)
+            val rowDeadline = nanoTime() + remaining * NANOS_PER_MILLI
+            val deadline = minOf(state(key, rowDeadline).deadline, rowDeadline)
+            val safeDeadline = if (nowMillis() < row.fetchedAt) nanoTime() else deadline
+            CachedResponse(value, row.fetchedAt, row.expiresAt, nanoTime() >= safeDeadline, safeDeadline)
         }
     }
 
-    private fun <T> decode(
+    private fun <T> decodePayload(
         row: ResponseCacheLocal,
         type: Class<T>,
-        validate: (T) -> Unit,
-        flightDeadline: Long? = null
-    ): CachedResponse<T> {
+        validate: (T) -> Unit
+    ): T {
         val value = requireNotNull(gson.fromJson(row.payload, type))
         validate(value)
-        val key = ResponseCacheKey(row.normalizedUrl, row.metaAccountId)
-        val remaining = (row.expiresAt - nowMillis()).coerceIn(0L, MAX_AGE_MILLIS)
-        val deadline = flightDeadline ?: state(key, nanoTime() + remaining * NANOS_PER_MILLI).deadline
-        val safeDeadline = if (nowMillis() < row.fetchedAt) nanoTime() else deadline
-        return CachedResponse(value, row.fetchedAt, row.expiresAt, nanoTime() >= safeDeadline, safeDeadline)
+        return value
     }
 
     private suspend fun <T> start(
         key: ResponseCacheKey,
+        type: Class<T>,
         validate: (T) -> Unit,
         fetch: suspend (String) -> Response<T>,
         background: Boolean
@@ -304,22 +355,13 @@ class ResponseCache(
             return@withLock flight
         }
         if (background && recentlyAttempted(key)) return@withLock null
-        val cached = storedRow(key)
-        if (cached != null && states[key]?.deadline?.let { it > nanoTime() } == true) {
-            if (background) return@withLock null
-            val flight = Flight().apply {
-                result = CompletableDeferred(cached)
-                deadline = requireNotNull(states[key]).deadline
-                readers = 1
-                completed = true
-            }
-            flights[key] = flight
-            return@withLock flight
-        }
         state(key).lastAttempt = nanoTime()
         val flight = Flight().apply { readers = if (background) 0 else 1 }
         flight.result = scope.async(start = CoroutineStart.LAZY) {
             try {
+                // A previous flight may have completed between the caller's read and registration.
+                val cached = read(key, type, validate)
+                if (cached != null && !cached.stale) return@async cached
                 val startedAt = nowMillis()
                 val startedNanos = nanoTime()
                 val response = fetch(key.normalizedUrl)
@@ -328,18 +370,18 @@ class ResponseCache(
                 validate(body)
                 val lifetime = lifetimeMillis(response)
                 val row = ResponseCacheLocal(key.normalizedUrl, key.metaAccountId, gson.toJson(body), startedAt, startedAt + lifetime)
+                val deadline = startedNanos + lifetime * NANOS_PER_MILLI
                 mutex.withLock {
                     currentCoroutineContext().ensureActive()
                     if (flight.invalidated) throw RequestInvalidated()
-                    flight.deadline = startedNanos + lifetime * NANOS_PER_MILLI
                     val saved = persist(row)
                     state(key).apply {
                         // A failed write must not grant the new response's lifetime to an older stored payload.
-                        deadline = if (saved) flight.deadline else nanoTime()
+                        this.deadline = if (saved) deadline else nanoTime()
                         lastAttempt = startedNanos
                     }
                 }
-                row
+                CachedResponse(body, row.fetchedAt, row.expiresAt, nanoTime() >= deadline, deadline)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

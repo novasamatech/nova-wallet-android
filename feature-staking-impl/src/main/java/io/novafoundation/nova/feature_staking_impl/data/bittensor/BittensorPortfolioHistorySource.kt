@@ -10,18 +10,6 @@ class BittensorPortfolioHistorySource(
     private val portfolioHistoryApi: BittensorPortfolioHistoryApi
 ) {
 
-    suspend fun portfolioHistory(
-        request: BittensorPortfolioHistoryRequest,
-        address: String
-    ): BittensorPortfolioHistoryRemote = client.get(
-        url = portfolioHistoryUrl(request, address),
-        type = BittensorPortfolioHistoryRemote::class.java,
-        metaAccountId = request.metaId,
-        allowStale = true,
-        validate = { mapBittensorPortfolioHistory(it, request.period) },
-        fetch = portfolioHistoryApi::history
-    )
-
     fun observePortfolioHistory(
         request: BittensorPortfolioHistoryRequest,
         address: String

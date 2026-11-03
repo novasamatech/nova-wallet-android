@@ -20,7 +20,7 @@ expiresAt and an owner-scoped primary key. The primary key includes both URL and
 URL must coexist for multiple wallets and SQLite nullable composite keys would not enforce that identity.
 `metaAccountId` references `meta_accounts.id` with `ON DELETE CASCADE` and an index. Null is reserved for
 public catalogue, yields, validators and recommendation metadata. Positions, held-subnet price snapshots,
-operation history and portfolio history always carry the operation/observation wallet's explicit ID.
+operation history, portfolio history and dashboard snapshots always carry the operation/observation wallet's explicit ID.
 The current selected wallet is never consulted later to assign ownership to an arriving response.
 
 `ResponseCache` owns persistence, reuse, snapshot admission and flights keyed by URL **and owner**.
@@ -38,9 +38,9 @@ Catalogue presentation permits saved data; `BittensorSubnetCatalogueSource.valua
 reusable HTTP response or a successful refresh. An expired response still labelled FRESH by the backend
 cannot suppress runtime price fallback or mark an external balance current.
 Generic get/peek/observe helpers belong to the shared client and return payloads directly.
-Only operation-history aggregation uses internal lifetime-aware reads to expire the assembled history
-when its earliest page expires. Settlement uses an
-explicit uncached operation-history read.
+Only operation-history aggregation uses internal lifetime-aware reads to schedule refresh at its earliest
+page deadline. The assembled result lives in the active shared stream, without a second payload cache.
+Settlement uses an explicit uncached operation-history read with the same origin and timeout checks.
 Account endpoints use the wallet captured by their request/caller, including background wallet updates;
 reading the currently selected wallet here would misattribute work after a wallet switch.
 Private HTTP endpoints require a non-null owner; a missing owner cannot fall back to public data.
@@ -49,7 +49,15 @@ Local positions/prices use `bittensor://runtime/...` resource URIs containing ch
 Reading these entries is a direct Room read and never resolves global config or a backend URL. They have
 zero freshness and restore as stale until a live chain read succeeds. Snapshot tickets capture resource
 and owner; transaction invalidation retains the last snapshot but rejects older writes for that owner.
-The existing dashboard summary remains a fallback. No Saved data labels or refresh banners are added.
+`withSnapshotTicket` bounds admission to the load's lifetime. Normal TTL/LRU eviction cannot invalidate
+an active load; completing or cancelling it releases the ticket.
+No Saved data labels or refresh banners are added.
+
+`BittensorDashboardSnapshotSource` stores dashboard summaries and claimable rewards in the same Room
+cache, under explicit wallet ownership. Existing Preferences snapshots are migrated on first read for
+their chain and coldkey and removed only once Room can restore them. Source-local serialization keeps
+legacy migration from overwriting a concurrent live update. Rewards are observed through Room, including
+owner deletion, without a separate event bus. These snapshots share the 512-row limit and cascade deletion.
 
 The single 75→76 auto migration creates `response_cache` with its owner foreign key and index.
 The intermediate cache schemas were never released, so their data transformations and schema exports
@@ -59,13 +67,18 @@ Development builds that used the intermediate schemas are not a supported upgrad
 
 Global configuration now persists its last successful response, separately for each config URL. If
 refresh fails after process restart, infrastructure URL resolution can use the saved config; cancellation
-still propagates. Without a previously saved config, the original failure remains visible to the caller.
+still propagates. Conversion to the domain model succeeds before replacing the saved response, so an
+incompatible successful HTTP response cannot destroy the offline fallback. Without a previously saved
+config, the original failure remains visible to the caller.
 
 ## Read and refresh behavior
 
 - Fresh entries are reused until their HTTP deadline. `max-age` is capped at 300 seconds; `Age` and time
   spent waiting for the response consume freshness. Monotonic deadlines are used in-process; bounded
   wall-clock expiry restores them after restart.
+  A fresh initial value is emitted once. An observer joining an existing background refresh receives its
+  result immediately, without waiting for the retry floor. Successful transports return their validated
+  body directly; JSON conversion is only for storage and runs outside the shared registry lock.
 - A validated no-store/no-cache response is an **application snapshot** with zero freshness. It may render,
   persist as stale, and be replaced; it never grants a new reusable lifetime. Quotes, fees, authentication,
   and transaction preflight are outside this cache.
@@ -86,10 +99,14 @@ still propagates. Without a previously saved config, the original failure remain
   cache mutex. The shared `BittensorAlphaYieldSource` caps its transports at four across reads and observations;
   the common client does not identify yield endpoints by URL.
   Cancelling one screen does not cancel another screen's flight; each flight, including its queue wait, has the existing
-  Bittensor request timeout. History keeps provider pagination validation and inter-page spacing.
+  Bittensor request timeout. History keeps provider pagination validation; inter-page spacing applies
+  only to actual network requests, not reads of saved pages.
 - The manual picker renders the backend catalogue directly, without waiting for runtime catalogue or
   SubtokenEnabled reads. Live eligibility/availability and transaction terms remain checked by the
   existing preflight/submission infrastructure. Optional external market metrics do not block stale browsing.
+  Runtime catalogue observers also follow backend updates when their initial response came from that
+  fallback. A healthy runtime catalogue still avoids backend requests. Failure to read optional backend
+  cache metadata cannot prevent runtime fallback; only one successful chain catalogue is retained.
 - Like iOS `SubtensorSubnetSelectInteractor`, the picker loads logos from the shared Bittensor config
   independently of its catalogue and updates visible rows when logos arrive. All subnet screens read
   the same observable config cache, including amount entry, portfolio/position, details, and buy/sell
@@ -112,16 +129,20 @@ still propagates. Without a previously saved config, the original failure remain
 The request URL contains the HTTPS backend origin. Changing the configured base clears Bittensor response
 URLs and rejects old flights, including changing away and back. Other features' response URLs are not deleted.
 Recommendation responses must pass semantic validation before advancing the persisted generation high-water
-mark. A newer generation invalidates other generational entries; older in-flight responses cannot restore them.
+mark, including required subnet ranking items and duplicate IDs. A newer generation invalidates other
+generational entries; older in-flight responses cannot restore them. Equal generations do not rewrite the watermark.
 The high-water mark survives normal response eviction: durable generation metadata uses
 `expiresAt = Long.MAX_VALUE` and is excluded from trimming. Only the current backend's watermark is kept.
 HTTP responses and local snapshots share one 512-row limit; in-memory entry states are also capped at 512.
 These are entry-count limits, not byte quotas.
-Assembled operation-history payloads are capped at eight accounts. History metadata keeps at most 32
+Operation-history pages use the shared response cache; no assembled-history LRU is retained. History metadata keeps at most 32
 inactive entries plus currently observed/loading accounts; active requests hold a lease and cannot be
 evicted. Generation numbers remain unique after eviction. Pending settlement deadlines survive metadata
 eviction/restart in preferences; a successful post-window refresh clears the deadline, and recreating
 state removes an already-expired deadline.
+One pagination algorithm assembles saved and current pages. The active stream retains the last result
+across refresh failures, and waits for foreground or its next deadline only after loading completes.
+Foreground during a load does not queue another request.
 
 Account data uses the captured meta-account ID and explicit chain/account identity, not a later wallet selection. Account switching
 starts another stream/key. The shared submission executor captures wallet/account/origin before handoff and
@@ -140,10 +161,14 @@ load from overwriting them or being published as a fresh load. Cached prices kee
 live pricing completes, so they cannot seed a fresh external-balance update.
 
 `BittensorPricesSource` owns restoring, refreshing, saving and invalidating runtime portfolio prices.
+It calls `BittensorPortfolioPriceSource` directly for backend/runtime selection; the redundant portfolio
+loader is removed, and holdings selection/valuation remain pure mapping functions.
 `BittensorPositionSource` owns restoring, validating, refreshing, saving and invalidating positions;
 `BittensorPositionRemoteSource` is the runtime transport adapter. Each source shares its subscriptions.
 Sources use `ComputationalCache.observeSharedFlow` to bind sharing to active collectors without repeating
 scope-management wrappers. Stopping the last collector releases the producer even if its parent scope lives on.
+The existing shared cache implementation is unchanged. New catalogue observations materialize load
+failures inside the producer and unwrap them in the consumer, preserving the existing shared-flow boundary.
 `RealBittensorPositionRepository` only combines positions with prices and delegates invalidation to those
 sources. It has no dependency on `ResponseCache` or `ComputationalCache`.
 A failed or partial price refresh keeps saved prices visible as stale and cannot replace a complete durable
@@ -172,18 +197,18 @@ automatically; no migration-specific verification script is needed. It runs with
 or emulator. The six retained schema exports (1, 2, 8, 9, 75 and 76) produce 15 migration cases. Data transformation migrations still
 need focused data-preservation tests in addition to this shared schema check.
 
-`ResponseCacheDaoTest` checks owner/public row isolation, real foreign-key cascade and rejection of late
-writes after wallet deletion. All 15 schema-pair migrations and these three DAO tests passed on a fresh
-Android 37 emulator profile via `AndroidJUnitRunner`. The offline Gradle connected-test runner could not
-resolve a missing UTP dependency, so the assembled test APK was run directly with `adb shell am instrument`.
+`ResponseCacheDaoTest` checks owner/public row isolation, real foreign-key cascade, rejection of late
+writes after wallet deletion and reactive removal of an observed snapshot. All 15 schema-pair migrations
+and these four DAO tests passed on a fresh Android 37 emulator profile via `AndroidJUnitRunner`.
+The assembled test APK was run directly with `adb shell am instrument`; no wallet APK was installed.
 
 Device acceptance still requires killing the process, disabling connectivity, and reopening dashboard,
 subnet picker, and positions. Also verify recovery after foreground/reconnect,
 and a real submitted trade's average purchase-price refresh. JVM and schema checks do not prove those device,
 authenticated backend, or on-chain scenarios. These checks do not install the wallet APK or submit transactions.
 
-`BittensorOperationHistorySource` owns page loading/mapping, shared history streams, cached assembled
-history and indexer-settlement state. The redundant operation-history repository has been removed.
+`BittensorOperationHistorySource` owns page loading/mapping, shared history streams and indexer-settlement
+state. The redundant operation-history repository has been removed.
 It invalidates operation pages itself and delegates chart invalidation to `BittensorPortfolioHistorySource`;
 each source owns its endpoint path. Alpha-yield reads use `BittensorAlphaYieldSource`, with no dependency
 on history pagination or its inter-page delay.

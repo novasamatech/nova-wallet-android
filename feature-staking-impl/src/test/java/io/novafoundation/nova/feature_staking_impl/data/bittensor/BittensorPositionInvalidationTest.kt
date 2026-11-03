@@ -18,9 +18,7 @@ class BittensorPositionInvalidationTest {
 
     private val prices = mock(BittensorPricesSource::class.java)
 
-    private val loader = mock(BittensorPortfolioLoader::class.java)
-
-    private val repository = RealBittensorPositionRepository(positions, loader, prices)
+    private val repository = RealBittensorPositionRepository(positions, prices)
 
     private val coldKey = ByteArray(32)
 

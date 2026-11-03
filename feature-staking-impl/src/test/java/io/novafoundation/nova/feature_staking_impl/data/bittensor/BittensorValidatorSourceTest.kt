@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import com.google.gson.Gson
+import io.novafoundation.nova.core_db.dao.ResponseCacheDao
+import io.novafoundation.nova.core_db.model.ResponseCacheLocal
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
@@ -287,6 +289,52 @@ class BittensorValidatorSourceTest {
         api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 100).meta, emptyList())
         assertTrue(backend.rankedValidators(64).items!!.isEmpty())
         assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `malformed subnet rankings cannot poison cache or advance shared generation`() = runBlocking {
+        val duplicate = BittensorSubnetRankingRemote(1, null, null, null)
+        val malformed = listOf(null, listOf(duplicate, duplicate))
+        for (items in malformed) {
+            val api = Api("max-age=60")
+            val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+            val backend = BittensorValidatorSource(api, urls)
+            api.recommendationsDocument = BittensorRecommendationsRemote(policy("FRESH", block = 200).meta, items = items)
+
+            assertTrue(runCatching { backend.gates() }.isFailure)
+
+            api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 100).meta, emptyList())
+            assertTrue(backend.rankedValidators(64).items!!.isEmpty())
+            api.recommendationsDocument = policy("FRESH", block = 100)
+            assertEquals(BigDecimal("0.18"), backend.gates().maxCommissionRate)
+            assertEquals(3, api.requests.size)
+        }
+    }
+
+    @Test
+    fun `equal recommendation generations do not rewrite the durable watermark`() = runBlocking {
+        val stored = InMemoryResponseCacheDao()
+        var watermarkWrites = 0
+        val dao = object : ResponseCacheDao by stored {
+            override suspend fun put(entry: ResponseCacheLocal) {
+                if (entry.normalizedUrl.startsWith("bittensor://generation/")) watermarkWrites += 1
+                stored.put(entry)
+            }
+        }
+        val api = Api("no-store")
+        val sources = createBittensorTestSources(dao = dao, validatorsApi = api, readExpiredCache = false)
+        sources.validators.gates()
+        sources.validators.rankedValidators(64)
+        sources.validators.gates()
+        assertEquals(1, watermarkWrites)
+
+        api.rankedDocument = BittensorRankedValidatorsRemote(policy("FRESH", block = 124).meta, emptyList())
+        sources.validators.rankedValidators(64)
+        assertEquals(2, watermarkWrites)
+
+        val restarted = createBittensorTestSources(dao = dao, validatorsApi = api, readExpiredCache = false)
+        assertTrue(runCatching { restarted.validators.gates() }.isFailure)
+        assertEquals(2, watermarkWrites)
     }
 
     @Test
@@ -663,6 +711,7 @@ class BittensorValidatorSourceTest {
                 "generation":{"sourceBlockNumber":123},
                 "clientGates":{"maxTake":"0.18","requirePermit":true,"requireActiveWithinCutoff":true}
             },
+            "items":[],
             "classes":{
                 "stable":[{"netuid":1,"hotkey":"subnet-one"},{"netuid":0,"hotkey":"stable-root"}],
                 "balanced":[{"netuid":0,"hotkey":"balanced-root"}],
@@ -683,7 +732,8 @@ class BittensorValidatorSourceTest {
                 BittensorRecommendationsRemote.Gates("0.18", true, true),
                 BittensorRecommendationsRemote.Components(BittensorRecommendationsRemote.Component(availability, freshness, asOf)),
                 BittensorRecommendationsRemote.Generation(block.toBigInteger())
-            )
+            ),
+            items = emptyList()
         )
     }
 }

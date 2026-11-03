@@ -10,14 +10,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.InMemoryPreferences
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPricesSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRemoteSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimPreview
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
@@ -58,7 +57,7 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val rootClaims = mock(BittensorRootClaimSource::class.java)
 
-    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
+    private val priceRepository = mock(BittensorPortfolioPriceSource::class.java)
 
     private val chainStateRepository = mock(ChainStateRepository::class.java)
 
@@ -68,7 +67,13 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val cache = RecordingCache()
 
-    private val snapshots = RealBittensorDashboardSnapshotRepository(InMemoryPreferences(), Gson())
+    private val preferences = InMemoryPreferences()
+
+    private val gson = Gson()
+
+    private val logger = mock(Logger::class.java)
+
+    private val snapshots = BittensorDashboardSnapshotSource(positionSnapshots, preferences, gson, logger)
 
     private val coldKey: AccountId = ByteArray(32)
 
@@ -113,15 +118,11 @@ class StakingDashboardBittensorUpdaterTest {
         )
     }
 
-    private val logger = mock(Logger::class.java)
-
-    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
-
     private val commonModule = CommonModule()
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val pricesSource = BittensorPricesSource(portfolioLoader, positionSnapshots, computationalCache)
+    private val pricesSource = BittensorPricesSource(priceRepository, positionSnapshots, computationalCache)
 
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
@@ -134,7 +135,7 @@ class StakingDashboardBittensorUpdaterTest {
         positionSnapshots
     )
 
-    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, pricesSource)
 
     private fun updater() = StakingDashboardBittensorUpdater(
         chain,
@@ -157,7 +158,7 @@ class StakingDashboardBittensorUpdaterTest {
 
         assertTrue(requireNotNull(cache.item).hasStake)
         assertEquals(BigInteger.ZERO, cache.item?.stake)
-        assertEquals(BigInteger.TEN, snapshots.claimableRootRewards(chain.id, coldKey))
+        assertEquals(BigInteger.TEN, snapshots.claimableRootRewards(chain.id, coldKey, metaAccount.id))
     }
 
     @Test
@@ -170,7 +171,7 @@ class StakingDashboardBittensorUpdaterTest {
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 
         assertFalse(requireNotNull(cache.item).hasStake)
-        assertNull(snapshots.claimableRootRewards(chain.id, coldKey))
+        assertNull(snapshots.claimableRootRewards(chain.id, coldKey, metaAccount.id))
     }
 
     @Test
@@ -196,7 +197,7 @@ class StakingDashboardBittensorUpdaterTest {
         val claimable = mutableListOf<BigInteger?>()
         withTimeout(3_000L) {
             updates.onEach {
-                claimable += snapshots.claimableRootRewards(chain.id, coldKey)
+                claimable += snapshots.claimableRootRewards(chain.id, coldKey, metaAccount.id)
                 `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
                 blockNumbers.value += BigInteger.ONE
             }.take(2).toList()
@@ -210,14 +211,14 @@ class StakingDashboardBittensorUpdaterTest {
     @Test
     fun `unavailable rewards reuse the last known claimable amount`() = runBlocking {
         prepare()
-        snapshots.saveClaimableRootRewards(chain.id, coldKey, BigInteger.TEN)
+        snapshots.saveClaimableRootRewards(chain.id, coldKey, metaAccount.id, BigInteger.TEN)
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
         `when`(rootClaims.claimPreviews(chain.id, coldKey)).thenThrow(IllegalStateException("offline"))
 
         withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
 
         assertTrue(requireNotNull(cache.item).hasStake)
-        assertEquals(BigInteger.TEN, snapshots.claimableRootRewards(chain.id, coldKey))
+        assertEquals(BigInteger.TEN, snapshots.claimableRootRewards(chain.id, coldKey, metaAccount.id))
     }
 
     private fun claims(redeemable: BigInteger, minimum: BigInteger): BittensorRootClaims {

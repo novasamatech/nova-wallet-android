@@ -26,7 +26,6 @@ interface BittensorPositionRepository {
 
 class RealBittensorPositionRepository(
     private val positionSource: BittensorPositionSource,
-    private val portfolioLoader: BittensorPortfolioLoader,
     private val pricesSource: BittensorPricesSource
 ) : BittensorPositionRepository {
 
@@ -58,9 +57,9 @@ class RealBittensorPositionRepository(
     }
 
     private fun valueLatestPositions(state: BittensorPositionState, prices: BittensorPortfolioPrices): BittensorPortfolioState {
-        val heldSubnets = portfolioLoader.heldSubnets(state.positions)
+        val heldSubnets = state.positions.heldSubnets()
         val matching = heldSubnets == prices.heldSubnets
-        val positions = state.positions?.let { portfolioLoader.value(it, if (matching) prices.prices else emptyMap()) }
+        val positions = state.positions?.let { mapBittensorPortfolio(it, if (matching) prices.prices else emptyMap()) }
         val pricesPending = state.status !is BittensorDataStatus.Stale && heldSubnets.isNotEmpty() && !(matching && prices.loaded)
         val status = if (matching && prices.stale && heldSubnets.isNotEmpty() && state.status is BittensorDataStatus.Fresh) {
             BittensorDataStatus.Stale(BittensorCacheStaleException())

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.di.modules.CommonModule
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
@@ -14,8 +16,20 @@ import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
@@ -30,7 +44,9 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class BittensorSubnetCatalogueTest {
 
     private val calls = CatalogueCalls()
@@ -51,15 +67,127 @@ class BittensorSubnetCatalogueTest {
 
     private val catalogueSource = BittensorSubnetCatalogueSource(backend, urls)
 
+    private val commonModule = CommonModule()
+
+    private val computationalCache = commonModule.provideComputationalCache()
+
     private val repository = createRepository()
 
     private fun createRepository(
         config: BittensorConfigSource = this.config,
         chainPatienceMillis: Long = 4_000L,
-        nanoTime: () -> Long = System::nanoTime
+        nanoTime: () -> Long = System::nanoTime,
+        catalogueSource: BittensorSubnetCatalogueSource = this.catalogueSource,
+        computationalCache: ComputationalCache = this.computationalCache
     ): RealBittensorSubnetRepository {
-        val source = BittensorSubnetSource(runtimeCalls, catalogueSource, chainPatienceMillis, nanoTime)
+        val source = BittensorSubnetSource(runtimeCalls, catalogueSource, computationalCache, chainPatienceMillis, nanoTime)
         return RealBittensorSubnetRepository(source, config, swaps)
+    }
+
+    @Test
+    fun `first load failure reaches the observer through the shared source`() = runBlocking<Unit> {
+        calls.failure = IOException("Node down")
+        backend.failure = IOException("Backend down")
+
+        val result = withTimeout(3_000) { runCatching { repository.observeSubnets().first() } }
+
+        assertEquals("Node down", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `background catalogue errors retain the first rows and retry without busy polling`() = runTest {
+        val catalogueSource = mock(BittensorSubnetCatalogueSource::class.java)
+        val computations = UnsharedComputations()
+        val repository = createRepository(catalogueSource = catalogueSource, computationalCache = computations)
+        var subscriptions = 0
+        val refreshes = flow {
+            if (++subscriptions == 1) throw IOException("Offline")
+            emit(backendCatalogue(name = "Recovered"))
+            awaitCancellation()
+        }
+        `when`(catalogueSource.availableSubnets()).thenReturn(backendCatalogue())
+        `when`(catalogueSource.observeSubnets()).thenReturn(refreshes)
+        val rows = mutableListOf<List<io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet>>()
+        val observer = backgroundScope.launch { repository.observeSubnets().toList(rows) }
+        runCurrent()
+
+        assertEquals(listOf("Backend 7"), rows.map { it.single().name })
+        advanceTimeBy(29_999)
+        runCurrent()
+        assertEquals(1, subscriptions)
+        advanceTimeBy(1)
+        runCurrent()
+        assertEquals(listOf("Backend 7", "Recovered"), rows.map { it.single().name })
+        assertEquals(0, calls.requests)
+
+        observer.cancelAndJoin()
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertEquals(2, subscriptions)
+    }
+
+    @Test
+    fun `cancellation of backend context resolution is never replaced by a runtime read`() = runBlocking<Unit> {
+        val unavailableUrls = InfrastructureUrls { throw CancellationException("Cancelled") }
+        val unavailableCatalogue = BittensorSubnetCatalogueSource(backend, unavailableUrls)
+        val repository = createRepository(catalogueSource = unavailableCatalogue)
+
+        assertTrue(runCatching { repository.catalogue() }.exceptionOrNull() is CancellationException)
+        assertEquals(0, calls.requests)
+        assertEquals(0, backend.requests)
+    }
+
+    @Test
+    fun `saved catalogue is followed by refreshed metadata without a runtime request`() = runBlocking<Unit> {
+        withTimeout(5_000) {
+            var now = 0L
+            val catalogueSource = BittensorSubnetCatalogueSource(backend, urls) { now }
+            catalogueSource.subnets()
+            now = 31.seconds.inWholeNanoseconds
+            val response = CompletableDeferred<Unit>()
+            backend.release = response
+            backend.name = "Updated name"
+            backend.cacheControl = "max-age=270"
+            val repository = createRepository(catalogueSource = catalogueSource)
+            val initial = CompletableDeferred<List<io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet>>()
+            val updated = async {
+                repository.observeSubnets()
+                    .onEach { initial.complete(it) }
+                    .first { it.single().name == "Updated name" }
+            }
+
+            assertEquals("Backend 7", initial.await().single().name)
+            assertEquals(0, calls.requests)
+            response.complete(Unit)
+
+            assertEquals("Updated name", updated.await().single().name)
+            assertEquals(2, backend.requests)
+            assertEquals(0, calls.requests)
+            verifyNoInteractions(swaps)
+        }
+    }
+
+    @Test
+    fun `failed backend context lookup does not prevent a healthy runtime catalogue`() = runBlocking<Unit> {
+        val unavailableUrls = InfrastructureUrls { throw IOException("Infrastructure unavailable") }
+        val unavailableCatalogue = BittensorSubnetCatalogueSource(backend, unavailableUrls)
+        val repository = createRepository(catalogueSource = unavailableCatalogue)
+
+        val catalogue = repository.catalogue()
+
+        assertTrue(catalogue.fromChain)
+        assertEquals(listOf("Name"), catalogue.subnets.map { it.name })
+        assertEquals(1, calls.requests)
+        assertEquals(0, backend.requests)
+    }
+
+    @Test
+    fun `observing a healthy runtime catalogue does not fetch backend metadata`() = runBlocking<Unit> {
+        val catalogue = withTimeout(3_000) { repository.observeSubnets().first() }
+
+        assertEquals(listOf("Name"), catalogue.map { it.name })
+        assertEquals(1, calls.requests)
+        assertEquals(0, backend.requests)
     }
 
     @Test
@@ -273,11 +401,25 @@ class BittensorSubnetCatalogueTest {
 
         var availability = "AVAILABLE"
 
+        var name = "Backend 7"
+
+        var release: CompletableDeferred<Unit>? = null
+
         override suspend fun subnets(url: String): Response<BittensorSubnetCatalogueRemote> {
             requests++
             delay(delayMillis)
+            release?.await()
             failure?.let { throw it }
-            return Response.success(backendCatalogue(availability = availability), Headers.headersOf("Cache-Control", cacheControl))
+            return Response.success(backendCatalogue(availability = availability, name = name), Headers.headersOf("Cache-Control", cacheControl))
+        }
+    }
+
+    private class UnsharedComputations : ComputationalCache {
+
+        override suspend fun <T> useCache(key: String, scope: CoroutineScope, computation: suspend CoroutineScope.() -> T): T = computation(scope)
+
+        override fun <T> useSharedFlow(key: String, scope: CoroutineScope, flowLazy: suspend CoroutineScope.() -> Flow<T>): Flow<T> = flow {
+            emitAll(flowLazy(scope))
         }
     }
 
@@ -334,8 +476,8 @@ class BittensorSubnetCatalogueTest {
     }
 }
 
-private fun backendCatalogue(freshness: String = "FRESH", availability: String = "AVAILABLE"): BittensorSubnetCatalogueRemote {
-    val row = BittensorSubnetCatalogueRemote.Subnet(7, "0.5", "Backend 7", "B7", 42.toBigInteger(), "2000", alphaReserve = "4000")
+private fun backendCatalogue(freshness: String = "FRESH", availability: String = "AVAILABLE", name: String = "Backend 7"): BittensorSubnetCatalogueRemote {
+    val row = BittensorSubnetCatalogueRemote.Subnet(7, "0.5", name, "B7", 42.toBigInteger(), "2000", alphaReserve = "4000")
     val component = BittensorRecommendationsRemote.Component(availability, freshness)
     val meta = BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component))
     return BittensorSubnetCatalogueRemote(listOf(row), meta)

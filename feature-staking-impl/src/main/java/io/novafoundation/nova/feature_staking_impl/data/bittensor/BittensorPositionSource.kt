@@ -96,13 +96,17 @@ class BittensorPositionSource(
         metaAccountId: Long
     ): BittensorPositionState = try {
         val key = BittensorCacheKeys.positions(chainId, coldKey.toHexString())
-        val ticket = cache.snapshotTicket(key, metaAccountId)
-        val positions = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { remoteSource.positions(chainId, coldKey) }
-        currentCoroutineContext().ensureActive()
-        check(cache.saveSnapshot(key, metaAccountId, positions, ticket)) {
-            "Position request was invalidated"
+        cache.withSnapshotTicket(
+            key = key,
+            metaAccountId = metaAccountId
+        ) { ticket ->
+            val positions = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { remoteSource.positions(chainId, coldKey) }
+            currentCoroutineContext().ensureActive()
+            check(cache.saveSnapshot(key, metaAccountId, positions, ticket)) {
+                "Position request was invalidated"
+            }
+            BittensorPositionState(positions, BittensorDataStatus.Fresh)
         }
-        BittensorPositionState(positions, BittensorDataStatus.Fresh)
     } catch (e: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
         stalePositions(cachedPositions, e)

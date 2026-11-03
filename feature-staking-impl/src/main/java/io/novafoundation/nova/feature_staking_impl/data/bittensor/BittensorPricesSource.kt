@@ -25,7 +25,7 @@ data class BittensorPortfolioPrices(
 
 /** Owns saved portfolio prices, refresh admission and invalidation for each wallet and chain account. */
 class BittensorPricesSource(
-    private val portfolioLoader: BittensorPortfolioLoader,
+    private val priceSource: BittensorPortfolioPriceSource,
     private val cache: ResponseCache,
     private val computationalCache: ComputationalCache
 ) {
@@ -68,7 +68,7 @@ class BittensorPricesSource(
         send(BittensorPortfolioPrices(emptySet(), emptyMap(), loaded = false))
 
         positions.collect { state ->
-            val heldSubnets = portfolioLoader.heldSubnets(state.positions)
+            val heldSubnets = state.positions.heldSubnets()
             if (heldSubnets != requestedSubnets) {
                 priceJob?.cancel()
                 priceJob = null
@@ -87,18 +87,22 @@ class BittensorPricesSource(
             // reach the independent combine immediately, without waiting for prices.
             if (state.status is BittensorDataStatus.Fresh && heldSubnets.isNotEmpty() && priceJob?.isActive != true) {
                 priceJob = launch {
-                    val ticket = cache.snapshotTicket(key, metaAccountId)
-                    val prices = portfolioLoader.loadPrices(chainId, heldSubnets)
-                    ensureActive()
-                    if (prices.keys.containsAll(heldSubnets)) {
-                        val stored = StoredPrices(prices.map { (subnet, price) -> StoredPrice(subnet.value, price.toString()) })
-                        if (!cache.saveSnapshot(key, metaAccountId, stored, ticket)) return@launch
+                    cache.withSnapshotTicket(
+                        key = key,
+                        metaAccountId = metaAccountId
+                    ) { ticket ->
+                        val prices = priceSource.prices(chainId, heldSubnets)
+                        ensureActive()
+                        if (prices.keys.containsAll(heldSubnets)) {
+                            val stored = StoredPrices(prices.map { (subnet, price) -> StoredPrice(subnet.value, price.toString()) })
+                            if (!cache.saveSnapshot(key, metaAccountId, stored, ticket)) return@withSnapshotTicket
+                        }
+                        if (!cache.isSnapshotCurrent(ticket)) return@withSnapshotTicket
+                        val savedPrices = lastPrices.filterKeys { it in heldSubnets }
+                        val usesSavedPrices = savedPrices.keys.any { it !in prices }
+                        lastPrices = savedPrices + prices
+                        send(BittensorPortfolioPrices(heldSubnets, lastPrices, loaded = true, stale = usesSavedPrices))
                     }
-                    if (!cache.isSnapshotCurrent(ticket)) return@launch
-                    val savedPrices = lastPrices.filterKeys { it in heldSubnets }
-                    val usesSavedPrices = savedPrices.keys.any { it !in prices }
-                    lastPrices = savedPrices + prices
-                    send(BittensorPortfolioPrices(heldSubnets, lastPrices, loaded = true, stale = usesSavedPrices))
                 }
             }
         }

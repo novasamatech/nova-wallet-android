@@ -12,8 +12,11 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.mockito.Mockito.mock
@@ -22,26 +25,36 @@ class InMemoryResponseCacheDao(private val owners: MutableSet<Long>? = null) : R
 
     val rows = linkedMapOf<String, ResponseCacheLocal>()
 
+    private val changes = MutableStateFlow(0L)
+
     override suspend fun get(url: String, metaAccountId: Long?) = rows[ResponseCacheKey(url, metaAccountId).storageKey]
+
+    override fun observe(url: String, metaAccountId: Long?) = changes.map { get(url, metaAccountId) }
 
     override suspend fun put(entry: ResponseCacheLocal) {
         require(entry.metaAccountId == null || owners == null || entry.metaAccountId in owners) { "Deleted owner" }
         rows[entry.key] = entry
+        changes.value++
     }
 
     fun deleteOwner(owner: Long) {
         owners?.remove(owner)
         rows.entries.removeAll { it.value.metaAccountId == owner }
+        changes.value++
     }
 
     override suspend fun ownerExists(metaAccountId: Long): Boolean = owners == null || metaAccountId in owners
 
     override suspend fun keys() = rows.values.map { ResponseCacheKey(it.normalizedUrl, it.metaAccountId) }
 
-    override suspend fun delete(keys: List<String>) { keys.forEach(rows::remove) }
+    override suspend fun delete(keys: List<String>) {
+        keys.forEach(rows::remove)
+        changes.value++
+    }
 
     override suspend fun trim(limit: Int) {
         rows.values.filter { it.expiresAt != Long.MAX_VALUE }.sortedByDescending { it.fetchedAt }.drop(limit).forEach { rows.remove(it.key) }
+        changes.value++
     }
 }
 
@@ -49,11 +62,11 @@ fun createResponseTestCache(
     dao: ResponseCacheDao = InMemoryResponseCacheDao(),
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
     nowMillis: () -> Long = System::currentTimeMillis,
-    nanoTime: () -> Long = System::nanoTime
+    nanoTime: () -> Long = System::nanoTime,
+    foreground: Flow<Boolean> = emptyFlow()
 ): ResponseCache {
     val gson = Gson()
     val logger = mock(Logger::class.java)
-    val foreground = emptyFlow<Boolean>()
     val flightScope = CoroutineScope(scope.coroutineContext + SupervisorJob(scope.coroutineContext[kotlinx.coroutines.Job]))
     return ResponseCache(dao, gson, flightScope, logger, foreground, nowMillis, nanoTime)
 }
@@ -68,9 +81,10 @@ fun createBittensorTestSources(
     catalogueApi: BittensorSubnetCatalogueApi? = null,
     estimatesApi: BittensorEstimatesApi? = null,
     portfolioHistoryApi: BittensorPortfolioHistoryApi? = null,
-    readExpiredCache: Boolean = true
+    readExpiredCache: Boolean = true,
+    foreground: Flow<Boolean> = emptyFlow()
 ): BittensorTestSources {
-    val responses = createResponseTestCache(dao, scope, nowMillis, nanoTime)
+    val responses = createResponseTestCache(dao, scope, nowMillis, nanoTime, foreground)
     val validators = validatorsApi ?: mock(BittensorValidatorsApi::class.java)
     val catalogue = catalogueApi ?: mock(BittensorSubnetCatalogueApi::class.java)
     val estimates = estimatesApi ?: mock(BittensorEstimatesApi::class.java)

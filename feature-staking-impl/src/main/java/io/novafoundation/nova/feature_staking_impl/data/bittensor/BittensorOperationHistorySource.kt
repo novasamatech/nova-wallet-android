@@ -1,14 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.cache.CachedResponse
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import retrofit2.HttpException
-import kotlinx.coroutines.flow.channelFlow
-
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.observeSharedFlow
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.feature_staking_impl.data.cache.CachedResponse
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -22,14 +18,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import retrofit2.HttpException
+import retrofit2.Response
 
 class BittensorOperationHistorySource(
     private val client: BittensorBackendClient,
@@ -43,21 +41,15 @@ class BittensorOperationHistorySource(
     private val nowMillis: () -> Long = System::currentTimeMillis
 ) {
 
-    private data class CachedHistory(val history: BittensorOperationHistory, val validUntilNanos: Long)
-
     private class AccountHistory(initialGeneration: Long) {
         val generation = MutableStateFlow(initialGeneration)
 
         var seedBlockedUntilNanos: Long? = null
 
-        var latestFlight = 0L
-
         var settledGeneration = initialGeneration
 
         var users = 0
     }
-
-    private data class CacheAdmission(val mayCache: Boolean, val flight: Long)
 
     private data class HistoryKey(val baseUrl: HttpUrl, val address: String, val metaAccountId: Long)
 
@@ -66,8 +58,6 @@ class BittensorOperationHistorySource(
     private val histories = linkedMapOf<HistoryKey, AccountHistory>()
 
     private var nextGeneration = 0L
-
-    private val cachedHistories = linkedMapOf<HistoryKey, CachedHistory>()
 
     internal data class Snapshot(
         val request: BittensorHistoryRequest,
@@ -89,7 +79,6 @@ class BittensorOperationHistorySource(
         val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
         synchronized(lock) {
             val state = accountHistory(key)
-            cachedHistories.remove(key)
             state.seedBlockedUntilNanos = nowNanos() + SETTLEMENT_NANOS
             preferences.putLong(settlementField(key), nowMillis() + SETTLEMENT_MILLIS)
         }
@@ -104,7 +93,6 @@ class BittensorOperationHistorySource(
         // Complete the generation transition before rethrowing failures, including cancellation.
         synchronized(lock) {
             // Publish only after invalidation, so replacement requests get the new cache revision.
-            cachedHistories.remove(key)
             accountHistory(key).generation.value = ++nextGeneration
         }
         val operationsError = operationsResult.exceptionOrNull()
@@ -119,7 +107,8 @@ class BittensorOperationHistorySource(
     }
 
     /** Shared while observed. Null means loading, never an unavailable or empty ledger. */
-    fun observe(address: String, metaAccountId: Long): Flow<Result<BittensorOperationHistory>?> = observeState(address, metaAccountId).map { it.result }
+    internal fun observe(address: String, metaAccountId: Long): Flow<Result<BittensorOperationHistory>?> =
+        observeState(address, metaAccountId).map { it.result }
 
     fun observeState(address: String, metaAccountId: Long): Flow<BittensorHistoryState> = flow {
         while (true) {
@@ -156,87 +145,69 @@ class BittensorOperationHistorySource(
         }
     }
 
-    private fun refreshHistory(request: BittensorHistoryRequest): Flow<Snapshot> = channelFlow {
-        val foreground = Channel<Unit>(Channel.CONFLATED)
-        val observer = launch { client.foregroundRefreshes.collect { foreground.trySend(Unit) } }
-        checkOrigin(request)
-        val restored = if (!isSettling(request)) cachedHistory(request.address, request.metaAccountId) else null
-        var lastResult: Result<BittensorOperationHistory>? = restored?.let {
-            Result.success(
-                BittensorOperationHistory(it.items, it.allPagesRead, stale = it.stale)
-            )
+    private fun refreshHistory(request: BittensorHistoryRequest): Flow<Snapshot> = flow {
+        val restoration = runCatching {
+            checkOrigin(request)
+            if (isSettling(request)) null else cachedHistory(request)
         }
-        send(Snapshot(request, lastResult, isSettling(request)))
-        try {
-            while (true) {
-                val startedDuringSettlement = synchronized(lock) {
-                    val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
-                    val deadline = histories.getValue(key).seedBlockedUntilNanos
-                    deadline != null && nowNanos() < deadline
-                }
-                val result = try {
-                    Result.success(history(request))
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    lastResult?.map { it.copy(stale = true) } ?: Result.failure(e)
-                }
-                lastResult = result.takeIf { it.isSuccess } ?: lastResult
-                send(Snapshot(request, result, startedDuringSettlement || isSettling(request)))
-                // A shared stream never migrates to another origin under its original cache key.
-                if (result.exceptionOrNull() is OriginChanged) awaitCancellation()
-                // Delay after completion: a ten-page request is not cancelled by a refresh tick.
-                withTimeoutOrNull(refreshDelayMillis(request)) { foreground.receive() }
+        val restorationFailure = restoration.exceptionOrNull()
+        if (restorationFailure is CancellationException) throw restorationFailure
+        val restored = restoration.getOrNull()
+        var lastResult = restored?.let { Result.success(it.toHistory()) }
+        val initialResult = restorationFailure?.let { Result.failure<BittensorOperationHistory>(it) } ?: lastResult
+        emit(Snapshot(request, initialResult, isSettling(request)))
+        if (restorationFailure is OriginChanged) awaitCancellation()
+        if (restored != null && nowNanos() < restored.validUntilNanos) {
+            awaitRefresh(request, restored.validUntilNanos)
+        }
+        while (true) {
+            // Settlement eligibility belongs to request start, even if the request outlives the window.
+            var startedDuringSettlement = false
+            val loaded = runCatching {
+                val persist = mayPersist(request)
+                startedDuringSettlement = !persist
+                loadCurrentHistory(request, persist)
             }
-        } finally {
-            observer.cancel()
-            foreground.close()
+            val failure = loaded.exceptionOrNull()
+            if (failure is CancellationException) throw failure
+            val result = loaded.map(HistoryPages::toHistory).recoverCatching { error ->
+                lastResult?.getOrNull()?.copy(stale = true) ?: throw error
+            }
+            lastResult = result.takeIf { it.isSuccess } ?: lastResult
+            emit(Snapshot(request, result, isSettling = startedDuringSettlement || isSettling(request)))
+            // A shared stream never migrates to another origin under its original cache key.
+            if (failure is OriginChanged) awaitCancellation()
+            awaitRefresh(request, loaded.getOrNull()?.validUntilNanos)
         }
     }
 
-    suspend fun history(request: BittensorHistoryRequest): BittensorOperationHistory = useHistory(request) {
-        loadHistory(request)
+    internal suspend fun history(request: BittensorHistoryRequest): BittensorOperationHistory = useHistory(request) {
+        loadCurrentHistory(request, persist = mayPersist(request)).toHistory()
     }
 
-    private suspend fun loadHistory(request: BittensorHistoryRequest): BittensorOperationHistory {
+    private suspend fun loadCurrentHistory(request: BittensorHistoryRequest, persist: Boolean): HistoryPages {
         checkOrigin(request)
-        val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
-        val admission = synchronized(lock) {
-            val state = requireCurrent(key, request)
-            val now = nowNanos()
-            val blockedUntil = state.seedBlockedUntilNanos
-            val seedAllowed = blockedUntil == null || now >= blockedUntil
-            val cached = cachedHistories[key]
-            if (seedAllowed && cached != null && now < cached.validUntilNanos) {
-                cachedHistories.remove(key)
-                cachedHistories[key] = cached
-                return cached.history
-            }
-            state.latestFlight += 1
-            CacheAdmission(seedAllowed, state.latestFlight)
-        }
-        val pages = loadHistoryPages(request.baseUrl, request.address, request.metaAccountId, persist = admission.mayCache)
+        val pages = loadHistoryPages(request.baseUrl, request.address, request.metaAccountId, persist)
         currentCoroutineContext().ensureActive()
         checkOrigin(request)
-        val history = BittensorOperationHistory(pages.items, pages.allPagesRead, stale = pages.stale)
         synchronized(lock) {
+            val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
             val state = requireCurrent(key, request)
-            if (admission.mayCache) {
+            if (persist) {
                 state.settledGeneration = request.generation
                 if (state.seedBlockedUntilNanos != null) {
                     state.seedBlockedUntilNanos = null
                     preferences.removeField(settlementField(key))
                 }
             }
-            // Settlement responses may be displayed, but never seed a later subscription.
-            // Admission uses eligibility at request start and the remote request-start TTL.
-            if (admission.mayCache && state.latestFlight == admission.flight && nowNanos() < pages.validUntilNanos) {
-                cachedHistories.remove(key)
-                cachedHistories[key] = CachedHistory(history, pages.validUntilNanos)
-                if (cachedHistories.size > HISTORY_CACHE_LIMIT) cachedHistories.remove(cachedHistories.keys.first())
-            }
         }
-        return history
+        return pages
+    }
+
+    private fun mayPersist(request: BittensorHistoryRequest): Boolean = synchronized(lock) {
+        val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
+        val deadline = requireCurrent(key, request).seedBlockedUntilNanos
+        deadline == null || nowNanos() >= deadline
     }
 
     private fun isSettling(request: BittensorHistoryRequest): Boolean = synchronized(lock) {
@@ -244,16 +215,23 @@ class BittensorOperationHistorySource(
         state.settledGeneration != state.generation.value
     }
 
-    private fun refreshDelayMillis(request: BittensorHistoryRequest): Long = synchronized(lock) {
-        val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
-        val cachedRemaining = cachedHistories[key]?.validUntilNanos?.minus(nowNanos()) ?: 0L
-        val deadline = histories.getValue(key).seedBlockedUntilNanos
-        val remaining = deadline?.minus(nowNanos()) ?: 0L
-        if (remaining > 0) {
-            ((remaining + 999_999L) / 1_000_000L).coerceAtMost(REFRESH_INTERVAL_MILLIS)
-        } else {
-            (cachedRemaining / NANOS_PER_MILLI).coerceIn(30_000L, 300_000L)
+    private suspend fun awaitRefresh(request: BittensorHistoryRequest, validUntilNanos: Long?) {
+        val delayMillis = synchronized(lock) {
+            val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
+            val settlementRemaining = histories.getValue(key).seedBlockedUntilNanos?.minus(nowNanos()) ?: 0L
+            if (settlementRemaining > 0) {
+                ((settlementRemaining + NANOS_PER_MILLI - 1) / NANOS_PER_MILLI).coerceAtMost(REFRESH_INTERVAL_MILLIS)
+            } else {
+                val cacheRemaining = validUntilNanos?.minus(nowNanos()) ?: 0L
+                if (cacheRemaining > 0) {
+                    ((cacheRemaining + NANOS_PER_MILLI - 1) / NANOS_PER_MILLI).coerceAtMost(300_000L)
+                } else {
+                    30_000L
+                }
+            }
         }
+        // Subscribe only after loading: foreground during a request does not queue a duplicate refresh.
+        withTimeoutOrNull(delayMillis) { client.foregroundRefreshes.firstOrNull() ?: awaitCancellation() }
     }
 
     private fun accountHistory(key: HistoryKey): AccountHistory {
@@ -285,7 +263,6 @@ class BittensorOperationHistorySource(
         val inactive = histories.filterValues { it.users == 0 }.keys
         inactive.take((inactive.size - INACTIVE_HISTORY_LIMIT).coerceAtLeast(0)).forEach { key ->
             histories.remove(key)
-            cachedHistories.remove(key)
         }
     }
 
@@ -332,27 +309,11 @@ class BittensorOperationHistorySource(
     private class OriginChanged : IllegalStateException("Cost basis origin has changed")
 
     internal suspend fun loadHistoryPages(baseUrl: HttpUrl, address: String, metaAccountId: Long, persist: Boolean = true): HistoryPages =
-        loadPages(
-            HISTORY_PAGE_LIMIT,
-            spacingMillis
-        ) { page -> loadHistoryPage(baseUrl, address, page, metaAccountId, persist) }
+        requireNotNull(loadPages { page -> loadHistoryPage(baseUrl, address, page, metaAccountId, persist) })
 
-    private suspend fun cachedHistory(address: String, metaAccountId: Long): HistoryPages? {
-        val items = mutableListOf<BittensorReportedOperation>()
-        var page: Int? = FIRST_PAGE
-        var deadline = Long.MAX_VALUE
-        var count = 0
-        var stale = false
-        while (page != null && count < HISTORY_PAGE_LIMIT) {
-            val current = page
-            val snapshot = cachedOperationHistory(address, current, metaAccountId) ?: return null
-            items += requireNotNull(snapshot.value.items).map(::mapBittensorReportedOperation)
-            deadline = minOf(deadline, snapshot.freshUntilNanos)
-            stale = stale || isReportedStale(snapshot.value)
-            page = nextPage(snapshot.value.pageInfo)
-            count += 1
-        }
-        return HistoryPages(items, deadline, allPagesRead = page == null, stale = stale)
+    private suspend fun cachedHistory(request: BittensorHistoryRequest): HistoryPages? = loadPages { page ->
+        val snapshot = cachedOperationHistory(request.baseUrl, request.address, page, request.metaAccountId)
+        snapshot?.let { historyPage(it.value, it.freshUntilNanos) }
     }
 
     private suspend fun loadHistoryPage(
@@ -364,7 +325,7 @@ class BittensorOperationHistorySource(
     ): HistoryPage {
         if (!persist) {
             val body = uncachedOperationHistory(baseUrl, address, page)
-            return historyPage(body, System.nanoTime())
+            return historyPage(body, nowNanos())
         }
         val snapshot = operationHistory(baseUrl, address, page, metaAccountId)
         return historyPage(snapshot.value, snapshot.freshUntilNanos)
@@ -377,27 +338,21 @@ class BittensorOperationHistorySource(
         stale = isReportedStale(body)
     )
 
-    private suspend fun loadPages(
-        pageLimit: Int,
-        spacingMillis: Long,
-        loadPage: suspend (Int) -> HistoryPage
-    ): HistoryPages {
+    private suspend fun loadPages(loadPage: suspend (Int) -> HistoryPage?): HistoryPages? {
         val items = mutableListOf<BittensorReportedOperation>()
         var nextPage: Int? = FIRST_PAGE
         var validUntilNanos = Long.MAX_VALUE
         var pagesRead = 0
         var stale = false
-
-        while (nextPage != null && pagesRead < pageLimit) {
-            if (pagesRead > 0) delay(spacingMillis)
-            val page = loadPage(nextPage)
+        while (nextPage != null && pagesRead < HISTORY_PAGE_LIMIT) {
+            // A missing saved page cannot become a successful, apparently complete history.
+            val page = loadPage(nextPage) ?: return null
             items += page.items
             validUntilNanos = minOf(validUntilNanos, page.validUntilNanos)
             stale = stale || page.stale
             nextPage = page.nextPage
             pagesRead += 1
         }
-
         return HistoryPages(items, validUntilNanos, allPagesRead = nextPage == null, stale = stale)
     }
 
@@ -417,7 +372,9 @@ class BittensorOperationHistorySource(
         val validUntilNanos: Long,
         val allPagesRead: Boolean,
         val stale: Boolean
-    )
+    ) {
+        fun toHistory() = BittensorOperationHistory(items, allPagesRead, stale)
+    }
 
     private suspend fun operationHistory(
         base: HttpUrl,
@@ -429,15 +386,16 @@ class BittensorOperationHistorySource(
         type = BittensorOperationsRemote::class.java,
         metaAccountId = metaAccountId,
         validate = { validateOperationHistory(it, page) },
-        fetch = estimatesApi::operations
+        fetch = { url -> fetchHistoryPage(url, page) }
     )
 
     private suspend fun cachedOperationHistory(
+        base: HttpUrl,
         address: String,
         page: Int,
         metaAccountId: Long
     ): CachedResponse<BittensorOperationsRemote>? = client.peekWithLifetime(
-        url = operationHistoryUrl(client.baseUrl(), address, page),
+        url = operationHistoryUrl(base, address, page),
         type = BittensorOperationsRemote::class.java,
         metaAccountId = metaAccountId,
         validate = { validateOperationHistory(it, page) }
@@ -445,10 +403,15 @@ class BittensorOperationHistorySource(
 
     /** During indexer settlement reads must neither reuse nor seed the cache. */
     internal suspend fun uncachedOperationHistory(base: HttpUrl, address: String, page: Int): BittensorOperationsRemote {
-        val response = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) { estimatesApi.operations(operationHistoryUrl(base, address, page)) }
-            ?: throw BittensorTimeoutException("Backend operations/search")
+        val response = client.fetch(operationHistoryUrl(base, address, page)) { url -> fetchHistoryPage(url, page) }
         if (!response.isSuccessful) throw HttpException(response)
         return requireNotNull(response.body()).also { validateOperationHistory(it, page) }
+    }
+
+    private suspend fun fetchHistoryPage(url: String, page: Int): Response<BittensorOperationsRemote> {
+        // Throttle transport only; restored/fresh pages must not delay the first render.
+        if (page > FIRST_PAGE) delay(spacingMillis)
+        return estimatesApi.operations(url)
     }
 
     private fun validateOperationHistory(body: BittensorOperationsRemote, page: Int) {
@@ -476,7 +439,6 @@ class BittensorOperationHistorySource(
         const val MAX_HISTORY_PAGE = 100
         const val HISTORY_PAGE_SIZE = 100
         const val OPERATIONS_PATH = "operations/search"
-        const val HISTORY_CACHE_LIMIT = 8
         const val INACTIVE_HISTORY_LIMIT = 32
         const val SETTLEMENT_MILLIS = 300_000L
         const val NANOS_PER_MILLI = 1_000_000L

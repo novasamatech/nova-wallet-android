@@ -31,8 +31,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorClaimClock
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingClaims
 import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
 import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
@@ -51,12 +50,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRec
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorCostBasisInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRuntimePriceSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioPriceRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioPriceSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
@@ -305,8 +303,9 @@ class BittensorModule {
     @FeatureScope
     fun provideBittensorSubnetSource(
         runtimeCalls: MultiChainRuntimeCallsApi,
-        catalogueSource: BittensorSubnetCatalogueSource
-    ) = BittensorSubnetSource(runtimeCalls, catalogueSource)
+        catalogueSource: BittensorSubnetCatalogueSource,
+        computationalCache: ComputationalCache
+    ) = BittensorSubnetSource(runtimeCalls, catalogueSource, computationalCache)
 
     @Provides
     @FeatureScope
@@ -325,8 +324,12 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorDashboardSnapshots(preferences: Preferences, gson: Gson): BittensorDashboardSnapshotRepository =
-        RealBittensorDashboardSnapshotRepository(preferences, gson)
+    fun provideBittensorDashboardSnapshots(
+        cache: ResponseCache,
+        preferences: Preferences,
+        gson: Gson,
+        logger: Logger
+    ) = BittensorDashboardSnapshotSource(cache, preferences, gson, logger)
 
     @Provides
     @FeatureScope
@@ -415,11 +418,6 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorPortfolioLoader(priceRepository: BittensorPortfolioPriceRepository, logger: Logger) =
-        BittensorPortfolioLoader(priceRepository, logger)
-
-    @Provides
-    @FeatureScope
     fun provideBittensorSubnetCatalogueApi(@Attested apiCreator: NetworkApiCreator): BittensorSubnetCatalogueApi =
         apiCreator.create(BittensorSubnetCatalogueApi::class.java)
 
@@ -433,19 +431,18 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorPortfolioPriceRepository(
+    fun provideBittensorPortfolioPriceSource(
         catalogueSource: BittensorSubnetCatalogueSource,
         runtimePrices: BittensorRuntimePriceSource,
         logger: Logger
-    ): BittensorPortfolioPriceRepository = RealBittensorPortfolioPriceRepository(catalogueSource, runtimePrices, logger)
+    ): BittensorPortfolioPriceSource = RealBittensorPortfolioPriceSource(catalogueSource, runtimePrices, logger)
 
     @Provides
     @FeatureScope
     fun provideBittensorPositionRepository(
         positionSource: BittensorPositionSource,
-        portfolioLoader: BittensorPortfolioLoader,
         pricesSource: BittensorPricesSource
-    ): BittensorPositionRepository = RealBittensorPositionRepository(positionSource, portfolioLoader, pricesSource)
+    ): BittensorPositionRepository = RealBittensorPositionRepository(positionSource, pricesSource)
 
     @Provides
     @FeatureScope
@@ -572,10 +569,10 @@ class BittensorModule {
     @Provides
     @FeatureScope
     fun provideBittensorPricesSource(
-        loader: BittensorPortfolioLoader,
+        priceSource: BittensorPortfolioPriceSource,
         cache: ResponseCache,
         computationalCache: ComputationalCache
-    ) = BittensorPricesSource(loader, cache, computationalCache)
+    ) = BittensorPricesSource(priceSource, cache, computationalCache)
 
     @Provides
     @FeatureScope
@@ -643,7 +640,7 @@ class BittensorModule {
         positions: BittensorPositionRepository,
         validators: BittensorValidatorInteractor,
         recommendedYields: BittensorRecommendedYieldInteractor,
-        snapshots: BittensorDashboardSnapshotRepository,
+        snapshots: BittensorDashboardSnapshotSource,
         logger: Logger
     ) = BittensorDashboardDetailsSource(
         positions,

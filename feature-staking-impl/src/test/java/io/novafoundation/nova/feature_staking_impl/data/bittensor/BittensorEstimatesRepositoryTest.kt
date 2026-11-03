@@ -15,7 +15,6 @@ import okhttp3.Headers
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -45,14 +44,15 @@ class BittensorEstimatesRepositoryTest {
     private val address = "test-account"
 
     @Test
-    fun `history stops at the last page and caches the completed result`() = runBlocking {
+    fun `history stops at the last page and reuses cached pages without backend calls`() = runBlocking {
         api.nextHistoryPage = { if (it == 1) 2 else null }
 
         val first = history()
+        assertEquals(listOf(1, 2), api.historyPages)
         val second = history()
 
         assertTrue(first.allProviderPagesRead)
-        assertSame(first, second)
+        assertEquals(first, second)
         assertEquals(listOf(1, 2), api.historyPages)
     }
 
@@ -239,7 +239,8 @@ class BittensorEstimatesRepositoryTest {
 
     @Test
     fun `operation history retains its page throttling`() = runTest {
-        val throttledSource = backendSource.historySource(computationalCache, preferences, spacingMillis = 12_000L)
+        val sources = createBittensorTestSources(infrastructureUrls, estimatesApi = api, scope = backgroundScope)
+        val throttledSource = sources.historySource(computationalCache, preferences, spacingMillis = 12_000L)
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         api.nextHistoryPage = { if (it == 1) 2 else null }
 
@@ -248,6 +249,10 @@ class BittensorEstimatesRepositoryTest {
         assertEquals(listOf(1, 2), api.historyPages)
         assertEquals(12_000L, testScheduler.currentTime)
         assertTrue(pages.allPagesRead)
+
+        throttledSource.loadHistoryPages(baseUrl, address, metaAccountId = 1L)
+        assertEquals(listOf(1, 2), api.historyPages)
+        assertEquals(12_000L, testScheduler.currentTime)
     }
 
     @Test

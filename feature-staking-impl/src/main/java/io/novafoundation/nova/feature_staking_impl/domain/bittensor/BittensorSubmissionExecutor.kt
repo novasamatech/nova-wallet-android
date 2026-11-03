@@ -64,13 +64,9 @@ class BittensorSubmissionExecutor(
         onStage: (String) -> Unit = {},
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
-        val operationColdKey = try {
+        val operationColdKey = runCatching {
             accountRepository.getMetaAccount(metaId).requireAccountIdIn(chain)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            return@withLock e.mapBittensorPreSubmissionError()
-        }
+        }.getOrElse { return@withLock it.mapBittensorPreSubmissionError() }
         val historyRequest = try {
             history.request(chain.addressOf(operationColdKey), metaId)
         } catch (e: CancellationException) {

@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.observeSharedFlow
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
@@ -8,6 +10,14 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -17,37 +27,66 @@ import kotlinx.coroutines.withTimeoutOrNull
 class BittensorSubnetSource(
     private val runtimeCalls: MultiChainRuntimeCallsApi,
     private val catalogueSource: BittensorSubnetCatalogueSource,
+    private val computationalCache: ComputationalCache,
     private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS,
     private val nanoTime: () -> Long = System::nanoTime
 ) {
 
     private val mutex = Mutex()
 
-    private var cachedCatalogue: BittensorSubnetCatalogue? = null
+    private data class ChainCatalogue(val value: BittensorSubnetCatalogue, val fetchedAtNanos: Long)
 
-    private var lastGoodCatalogue: BittensorSubnetCatalogue? = null
+    private var chainCatalogue: ChainCatalogue? = null
 
-    private var catalogueLoadedAtNanos = 0L
+    fun observeCatalogue(): Flow<BittensorSubnetCatalogue> {
+        val shared = computationalCache.observeSharedFlow("Bittensor.SubnetCatalogue") {
+            catalogueUpdates()
+                .map { Result.success(it) }
+                .catch { cause ->
+                    if (cause is CancellationException) throw cause
+                    emit(Result.failure(cause))
+                }
+        }
+        return shared.map { it.getOrThrow() }
+    }
+
+    private fun catalogueUpdates(): Flow<BittensorSubnetCatalogue> = flow {
+        val initial = catalogue()
+        emit(initial)
+        // Preserve the healthy runtime path. Backend-backed screens follow its cached and refreshed metadata.
+        if (!initial.fromChain) {
+            emitAll(
+                catalogueSource.observeSubnets()
+                    .map { BittensorSubnetCatalogue(mapBittensorBackendCatalogue(it), fromChain = false) }
+                    .retryWhen { cause, _ ->
+                        if (cause is CancellationException) throw cause
+                        delay(CATALOGUE_RETRY_MILLIS)
+                        true
+                    }
+            )
+        }
+    }.distinctUntilChanged()
 
     suspend fun catalogue(): BittensorSubnetCatalogue = mutex.withLock {
-        val cachedCatalogue = cachedCatalogue
-        if (cachedCatalogue != null && cachedCatalogue.fromChain && nanoTime() - catalogueLoadedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
-            return@withLock cachedCatalogue
+        val savedChain = chainCatalogue
+        if (savedChain != null && nanoTime() - savedChain.fetchedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
+            return@withLock savedChain.value
         }
-        val backend = catalogueSource.availableSubnets()
+        val backend = runCatching { catalogueSource.availableSubnets() }
+            .onFailure { if (it is CancellationException) throw it }
+            .getOrNull()
         if (backend != null) {
             return@withLock BittensorSubnetCatalogue(mapBittensorBackendCatalogue(backend), fromChain = false)
         }
+        val requestedAt = nanoTime()
         val catalogue = try {
             resolveCatalogue()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            return@withLock lastGoodCatalogue ?: throw e
+            return@withLock savedChain?.value?.namesOnly() ?: throw e
         }
-        this.cachedCatalogue = catalogue
-        if (catalogue.fromChain) lastGoodCatalogue = catalogue.namesOnly()
-        catalogueLoadedAtNanos = nanoTime()
+        if (catalogue.fromChain) chainCatalogue = ChainCatalogue(catalogue, requestedAt)
         catalogue
     }
 
@@ -111,5 +150,7 @@ class BittensorSubnetSource(
         val CATALOGUE_VALIDITY = 30.seconds
 
         const val CHAIN_CATALOGUE_PATIENCE_MILLIS = 4_000L
+
+        const val CATALOGUE_RETRY_MILLIS = 30_000L
     }
 }

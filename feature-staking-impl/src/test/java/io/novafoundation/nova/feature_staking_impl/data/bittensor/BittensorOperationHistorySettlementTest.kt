@@ -13,13 +13,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -32,7 +37,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
@@ -166,7 +170,9 @@ class BittensorOperationHistorySettlementTest {
         val legacyIdentity = (baseUrl.toString() + "|account").encodeToByteArray().blake2b256().toHexString()
         storedDeadlines["bittensor_history_settlement_$legacyIdentity"] = nowMillis + 300_000L
         val initial = request()
-        assertNotSame(repository.history(initial), repository.history(initial))
+        repository.history(initial)
+        repository.history(initial)
+        assertEquals(2, api.historyPages.size)
         assertEquals(2, storedDeadlines.size)
     }
 
@@ -176,9 +182,11 @@ class BittensorOperationHistorySettlementTest {
         val second = requireNotNull(repository.request("shared", metaAccountId = 2L))
         val firstHistory = repository.history(first)
         val secondHistory = repository.history(second)
-        assertNotSame(firstHistory, secondHistory)
+        assertEquals(firstHistory, secondHistory)
+        assertEquals(2, api.historyPages.size)
         repository.ownTradeSubmitted(first)
-        assertSame(secondHistory, repository.history(second))
+        assertEquals(secondHistory, repository.history(second))
+        assertEquals(2, api.historyPages.size)
         assertEquals(second, repository.request("shared", metaAccountId = 2L))
         assertTrue(runCatching { repository.history(first) }.isFailure)
     }
@@ -268,17 +276,21 @@ class BittensorOperationHistorySettlementTest {
         nowMillis += 299_000L
         val restarted = newRepository()
         val settling = requireNotNull(restarted.request("account", metaAccountId = 1L))
-        assertNotSame(restarted.history(settling), restarted.history(settling))
+        restarted.history(settling)
+        restarted.history(settling)
+        assertEquals(2, api.historyPages.size)
 
         nowNanos += 1_000_000_000L
         val settled = restarted.history(settling)
-        assertSame(settled, restarted.history(settling))
+        assertEquals(settled, restarted.history(settling))
+        assertEquals(3, api.historyPages.size)
 
         nowMillis += 1_000L
         val expired = newRepository()
         val request = requireNotNull(expired.request("account", metaAccountId = 1L))
-        assertSame(expired.history(request), expired.history(request))
+        assertEquals(expired.history(request), expired.history(request))
         assertTrue(storedDeadlines.isEmpty())
+        assertEquals(3, api.historyPages.size)
     }
 
     @Test
@@ -313,13 +325,13 @@ class BittensorOperationHistorySettlementTest {
         repository.ownTradeSubmitted(initial)
         val changed = request()
 
-        val remote = repository.history(changed)
-        assertNotSame(remote, repository.history(changed))
+        repository.history(changed)
+        repository.history(changed)
         assertEquals(3, api.historyPages.size)
 
         nowNanos += 300_000_000_000L
         val settled = repository.history(changed)
-        assertSame(settled, repository.history(changed))
+        assertEquals(settled, repository.history(changed))
         assertEquals(4, api.historyPages.size)
     }
 
@@ -340,7 +352,8 @@ class BittensorOperationHistorySettlementTest {
 
         api.beforeHistoryResponse = {}
         val changed = request()
-        assertNotSame(repository.history(changed), repository.history(changed))
+        repository.history(changed)
+        repository.history(changed)
         assertEquals(3, api.historyPages.size)
     }
 
@@ -358,12 +371,12 @@ class BittensorOperationHistorySettlementTest {
         started.await()
         nowNanos += 300_000_000_000L
         release.complete(Unit)
-        val lagged = flight.await()
+        flight.await()
 
         api.beforeHistoryResponse = {}
         val settled = repository.history(changed)
-        assertNotSame(lagged, settled)
-        assertSame(settled, repository.history(changed))
+        assertEquals(settled, repository.history(changed))
+        assertEquals(2, api.historyPages.size)
     }
 
     @Test
@@ -385,7 +398,7 @@ class BittensorOperationHistorySettlementTest {
         val settled = repository.history(changed)
         release.complete(Unit)
         assertTrue(flight.await().isFailure)
-        assertSame(settled, repository.history(changed))
+        assertEquals(settled, repository.history(changed))
     }
 
     @Test
@@ -396,11 +409,13 @@ class BittensorOperationHistorySettlementTest {
         repeat(30) { assertEquals(changed, request()) }
         nowNanos += 1_000_000_000L
         val settled = repository.history(changed)
-        assertSame(settled, repository.history(changed))
+        assertEquals(settled, repository.history(changed))
 
         repository.ownTradeSubmitted(changed)
         val next = request()
-        assertNotSame(repository.history(next), repository.history(next))
+        repository.history(next)
+        repository.history(next)
+        assertEquals(3, api.historyPages.size)
     }
 
     @Test
@@ -412,13 +427,16 @@ class BittensorOperationHistorySettlementTest {
         val otherA = request("a")
         val cachedOtherA = repository.history(otherA)
         repository.ownTradeSubmitted(a)
-        assertSame(cachedOtherA, repository.history(otherA))
+        assertEquals(cachedOtherA, repository.history(otherA))
         assertTrue(runCatching { repository.history(b) }.exceptionOrNull() is IllegalStateException)
 
         baseUrl = a.baseUrl
-        assertSame(cachedB, repository.history(b))
+        assertEquals(cachedB, repository.history(b))
+        assertEquals(3, api.historyPages.size) // Returning to A reloads its pages after the origin changed.
         val changedA = request("a")
-        assertNotSame(repository.history(changedA), repository.history(changedA))
+        repository.history(changedA)
+        repository.history(changedA)
+        assertEquals(5, api.historyPages.size)
     }
 
     @Test
@@ -510,24 +528,191 @@ class BittensorOperationHistorySettlementTest {
         assertEquals(1, api.historyPages.size)
     }
 
+    @Test
+    fun `a new subscription restores fresh pages immediately without refreshing or page spacing`() = runTest {
+        api.nextHistoryPage = { if (it == 1) 2 else null }
+        val request = request()
+        val expected = repository.history(request)
+        val restarted = backendSource.historySource(cache, preferences, spacingMillis = 12_000L, nowNanos = clock, nowMillis = wallClock)
+        val restoredRequest = requireNotNull(restarted.request("account", metaAccountId = 1L))
+
+        val restored = restarted.observeHistory(restoredRequest).first { it.result != null }
+
+        assertEquals(expected, restored.result!!.getOrThrow())
+        assertEquals(listOf(1, 2), api.historyPages)
+        assertEquals(0L, testScheduler.currentTime)
+        assertEquals(expected, restarted.history(restoredRequest))
+        assertEquals(0L, testScheduler.currentTime)
+    }
+
+    @Test
+    fun `foreground during a settlement request does not queue another request`() = runTest {
+        val foreground = MutableStateFlow(true)
+        val sources = createBittensorTestSources(urls, estimatesApi = api, scope = backgroundScope, foreground = foreground)
+        val history = sources.historySource(cache, preferences, nowNanos = clock, nowMillis = wallClock)
+        val initial = requireNotNull(history.request("account", metaAccountId = 1L))
+        history.ownTradeSubmitted(initial)
+        val request = requireNotNull(history.request("account", metaAccountId = 1L))
+        val release = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { release.await() }
+        val observer = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            history.observeHistory(request).collect {}
+        }
+        runCurrent()
+        assertEquals(1, api.historyPages.size)
+        foreground.value = false
+        runCurrent()
+        foreground.value = true
+        runCurrent()
+        release.complete(Unit)
+        runCurrent()
+        assertEquals(1, api.historyPages.size)
+
+        foreground.value = false
+        runCurrent()
+        foreground.value = true
+        runCurrent()
+        assertEquals(2, api.historyPages.size)
+        observer.cancelAndJoin()
+        advanceTimeBy(60_000L)
+        runCurrent()
+        assertEquals(2, api.historyPages.size)
+    }
+
+    @Test
+    fun `active history refresh follows its earliest page deadline`() = runTest {
+        val now = { testScheduler.currentTime * 1_000_000L }
+        val sources = createBittensorTestSources(urls, estimatesApi = api, scope = backgroundScope, nanoTime = now)
+        val history = sources.historySource(cache, preferences, nowNanos = now)
+        val request = requireNotNull(history.request("account", metaAccountId = 1L))
+        api.nextHistoryPage = { if (it == 1) 2 else null }
+        api.historyCacheControl = { if (it == 1) "max-age=60" else "max-age=30" }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { history.observeHistory(request).collect {} }
+        runCurrent()
+        assertEquals(listOf(1, 2), api.historyPages)
+
+        advanceTimeBy(29_999L)
+        runCurrent()
+        assertEquals(listOf(1, 2), api.historyPages)
+        advanceTimeBy(1L)
+        runCurrent()
+        assertEquals(listOf(1, 2, 2), api.historyPages)
+    }
+
+    @Test
+    fun `origin and cached restoration failures are emitted without escaping the history producer`() = runTest {
+        for (failingRead in 1..2) {
+            val failure = IllegalStateException("config unavailable")
+            var failReads = false
+            var reads = 0
+            val failingUrls = InfrastructureUrls {
+                if (failReads && ++reads == failingRead) throw failure
+                baseUrl
+            }
+            val sources = createBittensorTestSources(failingUrls, estimatesApi = api, scope = backgroundScope)
+            val history = sources.historySource(cache, preferences)
+            val request = requireNotNull(history.request("account", metaAccountId = 1L))
+            failReads = true
+            val requestsBefore = api.historyPages.size
+
+            val updates = history.observeHistory(request).take(2).toList()
+
+            assertEquals(failure, updates.first().result!!.exceptionOrNull())
+            assertTrue(updates.last().result!!.isSuccess)
+            assertEquals(requestsBefore + 1, api.historyPages.size)
+        }
+    }
+
+    @Test
+    fun `invalidation while the refresh loop wakes cannot escape the old generation producer`() = runTest {
+        lateinit var history: BittensorOperationHistorySource
+        lateinit var request: BittensorHistoryRequest
+        var submitted = false
+        val foreground = flow {
+            emit(true) // Current foreground state is skipped by the cache.
+            if (!submitted) {
+                submitted = true
+                history.ownTradeSubmitted(request)
+                emit(true) // Wake the old loop before flatMapLatest processes the generation change.
+            }
+            awaitCancellation()
+        }
+        val sources = createBittensorTestSources(urls, estimatesApi = api, scope = backgroundScope, foreground = foreground)
+        history = sources.historySource(cache, preferences, nowNanos = clock, nowMillis = wallClock)
+        request = requireNotNull(history.request("account", metaAccountId = 1L))
+        val updates = mutableListOf<BittensorOperationHistorySource.Snapshot>()
+        val errors = mutableListOf<Throwable>()
+        backgroundScope.launch {
+            history.observeHistory(request).catch { errors += it }.toList(updates)
+        }
+
+        runCurrent()
+
+        assertTrue(submitted)
+        assertTrue(errors.isEmpty())
+        assertEquals(2, api.historyPages.size)
+        assertTrue(updates.last().request.generation > request.generation)
+        assertTrue(updates.last().result!!.isSuccess)
+        assertTrue(updates.last().isSettling)
+    }
+
+    @Test
+    fun `fresh restored history refreshes at a subsecond remaining deadline`() = runTest {
+        val now = { testScheduler.currentTime * 1_000_000L }
+        val sources = createBittensorTestSources(urls, estimatesApi = api, scope = backgroundScope, nanoTime = now)
+        val history = sources.historySource(cache, preferences, nowNanos = now)
+        val request = requireNotNull(history.request("account", metaAccountId = 1L))
+        history.history(request)
+        advanceTimeBy(59_500L)
+        backgroundScope.launch { history.observeHistory(request).collect {} }
+        runCurrent()
+        assertEquals(1, api.historyPages.size)
+
+        advanceTimeBy(499L)
+        runCurrent()
+        assertEquals(1, api.historyPages.size)
+        advanceTimeBy(1L)
+        runCurrent()
+        assertEquals(2, api.historyPages.size)
+    }
+
+    @Test
+    fun `uncached settlement flight is rejected after backend changes away and back`() = runTest {
+        repository.ownTradeSubmitted(request())
+        val initial = request()
+        val release = CompletableDeferred<Unit>()
+        val started = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { started.complete(Unit); release.await() }
+        val old = async { runCatching { repository.history(initial) } }
+        started.await()
+
+        baseUrl = "https://other.test/".toHttpUrl()
+        backendSource.client.baseUrl()
+        baseUrl = initial.baseUrl
+        backendSource.client.baseUrl()
+        release.complete(Unit)
+
+        assertTrue(old.await().isFailure)
+    }
+
     private suspend fun request(address: String = "account") = requireNotNull(repository.request(address, metaAccountId = 1L))
 
     private fun newRepository() = backendSource.historySource(cache, preferences, nowNanos = clock, nowMillis = wallClock)
 
     @Test
-    fun `cache hits promote payloads so ninth entry evicts least recently used without losing generation`() = runTest {
+    fun `history reuses shared page cache across more than eight accounts`() = runTest {
         val oldest = request("oldest")
         val nextOldest = request("next-oldest")
         val retained = repository.history(oldest)
-        val evicted = repository.history(nextOldest)
+        val second = repository.history(nextOldest)
         repeat(6) { repository.history(request("other-$it")) }
 
-        assertSame(retained, repository.history(oldest))
+        assertEquals(retained, repository.history(oldest))
         repository.history(request("ninth"))
 
-        assertSame(retained, repository.history(oldest))
+        assertEquals(retained, repository.history(oldest))
         assertEquals(nextOldest, request("next-oldest"))
-        assertNotSame(evicted, repository.history(nextOldest))
+        assertEquals(second, repository.history(nextOldest))
         assertEquals(9, api.historyPages.size)
     }
 
@@ -575,12 +760,12 @@ class BittensorOperationHistorySettlementTest {
         assertNotSame(fromA, fromB)
         advanceTimeBy(60_000)
         runCurrent()
-        assertSame(fromB, first.last()!!.getOrThrow())
+        assertEquals(fromB, first.last()!!.getOrThrow())
         assertEquals(2, sharedCache.keys.size) // A did not migrate its producer under the old key.
     }
 
     @Test
-    fun `eight payload bound preserves active generation and immediate invalidation while old load finishes`() = runTest {
+    fun `other account reads preserve active generation and immediate invalidation while old load finishes`() = runTest {
         val sharedCache = SharedCache(backgroundScope)
         val repository = backendSource.historySource(sharedCache, preferences, nowNanos = clock, nowMillis = wallClock)
         val initial = requireNotNull(repository.request("active", metaAccountId = 1L))
@@ -592,7 +777,8 @@ class BittensorOperationHistorySettlementTest {
         val first = updates.last()!!.getOrThrow()
         repeat(8) { repository.history(requireNotNull(repository.request("other-$it", metaAccountId = 1L))) }
         assertEquals(initial, repository.request("active", metaAccountId = 1L))
-        assertNotSame(first, repository.history(initial)) // oldest payload was evicted, not generation state
+        assertEquals(first, repository.history(initial))
+        assertEquals(9, api.historyPages.size)
 
         api.historyCacheControl = { "no-store" }
         nowNanos = System.nanoTime() + 120_000_000_000L

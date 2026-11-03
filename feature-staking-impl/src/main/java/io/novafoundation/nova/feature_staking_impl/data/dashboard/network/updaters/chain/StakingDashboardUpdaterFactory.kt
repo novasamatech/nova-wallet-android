@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
@@ -28,7 +28,7 @@ class StakingDashboardUpdaterFactory(
     private val balanceLocksRepository: BalanceLocksRepository,
     private val bittensorPositionRepository: BittensorPositionRepository,
     private val bittensorRootClaims: BittensorRootClaimSource,
-    private val bittensorSnapshots: BittensorDashboardSnapshotRepository,
+    private val bittensorSnapshots: BittensorDashboardSnapshotSource,
     private val logger: Logger,
 ) {
 

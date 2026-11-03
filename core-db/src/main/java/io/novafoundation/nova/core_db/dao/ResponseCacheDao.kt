@@ -6,12 +6,16 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import io.novafoundation.nova.core_db.model.ResponseCacheKey
 import io.novafoundation.nova.core_db.model.ResponseCacheLocal
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ResponseCacheDao {
 
     @Query("SELECT * FROM response_cache WHERE normalizedUrl = :url AND metaAccountId IS :metaAccountId")
     suspend fun get(url: String, metaAccountId: Long?): ResponseCacheLocal?
+
+    @Query("SELECT * FROM response_cache WHERE normalizedUrl = :url AND metaAccountId IS :metaAccountId")
+    fun observe(url: String, metaAccountId: Long?): Flow<ResponseCacheLocal?>
 
     @Query("SELECT EXISTS(SELECT 1 FROM meta_accounts WHERE id = :metaAccountId)")
     suspend fun ownerExists(metaAccountId: Long): Boolean

@@ -4,7 +4,12 @@ import android.database.sqlite.SQLiteConstraintException
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.model.ResponseCacheLocal
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -54,5 +59,28 @@ class ResponseCacheDaoTest : DaoTest<ResponseCacheDao>(AppDatabase::responseCach
         val error = runCatching { dao.put(ResponseCacheLocal(url, owner, "late response", 1, 2)) }.exceptionOrNull()
         assertTrue(error is SQLiteConstraintException)
         assertNull(dao.get(url, owner))
+    }
+
+    @Test
+    fun snapshotObservationEmitsRemovalAfterOwnerCascade() = runBlocking {
+        val owner = accounts.insertMetaAccount(testMetaAccount())
+        dao.put(ResponseCacheLocal(url, owner, "positions", 1, 0))
+        val observed = CompletableDeferred<Unit>()
+        val removed = CompletableDeferred<Unit>()
+        val observer = launch {
+            dao.observe(url, owner)
+                .onEach { if (it != null) observed.complete(Unit) }
+                .first { it == null }
+            removed.complete(Unit)
+        }
+        try {
+            withTimeout(5_000) {
+                observed.await()
+                accounts.deleteByIds(listOf(owner))
+                removed.await()
+            }
+        } finally {
+            observer.cancel()
+        }
     }
 }

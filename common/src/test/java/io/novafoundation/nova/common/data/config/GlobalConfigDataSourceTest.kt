@@ -64,6 +64,23 @@ class GlobalConfigDataSourceTest {
     }
 
     @Test
+    fun `malformed network configuration cannot replace the last usable snapshot`() = runBlocking {
+        prepareStorage()
+        val online = RealGlobalConfigDataSource(onlineApi, preferences, gson, logger)
+        online.getGlobalConfig()
+        val saved = stored.toMap()
+        val malformedApi = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig(): GlobalConfigRemote = gson.fromJson("{}", GlobalConfigRemote::class.java)
+        }
+        val source = RealGlobalConfigDataSource(malformedApi, preferences, gson, logger)
+
+        assertEquals("https://infra.test/", source.getGlobalConfig().infraUrl)
+        assertEquals(saved, stored)
+        val restarted = RealGlobalConfigDataSource(offlineApi, preferences, gson, logger)
+        assertEquals("https://infra.test/", restarted.getGlobalConfig().infraUrl)
+    }
+
+    @Test
     fun `cancellation never falls back to saved config`() = runBlocking {
         prepareStorage()
         val online = RealGlobalConfigDataSource(onlineApi, preferences, gson, logger)

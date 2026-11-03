@@ -17,7 +17,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import retrofit2.Response
 
-class BittensorPortfolioPriceRepositoryTest {
+class BittensorPortfolioPriceSourceTest {
 
     private val runtime = mock(BittensorRuntimePriceSource::class.java)
 
@@ -44,7 +44,7 @@ class BittensorPortfolioPriceRepositoryTest {
 
     private val catalogueSource = BittensorSubnetCatalogueSource(api, urls)
 
-    private val repository = RealBittensorPortfolioPriceRepository(catalogueSource, runtime, logger)
+    private val source = RealBittensorPortfolioPriceSource(catalogueSource, runtime, logger)
 
     private val subnet = BittensorNetuid.Subnet(1)
 
@@ -52,7 +52,7 @@ class BittensorPortfolioPriceRepositoryTest {
 
     @Test
     fun `complete fresh backend skips runtime`() = runTest {
-        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet)))
+        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), source.prices("chain", setOf(subnet)))
         verifyNoInteractions(runtime)
     }
 
@@ -60,7 +60,7 @@ class BittensorPortfolioPriceRepositoryTest {
     fun `expired fresh-labelled catalogue cannot replace live runtime valuation`() = runTest {
         var now = 0L
         val sources = createBittensorTestSources(urls, nanoTime = { now }, scope = backgroundScope, catalogueApi = api)
-        val prices = RealBittensorPortfolioPriceRepository(sources.catalogue, runtime, logger)
+        val prices = RealBittensorPortfolioPriceSource(sources.catalogue, runtime, logger)
         sources.catalogue.subnets()
         now = 61_000_000_000L
         backendFailure = IllegalStateException("Backend offline")
@@ -74,7 +74,7 @@ class BittensorPortfolioPriceRepositoryTest {
     fun `batch runtime fills missing held prices without replacing backend or adding unheld ids`() = runTest {
         `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.ONE, missing to BigInteger.TEN, BittensorNetuid.Subnet(3) to BigInteger.ONE))
 
-        val prices = repository.prices("chain", setOf(subnet, missing))
+        val prices = source.prices("chain", setOf(subnet, missing))
 
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000), missing to BigInteger.TEN), prices)
         verify(runtime).prices("chain")
@@ -85,7 +85,7 @@ class BittensorPortfolioPriceRepositoryTest {
         backendHangs = true
         `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
 
-        assertEquals(mapOf(subnet to BigInteger.TEN), repository.prices("chain", setOf(subnet)))
+        assertEquals(mapOf(subnet to BigInteger.TEN), source.prices("chain", setOf(subnet)))
         verify(runtime).prices("chain")
     }
 
@@ -96,40 +96,48 @@ class BittensorPortfolioPriceRepositoryTest {
         backendResponse = BittensorSubnetCatalogueRemote(listOf(present, absent), backendResponse.meta)
         `when`(runtime.prices("chain")).thenReturn(mapOf(missing to BigInteger.TEN))
 
-        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000), missing to BigInteger.TEN), repository.prices("chain", setOf(subnet, missing)))
+        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000), missing to BigInteger.TEN), source.prices("chain", setOf(subnet, missing)))
     }
 
     @Test
     fun `backend error or stale metadata uses runtime`() = runTest {
         `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
         backendFailure = IllegalStateException("Offline")
-        assertEquals(mapOf(subnet to BigInteger.TEN), repository.prices("chain", setOf(subnet)))
+        assertEquals(mapOf(subnet to BigInteger.TEN), source.prices("chain", setOf(subnet)))
         backendFailure = null
         backendResponse = response("0.5", freshness = "STALE")
-        assertEquals(mapOf(subnet to BigInteger.TEN), repository.prices("chain", setOf(subnet)))
+        assertEquals(mapOf(subnet to BigInteger.TEN), source.prices("chain", setOf(subnet)))
     }
 
     @Test
     fun `runtime failure and later network loss retain an HTTP fresh backend price`() = runTest {
         `when`(runtime.prices("chain")).thenThrow(IllegalStateException("Offline"))
-        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet, missing)))
+        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), source.prices("chain", setOf(subnet, missing)))
         backendFailure = IllegalStateException("Offline")
-        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet)))
+        assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), source.prices("chain", setOf(subnet)))
     }
 
     @Test
     fun `cancellation never starts fallback and empty holdings require neither source`() = runTest {
-        assertTrue(repository.prices("chain", emptySet()).isEmpty())
+        assertTrue(source.prices("chain", emptySet()).isEmpty())
         assertEquals(0, backendCalls)
         backendFailure = CancellationException("Cancelled")
-        assertTrue(runCatching { repository.prices("chain", setOf(subnet)) }.exceptionOrNull() is CancellationException)
+        assertTrue(runCatching { source.prices("chain", setOf(subnet)) }.exceptionOrNull() is CancellationException)
         verifyNoInteractions(runtime)
+    }
+
+    @Test
+    fun `failure of both transports leaves valuation unavailable`() = runTest {
+        backendFailure = IllegalStateException("Backend offline")
+        `when`(runtime.prices("chain")).thenThrow(IllegalStateException("Runtime offline"))
+
+        assertTrue(source.prices("chain", setOf(subnet)).isEmpty())
     }
 
     @Test
     fun `runtime cancellation is not converted to a partial success`() = runTest {
         `when`(runtime.prices("chain")).thenThrow(CancellationException("Cancelled"))
-        assertTrue(runCatching { repository.prices("chain", setOf(subnet, missing)) }.exceptionOrNull() is CancellationException)
+        assertTrue(runCatching { source.prices("chain", setOf(subnet, missing)) }.exceptionOrNull() is CancellationException)
     }
 
     @Test

@@ -102,11 +102,9 @@ class BittensorStakingRepositoryTest {
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
+    private val priceSource = mock(BittensorPortfolioPriceSource::class.java)
 
-    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
-
-    private val pricesSource = BittensorPricesSource(portfolioLoader, snapshots, computationalCache)
+    private val pricesSource = BittensorPricesSource(priceSource, snapshots, computationalCache)
 
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
@@ -119,7 +117,7 @@ class BittensorStakingRepositoryTest {
         snapshots
     )
 
-    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, pricesSource)
 
     private val repository = RealBittensorStakingRepository(
         chainRegistry,

@@ -14,6 +14,10 @@ internal object BittensorCacheKeys {
     fun positions(chainId: String, coldkey: String) = bittensorSnapshotKey("runtime/positions/$chainId", coldkey)
 
     fun prices(chainId: String, coldkey: String) = bittensorSnapshotKey("runtime/prices/$chainId", coldkey)
+
+    fun dashboard(chainId: String, coldkey: AccountId) = bittensorSnapshotKey("dashboard/$chainId", coldkey.toHexString())
+
+    fun claimableRewards(chainId: String, coldkey: AccountId) = bittensorSnapshotKey("claimable-rewards/$chainId", coldkey.toHexString())
     fun sharedPositions(chainId: String, coldkey: AccountId, metaAccountId: Long) = sharedKey("Positions", chainId, coldkey, metaAccountId)
 
     fun sharedPrices(chainId: String, coldkey: AccountId, metaAccountId: Long) = sharedKey("Prices", chainId, coldkey, metaAccountId)

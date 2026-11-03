@@ -74,7 +74,7 @@ class BittensorValidatorSource(
         url = client.url("recommendations/subnets"),
         type = BittensorRecommendationsRemote::class.java,
         allowStale = readExpiredCache,
-        validate = { mapBittensorValidatorGates(it) },
+        validate = ::validateSubnetRecommendations,
         generation = { mapBittensorRecommendationGeneration(it.meta) },
         fetch = validatorsApi::recommendations
     )
@@ -92,9 +92,7 @@ class BittensorValidatorSource(
         requireUsableBittensorRecommendations(document)
         val sourceBlock = requireNotNull(document.meta?.generation?.sourceBlockNumber)
         require(registrationBlock == null || sourceBlock >= registrationBlock) { "Subnet ranking predates registration" }
-        val items = requireNotNull(document.items) { "Missing subnet rankings" }
-        require(items.map { it.netuid }.distinct().size == items.size) { "Duplicate subnet rankings" }
-        return items.singleOrNull { it.netuid == subnet.value }
+        return requireNotNull(document.items).singleOrNull { it.netuid == subnet.value }
     }
 
     suspend fun recommendedHotkeys(netuid: Int): List<String> = recommendedValidators()
@@ -132,5 +130,11 @@ class BittensorValidatorSource(
         val sourceBlock = requireNotNull(response.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
         require(sourceBlock.isNonNegative) { "Invalid recommendation block" }
         requireNotNull(response.classes) { "Missing validator recommendations" }
+    }
+
+    private fun validateSubnetRecommendations(response: BittensorRecommendationsRemote) {
+        requireUsableBittensorRecommendations(response)
+        val items = requireNotNull(response.items) { "Missing subnet rankings" }
+        require(items.map { it.netuid }.distinct().size == items.size) { "Duplicate subnet rankings" }
     }
 }

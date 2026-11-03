@@ -24,32 +24,26 @@ class RealGlobalConfigDataSource(
     private var globalConfig: GlobalConfig? = null
     private val mutex = Mutex()
 
-    override suspend fun getGlobalConfig(): GlobalConfig {
-        if (globalConfig != null) return globalConfig!!
+    override suspend fun getGlobalConfig(): GlobalConfig = mutex.withLock {
+        globalConfig?.let { return@withLock it }
 
-        mutex.withLock {
-            if (globalConfig != null) return globalConfig!!
-
-            val remoteConfig = try {
-                api.getGlobalConfig().also {
-                    preferences.putString(cacheKey(), gson.toJson(it))
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                val saved = preferences.getString(cacheKey())?.let { raw ->
-                    runCatching {
-                        requireNotNull(gson.fromJson(raw, GlobalConfigRemote::class.java)).also { it.toDomain() }
-                    }.getOrNull()
-                } ?: throw e
-                logger.log("[GlobalConfig] Using saved configuration after refresh failure")
-                logger.log(e)
-                saved
-            }
-            globalConfig = remoteConfig.toDomain()
+        val config = runCatching {
+            val response = api.getGlobalConfig()
+            val config = response.toDomain()
+            preferences.putString(cacheKey(), gson.toJson(response))
+            config
+        }.getOrElse { error ->
+            if (error is CancellationException) throw error
+            val saved = savedConfig() ?: throw error
+            logger.log("[GlobalConfig] Using saved configuration after refresh failure")
+            logger.log(error)
+            saved
         }
+        config.also { globalConfig = it }
+    }
 
-        return globalConfig!!
+    private fun savedConfig(): GlobalConfig? = preferences.getString(cacheKey())?.let { raw ->
+        runCatching { requireNotNull(gson.fromJson(raw, GlobalConfigRemote::class.java)).toDomain() }.getOrNull()
     }
 
     // Different build configurations must never inherit each other's infrastructure origin.

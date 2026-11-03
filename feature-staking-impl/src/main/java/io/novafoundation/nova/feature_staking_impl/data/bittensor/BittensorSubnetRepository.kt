@@ -12,13 +12,14 @@ import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * [fromChain] is false when the backend catalogue or the last good names stood in for a slow or failing node, so it
  * cannot cross-check the backend.
  */
-class BittensorSubnetCatalogue(val subnets: List<BittensorSubnet>, val fromChain: Boolean)
+data class BittensorSubnetCatalogue(val subnets: List<BittensorSubnet>, val fromChain: Boolean)
 
 interface BittensorSubnetRepository {
 
@@ -47,11 +48,11 @@ class RealBittensorSubnetRepository(
     }
 
     override fun observeSubnets(): Flow<List<BittensorSubnet>> = combine(
-        flowOf { subnets() },
+        subnetSource.observeCatalogue(),
         configSource.observeSubnetLogos()
-    ) { subnets, logos ->
-        subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
-    }
+    ) { catalogue, logos ->
+        catalogue.subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
+    }.distinctUntilChanged()
 
     override suspend fun catalogue(): BittensorSubnetCatalogue = subnetSource.catalogue()
 

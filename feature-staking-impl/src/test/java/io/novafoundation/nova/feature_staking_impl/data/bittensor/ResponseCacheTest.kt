@@ -12,10 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.mockito.Mockito.mock
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -24,6 +28,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
@@ -49,6 +54,123 @@ class ResponseCacheTest {
 
     private fun response(value: String, cacheControl: String = "max-age=60", age: String = "0") =
         Response.success(Payload(value), Headers.headersOf("Cache-Control", cacheControl, "Age", age))
+
+    @Test
+    fun `active snapshot ticket survives unrelated TTL state eviction`() = runTest {
+        val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
+        val key = BittensorCacheKeys.positions("chain", "owner")
+        cache.withSnapshotTicket(key, 1L) { ticket ->
+            repeat(513) { index ->
+                wall++
+                cache.get(endpoint("other/$index"), Payload::class.java) { response("other") }
+            }
+            assertTrue(cache.isSnapshotCurrent(ticket))
+            assertTrue(cache.saveSnapshot(key, 1L, Payload("positions"), ticket))
+        }
+        assertEquals("positions", cache.readSnapshot(key, Payload::class.java, 1L)?.value)
+    }
+
+    @Test
+    fun `snapshot ticket ends with its operation on completion cancellation and owner deletion`() = runTest {
+        val owners = mutableSetOf(1L)
+        val ownerDao = InMemoryResponseCacheDao(owners)
+        val cache = createResponseTestCache(ownerDao, backgroundScope, wallClock, monotonicClock)
+        val key = BittensorCacheKeys.positions("chain", "owner")
+        val completed = cache.withSnapshotTicket(key, 1L) { it }
+        assertFalse(cache.isSnapshotCurrent(completed))
+        assertFalse(cache.saveSnapshot(key, 1L, Payload("late"), completed))
+
+        val captured = CompletableDeferred<ResponseCache.SnapshotTicket>()
+        val operation = launch {
+            cache.withSnapshotTicket(key, 1L) { ticket ->
+                captured.complete(ticket)
+                awaitCancellation()
+            }
+        }
+        val cancelled = captured.await()
+        operation.cancelAndJoin()
+        assertFalse(cache.isSnapshotCurrent(cancelled))
+
+        cache.withSnapshotTicket(key, 1L) { ticket ->
+            assertTrue(cache.isSnapshotCurrent(ticket))
+            ownerDao.deleteOwner(1L)
+            assertFalse(cache.isSnapshotCurrent(ticket))
+            assertTrue(runCatching { cache.saveSnapshot(key, 1L, Payload("late"), ticket) }.isFailure)
+        }
+    }
+
+    @Test
+    fun `fresh observation emits once and does not fetch or decode a second time`() = runTest {
+        val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
+        cache.get(endpoint("subnets"), Payload::class.java) { response("fresh") }
+        val updates = mutableListOf<CachedResponse<Payload>>()
+        var validations = 0
+        val observer = backgroundScope.launch {
+            cache.observe(
+                url = endpoint("subnets"),
+                type = Payload::class.java,
+                validate = { validations++ },
+                fetch = { error("Fresh data must not fetch") }
+            ).toList(updates)
+        }
+        runCurrent()
+        assertEquals(listOf("fresh"), updates.map { it.value.value })
+        assertEquals(1, validations)
+        observer.cancelAndJoin()
+    }
+
+    @Test
+    fun `successful request returns its validated body without decoding serialized JSON`() = runTest {
+        val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
+        val body = Payload("live")
+        var validations = 0
+        val result = cache.get(
+            url = endpoint("subnets"),
+            type = Payload::class.java,
+            validate = { validations++ },
+            fetch = { Response.success(body) }
+        )
+        assertSame(body, result.value)
+        assertEquals(1, validations)
+    }
+
+    @Test
+    fun `snapshot validation runs outside registry lock and invalidation rejects its decoded result`() = runTest {
+        val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
+        val key = BittensorCacheKeys.positions("chain", "owner")
+        cache.saveSnapshot(key, 1L, Payload("old"))
+
+        val result = cache.readSnapshot(key, Payload::class.java, 1L) {
+            runBlocking {
+                withTimeout(1_000) { cache.invalidate { it.normalizedUrl == key } }
+            }
+        }
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `snapshot observation follows save invalidation and owner cascade without polling`() = runTest {
+        val owners = mutableSetOf(1L, 2L)
+        val ownerDao = InMemoryResponseCacheDao(owners)
+        val cache = createResponseTestCache(ownerDao, backgroundScope, wallClock, monotonicClock)
+        val key = BittensorCacheKeys.positions("chain", "owner")
+        val updates = mutableListOf<Payload?>()
+        val observer = backgroundScope.launch { cache.observeSnapshot(key, Payload::class.java, 1L).toList(updates) }
+        runCurrent()
+        cache.saveSnapshot(key, 2L, Payload("another wallet"))
+        cache.saveSnapshot(key, 1L, Payload("first"))
+        runCurrent()
+        cache.invalidate { it.metaAccountId == 1L }
+        runCurrent()
+        cache.saveSnapshot(key, 1L, Payload("second"))
+        runCurrent()
+        ownerDao.deleteOwner(1L)
+        runCurrent()
+
+        assertEquals(listOf(null, Payload("first"), null, Payload("second"), null), updates)
+        observer.cancelAndJoin()
+    }
 
     @Test
     fun `cancelled invalidation still prevents fallback to removed data when replacement fails`() = runTest {
@@ -230,17 +352,29 @@ class ResponseCacheTest {
     }
 
     @Test
+    fun `failed wallet ownership lookup treats a stored snapshot as unavailable`() = runTest {
+        val key = BittensorCacheKeys.positions("chain", "owner")
+        dao.put(ResponseCacheLocal(key, 1L, "{\"value\":\"private\"}", wall, 0))
+        val unavailableDao = object : ResponseCacheDao by dao {
+            override suspend fun ownerExists(metaAccountId: Long): Boolean = throw IOException("Cache unavailable")
+        }
+        val cache = createResponseTestCache(unavailableDao, backgroundScope, wallClock, monotonicClock)
+
+        assertNull(cache.readSnapshot(key, Payload::class.java, 1L))
+    }
+
+    @Test
     fun `trim failure does not discard accepted response or snapshot`() = runTest {
         val failingDao = object : ResponseCacheDao by dao {
             override suspend fun trim(limit: Int) = throw IOException("Cannot trim")
         }
         val cache = createResponseTestCache(failingDao, backgroundScope, wallClock, monotonicClock)
         val key = BittensorCacheKeys.positions("chain", "owner")
-        val ticket = cache.snapshotTicket(key, 1L)
-
         assertEquals("live", cache.get(endpoint("subnets"), Payload::class.java) { response("live") }.value.value)
-        assertTrue(cache.saveSnapshot(key, 1L, Payload("positions"), ticket))
-        assertTrue(cache.isSnapshotCurrent(ticket))
+        cache.withSnapshotTicket(key, 1L) { ticket ->
+            assertTrue(cache.saveSnapshot(key, 1L, Payload("positions"), ticket))
+            assertTrue(cache.isSnapshotCurrent(ticket))
+        }
     }
 
     @Test
@@ -250,13 +384,13 @@ class ResponseCacheTest {
         }
         val cache = createResponseTestCache(failingDao, backgroundScope, wallClock, monotonicClock)
         val key = BittensorCacheKeys.positions("chain", "owner")
-        val ticket = cache.snapshotTicket(key, 1L)
-
-        assertTrue(cache.saveSnapshot(key, 1L, Payload("positions"), ticket))
-        assertTrue(cache.isSnapshotCurrent(ticket))
-        cache.invalidate(keepStale = true) { it.metaAccountId == 1L }
-        assertFalse(cache.isSnapshotCurrent(ticket))
-        assertFalse(cache.saveSnapshot(key, 1L, Payload("obsolete"), ticket))
+        cache.withSnapshotTicket(key, 1L) { ticket ->
+            assertTrue(cache.saveSnapshot(key, 1L, Payload("positions"), ticket))
+            assertTrue(cache.isSnapshotCurrent(ticket))
+            cache.invalidate(keepStale = true) { it.metaAccountId == 1L }
+            assertFalse(cache.isSnapshotCurrent(ticket))
+            assertFalse(cache.saveSnapshot(key, 1L, Payload("obsolete"), ticket))
+        }
     }
 
     @Test
@@ -415,6 +549,34 @@ class ResponseCacheTest {
     }
 
     @Test
+    fun `stale observation joins an existing background flight without waiting for retry interval`() = runTest {
+        val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
+        cache.get(endpoint("subnets"), Payload::class.java) { response("old", "no-store") }
+        wall += 30_000
+        nanos += 30_000_000_000L
+        val release = CompletableDeferred<Unit>()
+        var requests = 0
+        cache.get(endpoint("subnets"), Payload::class.java, allowStale = true) {
+            requests++
+            release.await()
+            response("new")
+        }
+        runCurrent()
+        val seen = mutableListOf<CachedResponse<Payload>>()
+        val observer = async {
+            cache.observe(endpoint("subnets"), Payload::class.java) { error("Duplicated request") }.take(2).toList(seen)
+        }
+        runCurrent()
+        assertEquals(listOf("old"), seen.map { it.value.value })
+        release.complete(Unit)
+        runCurrent()
+
+        assertTrue(observer.isCompleted)
+        assertEquals(listOf("old", "new"), observer.await().map { it.value.value })
+        assertEquals(1, requests)
+    }
+
+    @Test
     fun `query ordering is normalized but accounts and pages remain isolated`() = runTest {
         val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
         val endpoint = endpoint("operations/search")
@@ -483,11 +645,13 @@ class ResponseCacheTest {
         assertEquals("first", cache.readSnapshot(key, Payload::class.java, 1L)!!.value)
         assertEquals("second", cache.readSnapshot(key, Payload::class.java, 2L)!!.value)
         assertNull(cache.readSnapshot(key, Payload::class.java, null))
-        val firstTicket = cache.snapshotTicket(key, 1L)
-        val secondTicket = cache.snapshotTicket(key, 2L)
-        cache.invalidate(keepStale = true) { it.metaAccountId == 1L }
-        assertFalse(cache.saveSnapshot(key, 1L, Payload("obsolete"), firstTicket))
-        assertTrue(cache.saveSnapshot(key, 2L, Payload("second updated"), secondTicket))
+        cache.withSnapshotTicket(key, 1L) { firstTicket ->
+            cache.withSnapshotTicket(key, 2L) { secondTicket ->
+                cache.invalidate(keepStale = true) { it.metaAccountId == 1L }
+                assertFalse(cache.saveSnapshot(key, 1L, Payload("obsolete"), firstTicket))
+                assertTrue(cache.saveSnapshot(key, 2L, Payload("second updated"), secondTicket))
+            }
+        }
     }
 
     @Test
@@ -533,18 +697,15 @@ class ResponseCacheTest {
     @Test
     fun `transaction retains stale holdings but rejects an older runtime write`() = runTest {
         val cache = createResponseTestCache()
-        cache.saveSnapshot(BittensorCacheKeys.positions("chain", "owner"), 1L, Payload("last known"))
-        val ticket = cache.snapshotTicket(BittensorCacheKeys.positions("chain", "owner"), 1L)
-        cache.invalidate(keepStale = true) { it.metaAccountId == 1L }
-        assertFalse(cache.saveSnapshot(BittensorCacheKeys.positions("chain", "owner"), 1L, Payload("obsolete flight"), ticket))
-        assertEquals("last known", cache.readSnapshot(BittensorCacheKeys.positions("chain", "owner"), Payload::class.java, 1L)!!.value)
-        assertTrue(
-            cache.saveSnapshot(
-                BittensorCacheKeys.positions("chain", "owner"),
-                1L,
-                Payload("confirmed"),
-                cache.snapshotTicket(BittensorCacheKeys.positions("chain", "owner"), 1L)
-            )
-        )
+        val key = BittensorCacheKeys.positions("chain", "owner")
+        cache.saveSnapshot(key, 1L, Payload("last known"))
+        cache.withSnapshotTicket(key, 1L) { ticket ->
+            cache.invalidate(keepStale = true) { it.metaAccountId == 1L }
+            assertFalse(cache.saveSnapshot(key, 1L, Payload("obsolete flight"), ticket))
+        }
+        assertEquals("last known", cache.readSnapshot(key, Payload::class.java, 1L)!!.value)
+        cache.withSnapshotTicket(key, 1L) { ticket ->
+            assertTrue(cache.saveSnapshot(key, 1L, Payload("confirmed"), ticket))
+        }
     }
 }

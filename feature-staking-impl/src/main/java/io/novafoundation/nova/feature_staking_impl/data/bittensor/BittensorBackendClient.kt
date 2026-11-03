@@ -123,6 +123,13 @@ class BittensorBackendClient(
 
     internal suspend fun baseUrl(): HttpUrl = context().base
 
+    /** Direct transport for settlement reads: origin checks and timeout, without cache access. */
+    internal suspend fun <T> fetch(url: String, fetch: suspend (String) -> Response<T>): Response<T> {
+        val context = context()
+        requireUrl(context, url)
+        return fetchInternal(context, url, fetch)
+    }
+
     /** Invalidates every query variant of one account endpoint and rejects its older in-flight writes. */
     internal suspend fun invalidateAccountResponses(base: HttpUrl, address: String, metaAccountId: Long, path: String) {
         val endpointPath = bittensorBackendUrl(base, path).toHttpUrl().encodedPath
@@ -192,6 +199,7 @@ class BittensorBackendClient(
         check(activeContext === context) { "Bittensor origin has changed" }
         val newest = context.generation
         require(newest == null || generation >= newest) { "Recommendation generation is stale" }
+        if (newest != null && generation.compareTo(newest) == 0) return@withLock
         if (newest != null && generation > newest) {
             responses.invalidate { key ->
                 val candidate = key.normalizedUrl.toHttpUrlOrNull() ?: return@invalidate false

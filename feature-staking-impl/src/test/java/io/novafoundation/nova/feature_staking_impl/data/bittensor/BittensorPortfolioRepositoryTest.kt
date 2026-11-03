@@ -61,7 +61,7 @@ class BittensorPortfolioRepositoryTest {
 
     private val blockNumbers = MutableStateFlow(BigInteger.ZERO)
 
-    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
+    private val priceSource = mock(BittensorPortfolioPriceSource::class.java)
 
     private val logger = mock(Logger::class.java)
 
@@ -90,7 +90,7 @@ class BittensorPortfolioRepositoryTest {
 
         assertEquals(asset, repository().observeAsset().first())
         assertEquals(0, positionRequests)
-        verifyNoInteractions(priceRepository, logger)
+        verifyNoInteractions(priceSource, logger)
     }
 
     @Test
@@ -205,13 +205,11 @@ class BittensorPortfolioRepositoryTest {
         `when`(it.accountIdIn(chain)).thenReturn(ByteArray(32) { id.toByte() })
     }
 
-    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
-
     private val commonModule = CommonModule()
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val pricesSource = BittensorPricesSource(portfolioLoader, snapshots, computationalCache)
+    private val pricesSource = BittensorPricesSource(priceSource, snapshots, computationalCache)
 
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
@@ -224,7 +222,7 @@ class BittensorPortfolioRepositoryTest {
         snapshots
     )
 
-    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, pricesSource)
 
     private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)
 }

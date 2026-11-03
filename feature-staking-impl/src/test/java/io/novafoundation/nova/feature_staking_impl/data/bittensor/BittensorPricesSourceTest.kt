@@ -43,15 +43,14 @@ class BittensorPricesSourceTest {
     )
     private var fetch: suspend () -> Map<BittensorNetuid.Subnet, BigInteger> = { prices }
     private var requests = 0
-    private val priceRepository = object : BittensorPortfolioPriceRepository {
+    private val priceSource = object : BittensorPortfolioPriceSource {
         override suspend fun prices(chainId: String, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
             requests++
             return fetch()
         }
     }
-    private val loader = BittensorPortfolioLoader(priceRepository, logger)
     private val computationalCache = UnsharedComputationalCache()
-    private val source = BittensorPricesSource(loader, cache, computationalCache)
+    private val source = BittensorPricesSource(priceSource, cache, computationalCache)
     private val freshPositions = flowOf(BittensorPositionState(positions, BittensorDataStatus.Fresh))
     private val stalePositions = flowOf(BittensorPositionState(positions, BittensorDataStatus.Stale(IllegalStateException("Offline"))))
 
@@ -59,7 +58,7 @@ class BittensorPricesSourceTest {
     fun `completed prices survive restart and render offline without a request`() = runTest {
         source.observePrices("chain", coldKey, freshPositions, 1L).first { it.loaded && !it.stale }
         val restartedCache = createResponseTestCache(dao)
-        val restarted = BittensorPricesSource(loader, restartedCache, computationalCache)
+        val restarted = BittensorPricesSource(priceSource, restartedCache, computationalCache)
         fetch = { error("Offline") }
 
         val restored = restarted.observePrices("chain", coldKey, stalePositions, 1L).first { it.loaded }
@@ -78,7 +77,7 @@ class BittensorPricesSourceTest {
         assertEquals(mapOf(subnet to BigInteger.valueOf(20), otherSubnet to BigInteger.ONE), updates.last().prices)
         assertTrue(updates.last().stale)
         val restartedCache = createResponseTestCache(dao)
-        val restarted = BittensorPricesSource(loader, restartedCache, computationalCache)
+        val restarted = BittensorPricesSource(priceSource, restartedCache, computationalCache)
         val saved = restarted.observePrices("chain", coldKey, stalePositions, 1L).first { it.loaded }
         assertEquals(prices, saved.prices)
     }
@@ -86,7 +85,8 @@ class BittensorPricesSourceTest {
     @Test
     fun `failed refresh keeps saved prices visible as stale`() = runTest {
         source.observePrices("chain", coldKey, freshPositions, 1L).first { it.loaded }
-        fetch = { error("Node unavailable") }
+        // The price source returns the subset available from backend/runtime; neither supplied a price.
+        fetch = { emptyMap() }
 
         val updates = source.observePrices("chain", coldKey, freshPositions, 1L).toList()
 
