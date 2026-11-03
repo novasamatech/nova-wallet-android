@@ -96,7 +96,8 @@ fun createBittensorTestSources(
     val portfolioSource = BittensorPortfolioHistorySource(client, history)
     val computations = mock(ComputationalCache::class.java)
     val preferences = mock(Preferences::class.java)
-    val operations = BittensorOperationHistorySource(client, estimates, portfolioSource, urls, computations, preferences, spacingMillis = 0L)
+    val gson = Gson()
+    val operations = BittensorOperationHistorySource(client, estimates, portfolioSource, urls, computations, preferences, gson, spacingMillis = 0L)
     return BittensorTestSources(client, urls, estimates, validatorSource, catalogueSource, yieldSource, portfolioSource, operations)
 }
 
@@ -136,7 +137,10 @@ class BittensorTestSources(
         spacingMillis: Long = 0L,
         nowNanos: () -> Long = System::nanoTime,
         nowMillis: () -> Long = System::currentTimeMillis
-    ) = BittensorOperationHistorySource(client, api, portfolio, urls, computations, preferences, spacingMillis, nowNanos, nowMillis)
+    ): BittensorOperationHistorySource {
+        val gson = Gson()
+        return BittensorOperationHistorySource(client, api, portfolio, urls, computations, preferences, gson, spacingMillis, nowNanos, nowMillis)
+    }
 }
 
 // Existing contract suites use named fixture factories while production receives the shared feature cache through DI.

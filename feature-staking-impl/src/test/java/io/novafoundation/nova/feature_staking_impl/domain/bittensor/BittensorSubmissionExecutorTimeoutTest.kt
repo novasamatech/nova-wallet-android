@@ -57,6 +57,12 @@ class BittensorSubmissionExecutorTimeoutTest {
 
     private val historyRequest = BittensorHistoryRequest(chain.addressOf(coldKey), "https://infra.test/".toHttpUrl(), 0L, METAID)
 
+    private val targetSubnet = BittensorNetuid.Subnet(7)
+
+    private val subnetTarget = BittensorOutcomeTarget(BittensorOperationKind.STAKE, targetSubnet, emptySet())
+
+    private val subnetScope = BittensorSettlementScope.Network(targetSubnet)
+
     private val account = mock(MetaAccount::class.java)
 
     private val wallet = mock(MetaAccount::class.java)
@@ -81,7 +87,7 @@ class BittensorSubmissionExecutorTimeoutTest {
         useWallet(LightMetaAccount.Type.SECRETS)
         extrinsics.build = { awaitCancellation() }
 
-        val result = executor.execute(METAID, chain) {} as BittensorOperationResult.Failure
+        val result = executor.execute(METAID, chain, target = subnetTarget) {} as BittensorOperationResult.Failure
 
         assertEquals(BITTENSOR_BUILD_AND_SIGN_TIMEOUT.inWholeMilliseconds, testScheduler.currentTime)
         assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
@@ -89,7 +95,7 @@ class BittensorSubmissionExecutorTimeoutTest {
         assertTrue(result.isRetryable)
         assertFalse(result.isSigningCancelled)
         verifyNoInteractions(positions)
-        verify(history, org.mockito.Mockito.never()).ownTradeSubmitted(historyRequest)
+        verify(history, org.mockito.Mockito.never()).ownTradeSubmitted(historyRequest, subnetScope)
         assertLockReleased()
     }
 
@@ -136,13 +142,13 @@ class BittensorSubmissionExecutorTimeoutTest {
             }
         }
 
-        val result = executor.execute(METAID, chain) {}
+        val result = executor.execute(METAID, chain, target = subnetTarget) {}
 
         assertEquals(BittensorOperationResult.Unknown(HASH), result)
         assertEquals(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT.inWholeMilliseconds, testScheduler.currentTime)
         assertEquals(1, extrinsics.submissions)
         verify(positions).invalidate(chain.id, coldKey, METAID)
-        verify(history).ownTradeSubmitted(historyRequest)
+        verify(history).ownTradeSubmitted(historyRequest, subnetScope)
         assertLockReleased()
         assertEquals(2, extrinsics.submissions)
     }
@@ -171,10 +177,10 @@ class BittensorSubmissionExecutorTimeoutTest {
         useWallet(LightMetaAccount.Type.SECRETS)
         extrinsics.build = { inBlockWatch() }
 
-        assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
+        assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain, target = subnetTarget) {})
         assertEquals(0L, testScheduler.currentTime)
         verify(positions).invalidate(chain.id, coldKey, METAID)
-        verify(history).ownTradeSubmitted(historyRequest)
+        verify(history).ownTradeSubmitted(historyRequest, subnetScope)
     }
 
     @Test
@@ -185,7 +191,7 @@ class BittensorSubmissionExecutorTimeoutTest {
 
         assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
         verify(positions).invalidate(chain.id, coldKey, METAID)
-        verify(history, org.mockito.Mockito.never()).ownTradeSubmitted(historyRequest)
+        verify(history, org.mockito.Mockito.never()).ownTradeSubmitted(historyRequest, BittensorSettlementScope.Account)
     }
 
     @Test
@@ -202,11 +208,11 @@ class BittensorSubmissionExecutorTimeoutTest {
     fun `history cache failure does not prevent position invalidation or change success`() = runTest {
         useWallet(LightMetaAccount.Type.SECRETS)
         extrinsics.build = { inBlockWatch() }
-        doThrow(IllegalStateException("History cache unavailable")).`when`(history).ownTradeSubmitted(historyRequest)
+        doThrow(IllegalStateException("History cache unavailable")).`when`(history).ownTradeSubmitted(historyRequest, BittensorSettlementScope.Account)
 
         assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
         verify(positions).invalidate(chain.id, coldKey, METAID)
-        verify(history).ownTradeSubmitted(historyRequest)
+        verify(history).ownTradeSubmitted(historyRequest, BittensorSettlementScope.Account)
     }
 
     @Test
@@ -218,7 +224,7 @@ class BittensorSubmissionExecutorTimeoutTest {
         `when`(positions.invalidate(chainId, coldKey, METAID)).thenReturn(Result.failure(failure))
 
         assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
-        verify(history).ownTradeSubmitted(historyRequest)
+        verify(history).ownTradeSubmitted(historyRequest, BittensorSettlementScope.Account)
         verify(logger).log(failure)
     }
 
@@ -226,12 +232,24 @@ class BittensorSubmissionExecutorTimeoutTest {
     fun `cancellation after handoff invalidates affected data before leaving`() = runTest {
         useWallet(LightMetaAccount.Type.SECRETS)
         extrinsics.build = { flow { awaitCancellation() } }
-        val submission = launch { executor.execute(METAID, chain) {} }
+        val submission = launch { executor.execute(METAID, chain, target = subnetTarget) {} }
         runCurrent()
         submission.cancelAndJoin()
 
         verify(positions).invalidate(chain.id, coldKey, METAID)
-        verify(history).ownTradeSubmitted(historyRequest)
+        verify(history).ownTradeSubmitted(historyRequest, subnetScope)
+    }
+
+    @Test
+    fun `watch failure after handoff marks only the target network as settling`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        extrinsics.build = { flow { throw IllegalStateException("Disconnected after submission") } }
+
+        val result = executor.execute(METAID, chain, target = subnetTarget) {}
+
+        assertEquals(BittensorOperationResult.Unknown(null), result)
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+        verify(history).ownTradeSubmitted(historyRequest, subnetScope)
     }
 
     private suspend fun useWallet(type: LightMetaAccount.Type) {

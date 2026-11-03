@@ -44,7 +44,7 @@ class BittensorCostBasisInteractor(
             .map { AccountIdKey(it.requireAccountIdIn(context.chain)) }
             .distinctUntilChanged()
             .flatMapLatest { coldKey ->
-                historySource.observeState(context.chain.addressOf(coldKey.value), context.metaId)
+                historySource.observeState(context.chain.addressOf(coldKey.value), context.metaId, context.netuid)
                     .map { update ->
                         val state = update.result?.fold(
                             onSuccess = { BittensorCostBasisState.Loaded(BittensorEstimatedCostBasis(it.operations, it.allProviderPagesRead)) },

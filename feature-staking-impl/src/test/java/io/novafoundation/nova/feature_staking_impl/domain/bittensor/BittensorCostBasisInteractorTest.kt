@@ -40,7 +40,9 @@ class BittensorCostBasisInteractorTest {
 
     private val interactor = BittensorCostBasisInteractor(history, accounts)
 
-    private val context = BittensorEstimateContext(7L, chain)
+    private val subnet = BittensorNetuid.Subnet(1)
+
+    private val context = BittensorEstimateContext(7L, chain, subnet)
 
     private val ledger = BittensorOperationHistory(emptyList(), allProviderPagesRead = false)
 
@@ -62,7 +64,7 @@ class BittensorCostBasisInteractorTest {
     fun `history loading invalidation and failure are distinct from absent context`() = runTest {
         val updates = MutableStateFlow<Result<BittensorOperationHistory>?>(null)
         val historyStates = updates.map { BittensorHistoryState(it, false) }
-        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L)).thenReturn(historyStates)
+        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L, netuid = subnet)).thenReturn(historyStates)
         val contexts = MutableStateFlow<BittensorEstimateContext?>(context)
         val states = mutableListOf<BittensorCostBasisState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -86,7 +88,7 @@ class BittensorCostBasisInteractorTest {
             BittensorHistoryState(Result.success(ledger), true),
             BittensorHistoryState(Result.success(ledger), false)
         )
-        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L)).thenReturn(historyStates)
+        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L, netuid = subnet)).thenReturn(historyStates)
         val contexts = flowOf(context)
 
         val states = interactor.observeUpdates(contexts).toList()
@@ -101,7 +103,7 @@ class BittensorCostBasisInteractorTest {
     fun `cached history stays provisional after trade settlement until fresh history arrives`() = runTest {
         val staleResult = Result.success(ledger.copy(stale = true))
         val historyStates = MutableStateFlow(BittensorHistoryState(staleResult, isSettling = true))
-        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L)).thenReturn(historyStates)
+        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L, netuid = subnet)).thenReturn(historyStates)
         val contexts = flowOf(context)
         val states = mutableListOf<BittensorCostBasisUpdate>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -123,7 +125,7 @@ class BittensorCostBasisInteractorTest {
         val updates = MutableStateFlow<Result<BittensorOperationHistory>?>(Result.success(ledger))
         `when`(accounts.metaAccountFlow(7L)).thenReturn(accountUpdates)
         val historyStates = updates.map { BittensorHistoryState(it, false) }
-        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L)).thenReturn(historyStates)
+        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L, netuid = subnet)).thenReturn(historyStates)
         val states = mutableListOf<BittensorCostBasisState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             interactor.observe(flowOf(context)).toList(states)
@@ -135,7 +137,7 @@ class BittensorCostBasisInteractorTest {
             accountUpdates.value = sameColdKeyAccount
         }
         assertEquals(count, states.size)
-        verify(history, times(1)).observeState(chain.addressOf(coldKey), metaAccountId = 7L)
+        verify(history, times(1)).observeState(chain.addressOf(coldKey), metaAccountId = 7L, netuid = subnet)
         // No PositionRepository dependency exists: stake amounts cannot clear/cancel this source.
     }
 
@@ -150,8 +152,8 @@ class BittensorCostBasisInteractorTest {
         `when`(accounts.metaAccountFlow(7L)).thenReturn(wallets)
         val firstStates = first.map { BittensorHistoryState(it, false) }
         val secondStates = second.map { BittensorHistoryState(it, false) }
-        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L)).thenReturn(firstStates)
-        `when`(history.observeState(chain.addressOf(secondKey), metaAccountId = 7L)).thenReturn(secondStates)
+        `when`(history.observeState(chain.addressOf(coldKey), metaAccountId = 7L, netuid = subnet)).thenReturn(firstStates)
+        `when`(history.observeState(chain.addressOf(secondKey), metaAccountId = 7L, netuid = subnet)).thenReturn(secondStates)
         val states = mutableListOf<BittensorCostBasisState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             interactor.observe(flowOf(context)).toList(states)
@@ -160,5 +162,32 @@ class BittensorCostBasisInteractorTest {
         assertEquals(BittensorCostBasisState.Loading, states.last())
         first.value = Result.failure(IllegalStateException("late old account"))
         assertEquals(BittensorCostBasisState.Loading, states.last())
+    }
+
+    @Test
+    fun `switching subnets observes the selected settlement scope and releases the previous one`() = runTest {
+        val otherSubnet = BittensorNetuid.Subnet(2)
+        val firstStates = MutableStateFlow(BittensorHistoryState(Result.success(ledger), isSettling = true))
+        val secondStates = MutableStateFlow(BittensorHistoryState(Result.success(ledger), isSettling = false))
+        val address = chain.addressOf(coldKey)
+        `when`(history.observeState(address, metaAccountId = 7L, netuid = subnet)).thenReturn(firstStates)
+        `when`(history.observeState(address, metaAccountId = 7L, netuid = otherSubnet)).thenReturn(secondStates)
+        val contexts = MutableStateFlow<BittensorEstimateContext?>(context)
+        val updates = mutableListOf<BittensorCostBasisUpdate>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            interactor.observeUpdates(contexts).toList(updates)
+        }
+        assertTrue(updates.last().isProvisional)
+
+        contexts.value = context.copy(netuid = otherSubnet)
+
+        assertTrue(updates.last().state is BittensorCostBasisState.Loaded)
+        assertEquals(false, updates.last().isProvisional)
+        assertEquals(0, firstStates.subscriptionCount.value)
+        assertEquals(1, secondStates.subscriptionCount.value)
+        val updateCount = updates.size
+        firstStates.value = BittensorHistoryState(Result.failure(IllegalStateException("Old subnet")), isSettling = true)
+        assertEquals(updateCount, updates.size)
+        verify(history).observeState(address, metaAccountId = 7L, netuid = otherSubnet)
     }
 }

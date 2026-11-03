@@ -525,8 +525,9 @@ class BittensorModule {
         portfolioHistory: BittensorPortfolioHistorySource,
         infrastructureUrls: InfrastructureUrls,
         computationalCache: ComputationalCache,
-        preferences: Preferences
-    ) = BittensorOperationHistorySource(client, api, portfolioHistory, infrastructureUrls, computationalCache, preferences, spacingMillis = 12_000L)
+        preferences: Preferences,
+        gson: Gson
+    ) = BittensorOperationHistorySource(client, api, portfolioHistory, infrastructureUrls, computationalCache, preferences, gson, spacingMillis = 12_000L)
 
     @Provides
     @FeatureScope

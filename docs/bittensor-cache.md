@@ -156,6 +156,10 @@ the caller. This prevents a failed deletion from silently restoring invalidated 
 Durable history invalidation happens **before** publishing the new generation to subscribers. Preserve the
 existing five-minute, persisted indexer-settlement window: responses fetched inside it may render but must
 not seed later subscriptions. Passive block/balance updates do not invalidate cost-basis history.
+Provisional cost-basis display is scoped to the submitted operation's netuid, matching iOS; root claim
+affects all networks. Overlapping trades keep independent deadlines, including after restart. A successful
+history fetch started after a network's deadline settles that network even while another trade still
+blocks account-wide cache reuse. The history stream and page invalidation remain shared per account.
 Runtime snapshots remain available as stale after a transaction, but revision tickets prevent a pre-transaction
 load from overwriting them or being published as a fresh load. Cached prices keep a portfolio stale until
 live pricing completes, so they cannot seed a fresh external-balance update.

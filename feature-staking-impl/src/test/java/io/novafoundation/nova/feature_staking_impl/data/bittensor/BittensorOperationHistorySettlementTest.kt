@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSettlementScope
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
@@ -27,6 +29,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -67,19 +70,35 @@ class BittensorOperationHistorySettlementTest {
 
     private val storedDeadlines = mutableMapOf<String, Long>()
 
+    private val storedScopes = mutableMapOf<String, String>()
+
+    private val subnetA = BittensorNetuid.Subnet(1)
+
+    private val subnetB = BittensorNetuid.Subnet(2)
+
+    private val scopeA = BittensorSettlementScope.Network(subnetA)
+
+    private val scopeB = BittensorSettlementScope.Network(subnetB)
+
     private val preferences = Proxy.newProxyInstance(
         Preferences::class.java.classLoader,
         arrayOf(Preferences::class.java)
     ) { _, method, arguments ->
         when (method.name) {
-            "contains" -> arguments[0] in storedDeadlines
+            "contains" -> arguments[0] in storedDeadlines || arguments[0] in storedScopes
             "getLong" -> storedDeadlines[arguments[0]] ?: arguments[1]
+            "getString" -> storedScopes[arguments[0]]
+            "putString" -> {
+                storedScopes[arguments[0] as String] = arguments[1] as String
+                null
+            }
             "putLong" -> {
                 storedDeadlines[arguments[0] as String] = arguments[1] as Long
                 null
             }
             "removeField" -> {
                 storedDeadlines.remove(arguments[0])
+                storedScopes.remove(arguments[0])
                 null
             }
             else -> error("Unexpected preference access: ${method.name}")
@@ -87,6 +106,203 @@ class BittensorOperationHistorySettlementTest {
     } as Preferences
 
     private val repository = newRepository()
+
+    @Test
+    fun `buy in subnet A never marks subnet B or root as settling including pending reload`() = runTest {
+        val sharedCache = SharedCache(backgroundScope)
+        val history = backendSource.historySource(sharedCache, preferences, nowNanos = clock, nowMillis = wallClock)
+        val updates = observeNetworkStates(history)
+        runCurrent()
+        assertTrue(updates.values.all { it.last().result!!.isSuccess })
+        val beforeTrade = updates.mapValues { it.value.size }
+        val release = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { release.await() }
+
+        history.ownTradeSubmitted(requireNotNull(history.request("account", 1L)), scopeA)
+        runCurrent()
+
+        assertNull(updates.getValue(subnetA).last().result)
+        assertTrue(updates.getValue(subnetA).last().isSettling)
+        for (unaffected in listOf(subnetB, BittensorNetuid.Root)) {
+            assertTrue(updates.getValue(unaffected).drop(beforeTrade.getValue(unaffected)).none { it.isSettling })
+        }
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(updates.getValue(subnetA).last().isSettling)
+        assertFalse(updates.getValue(subnetB).last().isSettling)
+        assertFalse(updates.getValue(BittensorNetuid.Root).last().isSettling)
+        assertTrue(updates.values.all { it.last().result!!.isSuccess })
+        assertEquals(2, api.historyPages.size) // All networks consume the same account-history request.
+    }
+
+    @Test
+    fun `root stake settlement affects only the root estimate`() = runTest {
+        val sharedCache = SharedCache(backgroundScope)
+        val history = backendSource.historySource(sharedCache, preferences, nowNanos = clock, nowMillis = wallClock)
+        val rootScope = BittensorSettlementScope.Network(BittensorNetuid.Root)
+        history.ownTradeSubmitted(requireNotNull(history.request("account", 1L)), rootScope)
+        val updates = observeNetworkStates(history)
+        runCurrent()
+
+        assertTrue(updates.getValue(BittensorNetuid.Root).all { it.isSettling })
+        assertTrue(updates.getValue(subnetA).none { it.isSettling })
+        assertTrue(updates.getValue(subnetB).none { it.isSettling })
+        assertTrue(updates.values.all { it.last().result!!.isSuccess })
+        assertEquals(1, api.historyPages.size)
+    }
+
+    @Test
+    fun `root claim settlement affects root and every subnet estimate`() = runTest {
+        val sharedCache = SharedCache(backgroundScope)
+        val history = backendSource.historySource(sharedCache, preferences, nowNanos = clock, nowMillis = wallClock)
+        history.ownTradeSubmitted(requireNotNull(history.request("account", 1L)), BittensorSettlementScope.Account)
+        val updates = observeNetworkStates(history)
+        runCurrent()
+
+        assertTrue(updates.values.all { states -> states.isNotEmpty() && states.all { it.isSettling } })
+        assertTrue(updates.values.all { it.last().result!!.isSuccess })
+        assertEquals(1, api.historyPages.size)
+    }
+
+    @Test
+    fun `later subnet B trade does not extend subnet A settlement deadline`() = runTest {
+        val live = observeSettlement()
+        runCurrent()
+        live.submit(scopeA)
+        runCurrent()
+        advanceClocks(120_000L)
+        live.submit(scopeB)
+        runCurrent()
+        assertSettling(live, subnetA, subnetB)
+
+        advanceClocks(180_000L) // A at 300s; B remains protected until 420s.
+        refresh(live)
+        assertSettling(live, subnetB)
+        val requestsBefore = api.historyPages.size
+        refresh(live)
+        assertEquals(requestsBefore + 1, api.historyPages.size) // B still prevents account-wide cache reuse.
+
+        advanceClocks(120_000L)
+        refresh(live)
+        assertSettling(live)
+        val settledRequests = api.historyPages.size
+        refresh(live)
+        assertEquals(settledRequests, api.historyPages.size)
+    }
+
+    @Test
+    fun `another trade in the same subnet extends its deadline`() = runTest {
+        val live = observeSettlement()
+        runCurrent()
+        live.submit(scopeA)
+        runCurrent()
+        advanceClocks(120_000L)
+        live.submit(scopeA)
+        runCurrent()
+
+        advanceClocks(180_000L)
+        refresh(live)
+        assertSettling(live, subnetA)
+
+        advanceClocks(120_000L)
+        refresh(live)
+        assertSettling(live)
+    }
+
+    @Test
+    fun `later subnet trade does not extend the account wide root claim deadline`() = runTest {
+        val live = observeSettlement()
+        runCurrent()
+        live.submit(BittensorSettlementScope.Account)
+        runCurrent()
+        advanceClocks(120_000L)
+        live.submit(scopeB)
+        runCurrent()
+        assertSettling(live, BittensorNetuid.Root, subnetA, subnetB)
+
+        advanceClocks(180_000L)
+        refresh(live)
+        assertSettling(live, subnetB)
+
+        advanceClocks(120_000L)
+        refresh(live)
+        assertSettling(live)
+    }
+
+    @Test
+    fun `refresh started before subnet A deadline cannot release A when it completes after deadline`() = runTest {
+        val live = observeSettlement()
+        runCurrent()
+        live.submit(scopeA)
+        runCurrent()
+        advanceClocks(120_000L)
+        live.submit(scopeB)
+        runCurrent()
+        advanceClocks(179_999L)
+        val release = CompletableDeferred<Unit>()
+        val started = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = {
+            started.complete(Unit)
+            release.await()
+        }
+        refresh(live)
+        assertTrue(started.isCompleted)
+
+        advanceClocks(1L)
+        release.complete(Unit)
+        runCurrent()
+        assertSettling(live, subnetA, subnetB)
+
+        api.beforeHistoryResponse = {}
+        refresh(live)
+        assertSettling(live, subnetB)
+    }
+
+    @Test
+    fun `restart restores per subnet scope and distinct remaining deadlines`() = runTest {
+        repository.ownTradeSubmitted(request(), scopeA)
+        advanceClocks(120_000L)
+        repository.ownTradeSubmitted(request(), scopeB)
+        advanceClocks(80_000L)
+        nowNanos = 17_000_000_000L // Different process/boot monotonic origin.
+        val release = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { release.await() }
+        val restarted = observeSettlement()
+        runCurrent()
+        assertSettling(restarted, subnetA, subnetB)
+
+        release.complete(Unit)
+        runCurrent()
+        assertSettling(restarted, subnetA, subnetB)
+        advanceClocks(100_000L)
+        refresh(restarted)
+        assertSettling(restarted, subnetB)
+        advanceClocks(120_000L)
+        refresh(restarted)
+        assertSettling(restarted)
+        assertTrue(storedScopes.isEmpty())
+        assertTrue(storedDeadlines.isEmpty())
+    }
+
+    @Test
+    fun `restart during B window retains elapsed A until a successful post deadline refresh`() = runTest {
+        repository.ownTradeSubmitted(request(), scopeA)
+        advanceClocks(120_000L)
+        repository.ownTradeSubmitted(request(), scopeB)
+        advanceClocks(230_000L)
+        api.failure = IllegalStateException("Indexer unavailable")
+        val restarted = observeSettlement()
+        runCurrent()
+        assertSettling(restarted, subnetA, subnetB)
+        assertTrue(restarted.updates.values.all { it.last().result!!.isFailure })
+
+        api.failure = null
+        refresh(restarted)
+        assertSettling(restarted, subnetB)
+        advanceClocks(70_000L)
+        refresh(restarted)
+        assertSettling(restarted)
+    }
 
     @Test
     fun `evicting inactive metadata never revives an older request for the same account`() = runTest {
@@ -300,10 +516,10 @@ class BittensorOperationHistorySettlementTest {
         val first = mutableListOf<BittensorHistoryState>()
         val second = mutableListOf<BittensorHistoryState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            repository.observeState("first", metaAccountId = 1L).toList(first)
+            repository.observeState("first", metaAccountId = 1L, netuid = subnetA).toList(first)
         }
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            repository.observeState("second", metaAccountId = 1L).toList(second)
+            repository.observeState("second", metaAccountId = 1L, netuid = subnetA).toList(second)
         }
         runCurrent()
         val release = CompletableDeferred<Unit>()
@@ -693,6 +909,62 @@ class BittensorOperationHistorySettlementTest {
         release.complete(Unit)
 
         assertTrue(old.await().isFailure)
+    }
+
+    private fun TestScope.observeNetworkStates(
+        history: BittensorOperationHistorySource
+    ): Map<BittensorNetuid, MutableList<BittensorHistoryState>> {
+        val networks = listOf(BittensorNetuid.Root, subnetA, subnetB)
+        val updates = networks.associateWith { mutableListOf<BittensorHistoryState>() }
+        updates.forEach { (network, values) ->
+            backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+                history.observeState("account", metaAccountId = 1L, netuid = network).toList(values)
+            }
+        }
+        return updates
+    }
+
+    private data class ObservedSettlement(
+        val source: BittensorOperationHistorySource,
+        val foreground: MutableStateFlow<Boolean>,
+        val updates: Map<BittensorNetuid, MutableList<BittensorHistoryState>>
+    )
+
+    private fun TestScope.observeSettlement(): ObservedSettlement {
+        val foreground = MutableStateFlow(true)
+        val sources = createBittensorTestSources(
+            urls = urls,
+            estimatesApi = api,
+            scope = backgroundScope,
+            nanoTime = clock,
+            nowMillis = wallClock,
+            foreground = foreground
+        )
+        val sharedCache = SharedCache(backgroundScope)
+        val history = sources.historySource(sharedCache, preferences, nowNanos = clock, nowMillis = wallClock)
+        return ObservedSettlement(history, foreground, observeNetworkStates(history))
+    }
+
+    private suspend fun ObservedSettlement.submit(scope: BittensorSettlementScope) {
+        source.ownTradeSubmitted(requireNotNull(source.request("account", metaAccountId = 1L)), scope)
+    }
+
+    private fun TestScope.refresh(live: ObservedSettlement) {
+        live.foreground.value = false
+        runCurrent()
+        live.foreground.value = true
+        runCurrent()
+    }
+
+    private fun assertSettling(live: ObservedSettlement, vararg affected: BittensorNetuid) {
+        live.updates.forEach { (network, states) ->
+            assertEquals("Settlement for netuid ${network.value}", network in affected, states.last().isSettling)
+        }
+    }
+
+    private fun advanceClocks(millis: Long) {
+        nowMillis += millis
+        nowNanos += millis * 1_000_000L
     }
 
     private suspend fun request(address: String = "account") = requireNotNull(repository.request(address, metaAccountId = 1L))

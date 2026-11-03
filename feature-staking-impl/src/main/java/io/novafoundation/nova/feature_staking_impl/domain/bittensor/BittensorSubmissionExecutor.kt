@@ -64,6 +64,7 @@ class BittensorSubmissionExecutor(
         onStage: (String) -> Unit = {},
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
+        val settlementScope = target.settlementScope()
         val operationColdKey = runCatching {
             accountRepository.getMetaAccount(metaId).requireAccountIdIn(chain)
         }.getOrElse { return@withLock it.mapBittensorPreSubmissionError() }
@@ -94,7 +95,7 @@ class BittensorSubmissionExecutor(
                 outcomeResolver.resolve(chain, inBlock)
             } ?: run {
                 onStage("Inclusion/events timeout; outcome unknown; hash=$lastSeenHash")
-                invalidateData(chain, metaId, operationColdKey, historyRequest)
+                invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
                 return@withLock BittensorOperationResult.Unknown(lastSeenHash)
             }
 
@@ -115,7 +116,7 @@ class BittensorSubmissionExecutor(
                 null
             }
             if (result is BittensorOperationResult.Success || result is BittensorOperationResult.Unknown) {
-                invalidateData(chain, metaId, operationColdKey, historyRequest)
+                invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
             }
             if (result is BittensorOperationResult.Success) positionUpdates.confirmed(metaId, chain.id, coldkey)
             when (result) {
@@ -127,15 +128,21 @@ class BittensorSubmissionExecutor(
         } catch (e: SigningCancelledException) {
             e.mapBittensorPreSubmissionError()
         } catch (e: CancellationException) {
-            if (handedOff) withContext(NonCancellable) { invalidateData(chain, metaId, operationColdKey, historyRequest) }
+            if (handedOff) withContext(NonCancellable) { invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope) }
             throw e
         } catch (e: Exception) {
-            if (handedOff) invalidateData(chain, metaId, operationColdKey, historyRequest)
+            if (handedOff) invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
             e.mapBittensorSubmissionError()
         }
     }
 
-    private suspend fun invalidateData(chain: Chain, metaId: Long, coldKey: AccountId, request: BittensorHistoryRequest?) {
+    private suspend fun invalidateData(
+        chain: Chain,
+        metaId: Long,
+        coldKey: AccountId,
+        request: BittensorHistoryRequest?,
+        settlementScope: BittensorSettlementScope
+    ) {
         // Each owner invalidates its own data. A cache failure cannot change the observed dispatch result.
         positions.invalidate(chain.id, coldKey, metaId)
             .onFailure { error ->
@@ -145,7 +152,7 @@ class BittensorSubmissionExecutor(
             }
         if (request == null) return
         runCatching {
-            history.ownTradeSubmitted(request)
+            history.ownTradeSubmitted(request, settlementScope)
         }.onFailure { error ->
             if (error is CancellationException) throw error
             logger.log("[BittensorSubmission] Could not invalidate operation history")

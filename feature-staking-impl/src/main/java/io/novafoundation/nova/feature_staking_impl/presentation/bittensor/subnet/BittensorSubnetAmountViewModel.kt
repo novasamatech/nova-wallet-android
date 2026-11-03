@@ -446,7 +446,8 @@ class BittensorSubnetAmountViewModel(
 
     private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map { wallet ->
-            if (existingPosition) BittensorEstimateContext(wallet.metaId, wallet.chain) else null
+            initialSubnetId?.takeIf { existingPosition }
+                ?.let { BittensorEstimateContext(wallet.metaId, wallet.chain, it) }
         }
     )
         .shareInBackground()

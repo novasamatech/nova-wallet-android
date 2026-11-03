@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.observeSharedFlow
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.data.cache.CachedResponse
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSettlementScope
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
@@ -36,6 +39,7 @@ class BittensorOperationHistorySource(
     private val infrastructureUrls: InfrastructureUrls,
     private val computationalCache: ComputationalCache,
     private val preferences: Preferences,
+    private val gson: Gson,
     private val spacingMillis: Long,
     private val nowNanos: () -> Long = System::nanoTime,
     private val nowMillis: () -> Long = System::currentTimeMillis
@@ -47,6 +51,8 @@ class BittensorOperationHistorySource(
         var seedBlockedUntilNanos: Long? = null
 
         var settledGeneration = initialGeneration
+
+        val settlementDeadlines = mutableMapOf<BittensorSettlementScope, Long>()
 
         var users = 0
     }
@@ -62,8 +68,12 @@ class BittensorOperationHistorySource(
     internal data class Snapshot(
         val request: BittensorHistoryRequest,
         val result: Result<BittensorOperationHistory>?,
-        val isSettling: Boolean = false
-    )
+        val settlingScopes: Set<BittensorSettlementScope> = emptySet()
+    ) {
+        val isSettling: Boolean get() = settlingScopes.isNotEmpty()
+    }
+
+    private data class StoredSettlement(val accountDeadlineMillis: Long?, val networkDeadlinesMillis: Map<Int, Long>)
 
     /** Capture before submission so an origin/account switch cannot invalidate another wallet's cache. */
     suspend fun request(address: String, metaAccountId: Long): BittensorHistoryRequest? {
@@ -75,12 +85,14 @@ class BittensorOperationHistorySource(
     }
 
     /** Explicit cache command after a submitted own trade (success or unknown), never on signing. */
-    suspend fun ownTradeSubmitted(request: BittensorHistoryRequest) {
+    suspend fun ownTradeSubmitted(request: BittensorHistoryRequest, scope: BittensorSettlementScope = BittensorSettlementScope.Account) {
         val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
         synchronized(lock) {
             val state = accountHistory(key)
             state.seedBlockedUntilNanos = nowNanos() + SETTLEMENT_NANOS
+            state.settlementDeadlines[scope] = requireNotNull(state.seedBlockedUntilNanos)
             preferences.putLong(settlementField(key), nowMillis() + SETTLEMENT_MILLIS)
+            saveSettlementScopes(key, state)
         }
         val operationsResult = runCatching {
             client.invalidateAccountResponses(request.baseUrl, request.address, request.metaAccountId, OPERATIONS_PATH)
@@ -108,9 +120,9 @@ class BittensorOperationHistorySource(
 
     /** Shared while observed. Null means loading, never an unavailable or empty ledger. */
     internal fun observe(address: String, metaAccountId: Long): Flow<Result<BittensorOperationHistory>?> =
-        observeState(address, metaAccountId).map { it.result }
+        observeState(address, metaAccountId, BittensorNetuid.Root).map { it.result }
 
-    fun observeState(address: String, metaAccountId: Long): Flow<BittensorHistoryState> = flow {
+    fun observeState(address: String, metaAccountId: Long, netuid: BittensorNetuid): Flow<BittensorHistoryState> = flow {
         while (true) {
             val request = request(address, metaAccountId)
             if (request == null) {
@@ -127,9 +139,10 @@ class BittensorOperationHistorySource(
                 combine(shared, state.generation) { snapshot, generation ->
                     // Clear immediately even if a cancelled old transport is slow to finish.
                     if (snapshot.request.generation == generation) {
-                        BittensorHistoryState(snapshot.result, snapshot.isSettling)
+                        BittensorHistoryState(snapshot.result, isSettling = snapshot.settlingScopes.affects(netuid))
                     } else {
-                        BittensorHistoryState(null, true)
+                        val scopes = synchronized(lock) { state.settlementDeadlines.keys.toSet() }
+                        BittensorHistoryState(null, isSettling = scopes.affects(netuid))
                     }
                 }
                     .takeWhile { infrastructureUrls.baseUrl() == request.baseUrl }
@@ -155,17 +168,14 @@ class BittensorOperationHistorySource(
         val restored = restoration.getOrNull()
         var lastResult = restored?.let { Result.success(it.toHistory()) }
         val initialResult = restorationFailure?.let { Result.failure<BittensorOperationHistory>(it) } ?: lastResult
-        emit(Snapshot(request, initialResult, isSettling(request)))
+        emit(Snapshot(request, initialResult, settlingScopes(request)))
         if (restorationFailure is OriginChanged) awaitCancellation()
         if (restored != null && nowNanos() < restored.validUntilNanos) {
             awaitRefresh(request, restored.validUntilNanos)
         }
         while (true) {
-            // Settlement eligibility belongs to request start, even if the request outlives the window.
-            var startedDuringSettlement = false
             val loaded = runCatching {
                 val persist = mayPersist(request)
-                startedDuringSettlement = !persist
                 loadCurrentHistory(request, persist)
             }
             val failure = loaded.exceptionOrNull()
@@ -174,7 +184,7 @@ class BittensorOperationHistorySource(
                 lastResult?.getOrNull()?.copy(stale = true) ?: throw error
             }
             lastResult = result.takeIf { it.isSuccess } ?: lastResult
-            emit(Snapshot(request, result, isSettling = startedDuringSettlement || isSettling(request)))
+            emit(Snapshot(request, result, settlingScopes(request)))
             // A shared stream never migrates to another origin under its original cache key.
             if (failure is OriginChanged) awaitCancellation()
             awaitRefresh(request, loaded.getOrNull()?.validUntilNanos)
@@ -187,12 +197,17 @@ class BittensorOperationHistorySource(
 
     private suspend fun loadCurrentHistory(request: BittensorHistoryRequest, persist: Boolean): HistoryPages {
         checkOrigin(request)
+        val startedAtNanos = nowNanos()
         val pages = loadHistoryPages(request.baseUrl, request.address, request.metaAccountId, persist)
         currentCoroutineContext().ensureActive()
         checkOrigin(request)
         synchronized(lock) {
             val key = HistoryKey(request.baseUrl, request.address, request.metaAccountId)
             val state = requireCurrent(key, request)
+            // A completed fetch can settle A while a later trade in B still prevents account-wide cache reuse.
+            // A request started before A's deadline cannot settle A, even if its response arrives afterwards.
+            val settledNetworks = state.settlementDeadlines.entries.removeAll { it.value <= startedAtNanos }
+            if (settledNetworks) saveSettlementScopes(key, state)
             if (persist) {
                 state.settledGeneration = request.generation
                 if (state.seedBlockedUntilNanos != null) {
@@ -214,6 +229,13 @@ class BittensorOperationHistorySource(
         val state = histories.getValue(HistoryKey(request.baseUrl, request.address, request.metaAccountId))
         state.settledGeneration != state.generation.value
     }
+
+    private fun settlingScopes(request: BittensorHistoryRequest): Set<BittensorSettlementScope> = synchronized(lock) {
+        histories.getValue(HistoryKey(request.baseUrl, request.address, request.metaAccountId)).settlementDeadlines.keys.toSet()
+    }
+
+    private fun Set<BittensorSettlementScope>.affects(netuid: BittensorNetuid): Boolean =
+        BittensorSettlementScope.Account in this || BittensorSettlementScope.Network(netuid) in this
 
     private suspend fun awaitRefresh(request: BittensorHistoryRequest, validUntilNanos: Long?) {
         val delayMillis = synchronized(lock) {
@@ -237,7 +259,13 @@ class BittensorOperationHistorySource(
     private fun accountHistory(key: HistoryKey): AccountHistory {
         val state = histories.remove(key) ?: AccountHistory(++nextGeneration).apply {
             seedBlockedUntilNanos = restoredSettlementDeadline(key)
-            if (seedBlockedUntilNanos != null) settledGeneration = -1L
+            val deadline = seedBlockedUntilNanos
+            if (deadline != null) {
+                settledGeneration = -1L
+                settlementDeadlines.putAll(restoredSettlementScopes(key, deadline))
+            } else {
+                preferences.removeField(settlementScopesField(key))
+            }
         }
         histories[key] = state
         trimHistories()
@@ -291,6 +319,50 @@ class BittensorOperationHistorySource(
 
     // Preferences are plain text on disk, so the field name carries only the hashed identity.
     private fun settlementField(key: HistoryKey) = "bittensor_history_settlement_" + identity(key)
+
+    private fun settlementScopesField(key: HistoryKey) = settlementField(key) + "_scopes"
+
+    private fun saveSettlementScopes(key: HistoryKey, state: AccountHistory) {
+        val field = settlementScopesField(key)
+        if (state.settlementDeadlines.isEmpty()) {
+            preferences.removeField(field)
+            return
+        }
+        val now = nowNanos()
+        val wallClock = nowMillis()
+
+        fun wallDeadline(deadline: Long): Long = wallClock + (deadline - now) / NANOS_PER_MILLI
+
+        val stored = StoredSettlement(
+            accountDeadlineMillis = state.settlementDeadlines[BittensorSettlementScope.Account]?.let(::wallDeadline),
+            networkDeadlinesMillis = state.settlementDeadlines.entries.mapNotNull { (scope, deadline) ->
+                val network = scope as? BittensorSettlementScope.Network ?: return@mapNotNull null
+                network.netuid.value to wallDeadline(deadline)
+            }.toMap()
+        )
+        preferences.putString(field, gson.toJson(stored))
+    }
+
+    private fun restoredSettlementScopes(key: HistoryKey, legacyDeadline: Long): Map<BittensorSettlementScope, Long> {
+        val restored = runCatching<Map<BittensorSettlementScope, Long>?> {
+            val json = preferences.getString(settlementScopesField(key)) ?: return@runCatching null
+            val stored = requireNotNull(gson.fromJson(json, StoredSettlement::class.java))
+            val now = nowNanos()
+            val wallClock = nowMillis()
+
+            // Already elapsed scopes still need a successful fetch after restart before showing settled estimates.
+            fun deadline(wallDeadline: Long): Long = now + (wallDeadline - wallClock).coerceIn(0L, SETTLEMENT_MILLIS) * NANOS_PER_MILLI
+
+            buildMap<BittensorSettlementScope, Long> {
+                stored.accountDeadlineMillis?.let { put(BittensorSettlementScope.Account, deadline(it)) }
+                stored.networkDeadlinesMillis.forEach { (netuid, wallDeadline) ->
+                    put(BittensorSettlementScope.Network(BittensorNetuid.from(netuid)), deadline(wallDeadline))
+                }
+            }
+        }.getOrNull()
+        // Existing versions only stored an account-wide deadline; retain that protection when scope is unknown.
+        return restored ?: mapOf(BittensorSettlementScope.Account to legacyDeadline)
+    }
 
     private fun identity(key: HistoryKey) = (key.metaAccountId.toString() + "|" + key.baseUrl.toString() + "|" + key.address).encodeToByteArray()
         .blake2b256()
