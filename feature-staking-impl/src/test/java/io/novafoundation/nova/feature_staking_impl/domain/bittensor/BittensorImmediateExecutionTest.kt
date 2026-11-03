@@ -59,11 +59,11 @@ class BittensorImmediateExecutionTest {
     }
 
     @Test
-    fun `generic and legacy ledger wallets are refused by type`() = runBlocking {
+    fun `generic and legacy ledger wallets pass without a signer lookup`() = runBlocking {
         for (type in listOf(LightMetaAccount.Type.LEDGER, LightMetaAccount.Type.LEDGER_LEGACY)) {
             `when`(wallet.type).thenReturn(type)
 
-            assertEquals(BittensorWalletSupport.LEDGER_NOT_SUPPORTED, capability.support(wallet))
+            assertEquals(BittensorWalletSupport.SUPPORTED, capability.support(wallet))
         }
         verifyNoInteractions(signerProvider)
     }

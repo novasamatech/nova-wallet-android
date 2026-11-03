@@ -15,4 +15,6 @@ dependencies {
     implementation androidDep
 
     api project(':core-api')
+
+    testImplementation jUnitDep
 }
