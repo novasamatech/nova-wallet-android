@@ -13,20 +13,21 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeout
 
-interface BittensorPortfolioPriceRepository {
+interface BittensorPortfolioPriceSource {
 
+    /** Available live prices only; unavailable held subnets remain absent, and cancellation propagates. */
     suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger>
 }
 
-class RealBittensorPortfolioPriceRepository(
-    private val catalogueRepository: BittensorSubnetCatalogueRepository,
+class RealBittensorPortfolioPriceSource(
+    private val catalogueSource: BittensorSubnetCatalogueSource,
     private val runtimePrices: BittensorRuntimePriceSource,
     private val logger: Logger
-) : BittensorPortfolioPriceRepository {
+) : BittensorPortfolioPriceSource {
 
     override suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
         if (heldSubnets.isEmpty()) return emptyMap()
-        val backend = loadPrices("backend") { mapBittensorPortfolioPrices(catalogueRepository.catalogue()) }
+        val backend = loadPrices("backend") { catalogueSource.valuationPrices() }
             .filterKeys { it in heldSubnets }
         val missing = heldSubnets - backend.keys
         if (missing.isEmpty()) return backend

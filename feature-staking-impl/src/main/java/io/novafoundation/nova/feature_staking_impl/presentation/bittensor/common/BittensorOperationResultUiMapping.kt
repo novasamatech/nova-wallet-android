@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotExecuted
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevCarrier
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotReady
+import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorFailureStage
@@ -27,7 +28,8 @@ fun BittensorOperationResult.Unknown.mapResult(
 
 fun BittensorOperationResult.Failure.mapResult(
     resources: ResourceManager,
-    landingActions: List<BittensorResultAction> = emptyList()
+    landingActions: List<BittensorResultAction> = emptyList(),
+    slippage: String? = null
 ): BittensorStakeResultUi {
     if (stage == BittensorFailureStage.UNKNOWN || stage == BittensorFailureStage.DISPATCHED && transactionHash == null) {
         return BittensorOperationResult.Unknown(transactionHash).mapResult(resources, landingActions)
@@ -49,27 +51,42 @@ fun BittensorOperationResult.Failure.mapResult(
         }
         return BittensorStakeResultUi.Failure(
             title = resources.getString(R.string.bittensor_mev_not_executed),
-            description = resources.getString(R.string.bittensor_mev_unchanged) + " " + resources.getString(message),
-            error = transactionHash.orEmpty()
+            description = resources.getString(message),
+            error = resources.getString(R.string.bittensor_mev_unchanged)
         )
     }
 
     return BittensorStakeResultUi.Failure(
         title = resources.getString(R.string.common_failed),
         description = resources.getString(
-            if (stage == BittensorFailureStage.NOT_SUBMITTED) R.string.bittensor_result_not_submitted else R.string.bittensor_result_dispatched_failure
+            if (stage == BittensorFailureStage.NOT_SUBMITTED) R.string.bittensor_result_nothing_spent else R.string.bittensor_result_fee_charged
         ),
-        error = transactionHash?.let { resources.getString(R.string.bittensor_result_transaction_hash, it) }
-            ?: resources.getString(R.string.common_error_general_title),
+        error = failureReason(resources, slippage),
         canRetry = isRetryable
     )
 }
 
+private fun BittensorOperationResult.Failure.failureReason(resources: ResourceManager, slippage: String?): String {
+    val dispatch = cause as? DispatchError.Module ?: return resources.getString(R.string.common_error_general_title)
+    return when (dispatch.module.name to dispatch.error.name) {
+        "Swap" to "PriceLimitExceeded", "SubtensorModule" to "SlippageTooHigh" -> {
+            if (slippage != null) {
+                resources.getString(R.string.bittensor_result_price_moved_format, slippage)
+            } else {
+                resources.getString(R.string.bittensor_result_price_moved)
+            }
+        }
+        "SubtensorModule" to "RootStakeLocked" -> resources.getString(R.string.bittensor_validation_root_locked)
+        else -> dispatch.toString()
+    }
+}
+
 fun BittensorOperationResult.Failure.toSubmissionState(
     resources: ResourceManager,
-    landingActions: List<BittensorResultAction> = emptyList()
+    landingActions: List<BittensorResultAction> = emptyList(),
+    slippage: String? = null
 ): BittensorSubmissionState =
-    if (isSigningCancelled) BittensorSubmissionState.Ready else mapResult(resources, landingActions).toSubmissionState()
+    if (isSigningCancelled) BittensorSubmissionState.Ready else mapResult(resources, landingActions, slippage).toSubmissionState()
 
 fun BittensorStakeResultUi.toSubmissionState(): BittensorSubmissionState = when (this) {
     is BittensorStakeResultUi.Progress -> BittensorSubmissionState.Submitting(this)

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueSource
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverageInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -31,7 +31,7 @@ class BittensorValidatorInfoModule {
     @Provides
     fun provideCoverageInteractor(
         delegates: BittensorDelegateSource,
-        catalogue: BittensorSubnetCatalogueRepository,
+        catalogue: BittensorSubnetCatalogueSource,
         validators: BittensorSubnetValidatorRepository
     ): BittensorValidatorCoverageInteractor = BittensorValidatorCoverageInteractor(delegates, catalogue, validators)
 

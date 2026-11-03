@@ -41,6 +41,8 @@ import org.mockito.Mockito.verifyNoInteractions
 
 class BittensorPortfolioRepositoryTest {
 
+    private val snapshots = createResponseTestCache()
+
     private val registry = mock(ChainRegistry::class.java)
 
     private val accounts = mock(AccountRepository::class.java)
@@ -59,7 +61,7 @@ class BittensorPortfolioRepositoryTest {
 
     private val blockNumbers = MutableStateFlow(BigInteger.ZERO)
 
-    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
+    private val priceSource = mock(BittensorPortfolioPriceSource::class.java)
 
     private val logger = mock(Logger::class.java)
 
@@ -73,7 +75,7 @@ class BittensorPortfolioRepositoryTest {
 
     private val selected = MutableStateFlow(account(1L))
 
-    private val positions = object : BittensorPositionSource {
+    private val positions = object : BittensorPositionRemoteSource {
         override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
             positionRequests++
             check(coldKey[0] == 1.toByte() && !failFirstWallet) { "RPC unavailable" }
@@ -88,7 +90,7 @@ class BittensorPortfolioRepositoryTest {
 
         assertEquals(asset, repository().observeAsset().first())
         assertEquals(0, positionRequests)
-        verifyNoInteractions(priceRepository, logger)
+        verifyNoInteractions(priceSource, logger)
     }
 
     @Test
@@ -203,22 +205,24 @@ class BittensorPortfolioRepositoryTest {
         `when`(it.accountIdIn(chain)).thenReturn(ByteArray(32) { id.toByte() })
     }
 
-    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
-
     private val commonModule = CommonModule()
 
     private val computationalCache = commonModule.provideComputationalCache()
 
+    private val pricesSource = BittensorPricesSource(priceSource, snapshots, computationalCache)
+
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val positionRepository = RealBittensorPositionRepository(
+    private val sharedPositionSource = BittensorPositionSource(
         positions,
-        portfolioLoader,
         chainStateRepository,
         computationalCache,
         logger,
-        positionUpdates
+        positionUpdates,
+        snapshots
     )
+
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, pricesSource)
 
     private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)
 }

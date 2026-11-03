@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
@@ -49,7 +49,7 @@ class BittensorExitInteractor(
     private val exitRuntimeSource: BittensorExitRuntimeSource,
     private val subnetMetadataInteractor: BittensorSubnetMetadataInteractor,
     private val swapSource: BittensorSwapSource,
-    private val configRepository: BittensorConfigRepository,
+    private val configSource: BittensorConfigSource,
     val slippage: BittensorSlippage,
     private val extrinsicService: ExtrinsicService,
     private val submissionExecutor: BittensorSubmissionExecutor,
@@ -57,7 +57,6 @@ class BittensorExitInteractor(
     private val beneficiaryAddress: String,
     private val logger: Logger,
     private val immediateExecution: BittensorImmediateExecution,
-    private val costBasisInteractor: BittensorCostBasisInteractor,
     private val chainState: ChainStateRepository,
     private val blockRequotes: BittensorBlockRequotes
 ) {
@@ -105,6 +104,8 @@ class BittensorExitInteractor(
 
     /** What re-quotes a sale: each new block while [shown] and each of [immediate]. */
     fun requotes(shown: Flow<Boolean>, immediate: Flow<Unit>): Flow<Unit> = blockRequotes.requotes(shown, immediate)
+
+    fun observeSubnetLogos() = configSource.observeSubnetLogos()
 
     suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition = coroutineScope {
         val wallet = accountRepository.getMetaAccount(metaId)
@@ -306,23 +307,17 @@ class BittensorExitInteractor(
         trace("Checking operation wallet")
         val position = draft.position
         requireWallet(position.metaId, position.coldkey, position.chain)
-        trace("Wallet checked; capturing history context")
+        trace("Wallet checked; entering submission executor")
         // Submit the exact reviewed amount, price limit and service-fee transfer.
-        val historyRequest = if (position.isRoot) null else costBasisInteractor.ownTradeRequest(position.metaId, position.chain)
-        trace("History context captured; entering submission executor")
         val result = submissionExecutor.execute(
             position.metaId,
             position.chain,
             draft.operation.outcomeTarget(),
             onStage = ::trace,
             mevProtection = mevProtection && !position.isRoot,
-            onUnconfirmed = { hash ->
-                costBasisInteractor.onTradeResult(historyRequest, BittensorOperationResult.Unknown(hash))
-                onUnconfirmed(hash)
-            }
+            onUnconfirmed = onUnconfirmed
         ) { draft.operation.build(this) }
-        trace("Executor returned ${result.javaClass.simpleName}; invalidating history")
-        costBasisInteractor.onTradeResult(historyRequest, result)
+        trace("Executor returned ${result.javaClass.simpleName}")
         trace("Returning result")
         return result
     }
@@ -401,7 +396,7 @@ class BittensorExitInteractor(
         val selectedSlippage = BittensorSlippage(slippageFraction)
         val limitPrice = selectedSlippage.limitPrice(spotPrice, BittensorSwapDirection.ALPHA_TO_TAO)
         val minimumTaoOut = simulation.amountIn * limitPrice / BittensorProtocolUnits.RAO_PER_TAO
-        val commission = configRepository.config().commission
+        val commission = configSource.config().commission
         val serviceFee = commission.feeFor(simulation.amountOut)
         // A sale that its own impact cannot fill at the limit price is still quoted; validation blocks it.
         require(minimumTaoOut.isPositive())

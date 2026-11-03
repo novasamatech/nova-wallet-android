@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketSource
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import java.math.BigDecimal
@@ -22,7 +22,7 @@ enum class BittensorSubnetChartPeriod(val source: PricePeriod, val duration: Dur
 }
 
 class BittensorSubnetDetailsInteractor(
-    private val markets: BittensorSubnetMarketRepository,
+    private val markets: BittensorSubnetMarketSource,
     private val prices: CoinPriceRepository
 ) {
 

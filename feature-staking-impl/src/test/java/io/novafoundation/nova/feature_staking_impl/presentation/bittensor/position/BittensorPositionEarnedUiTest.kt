@@ -13,7 +13,7 @@ class BittensorPositionEarnedUiTest {
 
     @Test
     fun `settling loading applies visibility after progress makes cell visible`() {
-        val basis = BittensorPositionCostBasis(ExtendedLoadingState.Loading, isSettling = true)
+        val basis = BittensorPositionCostBasis(ExtendedLoadingState.Loading, isProvisional = true)
         val subnet = BittensorNetuid.Subnet(1)
         val model = BittensorPositionEarnedUi(ExtendedLoadingState.Loading, basis.showsEarned(subnet))
         var visible = false
@@ -40,16 +40,16 @@ class BittensorPositionEarnedUiTest {
         val subnet = BittensorNetuid.Subnet(1)
         val empty = BittensorEstimatedCostBasis(emptyList(), true)
         val incomplete = BittensorEstimatedCostBasis(emptyList(), false)
-        val noPurchases = BittensorPositionCostBasis(ExtendedLoadingState.Loaded(empty), false)
-        val partial = BittensorPositionCostBasis(ExtendedLoadingState.Loaded(incomplete), false)
-        val unavailable = BittensorPositionCostBasis(ExtendedLoadingState.Loaded(null), false)
+        val noPurchases = BittensorPositionCostBasis(ExtendedLoadingState.Loaded(empty), isProvisional = false)
+        val partial = BittensorPositionCostBasis(ExtendedLoadingState.Loaded(incomplete), isProvisional = false)
+        val unavailable = BittensorPositionCostBasis(ExtendedLoadingState.Loaded(null), isProvisional = false)
         val failure = IllegalStateException("offline")
-        val failed = BittensorPositionCostBasis(ExtendedLoadingState.Error(failure), false)
+        val failed = BittensorPositionCostBasis(ExtendedLoadingState.Error(failure), isProvisional = false)
 
         assertFalse(noPurchases.showsEarned(subnet))
         assertTrue(partial.showsEarned(subnet))
         assertTrue(unavailable.showsEarned(subnet))
         assertTrue(failed.showsEarned(subnet))
-        assertFalse(failed.copy(isSettling = true).showsEarned(subnet))
+        assertFalse(failed.copy(isProvisional = true).showsEarned(subnet))
     }
 }

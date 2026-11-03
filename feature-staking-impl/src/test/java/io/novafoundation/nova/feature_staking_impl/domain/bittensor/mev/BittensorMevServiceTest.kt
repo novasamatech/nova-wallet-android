@@ -120,13 +120,14 @@ class BittensorMevServiceTest {
     @Test
     fun `authorization precedes fresh timing and fresh key follows signed inner`() = runTest {
         configure()
-        assertSame(submitted, service.submit(chain, 1, form))
+        assertSame(submitted, service.submit(chain, 1, form, onHandoff = { calls += "handoff" }))
         assertEquals(listOf(11.toBigInteger(), 10.toBigInteger()), submittedNonces)
         assertSame(submittedTimings[0], submittedTimings[1])
         assertTrue(calls.indexOf("authorize") < calls.lastIndexOf("timing"))
         assertTrue(calls.indexOf("sign:11") < calls.lastIndexOf("key"))
         assertTrue(calls.lastIndexOf("key") < calls.indexOf("seal"))
-        assertTrue(calls.indexOf("sign:10") < calls.indexOf("broadcast"))
+        assertTrue(calls.indexOf("sign:10") < calls.indexOf("handoff"))
+        assertTrue(calls.indexOf("handoff") < calls.indexOf("broadcast"))
         assertArrayEquals(ByteArray(1184) { 2 }, sealedWith)
         assertEquals("clear", calls.last())
     }
@@ -135,18 +136,20 @@ class BittensorMevServiceTest {
     fun `missing readiness key never prompts or broadcasts`() = runTest {
         configure()
         source.keyAvailable = false
-        assertTrue(runCatching { service.submit(chain, 1, form) }.exceptionOrNull() is BittensorMevNotReady)
+        assertTrue(runCatching { service.submit(chain, 1, form, onHandoff = { calls += "handoff" }) }.exceptionOrNull() is BittensorMevNotReady)
         assertTrue("authorize" !in calls)
         verifyNoInteractions(tracker)
+        assertTrue("handoff" !in calls)
     }
 
     @Test
     fun `a key lost after signing never causes a clear broadcast`() = runTest {
         configure()
         source.keyLostAfterSigning = true
-        assertTrue(runCatching { service.submit(chain, 1, form) }.exceptionOrNull() is BittensorMevNotReady)
+        assertTrue(runCatching { service.submit(chain, 1, form, onHandoff = { calls += "handoff" }) }.exceptionOrNull() is BittensorMevNotReady)
         assertEquals(listOf(11.toBigInteger()), submittedNonces)
         verifyNoInteractions(tracker)
+        assertTrue("handoff" !in calls)
         assertEquals("clear", calls.last())
     }
 
@@ -154,9 +157,10 @@ class BittensorMevServiceTest {
     fun `insufficient native balance fails readiness before authorization`() = runTest {
         configure()
         source.transferable = 209.toBigInteger()
-        assertTrue(runCatching { service.submit(chain, 1, form) }.exceptionOrNull() is BittensorMevNotReady)
+        assertTrue(runCatching { service.submit(chain, 1, form, onHandoff = { calls += "handoff" }) }.exceptionOrNull() is BittensorMevNotReady)
         assertTrue("authorize" !in calls)
         verifyNoInteractions(tracker)
+        assertTrue("handoff" !in calls)
     }
 
     @Test
@@ -174,9 +178,10 @@ class BittensorMevServiceTest {
     fun `cancelled PIN never signs or broadcasts and clears the authorization`() = runTest {
         configure()
         `when`(signer.preAuthorizeSignatures(2)).thenAnswer { throw SigningCancelledException() }
-        assertTrue(runCatching { service.submit(chain, 1, form) }.exceptionOrNull() is SigningCancelledException)
+        assertTrue(runCatching { service.submit(chain, 1, form, onHandoff = { calls += "handoff" }) }.exceptionOrNull() is SigningCancelledException)
         assertTrue(submittedNonces.isEmpty())
         verifyNoInteractions(tracker)
+        assertTrue("handoff" !in calls)
         assertEquals("clear", calls.last())
     }
 

@@ -1,5 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorOperationHistorySource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorHistoryRequest
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevExecution
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevNotExecuted
@@ -48,6 +57,9 @@ class BittensorSubmissionExecutor(
     private val extrinsicService: ExtrinsicService,
     private val accountRepository: AccountRepository,
     private val positionUpdates: BittensorPositionUpdates,
+    private val positions: BittensorPositionRepository,
+    private val history: BittensorOperationHistorySource,
+    private val logger: Logger,
     private val outcomeResolver: BittensorExtrinsicOutcomeResolver,
     private val mevService: BittensorMevService
 ) {
@@ -71,16 +83,43 @@ class BittensorSubmissionExecutor(
         onUnconfirmed: (String) -> Unit = {},
         formExtrinsic: FormExtrinsicWithOrigin
     ): BittensorOperationResult = mutex.withLock {
+        val settlementScope = target.settlementScope()
+        val operationColdKey = runCatching {
+            accountRepository.getMetaAccount(metaId).requireAccountIdIn(chain)
+        }.getOrElse {
+            if (it is CancellationException) throw it
+            return@withLock it.mapBittensorPreSubmissionError()
+        }
+        val historyRequest = try {
+            history.request(chain.addressOf(operationColdKey), metaId)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logger.log("[BittensorSubmission] Could not resolve the operation history context")
+            logger.log(e)
+            null
+        }
+        var handedOff = false
         try {
             var carrierExecution: ExtrinsicExecutionResult? = null
             var carrierState = BittensorMevCarrier.ABSENT
             val execution = if (mevProtection) {
                 val shielded = try {
                     require(target != null && !target.netuid.isRoot()) { "Only subnet orders support MEV protection" }
-                    mevService.submit(chain, metaId, formExtrinsic, onUnconfirmed)
+                    mevService.submit(
+                        chain = chain,
+                        metaId = metaId,
+                        form = formExtrinsic,
+                        onUnconfirmed = { hash ->
+                            invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
+                            onUnconfirmed(hash)
+                        },
+                        onHandoff = { handedOff = true }
+                    )
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
+                    if (handedOff) throw e
                     val cause = if (e is SigningCancelledException) e else BittensorMevNotReady(e)
                     return@withLock cause.mapBittensorPreSubmissionError()
                 }
@@ -90,7 +129,10 @@ class BittensorSubmissionExecutor(
                         carrierState = shielded.carrierState
                         shielded.inner
                     }
-                    is BittensorMevExecution.Unconfirmed -> return@withLock BittensorOperationResult.Unknown(shielded.innerHash)
+                    is BittensorMevExecution.Unconfirmed -> {
+                        invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
+                        return@withLock BittensorOperationResult.Unknown(shielded.innerHash)
+                    }
                     is BittensorMevExecution.NotExecuted -> return@withLock BittensorOperationResult.Failure(
                         BittensorMevNotExecuted(shielded.carrier, shielded.carrierExecution?.let { carrierFee(it, requireNotNull(target), chain) }),
                         shielded.carrierHash,
@@ -103,6 +145,7 @@ class BittensorSubmissionExecutor(
 
                 var lastSeenHash: String? = null
                 onStage("Build/sign finished; collecting submission watch")
+                handedOff = true
                 withTimeoutOrNull(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT) {
                     val inBlock = watch.onEach {
                         lastSeenHash = it.status.extrinsicHash
@@ -112,6 +155,7 @@ class BittensorSubmissionExecutor(
                     outcomeResolver.resolve(chain, inBlock)
                 } ?: run {
                     onStage("Inclusion/events timeout; outcome unknown; hash=$lastSeenHash")
+                    invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
                     return@withLock BittensorOperationResult.Unknown(lastSeenHash)
                 }
             }
@@ -148,6 +192,9 @@ class BittensorSubmissionExecutor(
             } else {
                 innerOutcome
             }
+            if (result is BittensorOperationResult.Success || result is BittensorOperationResult.Unknown) {
+                invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
+            }
             if (result is BittensorOperationResult.Success) positionUpdates.confirmed(metaId, chain.id, coldkey)
             when (result) {
                 is BittensorOperationResult.Success -> result.copy(outcome = outcome)
@@ -156,10 +203,17 @@ class BittensorSubmissionExecutor(
                 is BittensorOperationResult.Unknown -> result
             }
         } catch (e: SigningCancelledException) {
-            e.mapBittensorPreSubmissionError()
+            if (handedOff) {
+                invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
+                e.mapBittensorSubmissionError()
+            } else {
+                e.mapBittensorPreSubmissionError()
+            }
         } catch (e: CancellationException) {
+            if (handedOff) withContext(NonCancellable) { invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope) }
             throw e
         } catch (e: Exception) {
+            if (handedOff) invalidateData(chain, metaId, operationColdKey, historyRequest, settlementScope)
             e.mapBittensorSubmissionError()
         }
     }
@@ -172,6 +226,30 @@ class BittensorSubmissionExecutor(
             ExtrinsicDispatch.Unknown -> return null
         }
         return bindBittensorOperationOutcome(events, target, accountId, accountId, execution.blockHash).networkFee
+    }
+
+    private suspend fun invalidateData(
+        chain: Chain,
+        metaId: Long,
+        coldKey: AccountId,
+        request: BittensorHistoryRequest?,
+        settlementScope: BittensorSettlementScope
+    ) {
+        // Each owner invalidates its own data. A cache failure cannot change the observed dispatch result.
+        positions.invalidate(chain.id, coldKey, metaId)
+            .onFailure { error ->
+                if (error is CancellationException) throw error
+                logger.log("[BittensorSubmission] Could not invalidate positions and prices")
+                logger.log(error)
+            }
+        if (request == null) return
+        runCatching {
+            history.ownTradeSubmitted(request, settlementScope)
+        }.onFailure { error ->
+            if (error is CancellationException) throw error
+            logger.log("[BittensorSubmission] Could not invalidate operation history")
+            logger.log(error)
+        }
     }
 
     /**

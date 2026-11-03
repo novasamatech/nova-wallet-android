@@ -303,7 +303,7 @@ class BittensorSubnetReviewViewModel(
     private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map {
             it.takeIf { existingPosition && it.metaId == metaId }
-                ?.let { BittensorEstimateContext(metaId, it.chain) }
+                ?.let { BittensorEstimateContext(metaId, it.chain, subnetId) }
         }
     )
         .shareInBackground()
@@ -385,8 +385,9 @@ class BittensorSubnetReviewViewModel(
 
     val assets = combine(
         nativeToken,
-        preparationState
-    ) { token, preparation -> mapAssets(token, preparation.dataOrNull) }
+        preparationState,
+        bittensorSubnetStakingInteractor.observeSubnetLogos()
+    ) { token, preparation, logos -> mapAssets(token, preparation.dataOrNull, logos[subnetId]) }
         .shareInBackground()
 
     private var executionStartedAt = 0L
@@ -669,7 +670,7 @@ class BittensorSubnetReviewViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    val mapped = result.toSubmissionState(resources)
+                    val mapped = result.toSubmissionState(resources, slippage = slippage)
                     val failure = mapped.result as? BittensorStakeResultUi.Failure
                     submission.value = if (failure != null) {
                         BittensorSubmissionState.Failed(failure.copy(fee = result.formatMevFailureFee(fee, chain.await(), tokenFormatter)))
@@ -713,9 +714,9 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
-    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetsView.Model = SwapAssetsView.Model(
+    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?, logoUrl: String?): SwapAssetsView.Model = SwapAssetsView.Model(
         assetIn = mapInputAsset(token),
-        assetOut = mapOutputAsset(token, prepared)
+        assetOut = mapOutputAsset(token, prepared, logoUrl)
     )
 
     private fun mapInputAsset(token: TokenBase): SwapAssetView.Model {
@@ -732,8 +733,8 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
-    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetView.Model = SwapAssetView.Model(
-        assetIcon = prepared?.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
+    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?, logoUrl: String?): SwapAssetView.Model = SwapAssetView.Model(
+        assetIcon = (logoUrl ?: prepared?.subnet?.logoUrl)?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
         amount = mapOutputAmount(token, prepared),
         iconSizeDp = 48,
         clipIconToOutline = true

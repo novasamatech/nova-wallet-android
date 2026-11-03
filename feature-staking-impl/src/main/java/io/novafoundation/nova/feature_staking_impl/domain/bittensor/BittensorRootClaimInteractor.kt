@@ -110,7 +110,7 @@ class BittensorRootClaimInteractor(
 
     /** The validators of the wallet's root positions; null while the positions are unknown. */
     fun observeRootHotkeys(state: BittensorRootClaimState): Flow<Set<AccountIdKey>?> =
-        positionRepository.observePositions(state.chain.id, state.coldkey.value)
+        positionRepository.observePositions(state.chain.id, state.coldkey.value, state.metaId)
             .map { positions -> positions.positions?.root?.mapTo(mutableSetOf()) { it.validatorHotkey } }
 
     suspend fun validatorDetails(chain: Chain): Map<AccountIdKey, BittensorRootValidatorDetails> = rootValidatorSource.validatorDetails(chain)

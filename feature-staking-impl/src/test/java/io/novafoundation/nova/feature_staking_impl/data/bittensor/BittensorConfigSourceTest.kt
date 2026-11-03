@@ -6,6 +6,15 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.io.IOException
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -15,11 +24,92 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
 
-class BittensorConfigRepositoryTest {
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+class BittensorConfigSourceTest {
 
     private val gson = Gson()
 
     private val logger = mock(Logger::class.java)
+
+    @Test
+    fun `visible logo observers recover after an outage without reopening the screen`() = runTest {
+        val api = Api(gson, """{"swapFee":0.004,"subnets":[{"netuid":1,"logo":"https://logos.test/1.png"}]}""")
+        api.failure = IOException("Offline")
+        val foreground = MutableSharedFlow<Unit>()
+        val source = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger, backgroundScope, foreground)
+        val firstUpdates = mutableListOf<Map<BittensorNetuid.Subnet, String>>()
+        val secondUpdates = mutableListOf<Map<BittensorNetuid.Subnet, String>>()
+        val first = backgroundScope.launch { source.observeSubnetLogos().toList(firstUpdates) }
+        val second = backgroundScope.launch { source.observeSubnetLogos().toList(secondUpdates) }
+        runCurrent()
+        assertEquals(1, api.urls.size)
+        assertTrue(firstUpdates.last().isEmpty())
+
+        advanceTimeBy(30_000)
+        runCurrent()
+        assertEquals(2, api.urls.size)
+        api.failure = null
+        advanceTimeBy(30_000)
+        runCurrent()
+
+        val expected = mapOf(BittensorNetuid.Subnet(1) to "https://logos.test/1.png")
+        assertEquals(expected, firstUpdates.last())
+        assertEquals(expected, secondUpdates.last())
+        assertEquals(3, api.urls.size)
+        first.cancel()
+        second.cancel()
+    }
+
+    @Test
+    fun `foreground retries failed logos immediately and retries stop without observers`() = runTest {
+        val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
+        api.failure = IOException("Offline")
+        val foreground = MutableSharedFlow<Unit>()
+        val source = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger, backgroundScope, foreground)
+        val updates = mutableListOf<Map<BittensorNetuid.Subnet, String>>()
+        val observer = backgroundScope.launch { source.observeSubnetLogos().toList(updates) }
+        runCurrent()
+        assertEquals(1, api.urls.size)
+
+        foreground.emit(Unit)
+        runCurrent()
+        assertEquals(2, api.urls.size)
+        observer.cancel()
+        runCurrent()
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertEquals(2, api.urls.size)
+    }
+
+    @Test
+    fun `all logo observers share one config load and late observers immediately receive cached urls`() = runBlocking<Unit> {
+        withTimeout(5_000) {
+            val started = CompletableDeferred<Unit>()
+            val response = CompletableDeferred<BittensorConfigRemote>()
+            var requests = 0
+            val api = object : BittensorConfigApi {
+                override suspend fun config(url: String): BittensorConfigRemote {
+                    requests += 1
+                    started.complete(Unit)
+                    return response.await()
+                }
+            }
+            val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
+            val first = async { repository.observeSubnetLogos().first { it.isNotEmpty() } }
+            val second = async { repository.observeSubnetLogos().first { it.isNotEmpty() } }
+            started.await()
+            assertTrue(repository.observeSubnetLogos().first().isEmpty())
+            response.complete(document("""{"swapFee":0.003,"subnets":[{"netuid":105,"logo":"https://logos.test/beam.png"}]}"""))
+
+            val expected = mapOf(BittensorNetuid.Subnet(105) to "https://logos.test/beam.png")
+            assertEquals(expected, first.await())
+            assertEquals(expected, second.await())
+            assertEquals(expected, repository.observeSubnetLogos().first())
+            assertEquals(expected, repository.currentSubnetLogos())
+            assertEquals(BigDecimal("0.003"), repository.config().commission.fraction)
+            assertEquals(1, requests)
+        }
+    }
 
     @Test
     fun `canonical iOS config supplies the fee and only valid HTTPS subnet logos`() {
@@ -58,7 +148,7 @@ class BittensorConfigRepositoryTest {
     @Test
     fun `config is fetched once and reused by fee and logo consumers`() = runBlocking {
         val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         assertSame(repository.config(), repository.config())
         assertEquals(listOf("https://config.test/config.json"), api.urls)
@@ -69,7 +159,7 @@ class BittensorConfigRepositoryTest {
         val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
         val unavailable = IOException("Unavailable")
         api.failure = unavailable
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         val failure = runCatching { repository.config() }.exceptionOrNull()
         assertTrue(failure is IOException)
@@ -84,7 +174,7 @@ class BittensorConfigRepositoryTest {
         val api = Api(gson, """{"subnets":[]}""")
         val cancellation = CancellationException("Screen closed")
         api.failure = cancellation
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         val failure = runCatching { repository.config() }.exceptionOrNull()
         assertTrue(failure is CancellationException)
@@ -110,7 +200,7 @@ class BittensorConfigRepositoryTest {
         )
         for (response in malformedResponses) {
             val api = Api(gson, response)
-            val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+            val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
             assertTrue(response, runCatching { repository.config() }.isFailure)
             api.json = """{"swapFee":0.004,"subnets":[]}"""
@@ -123,7 +213,7 @@ class BittensorConfigRepositoryTest {
     fun `invalid fee field alone defaults after successful config decoding`() = runBlocking {
         for (fee in listOf("{}", "[]", "true", "\"invalid\"", "null", "-0.1", "1", "2")) {
             val api = Api(gson, """{"swapFee":$fee,"subnets":[{"netuid":1,"logo":"https://logos.test/1.png"}]}""")
-            val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+            val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
             val config = repository.config()
 
@@ -139,7 +229,7 @@ class BittensorConfigRepositoryTest {
         val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
         val unavailable = IOException("Unavailable")
         api.failure = unavailable
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         assertTrue(repository.subnetLogos().isEmpty())
         val failure = runCatching { repository.config() }.exceptionOrNull()
@@ -153,7 +243,7 @@ class BittensorConfigRepositoryTest {
     @Test
     fun `logo fallback preserves decode failure for fee consumers`() = runBlocking {
         val api = Api(gson, """{"swapFee":0.004,"subnets":{}}""")
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         assertTrue(repository.subnetLogos().isEmpty())
         assertTrue(runCatching { repository.config() }.isFailure)
@@ -164,7 +254,7 @@ class BittensorConfigRepositoryTest {
         val api = Api(gson, """{"subnets":[]}""")
         val cancellation = CancellationException("Screen closed")
         api.failure = cancellation
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         val failure = runCatching { repository.subnetLogos() }.exceptionOrNull()
 
@@ -176,7 +266,7 @@ class BittensorConfigRepositoryTest {
     fun `config timeout fails while optional logos fall back and next request recovers`() = runTest {
         val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
         api.delayMillis = 30_001L
-        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val repository = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
 
         assertTrue(runCatching { repository.config() }.exceptionOrNull() is IOException)
         assertTrue(repository.subnetLogos().isEmpty())

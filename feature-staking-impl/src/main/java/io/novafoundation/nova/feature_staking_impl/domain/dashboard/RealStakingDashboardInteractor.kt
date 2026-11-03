@@ -3,6 +3,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.dashboard
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.observeSharedFlow
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -53,7 +54,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -138,16 +138,14 @@ class RealStakingDashboardInteractor(
 
     // The dashboard and its More options show the same Bittensor figures: one observation serves both,
     // so its requests are not doubled.
-    private fun bittensorDetailsFlow(metaAccount: MetaAccount, stakingChains: ChainsById): Flow<Map<String, BittensorDashboardDetails>> = flow {
-        coroutineScope {
-            val shared = computationalCache.useSharedFlow(BITTENSOR_DETAILS_CACHE, this) {
-                accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
-                    bittensorDetailsSource.observe(account, stakingChains.values).map { details -> AccountBittensorDetails(account.id, details) }
-                }
+    private fun bittensorDetailsFlow(metaAccount: MetaAccount, stakingChains: ChainsById): Flow<Map<String, BittensorDashboardDetails>> = computationalCache
+        .observeSharedFlow(BITTENSOR_DETAILS_CACHE) {
+            accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
+                bittensorDetailsSource.observe(account, stakingChains.values).map { details -> AccountBittensorDetails(account.id, details) }
             }
-            emitAll(shared.filter { it.metaId == metaAccount.id }.map { it.details })
         }
-    }
+        .filter { it.metaId == metaAccount.id }
+        .map { it.details }
 
     private fun WalletRepository.supportedAssetsByIdFlow(metaId: Long, chainAssets: List<Chain.Asset>): Flow<Map<FullChainAssetId, Asset>> {
         return supportedAssetsFlow(metaId, chainAssets)

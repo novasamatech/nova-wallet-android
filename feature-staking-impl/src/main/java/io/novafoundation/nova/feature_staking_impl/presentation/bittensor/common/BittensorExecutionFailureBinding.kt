@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import android.view.Gravity
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.setImageTintRes
@@ -26,6 +27,7 @@ fun ViewBittensorSubnetExecutionBinding.showFailure(failure: BittensorStakeResul
     }
     operationIcon.setImageResource(if (failed) R.drawable.ic_x_clear_filled else R.drawable.ic_bittensor_execution_route)
     operationLabel.setTextColorRes(if (failed) R.color.text_primary else R.color.text_secondary)
+    operationLabel.gravity = if (failed) Gravity.START or Gravity.CENTER_VERTICAL else Gravity.CENTER
 
     if (failure == null) return
 
@@ -35,5 +37,5 @@ fun ViewBittensorSubnetExecutionBinding.showFailure(failure: BittensorStakeResul
     failureIcon.background = context.getRoundedCornerDrawable(R.color.error_block_background, cornerSizeInDp = 32)
     root.setPadding(0, 0, 0, 84.dp(context))
     title.text = failure.title
-    operationLabel.text = failure.description + "\n" + failure.error
+    operationLabel.text = failure.error + "\n\n" + failure.description
 }

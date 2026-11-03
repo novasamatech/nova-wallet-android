@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketSource
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioRowInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
@@ -36,7 +36,7 @@ class BittensorSubnetModule {
     @Provides
     fun browseRowInteractor(
         rootValidators: BittensorRootValidatorSource,
-        markets: BittensorSubnetMarketRepository,
+        markets: BittensorSubnetMarketSource,
         prices: CoinPriceRepository,
         currencies: CurrencyRepository
     ) = BittensorPortfolioRowInteractor(rootValidators, markets, prices, currencies)

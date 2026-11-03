@@ -78,7 +78,8 @@ class BittensorMevService(
         chain: Chain,
         metaId: Long,
         form: FormExtrinsicWithOrigin,
-        onUnconfirmed: (String) -> Unit = {}
+        onUnconfirmed: suspend (String) -> Unit = {},
+        onHandoff: () -> Unit = {}
     ): BittensorMevExecution {
         check(supports(metaId))
         val account = accounts.getMetaAccount(metaId)
@@ -113,6 +114,7 @@ class BittensorMevService(
             } ?: throw BittensorMevNotReady()
             val hierarchy = signer.getSigningHierarchy()
             return try {
+                onHandoff()
                 tracker.submitAndTrack(chain, built.timing, built.inner, built.carrier, hierarchy, blockMillis, onUnconfirmed)
             } catch (e: CancellationException) {
                 throw e

@@ -50,7 +50,7 @@ class BittensorMevTracker(
         carrier: SendableExtrinsic,
         hierarchy: SubmissionHierarchy,
         blockMillis: Long,
-        onUnconfirmed: (String) -> Unit = {}
+        onUnconfirmed: suspend (String) -> Unit = {}
     ): BittensorMevExecution = coroutineScope {
         val innerHash = inner.extrinsicHex.extrinsicHash()
         val carrierHash = carrier.extrinsicHex.extrinsicHash()

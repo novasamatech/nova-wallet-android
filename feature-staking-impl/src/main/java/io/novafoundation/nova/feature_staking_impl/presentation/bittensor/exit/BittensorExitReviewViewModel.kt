@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
 import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
@@ -302,11 +303,13 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    val assets = combine(prepared, execution) { prepared, state ->
+    private val subnetLogos = if (isRoot) flowOf { emptyMap<BittensorNetuid.Subnet, String>() } else bittensorExitInteractor.observeSubnetLogos()
+
+    val assets = combine(prepared, execution, subnetLogos) { prepared, state, logos ->
         ((state as? ExitExecution.Success)?.draft ?: prepared.dataOrNull)?.let { draft ->
             val outcome = (state as? ExitExecution.Success)?.outcome
             val actualAlpha = outcome?.alpha
-            val inIcon = draft.position.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
+            val inIcon = (logos[draft.position.netuid] ?: draft.position.subnet?.logoUrl)?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
             val outIcon = assetIconProvider.getAssetIconOrFallback(draft.position.asset.token.configuration)
             val actualReceive = outcome?.actualSellReceive(draft.quote.serviceFee)
             val token = draft.position.asset.token
@@ -789,7 +792,7 @@ class BittensorExitReviewViewModel(
                         execution.value = ExitExecution.Idle
                         return
                     }
-                    val model = result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit))
+                    val model = result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit), slippage)
                     execution.value = when (model) {
                         is BittensorStakeResultUi.Failure -> ExitExecution.Failure(
                             model.copy(fee = result.formatMevFailureFee(draft.fee, draft.position.chain, tokenFormatter))

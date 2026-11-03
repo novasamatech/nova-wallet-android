@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.utils.isNonNegative
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
@@ -48,7 +48,7 @@ class BittensorSubnetCommission(val fraction: BigDecimal) {
 
 class BittensorSubnetQuoteInteractor(
     private val swapSource: BittensorSwapSource,
-    private val configRepository: BittensorConfigRepository
+    private val configSource: BittensorConfigSource
 ) {
 
     suspend fun quoteBuy(
@@ -57,7 +57,7 @@ class BittensorSubnetQuoteInteractor(
         totalTaoInPlanks: BigInteger,
         slippage: BittensorSlippage
     ): BittensorSubnetBuyQuote = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
-        val commission = configRepository.config().commission
+        val commission = configSource.config().commission
         val serviceFee = commission.feeFor(totalTaoInPlanks)
         val stakeAmount = totalTaoInPlanks - serviceFee
         val quote = swapSource.quote(chainId, subnetId, BittensorSwapDirection.TAO_TO_ALPHA, stakeAmount)

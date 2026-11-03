@@ -33,7 +33,11 @@ Lint currently scans `**/src/main/**/*.kt`, so inspect test-source style separat
 - Serialization/runtime: use fixtures matching the real decoder/contract, malformed inputs and range checks.
 - Financial/signing: add invariant/call-construction tests, fee/Max/ED and batch boundary checks,
   confirmed input preservation and unknown-outcome handling; see [transactions](transactions.md).
-- DB: migration tests and schema/version review.
+- DB: migration tests and schema/version review. The shared `AppDatabaseMigrationTest` discovers exported
+  schemas and validates available forward migration paths; do not add a separate validation script for
+  each version. Use Room auto migrations for supported schema changes, keeping old and new schema exports
+  in version control; schema files must not be ignored.
+  Data transformations also need focused tests that verify the affected records survive correctly.
 - Auth: no credential logging; expiry, cancellation/coalescing, rejected generation and replay tests.
 
 Use existing test-shared helpers and neighboring test patterns; dependencies are named and injected.

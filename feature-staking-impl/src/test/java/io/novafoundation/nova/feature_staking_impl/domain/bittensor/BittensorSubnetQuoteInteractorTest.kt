@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfig
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapQuote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import java.math.BigDecimal
@@ -20,7 +20,7 @@ class BittensorSubnetQuoteInteractorTest {
 
     private var configuredCommission = commission
 
-    private val configRepository = BittensorConfigRepository { BittensorConfig(configuredCommission, emptyMap()) }
+    private val configSource = BittensorConfigSource { BittensorConfig(configuredCommission, emptyMap()) }
 
     private var partial = false
 
@@ -122,6 +122,6 @@ class BittensorSubnetQuoteInteractorTest {
         }
     }
 
-    private fun interactor() = BittensorSubnetQuoteInteractor(source, configRepository)
+    private fun interactor() = BittensorSubnetQuoteInteractor(source, configSource)
     private fun slippage() = BittensorSlippage(0.005.toBigDecimal())
 }

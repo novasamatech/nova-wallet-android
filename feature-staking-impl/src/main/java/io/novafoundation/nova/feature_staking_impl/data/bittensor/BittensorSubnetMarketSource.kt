@@ -17,11 +17,9 @@ private val SUBNET_SYMBOL_PATTERN = Regex("sn[0-9]+")
 private val MARKET_ID_PATTERN = Regex("[a-z0-9-]+")
 
 /** CoinGecko uses sn<N> market symbols; names and alpha symbols are not reliable identifiers. */
-class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi) {
+class BittensorSubnetMarketSource(private val api: BittensorSubnetMarketsApi) {
 
     private val mutex = Mutex()
-
-    private var cached = emptyMap<BittensorNetuid.Subnet, String>()
 
     private var cachedMarkets = emptyMap<BittensorNetuid.Subnet, BittensorSubnetMarketRemote>()
 
@@ -29,7 +27,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
 
     suspend fun priceId(subnetId: BittensorNetuid.Subnet): String? = mutex.withLock {
         refreshMarkets()
-        cached[subnetId]
+        cachedMarkets[subnetId]?.id
     }
 
     suspend fun weeklyMarkets(): Map<BittensorNetuid.Subnet, BittensorSubnetMarketRemote> = mutex.withLock {
@@ -44,9 +42,8 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
             val ids = mapBittensorMarketIds(markets)
             // No listed subnet is a degraded response, not every subnet unlisted, so the read fails.
             require(ids.isNotEmpty()) { "Empty subnet markets" }
-            cached = ids
             val byId = markets.associateBy { it.id }
-            cachedMarkets = cached.mapValues { (_, id) -> requireNotNull(byId[id]) }
+            cachedMarkets = ids.mapValues { (_, id) -> requireNotNull(byId[id]) }
             loadedAt = requestStartedAt
         }
     }

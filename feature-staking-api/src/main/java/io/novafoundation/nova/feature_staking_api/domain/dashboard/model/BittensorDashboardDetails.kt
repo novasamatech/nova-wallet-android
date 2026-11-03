@@ -16,7 +16,8 @@ data class BittensorDashboardDetails(
     val subnetYieldLoading: Boolean = false,
     val maximumYieldLoading: Boolean = false,
     /** Root rewards meeting the claim minimum. */
-    val claimableRootRewardsInPlanks: BigInteger? = null
+    val claimableRootRewardsInPlanks: BigInteger? = null,
+    val stale: Boolean = false
 ) {
 
     enum class Pricing { LOADING, KNOWN, UNKNOWN }

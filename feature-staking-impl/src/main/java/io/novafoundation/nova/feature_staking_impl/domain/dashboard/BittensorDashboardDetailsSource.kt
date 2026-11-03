@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshot
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -46,7 +46,7 @@ class BittensorDashboardDetailsSource(
     private val positions: BittensorPositionRepository,
     private val validators: BittensorValidatorInteractor,
     private val recommendedYields: BittensorRecommendedYieldInteractor,
-    private val snapshots: BittensorDashboardSnapshotRepository,
+    private val snapshots: BittensorDashboardSnapshotSource,
     private val logger: Logger
 ) {
 
@@ -70,29 +70,29 @@ class BittensorDashboardDetailsSource(
         val chain = chains.firstOrNull { chain ->
             chain.assets.any { Chain.Asset.StakingType.BITTENSOR_ROOT in it.staking }
         } ?: return flowOf(emptyMap())
-        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null)
+        val coldKey = account.accountIdIn(chain)
 
-        return flow { emitAll(observe(chain, coldKey)) }
+        return flow { emitAll(observe(chain, coldKey, account.id)) }
     }
 
-    private fun observe(chain: Chain, coldKey: AccountId?): Flow<Map<String, BittensorDashboardDetails>> {
+    private suspend fun observe(chain: Chain, coldKey: AccountId?, metaAccountId: Long): Flow<Map<String, BittensorDashboardDetails>> {
         val portfolio = if (coldKey != null) {
-            positions.observePortfolio(chain.id, coldKey)
+            positions.observePortfolio(chain.id, coldKey, metaAccountId)
         } else {
             flowOf(BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh))
         }
         // Like iOS persisted dashboard details: shown until positions are known again (cold start, offline).
-        val restored = coldKey?.let { snapshots.snapshot(chain.id, it) }
+        val restored = coldKey?.let { snapshots.snapshot(chain.id, it, metaAccountId) }
         var lastSaved = restored
         // Only a successful request replaces the stored maximum yield.
         var latestMaximumYield = restored?.maximumAnnualPercentageYield
-        val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it) } ?: flowOf(null)
-        // Yields are requested once per held set, never polled.
+        val claimable = coldKey?.let { snapshots.claimableRootRewardsFlow(chain.id, it, metaAccountId) } ?: flowOf(null)
+        // Each held set observes cached yields; the shared HTTP cache owns refresh timing.
         val rootRates = portfolio
             .map { it.positions?.root.orEmpty().map { position -> position.validatorHotkey }.toSet() }
             .distinctUntilChanged()
             .flatMapLatest { hotkeys ->
-                if (hotkeys.isEmpty()) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else requested { validators.yields(BittensorNetuid.Root) }
+                if (hotkeys.isEmpty()) flowOf(ExtendedLoadingState.Loaded(emptyMap())) else requested(validators.observeYields(BittensorNetuid.Root))
             }
         val subnetRates = combine(portfolio, claimable) { state, rewards -> subnetsShowingRate(state.positions, rewards) }
             .distinctUntilChanged()
@@ -129,13 +129,14 @@ class BittensorDashboardDetailsSource(
                 )
             }.copy(
                 maximumAnnualPercentageYield = latestMaximumYield,
-                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null
+                maximumYieldLoading = maximum is ExtendedLoadingState.Loading && latestMaximumYield == null,
+                stale = snapshot != null || state.status is BittensorDataStatus.Stale || maximum is ExtendedLoadingState.Error
             )
 
             if (coldKey != null && state.status is BittensorDataStatus.Fresh && details.pricing != BittensorDashboardDetails.Pricing.LOADING) {
                 val toSave = details.toSnapshot(lastSaved)
                 if (toSave != lastSaved) {
-                    snapshots.saveSnapshot(chain.id, coldKey, toSave)
+                    snapshots.saveSnapshot(chain.id, coldKey, metaAccountId, toSave)
                     lastSaved = toSave
                 }
             }
@@ -194,7 +195,7 @@ class BittensorDashboardDetailsSource(
         subnets: Set<BittensorNetuid.Subnet>
     ): Flow<SubnetRates> {
         if (subnets.isEmpty()) return flowOf(SubnetRates(emptyMap(), false))
-        val sources = subnets.map { subnet -> requested { validators.yields(subnet) }.map { subnet to it } }
+        val sources = subnets.map { subnet -> requested(validators.observeYields(subnet)).map { subnet to it } }
         return combine(sources) { results ->
             SubnetRates(
                 values = results.associate { it.first to it.second.dataOrNull.orEmpty() },
@@ -229,6 +230,22 @@ class BittensorDashboardDetailsSource(
             ExtendedLoadingState.Error(failure)
         }
         emit(result)
+    }
+
+    private fun <T> requested(source: Flow<T>): Flow<ExtendedLoadingState<T>> = flow {
+        emit(ExtendedLoadingState.Loading)
+        try {
+            source.collect { emit(ExtendedLoadingState.Loaded(it)) }
+        } catch (timeout: TimeoutCancellationException) {
+            currentCoroutineContext().ensureActive()
+            logFailure(timeout)
+            emit(ExtendedLoadingState.Error(timeout))
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (failure: Exception) {
+            logFailure(failure)
+            emit(ExtendedLoadingState.Error(failure))
+        }
     }
 
     private fun logFailure(failure: Throwable) {

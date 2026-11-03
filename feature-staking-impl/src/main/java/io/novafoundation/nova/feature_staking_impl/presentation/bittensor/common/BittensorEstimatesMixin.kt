@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import kotlinx.coroutines.flow.flowOf
+
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -22,11 +24,11 @@ import kotlinx.coroutines.flow.onEach
 
 data class BittensorPositionCostBasis(
     val state: ExtendedLoadingState<BittensorEstimatedCostBasis?>,
-    val isSettling: Boolean
+    val isProvisional: Boolean
 ) {
     fun showsEarned(netuid: BittensorNetuid.Subnet): Boolean {
         val basis = state.dataOrNull
-        return !isSettling && !(basis?.canEstimate(netuid.value) == true && basis.forSubnet(netuid.value) == null)
+        return !isProvisional && !(basis?.canEstimate(netuid.value) == true && basis.forSubnet(netuid.value) == null)
     }
 }
 
@@ -46,7 +48,7 @@ class BittensorEstimatesMixin(
 
     fun observePositionCostBasis(context: Flow<BittensorEstimateContext?>): Flow<BittensorPositionCostBasis> =
         costBasisInteractor.observeUpdates(context)
-            .map { update -> BittensorPositionCostBasis(mapCostBasis(update.state), update.isSettling) }
+            .map { update -> BittensorPositionCostBasis(state = mapCostBasis(update.state), isProvisional = update.isProvisional) }
             .onEach { update ->
                 val state = update.state
                 if (state is ExtendedLoadingState.Error) reportUnavailable(state.exception)
@@ -62,8 +64,13 @@ class BittensorEstimatesMixin(
     fun observeAlphaYields(context: Flow<Chain?>, subnetId: BittensorNetuid.Subnet): Flow<ExtendedLoadingState<Map<AccountIdKey, BigDecimal>?>> =
         context.distinctUntilChanged()
             .flatMapLatest { chain ->
-                flowOf { chain?.let { alphaYieldRepository.alphaYields(it, subnetId) } }
-                    .withSafeLoading()
+                val yields = if (chain == null) {
+                    flowOf(null)
+                } else {
+                    alphaYieldRepository.observeAlphaYields(chain, subnetId)
+                }
+
+                yields.withSafeLoading()
                     .onEach { state ->
                         if (state is ExtendedLoadingState.Error) reportUnavailable(state.exception)
                     }

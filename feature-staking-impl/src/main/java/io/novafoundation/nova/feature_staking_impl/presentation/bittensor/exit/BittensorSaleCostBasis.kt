@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorPositionCostBasis
 import kotlinx.coroutines.flow.Flow
@@ -46,10 +47,13 @@ internal fun BittensorEstimatesMixin.observeSaleCostBasis(
     netuid: Int,
     carried: BittensorEstimatedPurchaseTotals? = null
 ): Flow<ExtendedLoadingState<BittensorSaleCostBasis>> {
-    val context = positions.map { position -> position.takeUnless { it.isRoot }?.let { BittensorEstimateContext(it.metaId, it.chain) } }
+    val context = positions.map { position ->
+        val subnet = position.netuid as? BittensorNetuid.Subnet
+        subnet?.let { BittensorEstimateContext(position.metaId, position.chain, it) }
+    }
         .distinctUntilChanged()
     return observePositionCostBasis(context)
-        .onStart { emit(BittensorPositionCostBasis(ExtendedLoadingState.Loading, isSettling = false)) }
+        .onStart { emit(BittensorPositionCostBasis(ExtendedLoadingState.Loading, isProvisional = false)) }
         .map { resolveSaleCostBasis(it, netuid, carried) }
 }
 
@@ -64,12 +68,12 @@ fun resolveSaleCostBasis(
         is ExtendedLoadingState.Error -> ExtendedLoadingState.Loaded(carriedBasis ?: BittensorSaleCostBasis.Unknown)
         is ExtendedLoadingState.Loaded -> {
             val basis = state.data
-            val live = basis?.forSubnet(netuid)?.let { BittensorSaleCostBasis.Known(it, settled = !update.isSettling) }
+            val live = basis?.forSubnet(netuid)?.let { BittensorSaleCostBasis.Known(it, settled = !update.isProvisional) }
             val resolved = when {
                 live != null && live.settled -> live
                 carriedBasis != null -> carriedBasis
                 live != null -> live
-                basis?.canEstimate(netuid) == true && !update.isSettling -> BittensorSaleCostBasis.NoPurchases
+                basis?.canEstimate(netuid) == true && !update.isProvisional -> BittensorSaleCostBasis.NoPurchases
                 else -> BittensorSaleCostBasis.Unknown
             }
             ExtendedLoadingState.Loaded(resolved)

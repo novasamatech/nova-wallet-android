@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.memory.observeSharedFlow
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZero
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -25,8 +26,6 @@ import java.math.BigInteger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withTimeoutOrNull
 
 interface BittensorRootClaimSource {
@@ -48,15 +47,11 @@ class RealBittensorRootClaimSource(
     private val clock: BittensorClaimClock
 ) : BittensorRootClaimSource {
 
-    override fun observe(chainId: String, coldkey: AccountId): Flow<BittensorRootClaimSnapshot> = flow {
-        coroutineScope {
-            val key = "Bittensor.Claims.$chainId.${coldkey.blake2b256().toHexString()}"
-            val shared = computationalCache.useSharedFlow(key, this) {
-                val blocks = flowOfAll { chainStateRepository.currentRemoteBlockNumberFlow(chainId) }
-                observeBittensorRootClaims(blocks, { claims(chainId, coldkey) }, logger)
-            }
-            emitAll(shared)
-        }
+    override fun observe(chainId: String, coldkey: AccountId): Flow<BittensorRootClaimSnapshot> = computationalCache.observeSharedFlow(
+        key = "Bittensor.Claims.$chainId.${coldkey.blake2b256().toHexString()}"
+    ) {
+        val blocks = flowOfAll { chainStateRepository.currentRemoteBlockNumberFlow(chainId) }
+        observeBittensorRootClaims(blocks, { claims(chainId, coldkey) }, logger)
     }
 
     override suspend fun claims(chainId: String, coldkey: AccountId): BittensorRootClaims {

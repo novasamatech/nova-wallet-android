@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorOperationHistorySource
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -24,7 +27,6 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicWatchException
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
@@ -54,11 +56,17 @@ import org.mockito.Mockito.verifyNoInteractions
 @RunWith(Parameterized::class)
 class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
+    private val history = mock(BittensorOperationHistorySource::class.java)
+
+    private val logger = mock(Logger::class.java)
+
+    private val positions = mock(BittensorPositionRepository::class.java)
+
     enum class StakingType { ROOT, SUBNET }
 
     private val accounts = mock(AccountRepository::class.java)
 
-    // Read only by the executor to pick the build timeout; kept apart so `accounts` interactions stay meaningful.
+    // Explicit execution wallet, separate from screen selection so `accounts` interactions stay meaningful.
     private val signingWallets = mock(AccountRepository::class.java)
 
     private val wallets = mock(WalletRepository::class.java)
@@ -98,7 +106,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val resolver = BittensorExtrinsicOutcomeResolver { _, _ -> extrinsicService.result.getOrThrow() }
 
-    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates, resolver, mev)
+    private val submission = BittensorSubmissionExecutor(extrinsicService, signingWallets, positionUpdates, positions, history, logger, resolver, mev)
 
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
@@ -138,8 +146,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
 
-    private val costBasis = mock(BittensorCostBasisInteractor::class.java)
-
     private val blockState = mock(ChainStateRepository::class.java)
 
     private val blockLogger = mock(Logger::class.java)
@@ -154,7 +160,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         extrinsicService,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
         submission,
-        costBasis,
         blockRequotes,
         mev
     )
@@ -191,6 +196,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun prepare(): Unit = runBlocking {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(signingWallets.getMetaAccount(1L)).thenReturn(selectedAccount)
         `when`(signingWallets.getMetaAccount(2L)).thenReturn(selectedAccount)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selectedAccount)
@@ -250,7 +256,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     @Test
     fun `successful execution uses standard submission with explicit operation parameters`() = runBlocking {
-        assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
+        assertEquals(expectedSuccess(), execute())
         assertEquals(1, extrinsicService.submissions)
         assertEquals(
             1L,
@@ -291,7 +297,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         assertEquals(1, extrinsicService.submissions)
 
         extrinsicService.result = Result.success(successfulExecution)
-        assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
+        assertEquals(expectedSuccess(), execute())
         assertEquals(2, extrinsicService.submissions)
     }
 
@@ -366,6 +372,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `executor attaches actual amounts for exact requested wallet context`() = runTest {
         val coldkey = ByteArray(32) { 9 }
         `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(selectedAccount.accountIdIn(chain)).thenReturn(coldkey)
         val target = BittensorOutcomeTarget(BittensorOperationKind.STAKE, BittensorNetuid.Root, setOf(validator.hotkey))
         val added = outcomeEvent("SubtensorModule", "StakeAdded", listOf(coldkey, validator.hotkey.value, amount, amount, BigInteger.ZERO, BigInteger.ZERO))
@@ -383,6 +390,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `failed dispatch keeps paid fee events but never executed amounts`() = runTest {
         val coldkey = ByteArray(32) { 9 }
         `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(selectedAccount.accountIdIn(chain)).thenReturn(coldkey)
         val target = BittensorOutcomeTarget(BittensorOperationKind.STAKE, BittensorNetuid.Root, setOf(validator.hotkey))
         val feeEvent = outcomeEvent("TransactionPayment", "TransactionFeePaid", listOf(coldkey, BigInteger.TEN, BigInteger.ZERO))
@@ -402,6 +410,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `root aggregate fallback requires confirmed execution and cannot override delayed execution`() = runTest {
         val coldkey = ByteArray(32) { 9 }
         `when`(selectedAccount.id).thenReturn(1L)
+        `when`(selectedAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(selectedAccount.accountIdIn(chain)).thenReturn(coldkey)
         val target = BittensorOutcomeTarget(BittensorOperationKind.CLAIM, BittensorNetuid.Root, setOf(validator.hotkey))
         val claimed = outcomeEvent("SubtensorModule", "RootClaimed", listOf(coldkey, amount))
@@ -461,11 +470,29 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         val rejected = runCatching { subnetStakingInteractor.execute(existing) }
         assertTrue(rejected.exceptionOrNull() is IllegalArgumentException)
-        verifyNoInteractions(costBasis)
+        verifyNoInteractions(positions, history)
 
         assertTrue(subnetStakingInteractor.execute(existing.copy(inactiveValidatorAccepted = true)) is BittensorOperationResult.Success)
         verify(subnetValidators, org.mockito.Mockito.times(2)).existingPositionValidator(chain, subnetId, validator)
         verify(subnetValidators, org.mockito.Mockito.never()).validate(chain, subnetId, validator)
+    }
+
+    private fun expectedSuccess(): BittensorOperationResult.Success {
+        val coldkey = AccountIdKey(ByteArray(32))
+        val netuid = if (stakingType == StakingType.ROOT) BittensorNetuid.Root else subnetId
+        // The fixture dispatch has no events: identity is known, executed amounts and fees are not.
+        val outcome = BittensorOperationOutcome(
+            blockHash = successfulExecution.blockHash,
+            tao = null,
+            alpha = null,
+            serviceFee = null,
+            networkFee = null,
+            feePayer = coldkey,
+            alphaFee = null,
+            netuid = netuid,
+            coldkey = coldkey
+        )
+        return BittensorOperationResult.Success(successfulExecution.extrinsicHash, outcome)
     }
 
     private suspend fun execute(): BittensorOperationResult = when (stakingType) {

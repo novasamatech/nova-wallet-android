@@ -36,15 +36,15 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetFactsInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module(includes = [ViewModelModule::class, BittensorQuickPickModule::class])
 class BittensorSubnetAmountModule {
 
     @Provides
-    fun subnetFacts(backend: BittensorValidatorBackend, chainStateRepository: ChainStateRepository) =
-        BittensorSubnetFactsInteractor(backend, chainStateRepository)
+    fun subnetFacts(validatorSource: BittensorValidatorSource, chainStateRepository: ChainStateRepository) =
+        BittensorSubnetFactsInteractor(validatorSource, chainStateRepository)
 
     @Provides
     @IntoMap

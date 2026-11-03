@@ -37,7 +37,7 @@ Tests create named fakes/mocks first and pass them into the subject explicitly.
 
 ## Ownership review
 
-Keep responsibilities separated when a class spans several workflows: data sources own transport and pagination; repositories own data access and caches; interactors own wallet-context orchestration and financial calculations; presentation owns UI loading states and formatting. Do not move an overloaded repository wholesale into a mixin. Preserve cache keys, invalidation, incomplete-data semantics, and cancellation when extracting responsibilities. Existing shared contracts should be assessed in context rather than replaced solely because of their type names.
+Keep responsibilities separated when a class spans several workflows: data sources own transport, pagination and their cache lifecycle; repositories compose data access; interactors own wallet-context orchestration and financial calculations; presentation owns UI loading states and formatting. Do not move an overloaded repository wholesale into a mixin. Preserve cache keys, invalidation, incomplete-data semantics, and cancellation when extracting responsibilities. Existing shared contracts should be assessed in context rather than replaced solely because of their type names.
 
 Before introducing a class, identify its owner, inputs, output, lifetime and real callers.
 Extract when it fixes a concrete responsibility/testability/duplication problem; do not add a
