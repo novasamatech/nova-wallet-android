@@ -82,6 +82,12 @@ class BittensorValidatorInfoViewModel(
     val account = detail.map { it.dataOrNull?.name }
         .distinctUntilChanged()
         .map { name -> addressIconGenerator.createAccountAddressModel(validatorInteractor.chain(), payload.address, name) }
+        // Like the other chain-backed rows, an unavailable chain leaves the account header empty instead of failing the screen.
+        .catch { cause ->
+            if (cause is CancellationException) throw cause
+            logger.log("[BittensorValidatorInfo] Validator account unavailable")
+            logger.log(cause)
+        }
         .shareInBackground()
 
     val status = loadedDetail.map { detail ->
