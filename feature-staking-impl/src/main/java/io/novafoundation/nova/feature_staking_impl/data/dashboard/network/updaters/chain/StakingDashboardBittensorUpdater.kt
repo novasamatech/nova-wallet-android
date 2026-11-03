@@ -46,7 +46,7 @@ class StakingDashboardBittensorUpdater(
             // never the stored classification, which may predate a full exit.
             var lastClaimable: BigInteger? = null
 
-            positionRepository.observePortfolio(chain.id, coldKey).collect { state ->
+            positionRepository.observePortfolio(chain.id, coldKey, metaAccount.id).collect { state ->
                 val positions = state.positions
                 if (state.status !is BittensorDataStatus.Fresh || positions == null) return@collect
 

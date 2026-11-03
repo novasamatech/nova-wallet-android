@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
@@ -26,14 +26,14 @@ class BittensorSubnetInteractor(
     private val portfolioRepository: BittensorPortfolioRepository,
     private val bittensorSubnetQuoteInteractor: BittensorSubnetQuoteInteractor,
     private val favorites: BittensorSubnetFavoritesRepository,
-    private val configRepository: BittensorConfigRepository
+    private val configSource: BittensorConfigSource
 ) {
 
     val slippage = BittensorSlippage(0.005.toBigDecimal())
 
-    suspend fun commissionRate(): BigDecimal = configRepository.config().commission.fraction
+    suspend fun commissionRate(): BigDecimal = configSource.config().commission.fraction
 
-    fun observeSubnetLogos() = configRepository.observeSubnetLogos()
+    fun observeSubnetLogos() = configSource.observeSubnetLogos()
 
     suspend fun subnets() = repository.subnets()
 

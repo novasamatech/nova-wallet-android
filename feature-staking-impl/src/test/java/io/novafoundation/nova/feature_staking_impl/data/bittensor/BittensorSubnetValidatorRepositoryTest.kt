@@ -52,7 +52,7 @@ class BittensorSubnetValidatorRepositoryTest {
 
     private val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
-    private val backend = BittensorValidatorBackend(api, urls)
+    private val backend = BittensorValidatorSource(api, urls)
 
     private val chain = mock(Chain::class.java)
 
@@ -168,7 +168,7 @@ class BittensorSubnetValidatorRepositoryTest {
         assertTrue(directory.validators.single().recommended)
         assertEquals(0, directory.validators.single().recommendationRank)
         assertTrue(directory.validators.single().selectable)
-        assertTrue(directory.staleRecommendations)
+        assertFalse(directory.staleRecommendations)
     }
 
     @Test

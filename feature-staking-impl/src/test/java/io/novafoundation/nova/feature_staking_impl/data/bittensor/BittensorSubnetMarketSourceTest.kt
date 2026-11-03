@@ -6,7 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class BittensorSubnetMarketRepositoryTest {
+class BittensorSubnetMarketSourceTest {
 
     @Test
     fun `market ids use netuid symbols rather than names or alpha symbols`() {
@@ -28,7 +28,7 @@ class BittensorSubnetMarketRepositoryTest {
     @Test
     fun `markets listing no subnet fail and are not cached as unlisted`() = runTest {
         val api = MarketsApi(listOf(BittensorSubnetMarketRemote("wrong", "theta")))
-        val repository = BittensorSubnetMarketRepository(api)
+        val repository = BittensorSubnetMarketSource(api)
 
         val failure = runCatching { repository.weeklyMarkets() }.exceptionOrNull()
         api.rows = listOf(BittensorSubnetMarketRemote("vanta", "sn8"))

@@ -44,3 +44,8 @@ dependencies {
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
+
+// The standalone test APK includes web3j's obsolete provider as well as the SDK's current provider.
+configurations.matching { it.name.endsWith('AndroidTestRuntimeClasspath') }.configureEach {
+    exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
+}

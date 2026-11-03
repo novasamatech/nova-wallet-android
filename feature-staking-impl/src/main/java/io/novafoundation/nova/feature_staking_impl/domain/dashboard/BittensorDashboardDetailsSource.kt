@@ -70,14 +70,14 @@ class BittensorDashboardDetailsSource(
         val chain = chains.firstOrNull { chain ->
             chain.assets.any { Chain.Asset.StakingType.BITTENSOR_ROOT in it.staking }
         } ?: return flowOf(emptyMap())
-        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null)
+        val coldKey = account.accountIdIn(chain) ?: return observe(chain, null, account.id)
 
-        return flow { emitAll(observe(chain, coldKey)) }
+        return flow { emitAll(observe(chain, coldKey, account.id)) }
     }
 
-    private fun observe(chain: Chain, coldKey: AccountId?): Flow<Map<String, BittensorDashboardDetails>> {
+    private fun observe(chain: Chain, coldKey: AccountId?, metaAccountId: Long): Flow<Map<String, BittensorDashboardDetails>> {
         val portfolio = if (coldKey != null) {
-            positions.observePortfolio(chain.id, coldKey)
+            positions.observePortfolio(chain.id, coldKey, metaAccountId)
         } else {
             flowOf(BittensorPortfolioState(BittensorPortfolioPositions(emptyList(), emptyList(), emptyMap()), BittensorDataStatus.Fresh))
         }

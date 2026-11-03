@@ -2,7 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorResponseCache
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioFxSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistorySource
 import io.novafoundation.nova.common.data.storage.DebugSettings
 
 import io.novafoundation.nova.analytics.AnalyticsService
@@ -14,7 +15,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -22,10 +22,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketSource
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
@@ -43,7 +42,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
-import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -52,7 +50,7 @@ class BittensorDetailsModule {
     @Provides
     fun providePortfolioRowInteractor(
         rootValidators: BittensorRootValidatorSource,
-        markets: BittensorSubnetMarketRepository,
+        markets: BittensorSubnetMarketSource,
         prices: CoinPriceRepository,
         currencies: CurrencyRepository
     ) = BittensorPortfolioRowInteractor(rootValidators, markets, prices, currencies)
@@ -62,15 +60,10 @@ class BittensorDetailsModule {
         BittensorPortfolioRowMapper(resources, amounts, icons)
 
     @Provides
-    fun providePortfolioHistoryApi(@Attested apiCreator: NetworkApiCreator): BittensorPortfolioHistoryApi =
-        apiCreator.create(BittensorPortfolioHistoryApi::class.java)
-
-    @Provides
     fun providePortfolioHistoryRepository(
-        prices: CoinPriceRepository,
-        api: BittensorPortfolioHistoryApi,
-        cache: BittensorResponseCache
-    ) = BittensorPortfolioHistoryRepository(api, prices, cache)
+        fxSource: BittensorPortfolioFxSource,
+        historySource: BittensorPortfolioHistorySource
+    ) = BittensorPortfolioHistoryRepository(fxSource, historySource)
 
     @Provides
     fun providePortfolioChartCalculator() = BittensorPortfolioChartCalculator()

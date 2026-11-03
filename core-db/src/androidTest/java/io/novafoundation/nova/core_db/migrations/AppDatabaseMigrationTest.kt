@@ -40,6 +40,6 @@ class AppDatabaseMigrationTest(private val from: Int, private val to: Int) {
     fun migratesBetweenExportedSchemas() {
         val databaseName = "migration-$from-$to"
         migrationHelper.createDatabase(databaseName, from).close()
-        migrationHelper.runMigrationsAndValidate(databaseName, to, true, *AppDatabase.migrations)
+        migrationHelper.runMigrationsAndValidate(databaseName, to, true, *AppDatabase.migrations).close()
     }
 }

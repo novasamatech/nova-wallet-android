@@ -9,21 +9,21 @@ import kotlinx.coroutines.flow.combine
 
 /** Browsing names is independent of node connectivity. Eligibility is checked when selecting and before signing. */
 class BittensorSubnetBrowseRepository(
-    private val catalogueRepository: BittensorSubnetCatalogueRepository,
-    private val configRepository: BittensorConfigRepository
+    private val catalogueSource: BittensorSubnetCatalogueSource,
+    private val configSource: BittensorConfigSource
 ) {
 
     data class Catalogue(val subnets: List<BittensorSubnet>, val stale: Boolean)
 
     // Like iOS, logos decorate an already visible list and never delay the catalogue.
     fun observe(): Flow<Catalogue> = combine(
-        catalogueRepository.observe(),
-        configRepository.observeSubnetLogos()
+        catalogueSource.observeSubnets(),
+        configSource.observeSubnetLogos()
     ) { snapshot, logos ->
-        val components = snapshot.value.meta?.components
+        val components = snapshot.meta?.components
         val backendStale = components?.subnetMetadata?.freshness != "FRESH" || components.alphaPrices?.freshness != "FRESH"
-        val subnets = mapCatalogue(snapshot.value).map { subnet -> subnet.copy(logoUrl = logos[subnet.id]) }
-        Catalogue(subnets, snapshot.stale || backendStale)
+        val subnets = mapCatalogue(snapshot).map { subnet -> subnet.copy(logoUrl = logos[subnet.id]) }
+        Catalogue(subnets, stale = backendStale)
     }
 
     private fun mapCatalogue(remote: BittensorSubnetCatalogueRemote): List<BittensorSubnet> {

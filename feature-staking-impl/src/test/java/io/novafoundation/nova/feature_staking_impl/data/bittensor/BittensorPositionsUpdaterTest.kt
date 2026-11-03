@@ -45,14 +45,15 @@ class BittensorPositionsUpdaterTest {
         `when`(registry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         val coldKey = ByteArray(32)
+        `when`(account.id).thenReturn(1L)
         `when`(account.accountIdIn(chain)).thenReturn(coldKey)
         val positions = BittensorStakePositions(emptyList(), emptyList())
         val state = BittensorPositionState(positions, BittensorDataStatus.Fresh)
-        `when`(repository.observePositions(chain.id, coldKey)).thenReturn(flowOf(state))
+        `when`(repository.observePositions(chain.id, coldKey, metaAccountId = 1L)).thenReturn(flowOf(state))
 
         assertTrue(updater.listenForUpdates(builder, account).toList().isEmpty())
 
-        verify(repository).observePositions(chain.id, coldKey)
+        verify(repository).observePositions(chain.id, coldKey, metaAccountId = 1L)
         verifyNoInteractions(builder)
     }
 

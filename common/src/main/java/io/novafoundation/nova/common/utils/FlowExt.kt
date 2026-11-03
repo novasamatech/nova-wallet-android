@@ -59,6 +59,8 @@ import kotlin.coroutines.coroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
 
+inline fun <T> Flow<T>.coerceToUnit() = map { Unit }
+
 inline fun <T> Flow<List<T>>.filterList(crossinline handler: suspend (T) -> Boolean) = map { list ->
     list.filter { item -> handler(item) }
 }

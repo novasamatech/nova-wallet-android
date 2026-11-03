@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
-import io.novafoundation.nova.core_db.dao.BittensorCacheDao
+import io.novafoundation.nova.core_db.dao.ResponseCacheDao
 
 import android.content.SharedPreferences
 import coil.ImageLoader
@@ -97,7 +97,7 @@ import javax.inject.Named
 
 interface StakingFeatureDependencies {
 
-    fun bittensorCacheDao(): BittensorCacheDao
+    fun responseCacheDao(): ResponseCacheDao
 
     val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory
 

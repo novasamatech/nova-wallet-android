@@ -22,7 +22,7 @@ import io.novafoundation.nova.core_db.converters.ProxyAccountConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
-import io.novafoundation.nova.core_db.dao.BittensorCacheDao
+import io.novafoundation.nova.core_db.dao.ResponseCacheDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -132,7 +132,7 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.BalanceHoldLocal
-import io.novafoundation.nova.core_db.model.BittensorCacheLocal
+import io.novafoundation.nova.core_db.model.ResponseCacheLocal
 import io.novafoundation.nova.core_db.model.ChainAssetVisibilityLocal
 import io.novafoundation.nova.core_db.model.MetaAccountSettingsLocal
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
@@ -227,7 +227,7 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         BrowserTabLocal::class,
         MultisigOperationCallLocal::class,
         GiftLocal::class,
-        BittensorCacheLocal::class,
+        ResponseCacheLocal::class,
         AnalyticsEventLocal::class
     ],
 )
@@ -345,7 +345,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
-    abstract fun bittensorCacheDao(): BittensorCacheDao
+    abstract fun responseCacheDao(): ResponseCacheDao
 
     abstract fun nodeDao(): NodeDao
 

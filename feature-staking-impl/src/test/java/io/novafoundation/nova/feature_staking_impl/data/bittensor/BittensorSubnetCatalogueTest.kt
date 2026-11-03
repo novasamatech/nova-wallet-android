@@ -41,7 +41,7 @@ class BittensorSubnetCatalogueTest {
         override suspend fun isSupported(chainId: String, section: String, method: String) = true
     }
 
-    private val config = BittensorConfigRepository { fallbackBittensorConfig() }
+    private val config = BittensorConfigSource { fallbackBittensorConfig() }
 
     private val swaps = mock(BittensorSwapSource::class.java)
 
@@ -49,15 +49,24 @@ class BittensorSubnetCatalogueTest {
 
     private val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
-    private val catalogueRepository = BittensorSubnetCatalogueRepository(backend, urls)
+    private val catalogueSource = BittensorSubnetCatalogueSource(backend, urls)
 
-    private val repository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository)
+    private val repository = createRepository()
+
+    private fun createRepository(
+        config: BittensorConfigSource = this.config,
+        chainPatienceMillis: Long = 4_000L,
+        nanoTime: () -> Long = System::nanoTime
+    ): RealBittensorSubnetRepository {
+        val source = BittensorSubnetSource(runtimeCalls, catalogueSource, chainPatienceMillis, nanoTime)
+        return RealBittensorSubnetRepository(source, config, swaps)
+    }
 
     @Test
     fun `cached portfolio metadata and picker receive the same late logo without any chain query`() = runBlocking<Unit> {
         withTimeout(5_000) {
             backend.cacheControl = "public, max-age=270"
-            catalogueRepository.catalogue()
+            catalogueSource.subnets()
             val response = CompletableDeferred<BittensorConfigRemote>()
             var configRequests = 0
             val api = object : BittensorConfigApi {
@@ -67,9 +76,9 @@ class BittensorSubnetCatalogueTest {
                 }
             }
             val logger = mock(Logger::class.java)
-            val config = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
-            val metadataRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository)
-            val browseRepository = BittensorSubnetBrowseRepository(catalogueRepository, config)
+            val config = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
+            val metadataRepository = createRepository(config = config)
+            val browseRepository = BittensorSubnetBrowseRepository(catalogueSource, config)
             val firstMetadata = CompletableDeferred<List<io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet>>()
             val firstBrowse = CompletableDeferred<BittensorSubnetBrowseRepository.Catalogue>()
             val metadata = async {
@@ -94,9 +103,9 @@ class BittensorSubnetCatalogueTest {
     }
 
     @Test
-    fun `slow chain node falls back to backend names within the patience window`() = runBlocking<Unit> {
+    fun `slow chain node falls back to backend data without altering reported prices`() = runBlocking<Unit> {
         calls.delayMillis = 5_000L
-        val slowNodeRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository, chainPatienceMillis = 50L)
+        val slowNodeRepository = createRepository(chainPatienceMillis = 50L)
 
         val catalogue = slowNodeRepository.catalogue()
         val subnets = catalogue.subnets
@@ -104,7 +113,7 @@ class BittensorSubnetCatalogueTest {
         assertFalse(catalogue.fromChain)
         assertEquals(listOf("Backend 7"), subnets.map { it.name })
         assertEquals("B7", subnets.single().symbol)
-        assertNull(subnets.single().priceInRao)
+        assertEquals(BigInteger.valueOf(500_000_000), subnets.single().priceInRao)
         assertEquals(BigInteger.valueOf(2_000_000_000_000), subnets.single().taoReserveInPlanks)
         assertEquals(BigInteger.valueOf(42), subnets.single().registrationBlock)
         assertEquals(1, backend.requests)
@@ -116,7 +125,7 @@ class BittensorSubnetCatalogueTest {
         assertEquals(listOf("Backend 7"), repository.subnets().map { it.name })
 
         calls.failure = null
-        val freshRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository)
+        val freshRepository = createRepository()
         assertEquals(listOf("Backend 7"), freshRepository.subnets().map { it.name })
     }
 
@@ -140,7 +149,7 @@ class BittensorSubnetCatalogueTest {
     fun `after the patience window the first source to answer wins`() = runBlocking<Unit> {
         calls.delayMillis = 300L
         backend.delayMillis = 5_000L
-        val slowBackendRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository, chainPatienceMillis = 50L)
+        val slowBackendRepository = createRepository(chainPatienceMillis = 50L)
 
         val catalogue = slowBackendRepository.catalogue()
 
@@ -165,7 +174,7 @@ class BittensorSubnetCatalogueTest {
     @Test
     fun `last good catalogue keeps names without prices and never counts as a fresh load`() = runBlocking<Unit> {
         var now = 0L
-        val clockedRepository = RealBittensorSubnetRepository(runtimeCalls, config, swaps, catalogueRepository, nanoTime = { now })
+        val clockedRepository = createRepository(nanoTime = { now })
         clockedRepository.catalogue()
         calls.failure = IOException("Node down")
         backend.failure = IOException("Backend down")
@@ -203,8 +212,8 @@ class BittensorSubnetCatalogueTest {
             override suspend fun config(url: String): BittensorConfigRemote = throw IOException("Config unavailable")
         }
         val logger = mock(Logger::class.java)
-        val remoteConfig = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
-        val configlessRepository = RealBittensorSubnetRepository(runtimeCalls, remoteConfig, swaps, catalogueRepository)
+        val remoteConfig = RemoteBittensorConfigSource(api, "https://config.test/config.json", logger)
+        val configlessRepository = createRepository(config = remoteConfig)
 
         val subnets = configlessRepository.observeSubnets().first()
 
@@ -230,14 +239,14 @@ class BittensorSubnetCatalogueTest {
     fun `backend catalogue is shared while it is HTTP-fresh`() = runBlocking<Unit> {
         var now = 0L
         backend.cacheControl = "max-age=30"
-        val source = BittensorSubnetCatalogueRepository(backend, urls) { now }
+        val source = BittensorSubnetCatalogueSource(backend, urls) { now }
 
-        source.catalogue()
+        source.subnets()
         now = 29_000_000_000L
-        source.catalogue()
+        source.subnets()
         assertEquals(1, backend.requests)
         now = 30_000_000_000L
-        source.catalogue()
+        source.subnets()
         assertEquals(2, backend.requests)
     }
 
@@ -245,9 +254,9 @@ class BittensorSubnetCatalogueTest {
     fun `rejected backend catalogue is fetched again despite its max-age`() = runBlocking<Unit> {
         backend.cacheControl = "max-age=30"
         backend.availability = "UNAVAILABLE"
-        val source = BittensorSubnetCatalogueRepository(backend, urls) { 0L }
+        val source = BittensorSubnetCatalogueSource(backend, urls) { 0L }
 
-        repeat(2) { assertTrue(runCatching { source.catalogue() }.isFailure) }
+        repeat(2) { assertTrue(runCatching { source.subnets() }.isFailure) }
 
         assertEquals(2, backend.requests)
     }

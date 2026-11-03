@@ -34,3 +34,10 @@ Prioritize operation correctness, then state and error handling, then architectu
 Use named Boolean arguments when the meaning is not obvious at the call site. Give compound conditions descriptive names and keep their domain reasons explicit; the receiving field must describe the full condition.
 
 Prefer named models for meaningful requests and load results over positional `Pair`/`Triple` values. Use scope functions for short transformations; keep validation, mutation and operation sequencing explicit. Do not manufacture zero-valued data merely to call a formatter and erase the result afterwards.
+
+Prefer `runCatching` when an operation needs an explicit success/failure result. Expose `Result<T>` when
+the caller needs to handle or present the failure, and make callers consume it explicitly. Do not use
+`try/finally` merely to sequence independent fallible actions: capture their results separately when all
+must be attempted, and preserve failures instead of masking the earlier one. Keep `finally` for actual
+resource cleanup and lifecycle guarantees. In suspend code, rethrow `CancellationException` rather than
+returning it as an ordinary failure; see [Data and state](data-and-state.md).

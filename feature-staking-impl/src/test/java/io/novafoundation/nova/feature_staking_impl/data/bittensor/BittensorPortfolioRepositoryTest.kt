@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
-
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -43,7 +41,7 @@ import org.mockito.Mockito.verifyNoInteractions
 
 class BittensorPortfolioRepositoryTest {
 
-    private val responseCache = createBittensorTestCache()
+    private val snapshots = createResponseTestCache()
 
     private val registry = mock(ChainRegistry::class.java)
 
@@ -77,7 +75,7 @@ class BittensorPortfolioRepositoryTest {
 
     private val selected = MutableStateFlow(account(1L))
 
-    private val positions = object : BittensorPositionSource {
+    private val positions = object : BittensorPositionRemoteSource {
         override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
             positionRequests++
             check(coldKey[0] == 1.toByte() && !failFirstWallet) { "RPC unavailable" }
@@ -213,17 +211,20 @@ class BittensorPortfolioRepositoryTest {
 
     private val computationalCache = commonModule.provideComputationalCache()
 
+    private val pricesSource = BittensorPricesSource(portfolioLoader, snapshots, computationalCache)
+
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val positionRepository = RealBittensorPositionRepository(
+    private val sharedPositionSource = BittensorPositionSource(
         positions,
-        portfolioLoader,
         chainStateRepository,
         computationalCache,
         logger,
         positionUpdates,
-        responseCache = responseCache
+        snapshots
     )
+
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
 
     private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)
 }

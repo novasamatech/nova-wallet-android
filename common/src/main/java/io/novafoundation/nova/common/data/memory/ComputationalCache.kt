@@ -1,7 +1,10 @@
 package io.novafoundation.nova.common.data.memory
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 
 interface ComputationalCache {
 
@@ -19,6 +22,19 @@ interface ComputationalCache {
         scope: CoroutineScope,
         flowLazy: suspend CoroutineScope.() -> Flow<T>
     ): Flow<T>
+}
+
+/**
+ * Shares the producer by [key] while it has collectors. Each collection owns its scope, so finishing
+ * the last collection releases the cached producer even if the caller's parent scope is still alive.
+ */
+fun <T> ComputationalCache.observeSharedFlow(
+    key: String,
+    flowLazy: suspend CoroutineScope.() -> Flow<T>
+): Flow<T> = flow {
+    coroutineScope {
+        emitAll(useSharedFlow(key, this, flowLazy))
+    }
 }
 
 context(ComputationalScope)

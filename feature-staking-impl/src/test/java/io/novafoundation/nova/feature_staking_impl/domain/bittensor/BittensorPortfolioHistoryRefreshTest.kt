@@ -9,6 +9,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -52,11 +54,10 @@ class BittensorPortfolioHistoryRefreshTest {
 
     private suspend fun prepare() {
         `when`(repository.observe(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
-            .thenAnswer { invocation -> kotlinx.coroutines.flow.flow { emit(repository.load(request, invocation.getArgument(1))) } }
+            .thenReturn(flowOf(history))
         `when`(chains.getChain("chain")).thenReturn(chain)
         `when`(accounts.getMetaAccount(1L)).thenReturn(account)
         `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
-        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: "")).thenReturn(history)
     }
 
     @Test
@@ -98,8 +99,8 @@ class BittensorPortfolioHistoryRefreshTest {
     @Test
     fun `cancelling history observation is not converted to an empty success`() = runTest {
         prepare()
-        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
-            .thenThrow(CancellationException("Switched wallet"))
+        `when`(repository.observe(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
+            .thenReturn(flow { throw CancellationException("Switched wallet") })
         var emitted = false
         val job = launch { interactor.observeHistory(request).collect { emitted = true } }
         runCurrent()

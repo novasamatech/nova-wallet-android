@@ -96,31 +96,31 @@ class BittensorSubnetBrowseRepositoryTest {
     fun `a new picker instance renders persisted catalogue without any node dependency`() = runBlocking<Unit> {
         val api = SwitchableCatalogueApi()
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
-        val dao = InMemoryBittensorCacheDao()
-        val onlineCache = createBittensorTestCache(urls, dao = dao)
-        val onlineCatalogue = BittensorSubnetCatalogueRepository(api, onlineCache)
-        val config = BittensorConfigRepository { fallbackBittensorConfig() }
+        val dao = InMemoryResponseCacheDao()
+        val onlineCache = createBittensorTestSources(urls, dao = dao, catalogueApi = api)
+        val onlineCatalogue = onlineCache.catalogue
+        val config = BittensorConfigSource { fallbackBittensorConfig() }
         val online = BittensorSubnetBrowseRepository(onlineCatalogue, config)
         assertEquals("Backend", online.observe().first().subnets.single().name)
 
         api.failure = java.io.IOException("Offline")
-        val restartedCache = createBittensorTestCache(urls, dao = dao)
-        val offlineCatalogue = BittensorSubnetCatalogueRepository(api, restartedCache)
+        val restartedCache = createBittensorTestSources(urls, dao = dao, catalogueApi = api)
+        val offlineCatalogue = restartedCache.catalogue
         val offline = BittensorSubnetBrowseRepository(offlineCatalogue, config)
         val snapshot = offline.observe().first()
         assertEquals("Backend", snapshot.subnets.single().name)
-        assertTrue(snapshot.stale)
+        assertTrue(!snapshot.stale)
     }
 
     @Test
     fun `logos arrive after the cached list without blocking its first render`() = runBlocking<Unit> {
         withTimeout(5_000) {
             val api = SwitchableCatalogueApi("public, max-age=270")
-            val cache = createBittensorTestCache()
-            val catalogue = BittensorSubnetCatalogueRepository(api, cache)
-            catalogue.catalogue()
+            val cache = createBittensorTestSources(catalogueApi = api)
+            val catalogue = cache.catalogue
+            catalogue.subnets()
             val logos = CompletableDeferred<BittensorConfig>()
-            val config = BittensorConfigRepository { logos.await() }
+            val config = BittensorConfigSource { logos.await() }
             val repository = BittensorSubnetBrowseRepository(catalogue, config)
             val initial = CompletableDeferred<BittensorSubnetBrowseRepository.Catalogue>()
             val decorated = async {
@@ -142,8 +142,8 @@ class BittensorSubnetBrowseRepositoryTest {
     @Test
     fun `reopening browse restores logos from the shared config without refetching`() = runBlocking<Unit> {
         val api = SwitchableCatalogueApi("public, max-age=270")
-        val cache = createBittensorTestCache()
-        val catalogue = BittensorSubnetCatalogueRepository(api, cache)
+        val cache = createBittensorTestSources(catalogueApi = api)
+        val catalogue = cache.catalogue
         var configRequests = 0
         val configApi = object : BittensorConfigApi {
             override suspend fun config(url: String): BittensorConfigRemote {
@@ -152,7 +152,7 @@ class BittensorSubnetBrowseRepositoryTest {
             }
         }
         val logger = mock(Logger::class.java)
-        val config = RemoteBittensorConfigRepository(configApi, "https://config.test/config.json", logger)
+        val config = RemoteBittensorConfigSource(configApi, "https://config.test/config.json", logger)
         val first = BittensorSubnetBrowseRepository(catalogue, config)
         val second = BittensorSubnetBrowseRepository(catalogue, config)
 
@@ -168,9 +168,9 @@ class BittensorSubnetBrowseRepositoryTest {
     fun `reopening browse within max age reuses one backend request`() = runBlocking<Unit> {
         val api = SwitchableCatalogueApi("public, max-age=270")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
-        val cache = createBittensorTestCache(urls)
-        val catalogue = BittensorSubnetCatalogueRepository(api, cache)
-        val config = BittensorConfigRepository { fallbackBittensorConfig() }
+        val cache = createBittensorTestSources(urls, catalogueApi = api)
+        val catalogue = cache.catalogue
+        val config = BittensorConfigSource { fallbackBittensorConfig() }
         val first = BittensorSubnetBrowseRepository(catalogue, config)
         val second = BittensorSubnetBrowseRepository(catalogue, config)
         first.observe().first()

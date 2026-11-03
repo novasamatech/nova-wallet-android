@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
-
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -25,6 +23,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -45,7 +44,7 @@ import org.mockito.Mockito.mock
 
 class BittensorStakingRepositoryTest {
 
-    private val responseCache = createBittensorTestCache()
+    private val snapshots = createResponseTestCache()
 
     private val chainRegistry = mock(ChainRegistry::class.java)
 
@@ -67,6 +66,8 @@ class BittensorStakingRepositoryTest {
 
     private val blockNumbers = MutableStateFlow(BigInteger.ONE)
 
+    private val initialBlockObserved = CompletableDeferred<Unit>()
+
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
         "Validator"
@@ -80,7 +81,7 @@ class BittensorStakingRepositoryTest {
 
     private var failValidatorSelection = false
 
-    private val positions = object : BittensorPositionSource {
+    private val positions = object : BittensorPositionRemoteSource {
         override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
             positionRequests++
             check(!failPositions) { "Positions unavailable" }
@@ -105,17 +106,20 @@ class BittensorStakingRepositoryTest {
 
     private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
+    private val pricesSource = BittensorPricesSource(portfolioLoader, snapshots, computationalCache)
+
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val positionRepository = RealBittensorPositionRepository(
+    private val sharedPositionSource = BittensorPositionSource(
         positions,
-        portfolioLoader,
         chainStateRepository,
         computationalCache,
         logger,
         positionUpdates,
-        responseCache = responseCache
+        snapshots
     )
+
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
 
     private val repository = RealBittensorStakingRepository(
         chainRegistry,
@@ -140,7 +144,10 @@ class BittensorStakingRepositoryTest {
         prepare()
 
         withTimeout(3_000L) {
-            interactor.observeRootStakingDetails().onEach { if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE }
+            interactor.observeRootStakingDetails().onEach {
+                initialBlockObserved.await()
+                if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE
+            }
                 .take(2)
                 .toList()
         }
@@ -173,7 +180,10 @@ class BittensorStakingRepositoryTest {
         val states = withTimeout(3_000L) {
             repository.observeRootAccountDetails(1L)
                 .filter { it.dataStatus is BittensorDataStatus.Fresh }
-                .onEach { blockNumbers.value += BigInteger.ONE }
+                .onEach {
+                    initialBlockObserved.await()
+                    blockNumbers.value += BigInteger.ONE
+                }
                 .take(2)
                 .toList()
         }
@@ -187,6 +197,7 @@ class BittensorStakingRepositoryTest {
 
         val states = withTimeout(3_000L) {
             interactor.observeRootStakingDetails().onEach {
+                initialBlockObserved.await()
                 failPositions = true
                 blockNumbers.value += BigInteger.ONE
             }
@@ -214,6 +225,7 @@ class BittensorStakingRepositoryTest {
 
         val states = withTimeout(3_000L) {
             interactor.observeRootStakingDetails().onEach {
+                initialBlockObserved.await()
                 failValidatorSelection = false
                 blockNumbers.value += BigInteger.ONE
             }
@@ -239,7 +251,10 @@ class BittensorStakingRepositoryTest {
         `when`(account.id).thenReturn(1L)
         `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(walletRepository.assetFlow(1L, chainAsset)).thenReturn(flowOf(asset))
-        `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
+        // The initial positions fetch can finish before the independently merged block observer starts.
+        // Send test updates only after its initial block was seen, otherwise drop(1) can consume the update.
+        val observedBlocks = blockNumbers.onEach { initialBlockObserved.complete(Unit) }
+        `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(observedBlocks)
         `when`(presetValidatorInteractor.rootPreset(eq(chain) ?: chain, anyList())).thenAnswer {
             validatorRequests++
             check(!failValidatorSelection) { "Validators unavailable" }

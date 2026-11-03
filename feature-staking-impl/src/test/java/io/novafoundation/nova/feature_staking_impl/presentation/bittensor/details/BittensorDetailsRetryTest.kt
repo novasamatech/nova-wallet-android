@@ -167,7 +167,9 @@ class BittensorDetailsRetryTest {
     }
 
     private val historyApi = object : BittensorPortfolioHistoryApi {
-        override suspend fun history(url: String, accountSubject: String, period: String): retrofit2.Response<BittensorPortfolioHistoryRemote> {
+        override suspend fun history(url: String): retrofit2.Response<BittensorPortfolioHistoryRemote> {
+            val accountSubject = requireNotNull(url.toHttpUrl().queryParameter("accountSubject"))
+            val period = requireNotNull(url.toHttpUrl().queryParameter("period"))
             requestedPeriods += period
             val attempt = priceLoads.incrementAndGet()
             if (timeoutFirstChart && attempt == 1) withTimeout(1L) { awaitCancellation() }
@@ -178,9 +180,14 @@ class BittensorDetailsRetryTest {
 
     private val urls = InfrastructureUrls { "https://infra.example".toHttpUrl() }
 
-    private val responseCache = io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache(urls)
+    private val backendSource = io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestSources(
+        urls,
+        portfolioHistoryApi = historyApi
+    )
 
-    private val historyRepository = BittensorPortfolioHistoryRepository(historyApi, prices, responseCache)
+    private val fxSource = io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestFxSource(prices)
+
+    private val historyRepository = BittensorPortfolioHistoryRepository(fxSource, backendSource.portfolio)
 
     private val chartCalculator = BittensorPortfolioChartCalculator()
 
@@ -533,7 +540,7 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
-    fun `another wallet with the same on chain account reuses its cached history`() = runBlocking<Unit> {
+    fun `another wallet with the same on chain account loads its own cached history`() = runBlocking<Unit> {
         createViewModel()
 
         withTimeout(3_000L) {
@@ -541,7 +548,7 @@ class BittensorDetailsRetryTest {
             portfolioUpdates.value = portfolioUpdates.value.copy(metaId = 2L)
 
             viewModel.priceChartModels.first { models ->
-                priceLoads.get() == 1 && models.any { it is PriceChartModel.Chart }
+                priceLoads.get() == 2 && models.any { it is PriceChartModel.Chart }
             }
         }
     }

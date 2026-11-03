@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class BittensorAlphaYieldRepository(
-    private val remoteSource: BittensorEstimatesRemoteSource,
+    private val yieldSource: BittensorAlphaYieldSource,
     private val infrastructureUrls: InfrastructureUrls
 ) {
 
     fun observeAlphaYields(chain: Chain, subnet: BittensorNetuid.Subnet): Flow<Map<AccountIdKey, BigDecimal>> =
-        remoteSource.observeYields(chain, subnet).map { snapshot ->
-            requireNotNull(snapshot.value.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnet) }
+        yieldSource.observeAlphaYields(chain, subnet).map { snapshot ->
+            requireNotNull(snapshot.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnet) }
                 .distinctBy { it.hotkey }
                 .filter { it.reliable }
                 .associate { it.hotkey to it.annualPercentageYield }
@@ -24,8 +24,9 @@ class BittensorAlphaYieldRepository(
     /** The reported rate is an annual percent; validator commission is already accounted for. */
     suspend fun alphaYields(chain: Chain, subnet: BittensorNetuid.Subnet, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
-        val pages = remoteSource.yields(baseUrl, chain, subnet)
-        return pages.items.distinctBy { it.hotkey }
+        val snapshot = yieldSource.alphaYields(baseUrl, chain, subnet)
+        val yields = requireNotNull(snapshot.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnet) }
+        return yields.distinctBy { it.hotkey }
             .filter { includeUnreliable || it.reliable }
             .associate { it.hotkey to it.annualPercentageYield }
     }

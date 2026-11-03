@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
-
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -36,9 +35,9 @@ import org.mockito.Mockito.verify
 
 class BittensorPositionRepositoryTest {
 
-    private val responseCache = createBittensorTestCache()
+    private val snapshots = createResponseTestCache()
 
-    private val positionSource = mock(BittensorPositionSource::class.java)
+    private val positionSource = mock(BittensorPositionRemoteSource::class.java)
 
     private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
 
@@ -52,9 +51,20 @@ class BittensorPositionRepositoryTest {
 
     private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
+    private val pricesSource = BittensorPricesSource(portfolioLoader, snapshots, computationalCache)
+
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger, positionUpdates, responseCache = responseCache)
+    private val sharedPositionSource = BittensorPositionSource(
+        positionSource,
+        chainStateRepository,
+        computationalCache,
+        logger,
+        positionUpdates,
+        snapshots
+    )
+
+    private val repository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
 
     private val blocks = MutableStateFlow(BigInteger.ONE)
 
@@ -70,11 +80,62 @@ class BittensorPositionRepositoryTest {
     )
 
     @Test
+    fun `invalidation rejects previous position and price writes only for the operation wallet`() = runBlocking {
+        val positionKey = BittensorCacheKeys.positions("chain", coldKey.toHexString())
+        val priceKey = BittensorCacheKeys.prices("chain", coldKey.toHexString())
+        val positionTicket = snapshots.snapshotTicket(positionKey, 1L)
+        val priceTicket = snapshots.snapshotTicket(priceKey, 1L)
+        val otherWalletTicket = snapshots.snapshotTicket(priceKey, 2L)
+        snapshots.saveSnapshot(positionKey, 1L, positions)
+
+        repository.invalidate("chain", coldKey, 1L).getOrThrow()
+
+        assertFalse(snapshots.saveSnapshot(positionKey, 1L, positions, positionTicket))
+        assertFalse(snapshots.saveSnapshot(priceKey, 1L, "obsolete prices", priceTicket))
+        assertTrue(snapshots.saveSnapshot(priceKey, 2L, "other wallet prices", otherWalletTicket))
+        assertEquals(positions, repository.observePositions("chain", coldKey, 1L).first().positions)
+    }
+
+    @Test
+    fun `same coldkey in another meta account does not inherit the saved positions`() = runBlocking {
+        val key = BittensorCacheKeys.positions("chain", coldKey.toHexString())
+        snapshots.saveSnapshot(key, 1L, positions)
+        val other = repository.observePositions("chain", coldKey, metaAccountId = 2L).first()
+        assertNull(other.positions)
+        assertTrue(other.status is BittensorDataStatus.Loading)
+        val owner = repository.observePositions("chain", coldKey, metaAccountId = 1L).first()
+        assertEquals(positions, owner.positions)
+        assertTrue(owner.status is BittensorDataStatus.Stale)
+    }
+
+    @Test
+    fun `offline cold start emits saved positions before any chain request`() = runBlocking {
+        val dao = InMemoryResponseCacheDao()
+        val previousProcess = createResponseTestCache(dao)
+        previousProcess.saveSnapshot(BittensorCacheKeys.positions("chain", coldKey.toHexString()), 1L, positions)
+        val restartedSnapshots = createResponseTestCache(dao)
+        val restartedPricesSource = BittensorPricesSource(portfolioLoader, restartedSnapshots, computationalCache)
+        val sharedPositionSource = BittensorPositionSource(
+            positionSource,
+            chainStateRepository,
+            computationalCache,
+            logger,
+            positionUpdates,
+            restartedSnapshots
+        )
+
+        val restarted = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, restartedPricesSource)
+        val state = withTimeout(3_000) { restarted.observePositions("chain", coldKey, metaAccountId = 1L).first() }
+        assertEquals(positions, state.positions)
+        assertTrue(state.status is BittensorDataStatus.Stale)
+    }
+
+    @Test
     fun `confirmed operation refreshes positions without waiting for a block`() = runBlocking<Unit> {
         prepare()
         val states = Channel<BittensorPositionState>(Channel.UNLIMITED)
         val observer = launch {
-            repository.observePositions("chain", coldKey)
+            repository.observePositions("chain", coldKey, metaAccountId = 1L)
                 .filter { it.status is BittensorDataStatus.Fresh }
                 .collect { states.send(it) }
         }
@@ -99,17 +160,17 @@ class BittensorPositionRepositoryTest {
         val portfolioUpdates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
         val dashboardUpdates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
         val rootJob = launch {
-            repository.observePositions("chain", coldKey)
+            repository.observePositions("chain", coldKey, metaAccountId = 1L)
                 .filter { it.status is BittensorDataStatus.Fresh }
                 .collect { rootUpdates.send(it) }
         }
         val portfolioJob = launch {
-            repository.observePortfolio("chain", coldKey.copyOf())
+            repository.observePortfolio("chain", coldKey.copyOf(), metaAccountId = 1L)
                 .filter { it.status is BittensorDataStatus.Fresh && it.positions?.subnetPrices?.isNotEmpty() == true }
                 .collect { portfolioUpdates.send(it) }
         }
         val dashboardJob = launch {
-            repository.observePortfolio("chain", coldKey.copyOf())
+            repository.observePortfolio("chain", coldKey.copyOf(), metaAccountId = 1L)
                 .filter { it.status is BittensorDataStatus.Fresh && it.positions?.subnetPrices?.isNotEmpty() == true }
                 .collect { dashboardUpdates.send(it) }
         }
@@ -129,6 +190,13 @@ class BittensorPositionRepositoryTest {
                 assertEquals(portfolio, dashboard)
                 verify(positionSource, times(2)).positions("chain", coldKey)
 
+                // Price sharing must outlive the first portfolio consumer while another is still observing.
+                portfolioJob.cancelAndJoin()
+                val updatedPrice = BigInteger.valueOf(50)
+                `when`(priceRepository.prices("chain", setOf(subnetId))).thenReturn(mapOf(subnetId to updatedPrice))
+                blocks.value += BigInteger.ONE
+                val repriced = dashboardUpdates.next { it.positions?.subnetPrices?.get(subnetId) == updatedPrice }
+                assertEquals(changed.subnets, repriced.positions?.subnets)
                 assertEquals(1, blocks.subscriptionCount.value)
             }
         } finally {
@@ -151,20 +219,22 @@ class BittensorPositionRepositoryTest {
             }
         }
         val slowPortfolioLoader = BittensorPortfolioLoader(slowPriceRepository, logger)
-        val sharedPositions = RealBittensorPositionRepository(
+        val pricesSource = BittensorPricesSource(slowPortfolioLoader, snapshots, computationalCache)
+        val sharedPositionSource = BittensorPositionSource(
             positionSource,
-            slowPortfolioLoader,
             chainStateRepository,
             computationalCache,
             logger,
             positionUpdates,
-        responseCache = responseCache
-    )
-        val portfolioJob = launch { sharedPositions.observePortfolio("chain", coldKey).collect {} }
+            snapshots
+        )
+
+        val sharedPositions = RealBittensorPositionRepository(sharedPositionSource, slowPortfolioLoader, pricesSource)
+        val portfolioJob = launch { sharedPositions.observePortfolio("chain", coldKey, metaAccountId = 1L).collect {} }
         try {
             withTimeout(3_000L) {
                 priceRequested.await()
-                val root = sharedPositions.observePositions("chain", coldKey)
+                val root = sharedPositions.observePositions("chain", coldKey, metaAccountId = 1L)
                     .first { it.status is BittensorDataStatus.Fresh }
                 assertEquals(positions.root, root.positions?.root)
                 verify(positionSource).positions("chain", coldKey)
@@ -180,10 +250,10 @@ class BittensorPositionRepositoryTest {
         prepare()
         val otherColdKey = ByteArray(32) { 2 }
         `when`(positionSource.positions("chain", otherColdKey)).thenThrow(IllegalStateException("Unavailable"))
-        val firstWallet = launch { repository.observePortfolio("chain", coldKey).collect {} }
+        val firstWallet = launch { repository.observePortfolio("chain", coldKey, metaAccountId = 1L).collect {} }
         try {
             withTimeout(3_000L) {
-                val state = repository.observePortfolio("chain", otherColdKey)
+                val state = repository.observePortfolio("chain", otherColdKey, metaAccountId = 1L)
                     .first { it.status is BittensorDataStatus.Stale }
                 assertNull(state.positions)
             }
@@ -207,9 +277,19 @@ class BittensorPositionRepositoryTest {
             }
         }
         val loader = BittensorPortfolioLoader(slowPrices, logger)
-        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates, responseCache = responseCache)
+        val pricesSource = BittensorPricesSource(loader, snapshots, computationalCache)
+        val sharedPositionSource = BittensorPositionSource(
+            positionSource,
+            chainStateRepository,
+            computationalCache,
+            logger,
+            positionUpdates,
+            snapshots
+        )
+
+        val repository = RealBittensorPositionRepository(sharedPositionSource, loader, pricesSource)
         val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
-        val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
+        val observer = launch { repository.observePortfolio("chain", coldKey, metaAccountId = 1L).collect { updates.send(it) } }
         try {
             withTimeout(3_000L) {
                 requested.await()
@@ -262,9 +342,19 @@ class BittensorPositionRepositoryTest {
             }
         }
         val loader = BittensorPortfolioLoader(slowPrices, logger)
-        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates, responseCache = responseCache)
+        val pricesSource = BittensorPricesSource(loader, snapshots, computationalCache)
+        val sharedPositionSource = BittensorPositionSource(
+            positionSource,
+            chainStateRepository,
+            computationalCache,
+            logger,
+            positionUpdates,
+            snapshots
+        )
+
+        val repository = RealBittensorPositionRepository(sharedPositionSource, loader, pricesSource)
         val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
-        val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
+        val observer = launch { repository.observePortfolio("chain", coldKey, metaAccountId = 1L).collect { updates.send(it) } }
         try {
             withTimeout(3_000L) {
                 firstStarted.await()
@@ -276,7 +366,7 @@ class BittensorPositionRepositoryTest {
                 firstFinished.await()
 
                 // An active second subscriber gets the shared latest state, not old prices.
-                val replayed = repository.observePortfolio("chain", coldKey)
+                val replayed = repository.observePortfolio("chain", coldKey, metaAccountId = 1L)
                     .first { it.positions?.subnetPrices?.isNotEmpty() == true }
                 assertEquals(mapOf(otherSubnet to BigInteger.TEN), replayed.positions?.subnetPrices)
             }
@@ -297,13 +387,13 @@ class BittensorPositionRepositoryTest {
     fun `last subscriber stops updates and a later subscription reloads positions`() = runBlocking<Unit> {
         prepare()
         withTimeout(3_000L) {
-            repository.observePositions("chain", coldKey)
+            repository.observePositions("chain", coldKey, metaAccountId = 1L)
                 .first { it.status is BittensorDataStatus.Fresh }
             blocks.subscriptionCount.first { it == 0 }
 
             val emptyPositions = BittensorStakePositions(emptyList(), emptyList())
             `when`(positionSource.positions("chain", coldKey)).thenReturn(emptyPositions)
-            val state = repository.observePositions("chain", coldKey)
+            val state = repository.observePositions("chain", coldKey, metaAccountId = 1L)
                 .first { it.status is BittensorDataStatus.Fresh }
 
             assertTrue(requireNotNull(state.positions).root.isEmpty())
@@ -319,10 +409,10 @@ class BittensorPositionRepositoryTest {
         val emptyPositions = BittensorStakePositions(emptyList(), emptyList())
         `when`(chainStateRepository.currentRemoteBlockNumberFlow("other-chain")).thenReturn(otherBlocks)
         `when`(positionSource.positions("other-chain", coldKey)).thenReturn(emptyPositions)
-        val firstChain = launch { repository.observePositions("chain", coldKey).collect {} }
+        val firstChain = launch { repository.observePositions("chain", coldKey, metaAccountId = 1L).collect {} }
         try {
             withTimeout(3_000L) {
-                val state = repository.observePositions("other-chain", coldKey)
+                val state = repository.observePositions("other-chain", coldKey, metaAccountId = 1L)
                     .first { it.status is BittensorDataStatus.Fresh }
                 assertEquals(emptyPositions, state.positions)
                 verify(positionSource).positions("other-chain", coldKey)
@@ -344,7 +434,7 @@ class BittensorPositionRepositoryTest {
         `when`(chainStateRepository.currentRemoteBlockNumberFlow("chain")).thenReturn(failedBlocks, blocks)
         val updates = Channel<BittensorPositionState>(Channel.UNLIMITED)
         val observer = launch {
-            repository.observePositions("chain", coldKey)
+            repository.observePositions("chain", coldKey, metaAccountId = 1L)
                 .filter { it.status !is BittensorDataStatus.Loading }
                 .collect { updates.send(it) }
         }

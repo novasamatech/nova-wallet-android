@@ -57,7 +57,7 @@ class RealBittensorPortfolioRepository(
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
             combine(
                 walletRepository.assetFlow(account.id, chain.utilityAsset),
-                observePositions(chain, account.requireAccountIdIn(chain), rootOnly)
+                observePositions(chain, account.requireAccountIdIn(chain), rootOnly, account.id)
             ) { asset, positionState ->
                 BittensorPortfolio(
                     account.id,
@@ -71,14 +71,14 @@ class RealBittensorPortfolioRepository(
         }
     }
 
-    private fun observePositions(chain: Chain, coldKey: AccountId, rootOnly: Boolean): Flow<BittensorPortfolioState> {
+    private fun observePositions(chain: Chain, coldKey: AccountId, rootOnly: Boolean, metaAccountId: Long): Flow<BittensorPortfolioState> {
         return if (rootOnly) {
-            positionRepository.observePositions(chain.id, coldKey).map { state ->
+            positionRepository.observePositions(chain.id, coldKey, metaAccountId).map { state ->
                 val positions = state.positions?.let { BittensorPortfolioPositions(it.root, emptyList(), emptyMap()) }
                 BittensorPortfolioState(positions, state.status)
             }
         } else {
-            positionRepository.observePortfolio(chain.id, coldKey)
+            positionRepository.observePortfolio(chain.id, coldKey, metaAccountId)
         }
     }
 }

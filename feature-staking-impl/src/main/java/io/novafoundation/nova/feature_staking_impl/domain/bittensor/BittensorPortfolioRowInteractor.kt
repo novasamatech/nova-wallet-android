@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRemote
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketSource
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
@@ -21,7 +21,7 @@ import kotlinx.coroutines.withTimeout
 
 class BittensorPortfolioRowInteractor(
     private val rootValidators: BittensorRootValidatorSource,
-    private val markets: BittensorSubnetMarketRepository,
+    private val markets: BittensorSubnetMarketSource,
     private val prices: CoinPriceRepository,
     private val currencies: CurrencyRepository
 ) {

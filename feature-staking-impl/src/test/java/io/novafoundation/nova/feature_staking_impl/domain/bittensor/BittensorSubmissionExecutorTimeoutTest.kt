@@ -1,5 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorHistoryRequest
+import io.novafoundation.nova.runtime.ext.addressOf
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.Mockito.doThrow
+import kotlinx.coroutines.cancelAndJoin
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorOperationHistorySource
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
@@ -35,9 +45,17 @@ import org.mockito.Mockito.mock
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorSubmissionExecutorTimeoutTest {
 
-    private val cacheInvalidator = mock(io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorCacheInvalidator::class.java)
+    private val history = mock(BittensorOperationHistorySource::class.java)
+
+    private val logger = mock(Logger::class.java)
+
+    private val positions = mock(BittensorPositionRepository::class.java)
 
     private val chain = mock(Chain::class.java).also { `when`(it.id).thenReturn("bittensor") }
+
+    private val coldKey = ByteArray(32)
+
+    private val historyRequest = BittensorHistoryRequest(chain.addressOf(coldKey), "https://infra.test/".toHttpUrl(), 0L, METAID)
 
     private val account = mock(MetaAccount::class.java)
 
@@ -51,7 +69,9 @@ class BittensorSubmissionExecutorTimeoutTest {
 
     private val extrinsics = FakeExtrinsicService()
 
-    private val executor = BittensorSubmissionExecutor(extrinsics, accounts, BittensorPositionUpdates(), cacheInvalidator) { _, inBlock ->
+    private val positionUpdates = BittensorPositionUpdates()
+
+    private val executor = BittensorSubmissionExecutor(extrinsics, accounts, positionUpdates, positions, history, logger) { _, inBlock ->
         assertEquals(HASH, inBlock.status.extrinsicHash)
         execution
     }
@@ -68,6 +88,8 @@ class BittensorSubmissionExecutorTimeoutTest {
         assertTrue(result.cause is BittensorBuildTimeoutException)
         assertTrue(result.isRetryable)
         assertFalse(result.isSigningCancelled)
+        verifyNoInteractions(positions)
+        verify(history, org.mockito.Mockito.never()).ownTradeSubmitted(historyRequest)
         assertLockReleased()
     }
 
@@ -81,6 +103,7 @@ class BittensorSubmissionExecutorTimeoutTest {
         val proxied = mock(ProxiedMetaAccount::class.java)
         `when`(proxied.type).thenReturn(LightMetaAccount.Type.PROXIED)
         `when`(proxied.proxy).thenReturn(proxy)
+        `when`(proxied.accountIdIn(chain)).thenReturn(coldKey)
         `when`(accounts.getMetaAccount(METAID)).thenReturn(proxied)
         extrinsics.build = { awaitCancellation() }
 
@@ -118,6 +141,8 @@ class BittensorSubmissionExecutorTimeoutTest {
         assertEquals(BittensorOperationResult.Unknown(HASH), result)
         assertEquals(BITTENSOR_SEND_AND_INCLUSION_TIMEOUT.inWholeMilliseconds, testScheduler.currentTime)
         assertEquals(1, extrinsics.submissions)
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+        verify(history).ownTradeSubmitted(historyRequest)
         assertLockReleased()
         assertEquals(2, extrinsics.submissions)
     }
@@ -148,9 +173,70 @@ class BittensorSubmissionExecutorTimeoutTest {
 
         assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
         assertEquals(0L, testScheduler.currentTime)
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+        verify(history).ownTradeSubmitted(historyRequest)
+    }
+
+    @Test
+    fun `missing backend origin does not skip local position invalidation after success`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        `when`(history.request(historyRequest.address, METAID)).thenReturn(null)
+        extrinsics.build = { inBlockWatch() }
+
+        assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+        verify(history, org.mockito.Mockito.never()).ownTradeSubmitted(historyRequest)
+    }
+
+    @Test
+    fun `failed backend context does not skip local invalidation after unknown execution`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        `when`(history.request(historyRequest.address, METAID)).thenThrow(IllegalStateException("backend unavailable"))
+        extrinsics.build = { flow { awaitCancellation() } }
+
+        assertEquals(BittensorOperationResult.Unknown(null), executor.execute(METAID, chain) {})
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+    }
+
+    @Test
+    fun `history cache failure does not prevent position invalidation or change success`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        extrinsics.build = { inBlockWatch() }
+        doThrow(IllegalStateException("History cache unavailable")).`when`(history).ownTradeSubmitted(historyRequest)
+
+        assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+        verify(history).ownTradeSubmitted(historyRequest)
+    }
+
+    @Test
+    fun `position cache failure does not prevent history invalidation or change success`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        extrinsics.build = { inBlockWatch() }
+        val chainId = chain.id
+        val failure = IllegalStateException("Position cache unavailable")
+        `when`(positions.invalidate(chainId, coldKey, METAID)).thenReturn(Result.failure(failure))
+
+        assertEquals(BittensorOperationResult.Success(HASH), executor.execute(METAID, chain) {})
+        verify(history).ownTradeSubmitted(historyRequest)
+        verify(logger).log(failure)
+    }
+
+    @Test
+    fun `cancellation after handoff invalidates affected data before leaving`() = runTest {
+        useWallet(LightMetaAccount.Type.SECRETS)
+        extrinsics.build = { flow { awaitCancellation() } }
+        val submission = launch { executor.execute(METAID, chain) {} }
+        runCurrent()
+        submission.cancelAndJoin()
+
+        verify(positions).invalidate(chain.id, coldKey, METAID)
+        verify(history).ownTradeSubmitted(historyRequest)
     }
 
     private suspend fun useWallet(type: LightMetaAccount.Type) {
+        `when`(wallet.accountIdIn(chain)).thenReturn(coldKey)
+        `when`(history.request(historyRequest.address, METAID)).thenReturn(historyRequest)
         `when`(wallet.type).thenReturn(type)
         `when`(accounts.getMetaAccount(METAID)).thenReturn(wallet)
     }

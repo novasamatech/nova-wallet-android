@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
@@ -47,7 +47,7 @@ class BittensorExitInteractor(
     private val exitRuntimeSource: BittensorExitRuntimeSource,
     private val subnetMetadataInteractor: BittensorSubnetMetadataInteractor,
     private val swapSource: BittensorSwapSource,
-    private val configRepository: BittensorConfigRepository,
+    private val configSource: BittensorConfigSource,
     val slippage: BittensorSlippage,
     private val extrinsicService: ExtrinsicService,
     private val submissionExecutor: BittensorSubmissionExecutor,
@@ -99,7 +99,7 @@ class BittensorExitInteractor(
     /** What re-quotes a sale: each new block while [shown] and each of [immediate]. */
     fun requotes(shown: Flow<Boolean>, immediate: Flow<Unit>): Flow<Unit> = blockRequotes.requotes(shown, immediate)
 
-    fun observeSubnetLogos() = configRepository.observeSubnetLogos()
+    fun observeSubnetLogos() = configSource.observeSubnetLogos()
 
     suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition = coroutineScope {
         val wallet = accountRepository.getMetaAccount(metaId)
@@ -372,7 +372,7 @@ class BittensorExitInteractor(
         val selectedSlippage = BittensorSlippage(slippageFraction)
         val limitPrice = selectedSlippage.limitPrice(spotPrice, BittensorSwapDirection.ALPHA_TO_TAO)
         val minimumTaoOut = simulation.amountIn * limitPrice / BittensorProtocolUnits.RAO_PER_TAO
-        val commission = configRepository.config().commission
+        val commission = configSource.config().commission
         val serviceFee = commission.feeFor(simulation.amountOut)
         // A sale that its own impact cannot fill at the limit price is still quoted; validation blocks it.
         require(minimumTaoOut.isPositive())

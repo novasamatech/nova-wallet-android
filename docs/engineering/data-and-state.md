@@ -20,6 +20,30 @@ External staking balances belong to the existing wallet balance update lifecycle
 
 Model known JSON API and configuration contracts with typed remote DTOs returned directly by Retrofit. Keep domain mapping and semantic validation in repositories or mappers; do not traverse `JsonObject`, `JsonElement`, or untyped maps for responses with a known schema. Reserve raw JSON for genuinely dynamic payloads.
 
+When a source encapsulates cached backend access, expose endpoint-specific methods. Keep URL construction,
+response types, transport callbacks and endpoint cache policy inside that source. When several sources
+share backend mechanics, inject one shared client with internal generic request helpers (`get`/`observe`).
+Only sources call those helpers; repositories receive typed sources. Do not copy the generic pipeline
+into every source or introduce a public universal-source facade. Endpoint-specific concurrency limits
+belong to the owning source; the common client must not infer them from URL strings.
+Return typed payloads from source APIs, not cache envelopes or TTL metadata. Unwrap responses once in
+the shared client (`get: T`, `observe: Flow<T>`), rather than repeating `.value` in every source.
+Use an explicit internal lifetime-aware path only when a source aggregates cached pages. Cache expiry controls
+refresh inside the source/client; it must not rewrite backend freshness or imply transaction eligibility.
+Preserve backend-reported availability and separate live transaction validation.
+Reuse repository/domain mappers for validation before storing a response.
+
+Cache ownership is a general data-layer rule, not a Bittensor-only convention: caching belongs in
+sources, never in repositories. Sources own both persistent and in-memory caches, cache validation,
+restoration, refresh, invalidation and request/subscription sharing. Repositories compose and map source
+results; they must not depend on cache implementations, build cache keys, serialize cached payloads or
+manage expiry/revisions. Apply this rule to new work and authorized refactors; do not rewrite unrelated
+legacy code merely because it violates the rule. Consumers call
+explicit domain methods instead of constructing storage keys or passing cache-control flags. Keep each
+key definition in one place and reuse it for reads, writes and invalidation. Orchestration calls those
+owners directly; do not add a separate invalidator just to reconstruct their keys. Preserve explicit
+operation/account identity, cancellation and rejection of obsolete writes when simplifying this design.
+
 Use `map...` and `...Mapping`/`...Mapper` names for transformations between DTOs and domain models. Reserve `bind...` and `...Binding` names in data conversion code for SCALE/runtime decoding, not JSON DTO mapping. Keep validation-only helpers named `require...` or `validate...`.
 
 Keep Retrofit API interfaces and their remote DTOs in separate files from repository implementations, following the existing API/remote-model/repository structure.
@@ -42,9 +66,19 @@ Keep read and mapping methods free of hidden workflow state changes. Pass an exp
 
 Share subscriptions, decoding, and loading when multiple consumers need different parts of the same runtime response. Key shared streams by chain and account identity, bind their lifetime to active consumers, and keep dashboard and screen state derived from the same source. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.
 
+Use `ComputationalCache.observeSharedFlow` when sharing should last only while collected; do not repeat
+`flow`/`coroutineScope`/`emitAll` wrappers in every source. Keep `useSharedFlow` with an explicit scope
+when that scope intentionally owns a longer lifetime. Express recurring refresh through a named Flow
+operation that states its triggers and intervals, rather than manual channels/jobs at each call site.
+
 ## Cancellation and state transitions
 
-Preserve CancellationException through catch/result/retry boundaries. A cancelled screen must not
+Preserve CancellationException through catch/result/retry boundaries, including `runCatching` and
+`Result.onFailure`: rethrow cancellation before continuing to another action or presenting an error.
+A returned `Result` must be handled by the consumer; do not silently ignore it or discard its failure
+with `getOrNull()` unless an explicit optional-data fallback applies. A cache-maintenance failure after
+submission must not replace the observed transaction outcome with a transaction failure.
+A cancelled screen must not
 emit a generic retry dialog onto the next screen. Do not convert failed financial reads to zero.
 Keep retries bounded and user-recoverable; failed loading must leave the pending state.
 Check initial load, success, empty/missing, failure, retry, wallet/asset change and leaving the screen.

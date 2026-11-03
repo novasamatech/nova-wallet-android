@@ -9,7 +9,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfig
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitAvailability
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
@@ -106,7 +106,7 @@ class BittensorExitQuoteInteractorTest {
 
     private val commission = BittensorSubnetCommission(BigDecimal("0.003"))
 
-    private val config = BittensorConfigRepository { BittensorConfig(commission, emptyMap()) }
+    private val config = BittensorConfigSource { BittensorConfig(commission, emptyMap()) }
 
     private val registry = mock(ChainRegistry::class.java)
 

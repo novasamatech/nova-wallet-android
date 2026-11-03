@@ -28,23 +28,19 @@ class BittensorEstimatesRepositoryTest {
 
     private val infrastructureUrls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
-    private val responseCache = createBittensorTestCache(infrastructureUrls)
+    private val backendSource = createBittensorTestSources(infrastructureUrls, estimatesApi = api)
 
-    private val remoteSource = BittensorEstimatesRemoteSource(api, spacingMillis = 0L, cache = responseCache)
+    private val remoteSource = backendSource.operations
 
     private val chain = mock(Chain::class.java)
 
-
     private val computationalCache = mock(ComputationalCache::class.java)
 
-    private val historyRepository = BittensorOperationHistoryRepository(
-        remoteSource,
-        infrastructureUrls,
-        computationalCache,
-        mock(Preferences::class.java)
-    )
+    private val preferences = mock(Preferences::class.java)
 
-    private val yieldRepository = BittensorAlphaYieldRepository(remoteSource, infrastructureUrls)
+    private val historyRepository = backendSource.historySource(computationalCache, preferences)
+
+    private val yieldRepository = BittensorAlphaYieldRepository(backendSource.yields, infrastructureUrls)
 
     private val address = "test-account"
 
@@ -63,7 +59,7 @@ class BittensorEstimatesRepositoryTest {
     @Test
     fun `own trade invalidates otherwise fresh history`() = runBlocking {
         history()
-        historyRepository.ownTradeSubmitted(requireNotNull(historyRepository.request(address)))
+        historyRepository.ownTradeSubmitted(requireNotNull(historyRepository.request(address, metaAccountId = 1L)))
         history()
 
         assertEquals(listOf(1, 1), api.historyPages)
@@ -185,7 +181,7 @@ class BittensorEstimatesRepositoryTest {
     @Test
     fun `history cache lifetime begins before the response is received`() = runBlocking {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
-        val result = remoteSource.history(baseUrl, address)
+        val result = remoteSource.loadHistoryPages(baseUrl, address, metaAccountId = 1L)
 
         assertTrue(result.validUntilNanos <= api.historyResponseAtNanos + 60_000_000_000L)
     }
@@ -194,9 +190,15 @@ class BittensorEstimatesRepositoryTest {
     fun `yield cache lifetime begins before the response is received`() = runBlocking {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         val subnetId = BittensorNetuid.Subnet(1)
-        val result = remoteSource.yields(baseUrl, chain, subnetId)
+        backendSource.yields.alphaYields(baseUrl, chain, subnetId)
+        val result = requireNotNull(
+            backendSource.client.peekWithLifetime(
+                bittensorBackendUrl(baseUrl, "subnets/${subnetId.value}/yields/alpha"),
+                BittensorAlphaYieldsRemote::class.java
+            )
+        )
 
-        assertTrue(result.validUntilNanos <= api.yieldResponseAtNanos + 60_000_000_000L)
+        assertTrue(result.freshUntilNanos <= api.yieldResponseAtNanos + 60_000_000_000L)
     }
 
     @Test
@@ -228,23 +230,20 @@ class BittensorEstimatesRepositoryTest {
 
     @Test
     fun `yield snapshot does not inherit operation history throttling`() = runTest {
-        val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L, cache = responseCache)
-        val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
-
-        val pages = throttledSource.yields(baseUrl, chain, BittensorNetuid.Subnet(1))
+        val yields = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
 
         assertEquals(listOf("https://infra.test/v1/bittensor/subnets/1/yields/alpha"), api.yieldRequests)
         assertEquals(0L, testScheduler.currentTime)
-        assertTrue(pages.allPagesRead)
+        assertTrue(yields.isEmpty())
     }
 
     @Test
     fun `operation history retains its page throttling`() = runTest {
-        val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L, cache = responseCache)
+        val throttledSource = backendSource.historySource(computationalCache, preferences, spacingMillis = 12_000L)
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         api.nextHistoryPage = { if (it == 1) 2 else null }
 
-        val pages = throttledSource.history(baseUrl, address)
+        val pages = throttledSource.loadHistoryPages(baseUrl, address, metaAccountId = 1L)
 
         assertEquals(listOf(1, 2), api.historyPages)
         assertEquals(12_000L, testScheduler.currentTime)
@@ -332,7 +331,7 @@ class BittensorEstimatesRepositoryTest {
     }
 
     private suspend fun history(): io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory {
-        val request = requireNotNull(historyRepository.request(address))
+        val request = requireNotNull(historyRepository.request(address, metaAccountId = 1L))
         return historyRepository.history(request)
     }
 
@@ -366,7 +365,8 @@ class BittensorEstimatesRepositoryTest {
 
         var failure: Exception? = null
 
-        override suspend fun operations(url: String, address: String, page: Int): Response<BittensorOperationsRemote> {
+        override suspend fun operations(url: String): Response<BittensorOperationsRemote> {
+            val page = requireNotNull(url.toHttpUrl().queryParameter("page")).toInt()
             historyPages += page
             beforeHistoryResponse()
             failure?.let { throw it }

@@ -52,8 +52,11 @@ class BittensorSaleCostBasisTest {
     @Test
     fun `review keeps the setup totals while its own history reloads or fails`() {
         val known = ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Known(carried, true))
-        assertEquals(known, resolveSaleCostBasis(BittensorPositionCostBasis(ExtendedLoadingState.Loading, isProvisional = false), 1, carried))
-        assertEquals(known, resolveSaleCostBasis(BittensorPositionCostBasis(ExtendedLoadingState.Error(IllegalStateException()), isProvisional = false), 1, carried))
+        val loading = BittensorPositionCostBasis(ExtendedLoadingState.Loading, isProvisional = false)
+        val failed = BittensorPositionCostBasis(ExtendedLoadingState.Error(IllegalStateException()), isProvisional = false)
+
+        assertEquals(known, resolveSaleCostBasis(loading, 1, carried))
+        assertEquals(known, resolveSaleCostBasis(failed, 1, carried))
         assertEquals(known, resolveSaleCostBasis(loaded(null), 1, carried))
         assertEquals(known, resolveSaleCostBasis(loaded(withPurchase, settling = true), 1, carried))
         assertEquals(ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Known(purchaseTotals, true)), resolveSaleCostBasis(loaded(withPurchase), 1, carried))

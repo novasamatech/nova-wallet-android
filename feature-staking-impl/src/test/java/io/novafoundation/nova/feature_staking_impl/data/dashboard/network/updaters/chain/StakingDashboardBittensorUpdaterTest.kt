@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.createBittensorTestCache
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.createResponseTestCache
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.modules.CommonModule
@@ -9,9 +9,11 @@ import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.InMemoryPreferences
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPricesSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRemoteSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimPreview
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
@@ -44,7 +46,7 @@ import org.mockito.Mockito.verifyNoInteractions
 
 class StakingDashboardBittensorUpdaterTest {
 
-    private val responseCache = createBittensorTestCache()
+    private val positionSnapshots = createResponseTestCache()
 
     private val chain = mock(Chain::class.java)
 
@@ -52,7 +54,7 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val metaAccount = mock(MetaAccount::class.java)
 
-    private val positionSource = mock(BittensorPositionSource::class.java)
+    private val positionSource = mock(BittensorPositionRemoteSource::class.java)
 
     private val rootClaims = mock(BittensorRootClaimSource::class.java)
 
@@ -119,17 +121,20 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val computationalCache = commonModule.provideComputationalCache()
 
+    private val pricesSource = BittensorPricesSource(portfolioLoader, positionSnapshots, computationalCache)
+
     private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
 
-    private val positionRepository = RealBittensorPositionRepository(
+    private val sharedPositionSource = BittensorPositionSource(
         positionSource,
-        portfolioLoader,
         chainStateRepository,
         computationalCache,
         logger,
         positionUpdates,
-        responseCache = responseCache
+        positionSnapshots
     )
+
+    private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, portfolioLoader, pricesSource)
 
     private fun updater() = StakingDashboardBittensorUpdater(
         chain,

@@ -7,6 +7,8 @@ import android.graphics.Color
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.google.android.play.core.integrity.IntegrityManagerFactory
+import com.google.gson.Gson
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
@@ -510,10 +512,13 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideGlobalConfigDataSource(
-        networkApiCreator: NetworkApiCreator
+        networkApiCreator: NetworkApiCreator,
+        preferences: Preferences,
+        gson: Gson,
+        logger: Logger
     ): GlobalConfigDataSource {
         val api = networkApiCreator.create(GlobalConfigApi::class.java)
-        return RealGlobalConfigDataSource(api)
+        return RealGlobalConfigDataSource(api, preferences, gson, logger)
     }
 
     @Provides

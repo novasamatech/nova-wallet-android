@@ -42,7 +42,9 @@ class BittensorPortfolioPriceRepositoryTest {
         }
     }
 
-    private val repository = RealBittensorPortfolioPriceRepository(BittensorSubnetCatalogueRepository(api, urls), runtime, logger)
+    private val catalogueSource = BittensorSubnetCatalogueSource(api, urls)
+
+    private val repository = RealBittensorPortfolioPriceRepository(catalogueSource, runtime, logger)
 
     private val subnet = BittensorNetuid.Subnet(1)
 
@@ -52,6 +54,20 @@ class BittensorPortfolioPriceRepositoryTest {
     fun `complete fresh backend skips runtime`() = runTest {
         assertEquals(mapOf(subnet to BigInteger.valueOf(500_000_000)), repository.prices("chain", setOf(subnet)))
         verifyNoInteractions(runtime)
+    }
+
+    @Test
+    fun `expired fresh-labelled catalogue cannot replace live runtime valuation`() = runTest {
+        var now = 0L
+        val sources = createBittensorTestSources(urls, nanoTime = { now }, scope = backgroundScope, catalogueApi = api)
+        val prices = RealBittensorPortfolioPriceRepository(sources.catalogue, runtime, logger)
+        sources.catalogue.subnets()
+        now = 61_000_000_000L
+        backendFailure = IllegalStateException("Backend offline")
+        `when`(runtime.prices("chain")).thenReturn(mapOf(subnet to BigInteger.TEN))
+
+        assertEquals(mapOf(subnet to BigInteger.TEN), prices.prices("chain", setOf(subnet)))
+        assertEquals("FRESH", sources.catalogue.subnets().meta?.components?.alphaPrices?.freshness)
     }
 
     @Test

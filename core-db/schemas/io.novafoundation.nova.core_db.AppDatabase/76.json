@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 76,
-    "identityHash": "9819d86b37930a04c2b04b14ce4f8db0",
+    "identityHash": "45c89a4dd059ecbcdc53727e87ffc914",
     "entities": [
       {
         "tableName": "users",
@@ -3312,32 +3312,20 @@
         ]
       },
       {
-        "tableName": "bittensor_cache",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `namespace` TEXT NOT NULL, `resource` TEXT NOT NULL, `account` TEXT NOT NULL, `payload` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, `expiresAt` INTEGER NOT NULL, `generationAsOf` TEXT, `generationBlock` TEXT, PRIMARY KEY(`key`))",
+        "tableName": "response_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`normalizedUrl` TEXT NOT NULL, `metaAccountId` INTEGER, `payload` TEXT NOT NULL, `fetchedAt` INTEGER NOT NULL, `expiresAt` INTEGER NOT NULL, `key` TEXT NOT NULL, PRIMARY KEY(`key`), FOREIGN KEY(`metaAccountId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
-            "fieldPath": "key",
-            "columnName": "key",
+            "fieldPath": "normalizedUrl",
+            "columnName": "normalizedUrl",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "namespace",
-            "columnName": "namespace",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "resource",
-            "columnName": "resource",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "account",
-            "columnName": "account",
-            "affinity": "TEXT",
-            "notNull": true
+            "fieldPath": "metaAccountId",
+            "columnName": "metaAccountId",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "payload",
@@ -3358,16 +3346,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "generationAsOf",
-            "columnName": "generationAsOf",
+            "fieldPath": "key",
+            "columnName": "key",
             "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "generationBlock",
-            "columnName": "generationBlock",
-            "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -3376,8 +3358,30 @@
             "key"
           ]
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_response_cache_metaAccountId",
+            "unique": false,
+            "columnNames": [
+              "metaAccountId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_response_cache_metaAccountId` ON `${TABLE_NAME}` (`metaAccountId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaAccountId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "analytics_pending_events",
@@ -3427,7 +3431,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9819d86b37930a04c2b04b14ce4f8db0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '45c89a4dd059ecbcdc53727e87ffc914')"
     ]
   }
 }

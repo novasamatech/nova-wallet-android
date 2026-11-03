@@ -309,8 +309,9 @@ class BittensorDashboardDetailsSourceTest {
         `when`(chain.id).thenReturn("chain")
         `when`(chain.assets).thenReturn(listOf(asset))
         `when`(asset.staking).thenReturn(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT))
+        `when`(account.id).thenReturn(1L)
         `when`(account.accountIdIn(chain)).thenReturn(coldKey)
-        `when`(positions.observePortfolio("chain", coldKey)).thenReturn(portfolioState)
+        `when`(positions.observePortfolio("chain", coldKey, metaAccountId = 1L)).thenReturn(portfolioState)
         `when`(validators.yields(BittensorNetuid.Root)).thenReturn(mapOf(hotkey to BigDecimal.TEN))
         `when`(recommendations.maximumYields()).thenReturn(mapOf(subnet to BigDecimal.ONE))
     }

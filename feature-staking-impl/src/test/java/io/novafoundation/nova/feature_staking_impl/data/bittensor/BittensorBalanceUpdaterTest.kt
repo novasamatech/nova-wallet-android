@@ -209,7 +209,7 @@ class BittensorBalanceUpdaterTest {
         `when`(otherAccount.accountIdIn(chain)).thenReturn(otherColdKey)
         val partial = holdings.copy(subnetPrices = emptyMap())
         val states = listOf(BittensorPortfolioState(partial, BittensorDataStatus.Fresh))
-        `when`(positions.observePortfolio(chain.id, otherColdKey)).thenReturn(states.asFlow())
+        `when`(positions.observePortfolio(chain.id, otherColdKey, metaAccountId = 8L)).thenReturn(states.asFlow())
 
         updater.listenForUpdates(subscription, otherAccount).collect {}
 
@@ -248,7 +248,7 @@ class BittensorBalanceUpdaterTest {
     fun `upstream cancellation propagates without persisting a balance`() = runBlocking<Unit> {
         prepare(emptyList())
         val cancelled = flow<BittensorPortfolioState> { throw CancellationException("cancelled") }
-        `when`(positions.observePortfolio(chain.id, coldKey)).thenReturn(cancelled)
+        `when`(positions.observePortfolio(chain.id, coldKey, metaAccountId = 7L)).thenReturn(cancelled)
 
         val failure = runCatching { updater.listenForUpdates(subscription, account).collect {} }.exceptionOrNull()
 
@@ -272,6 +272,6 @@ class BittensorBalanceUpdaterTest {
         `when`(chainAsset.id).thenReturn(0)
         `when`(account.id).thenReturn(7L)
         `when`(account.accountIdIn(chain)).thenReturn(coldKey)
-        `when`(positions.observePortfolio(chain.id, coldKey)).thenReturn(states.asFlow())
+        `when`(positions.observePortfolio(chain.id, coldKey, metaAccountId = 7L)).thenReturn(states.asFlow())
     }
 }

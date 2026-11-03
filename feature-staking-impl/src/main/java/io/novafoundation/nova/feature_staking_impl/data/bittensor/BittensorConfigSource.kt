@@ -7,10 +7,17 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -22,27 +29,47 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 data class BittensorConfig(val commission: BittensorSubnetCommission, val subnetLogos: Map<BittensorNetuid.Subnet, String>)
 
-fun interface BittensorConfigRepository {
+fun interface BittensorConfigSource {
 
     suspend fun config(): BittensorConfig
 
     suspend fun subnetLogos(): Map<BittensorNetuid.Subnet, String> = config().subnetLogos
 
-    fun cachedSubnetLogos(): Map<BittensorNetuid.Subnet, String> = emptyMap()
+    fun currentSubnetLogos(): Map<BittensorNetuid.Subnet, String> = emptyMap()
 
     fun observeSubnetLogos(): Flow<Map<BittensorNetuid.Subnet, String>> =
-        flowOf { subnetLogos() }.onStart { emit(cachedSubnetLogos()) }
+        flowOf { subnetLogos() }.onStart { emit(currentSubnetLogos()) }
 }
 
-class RemoteBittensorConfigRepository(
+class RemoteBittensorConfigSource(
     private val api: BittensorConfigApi,
     private val configUrl: String,
-    private val logger: Logger
-) : BittensorConfigRepository {
+    private val logger: Logger,
+    scope: CoroutineScope,
+    foregroundRefreshes: Flow<Unit>
+) : BittensorConfigSource {
 
     private val cachedConfig = MutableStateFlow<BittensorConfig?>(null)
 
     private val mutex = Mutex()
+
+    private val logos = channelFlow {
+        launch {
+            merge(flowOf(Unit), foregroundRefreshes).collectLatest {
+                while (cachedConfig.value == null) {
+                    try {
+                        config()
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Exception) {
+                        // config() reports the error; stay subscribed and retry at a bounded rate.
+                        delay(LOGO_RETRY_INTERVAL_MILLIS)
+                    }
+                }
+            }
+        }
+        cachedConfig.map { it?.subnetLogos.orEmpty() }.distinctUntilChanged().collect { send(it) }
+    }.shareIn(scope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 0), replay = 1)
 
     override suspend fun config(): BittensorConfig {
         try {
@@ -61,12 +88,9 @@ class RemoteBittensorConfigRepository(
         }
     }
 
-    override fun cachedSubnetLogos(): Map<BittensorNetuid.Subnet, String> = cachedConfig.value?.subnetLogos.orEmpty()
+    override fun currentSubnetLogos(): Map<BittensorNetuid.Subnet, String> = cachedConfig.value?.subnetLogos.orEmpty()
 
-    override fun observeSubnetLogos(): Flow<Map<BittensorNetuid.Subnet, String>> = channelFlow {
-        launch { subnetLogos() }
-        cachedConfig.map { it?.subnetLogos.orEmpty() }.distinctUntilChanged().collect { send(it) }
-    }
+    override fun observeSubnetLogos(): Flow<Map<BittensorNetuid.Subnet, String>> = logos
 
     override suspend fun subnetLogos(): Map<BittensorNetuid.Subnet, String> {
         return try {
@@ -81,6 +105,8 @@ class RemoteBittensorConfigRepository(
 }
 
 private const val CONFIG_TIMEOUT_MILLIS = 30_000L
+
+private const val LOGO_RETRY_INTERVAL_MILLIS = 30_000L
 
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())
 

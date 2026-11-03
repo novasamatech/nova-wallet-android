@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootYields
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -36,7 +36,7 @@ class BittensorValidatorPreset(
 class BittensorPresetValidatorInteractor @Inject constructor(
     private val repository: BittensorSubnetValidatorRepository,
     private val yields: BittensorAlphaYieldRepository,
-    private val backend: BittensorValidatorBackend,
+    private val validatorSource: BittensorValidatorSource,
     private val chains: ChainRegistry,
     private val portfolioRepository: BittensorPortfolioRepository,
     private val logger: Logger
@@ -106,7 +106,7 @@ class BittensorPresetValidatorInteractor @Inject constructor(
 
     private suspend fun optionalYields(chain: Chain, netuid: BittensorNetuid): Map<AccountIdKey, BigDecimal> = try {
         when (netuid) {
-            BittensorNetuid.Root -> mapBittensorRootYields(chain, backend.rootValidators())
+            BittensorNetuid.Root -> mapBittensorRootYields(chain, validatorSource.rootValidators())
             is BittensorNetuid.Subnet -> yields.alphaYields(chain, netuid)
         }
     } catch (cancelled: CancellationException) {
