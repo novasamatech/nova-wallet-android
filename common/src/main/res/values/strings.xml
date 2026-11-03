@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
-    <string name="bittensor_result_price_moved">Order cancelled · price moved beyond your limit</string>
-    <string name="bittensor_result_price_moved_format">Order cancelled · price moved &gt; %1$s</string>
-    <string name="bittensor_result_fee_charged">Only the network fee was charged.</string>
     <string name="bittensor_result_nothing_spent">Nothing was spent.</string>
 
     <string name="bittensor_result_paid_by">Paid by: %1$s</string>
 
     <string name="bittensor_result_unconfirmed_title">Outcome not confirmed</string>
     <string name="bittensor_result_unconfirmed_description">The transaction may have been submitted. Its outcome and any charges are not confirmed. Check your activity before starting another operation.</string>
+    <string name="bittensor_result_price_moved">The order was not executed because the price moved beyond your slippage tolerance.</string>
+    <string name="bittensor_result_price_moved_format">The order was not executed: the price moved beyond your slippage tolerance (%1$s). You can change slippage using the settings icon on the %2$s amount entry screen and try again.</string>
+    <string name="bittensor_result_fee_charged">A network fee may have been charged.</string>
     <string name="bittensor_result_not_submitted">The transaction was not submitted. No funds were spent on this attempt. Return to review before trying again.</string>
     <string name="bittensor_result_dispatched_failure">The transaction was included in a block but execution failed. A network fee may have been charged. Return to review before trying again.</string>
     <string name="bittensor_result_transaction_hash">Transaction hash: %1$s</string>

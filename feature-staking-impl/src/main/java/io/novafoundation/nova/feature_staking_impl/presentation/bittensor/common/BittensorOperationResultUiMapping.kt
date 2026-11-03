@@ -59,7 +59,7 @@ fun BittensorOperationResult.Failure.mapResult(
     return BittensorStakeResultUi.Failure(
         title = resources.getString(R.string.common_failed),
         description = resources.getString(
-            if (stage == BittensorFailureStage.NOT_SUBMITTED) R.string.bittensor_result_nothing_spent else R.string.bittensor_result_fee_charged
+            if (stage == BittensorFailureStage.NOT_SUBMITTED) R.string.bittensor_result_not_submitted else R.string.bittensor_result_fee_charged
         ),
         error = failureReason(resources, slippage),
         canRetry = isRetryable
@@ -71,7 +71,7 @@ private fun BittensorOperationResult.Failure.failureReason(resources: ResourceMa
     return when (dispatch.module.name to dispatch.error.name) {
         "Swap" to "PriceLimitExceeded", "SubtensorModule" to "SlippageTooHigh" -> {
             if (slippage != null) {
-                resources.getString(R.string.bittensor_result_price_moved_format, slippage)
+                resources.getString(R.string.bittensor_result_price_moved_format, slippage, resources.getString(R.string.bittensor_earn_title))
             } else {
                 resources.getString(R.string.bittensor_result_price_moved)
             }

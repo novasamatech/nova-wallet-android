@@ -792,7 +792,11 @@ class BittensorExitReviewViewModel(
                         execution.value = ExitExecution.Idle
                         return
                     }
-                    val model = result.mapResult(resources, resultNavigation.landingActions(draft.quote.fullExit), slippage)
+                    val model = result.mapResult(
+                        resources,
+                        resultNavigation.landingActions(draft.quote.fullExit),
+                        slippage = slippage.takeUnless { isRoot }
+                    )
                     execution.value = when (model) {
                         is BittensorStakeResultUi.Failure -> ExitExecution.Failure(
                             model.copy(fee = result.formatMevFailureFee(draft.fee, draft.position.chain, tokenFormatter))
