@@ -35,7 +35,6 @@ class BittensorOperationResultUiMappingTest {
         `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Unable to complete operation")
         `when`(resources.getString(R.string.bittensor_result_fee_charged)).thenReturn("A network fee may have been charged.")
         `when`(resources.getString(R.string.bittensor_result_price_moved)).thenReturn("The price moved beyond your slippage tolerance.")
-        `when`(resources.getString(R.string.bittensor_earn_title)).thenReturn("Earn with Bittensor")
         `when`(resources.getString(R.string.bittensor_result_unconfirmed_title)).thenReturn("Unconfirmed")
         `when`(resources.getString(R.string.bittensor_result_unconfirmed_description)).thenReturn("Outcome and charges unknown")
     }
@@ -254,8 +253,8 @@ class BittensorOperationResultUiMappingTest {
     }
 
     private fun stubSlippageReason(slippage: String): String {
-        val reason = "Order not executed beyond $slippage. Change slippage in the Earn with Bittensor amount settings and try again."
-        `when`(resources.getString(R.string.bittensor_result_price_moved_format, slippage, "Earn with Bittensor")).thenReturn(reason)
+        val reason = "Order not executed beyond $slippage. Change slippage using the settings icon on the amount entry screen and try again."
+        `when`(resources.getString(R.string.bittensor_result_price_moved_format, slippage)).thenReturn(reason)
         return reason
     }
 
