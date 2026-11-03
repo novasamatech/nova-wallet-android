@@ -2447,4 +2447,20 @@
     <string name="deep_linking_staking_asset_not_found">このStakingリンクのアセットが見つかりませんでした。</string>
     <string name="deep_linking_staking_not_supported">このアセットではStakingはサポートされていません。</string>
     <string name="staking_new_feature">新着</string>
+    <string name="bittensor_mev_description">パブリックメンプール内で注文を暗号化したままにして、フロントランニングの防止に役立てます。</string>
+    <string name="bittensor_mev_fee_may_be_charged">ネットワーク手数料が請求された可能性があります。</string>
+    <string name="bittensor_mev_not_executed">注文は実行されませんでした</string>
+    <string name="bittensor_mev_nothing_spent">何も使用されませんでした。</string>
+    <string name="bittensor_mev_title">MEV保護</string>
+    <string name="bittensor_mev_unavailable">この注文ではMEV保護を利用できません。</string>
+    <string name="bittensor_mev_unchanged">注文は実行されませんでした。Stakeは変更されていません。もう一度お試しください。</string>
+    <string name="bittensor_result_fee_charged">ネットワーク手数料が請求された可能性があります。</string>
+    <string name="bittensor_result_nothing_spent">何も使用されませんでした。</string>
+    <string name="bittensor_result_price_moved">スリッページ許容範囲を超えて価格が変動したため、注文は実行されませんでした。</string>
+    <string name="bittensor_result_price_moved_format">スリッページ許容範囲（%1$s）を超えて価格が変動したため、注文は実行されませんでした。%2$sの数量入力画面にある設定アイコンからスリッページを変更して、もう一度お試しください。</string>
+    <string name="swap_get_token_alternatives_format">%1$sまたは%2$s</string>
+    <string name="swap_get_token_dapp_browser_description">ブラウザで開きます</string>
+    <string name="swap_get_token_dapp_description">%s · ブラウザで開きます</string>
+    <string name="swap_get_token_dapp_title">%sで交換</string>
+    <string name="swap_get_token_third_party">サードパーティ</string>
 </resources>
