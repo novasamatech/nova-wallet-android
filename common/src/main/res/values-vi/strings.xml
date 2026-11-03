@@ -2463,4 +2463,5 @@
     <string name="swap_get_token_dapp_description">%s · mở trong trình duyệt</string>
     <string name="swap_get_token_dapp_title">Đổi token trên %s</string>
     <string name="swap_get_token_third_party">BÊN THỨ BA</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Lệnh không được thực hiện: giá đã biến động vượt quá mức trượt giá cho phép của bạn (%1$s). Bạn có thể thay đổi mức trượt giá bằng biểu tượng cài đặt trên màn hình nhập số tiền rồi thử lại.</string>
 </resources>

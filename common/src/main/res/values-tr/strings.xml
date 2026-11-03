@@ -2477,4 +2477,5 @@
     <string name="swap_get_token_dapp_description">%s · tarayıcıda açılır</string>
     <string name="swap_get_token_dapp_title">%s üzerinde takas yap</string>
     <string name="swap_get_token_third_party">ÜÇÜNCÜ TARAF</string>
+    <string name="bittensor_result_price_moved_with_tolerance">İşlem gerçekleştirilemedi: fiyat, kayma toleransınızın (%1$s) ötesinde değişti. Tutar giriş ekranındaki ayarlar simgesini kullanarak kayma toleransını değiştirebilir ve tekrar deneyebilirsiniz.</string>
 </resources>

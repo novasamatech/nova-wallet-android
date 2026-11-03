@@ -2477,4 +2477,5 @@
     <string name="swap_get_token_dapp_description">%s · abre no navegador</string>
     <string name="swap_get_token_dapp_title">Trocar em %s</string>
     <string name="swap_get_token_third_party">TERCEIROS</string>
+    <string name="bittensor_result_price_moved_with_tolerance">A ordem não foi executada: o preço variou além da sua tolerância de slippage (%1$s). Você pode alterar o slippage usando o ícone de configurações na tela de inserção do valor e tentar novamente.</string>
 </resources>

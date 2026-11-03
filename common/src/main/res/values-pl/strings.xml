@@ -2505,4 +2505,5 @@
     <string name="swap_get_token_dapp_description">%s · otwiera się w przeglądarce</string>
     <string name="swap_get_token_dapp_title">Wymień na %s</string>
     <string name="swap_get_token_third_party">FIRMA ZEWNĘTRZNA</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Zlecenie nie zostało zrealizowane: cena zmieniła się poza ustawiony przez Ciebie poziom tolerancji poślizgu (%1$s). Możesz zmienić poślizg za pomocą ikony ustawień na ekranie wprowadzania kwoty i spróbować ponownie.</string>
 </resources>

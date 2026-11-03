@@ -2477,4 +2477,5 @@
     <string name="swap_get_token_dapp_description">%s · s’ouvre dans le navigateur</string>
     <string name="swap_get_token_dapp_title">Échanger sur %s</string>
     <string name="swap_get_token_third_party">TIERS</string>
+    <string name="bittensor_result_price_moved_with_tolerance">L’ordre n’a pas été exécuté : le prix a évolué au-delà de votre tolérance de glissement (%1$s). Vous pouvez modifier le glissement à l’aide de l’icône des paramètres sur l’écran de saisie du montant, puis réessayer.</string>
 </resources>

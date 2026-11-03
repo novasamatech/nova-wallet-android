@@ -2505,4 +2505,5 @@
     <string name="swap_get_token_dapp_description">%s · открывается в браузере</string>
     <string name="swap_get_token_dapp_title">Обмен на %s</string>
     <string name="swap_get_token_third_party">СТОРОННИЙ</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Ордер не был исполнен: цена изменилась больше допустимого проскальзывания (%1$s). Вы можете изменить проскальзывание с помощью значка настроек на экране ввода суммы и повторить попытку.</string>
 </resources>
