@@ -104,9 +104,10 @@ class RealGetAssetOptionsMixin(
 
     private fun onAssetOptionSelected(option: GetAssetOption) {
         when (option) {
-            GetAssetOption.RECEIVE -> receiveSelected()
-            GetAssetOption.CROSS_CHAIN -> onCrossChainTransferSelected()
-            GetAssetOption.BUY -> buySelected()
+            GetAssetOption.Receive -> receiveSelected()
+            GetAssetOption.CrossChain -> onCrossChainTransferSelected()
+            GetAssetOption.Buy -> buySelected()
+            is GetAssetOption.DApp -> walletRouter.openDAppBrowser(option.url)
         }
     }
 
