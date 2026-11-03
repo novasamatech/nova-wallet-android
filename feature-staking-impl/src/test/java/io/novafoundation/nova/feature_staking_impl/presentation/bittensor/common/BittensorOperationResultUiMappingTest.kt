@@ -254,7 +254,7 @@ class BittensorOperationResultUiMappingTest {
 
     private fun stubSlippageReason(slippage: String): String {
         val reason = "Order not executed beyond $slippage. Change slippage using the settings icon on the amount entry screen and try again."
-        `when`(resources.getString(R.string.bittensor_result_price_moved_format, slippage)).thenReturn(reason)
+        `when`(resources.getString(R.string.bittensor_result_price_moved_with_tolerance, slippage)).thenReturn(reason)
         return reason
     }
 

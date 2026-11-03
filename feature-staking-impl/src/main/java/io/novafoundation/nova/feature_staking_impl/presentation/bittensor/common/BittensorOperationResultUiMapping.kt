@@ -71,7 +71,7 @@ private fun BittensorOperationResult.Failure.failureReason(resources: ResourceMa
     return when (dispatch.module.name to dispatch.error.name) {
         "Swap" to "PriceLimitExceeded", "SubtensorModule" to "SlippageTooHigh" -> {
             if (slippage != null) {
-                resources.getString(R.string.bittensor_result_price_moved_format, slippage)
+                resources.getString(R.string.bittensor_result_price_moved_with_tolerance, slippage)
             } else {
                 resources.getString(R.string.bittensor_result_price_moved)
             }
