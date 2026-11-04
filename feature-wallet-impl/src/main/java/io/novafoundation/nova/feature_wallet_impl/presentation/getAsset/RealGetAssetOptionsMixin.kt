@@ -22,6 +22,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -68,16 +71,21 @@ class RealGetAssetOptionsMixin(
     showWhenNoOptions: Boolean
 ) : GetAssetOptionsMixin, CoroutineScope by scope {
 
-    private val getAssetOptionsFlow = assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(assetFlow)
-        .shareInBackground()
+    // Keep options tied to the asset that produced them, including after a late asset load or an asset change.
+    private val getAssetPayloadFlow = assetFlow
+        .distinctUntilChanged()
+        .flatMapLatest { asset ->
+            assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(flowOf(asset)).map { options ->
+                asset?.let { GetAssetBottomSheet.Payload(it, options) }
+            }
+        }
 
     override val getAssetOptionsButtonState = combine(
-        assetFlow.filterNotNull(),
-        getAssetOptionsFlow,
+        getAssetPayloadFlow,
         additionalButtonFilter
-    ) { assetIn, getAssetInOptions, shouldShownButton ->
-        if (shouldShowGetAssetButton(shouldShownButton, getAssetInOptions, showWhenNoOptions)) {
-            val symbol = assetIn.symbol
+    ) { payload, shouldShownButton ->
+        if (payload != null && shouldShowGetAssetButton(shouldShownButton, payload.availableOptions, showWhenNoOptions)) {
+            val symbol = payload.chainAsset.symbol
             DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_get_token_format, symbol))
         } else {
             DescriptiveButtonState.Gone
@@ -90,29 +98,22 @@ class RealGetAssetOptionsMixin(
     override val observeGetAssetAction = actionAwaitableFactory.create<GetAssetBottomSheet.Payload, GetAssetOption>()
 
     override fun openAssetOptions() = launchUnit {
-        val assetIn = assetFlow.first() ?: return@launchUnit
-        val availableOptions = getAssetOptionsFlow.first()
-
-        val payload = GetAssetBottomSheet.Payload(
-            chainAsset = assetIn,
-            availableOptions = availableOptions
-        )
-
+        // Read fresh options rather than the button's replay from before the asset became available.
+        val payload = getAssetPayloadFlow.filterNotNull().first()
         val selectedOption = observeGetAssetAction.awaitAction(payload)
-        onAssetOptionSelected(selectedOption)
+        onAssetOptionSelected(selectedOption, payload.chainAsset)
     }
 
-    private fun onAssetOptionSelected(option: GetAssetOption) {
+    private fun onAssetOptionSelected(option: GetAssetOption, chainAsset: Chain.Asset) {
         when (option) {
-            GetAssetOption.Receive -> receiveSelected()
-            GetAssetOption.CrossChain -> onCrossChainTransferSelected()
-            GetAssetOption.Buy -> buySelected()
+            GetAssetOption.Receive -> receiveSelected(chainAsset)
+            GetAssetOption.CrossChain -> onCrossChainTransferSelected(chainAsset)
+            GetAssetOption.Buy -> buySelected(chainAsset)
             is GetAssetOption.DApp -> walletRouter.openDAppBrowser(option.url)
         }
     }
 
-    private fun onCrossChainTransferSelected() = launch {
-        val chainAssetIn = assetFlow.first() ?: return@launch
+    private fun onCrossChainTransferSelected(chainAssetIn: Chain.Asset) = launch {
         val assetInChain = chainRegistry.getChain(chainAssetIn.chainId)
 
         val currentAddress = selectedAccountUseCase.getSelectedMetaAccount().addressIn(assetInChain)
@@ -120,13 +121,11 @@ class RealGetAssetOptionsMixin(
         walletRouter.openSendCrossChain(AssetPayload(chainAssetIn.chainId, chainAssetIn.id), currentAddress)
     }
 
-    private fun buySelected() = launch {
-        val chainAssetIn = assetFlow.first() ?: return@launch
+    private fun buySelected(chainAssetIn: Chain.Asset) {
         walletRouter.openBuyToken(chainAssetIn.chainId, chainAssetIn.id)
     }
 
-    private fun receiveSelected() = launch {
-        val chainAssetIn = assetFlow.first() ?: return@launch
+    private fun receiveSelected(chainAssetIn: Chain.Asset) {
         walletRouter.openReceive(AssetPayload(chainAssetIn.chainId, chainAssetIn.id))
     }
 }

@@ -4,7 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.coerceToUnit
-import io.novafoundation.nova.common.utils.combineToPair
+import io.novafoundation.nova.common.utils.combineToTriple
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -47,6 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -56,8 +57,8 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
-private const val INCOMING_DIRECTIONS = "RealCrossChainTransfersUseCase.INCOMING_DIRECTIONS"
 private const val CONFIGURATION_CACHE = "RealCrossChainTransfersUseCase.CONFIGURATION"
+private const val INCOMING_CONFIGURATION_CACHE = "RealCrossChainTransfersUseCase.INCOMING_CONFIGURATION"
 
 internal class RealCrossChainTransfersUseCase(
     private val crossChainTransfersRepository: CrossChainTransfersRepository,
@@ -77,23 +78,24 @@ internal class RealCrossChainTransfersUseCase(
 
     override fun incomingCrossChainDirections(destination: Flow<Chain.Asset?>): Flow<List<IncomingDirection>> {
         return withFlowScope { scope ->
-            computationalCache.useSharedFlow(INCOMING_DIRECTIONS, scope) {
-                scope.launch { crossChainTransfersRepository.syncConfiguration() }
+            // Only configuration is shared: directions depend on this collector's destination and wallet.
+            val selectedMetaAccountIdFlow = accountRepository.selectedMetaAccountFlow().map { it.id }.distinctUntilChanged()
+            combineToTriple(
+                destination,
+                incomingConfigurationFlow(scope),
+                selectedMetaAccountIdFlow
+            ).flatMapLatest { (destinationAsset, crossChainConfig, selectedMetaAccountId) ->
+                if (destinationAsset == null) return@flatMapLatest flowOf(emptyList())
 
-                combineToPair(destination, cachedConfigurationFlow(scope)).flatMapLatest { (destinationAsset, crossChainConfig) ->
-                    if (destinationAsset == null) return@flatMapLatest flowOf(emptyList())
+                val availableDirections = crossChainConfig.availableInDestinations(destinationAsset)
 
-                    val selectedMetaAccountId = accountRepository.getSelectedMetaAccount().id
-                    val availableDirections = crossChainConfig.availableInDestinations(destinationAsset)
+                val chains = chainRegistry.chainsById()
+                val availableDirectionChainAssets = chains.assets(availableDirections)
 
-                    val chains = chainRegistry.chainsById()
-                    val availableDirectionChainAssets = chains.assets(availableDirections)
-
-                    walletRepository.assetsFlow(selectedMetaAccountId, availableDirectionChainAssets).map { balances ->
-                        balances
-                            .filter { it.transferable.isPositive }
-                            .map { IncomingDirection(it, chains.getValue(it.token.configuration.chainId)) }
-                    }
+                walletRepository.assetsFlow(selectedMetaAccountId, availableDirectionChainAssets).map { balances ->
+                    balances
+                        .filter { it.transferable.isPositive }
+                        .map { IncomingDirection(it, chains.getValue(it.token.configuration.chainId)) }
                 }
             }
         }.catch { emit(emptyList()) }
@@ -229,6 +231,13 @@ internal class RealCrossChainTransfersUseCase(
             originAsset = sendingAsset,
             destinationChain = parachainInfoRepository.getXcmChain(destinationChain),
         )!!
+    }
+
+    private fun incomingConfigurationFlow(scope: CoroutineScope): Flow<CrossChainTransfersConfiguration> {
+        return computationalCache.useSharedFlow(INCOMING_CONFIGURATION_CACHE, scope) {
+            launch { crossChainTransfersRepository.syncConfiguration() }
+            cachedConfigurationFlow(this)
+        }
     }
 
     private fun cachedConfigurationFlow(cachingScope: CoroutineScope?): Flow<CrossChainTransfersConfiguration> {

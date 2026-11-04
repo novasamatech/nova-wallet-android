@@ -18,6 +18,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -67,7 +68,9 @@ class GetAssetDAppNavigationTest {
         )
         val assetFlow = flowOf(asset)
         val optionsUseCase = Mockito.mock(AssetGetOptionsUseCase::class.java)
-        Mockito.`when`(optionsUseCase.observeAssetGetOptionsForSelectedAccount(assetFlow)).thenReturn(flowOf(options))
+        Mockito.`when`(
+            optionsUseCase.observeAssetGetOptionsForSelectedAccount(Mockito.any<Flow<Chain.Asset?>>() ?: assetFlow)
+        ).thenReturn(flowOf(options))
 
         val openedUrl = CompletableDeferred<String>()
         val router = Mockito.mock(WalletRouter::class.java)
