@@ -23,7 +23,7 @@ The explicitly approved root-claim exception is a process-local, 15-minute dupli
 
 ## Loading presentation
 
-Keep loading, missing data, and failed reads distinct in Bittensor presentation. Preserve loading states through formatting and use existing Android loading components while requests are pending; an em dash is a settled unavailable value, not a loading placeholder. Reset account-dependent loading on wallet changes. Hide optional values when the corresponding iOS presentation hides them, rather than displaying placeholder rows. Keep retries and unrelated field loading independent.
+Keep loading, missing data, and failed reads distinct in Bittensor presentation. Preserve loading states through formatting and use existing Android loading components while requests are pending; an em dash is a settled unavailable value, not a loading placeholder. Reset account-dependent loading on wallet changes. Hide optional values when the corresponding iOS presentation hides them, rather than displaying placeholder rows. Keep retries and unrelated field loading independent. For cached catalogue/dashboard values, follow iOS cached-first delivery without additional Saved data labels or refresh banners. All subnet icons use the same observable Bittensor config cache. Load logos independently of catalogue/position data and update open screens when they arrive; never rely solely on a catalogue row's optional logo URL. Logo requests must not delay cached content or change transaction terms.
 
 ## Validator selection
 
@@ -65,7 +65,7 @@ Root and subnet position screens share the primary gradient background and trans
 
 Keep a root position visible when it has redeemable rewards even if its stake is zero. Dashboard classification and portfolio empty states must preserve access to those rewards. An Active badge describes on-chain registration, not a positive stake amount.
 
-Subnet buy/sell execution uses the same swap-style screen for progress, success, and failure; do not open the root-staking result sheet for subnet failures. Keep operation details visible on failure. Try again returns to review rather than silently resubmitting, and unknown transaction outcomes must not offer retry.
+Subnet buy/sell execution uses the same swap-style screen for progress, success, and failure; do not open the root-staking result sheet for subnet failures. Keep operation details visible on failure. Map recognized dispatch failures to localized reasons in a left-aligned error block; do not append transaction hashes to status/error text. Slippage-error guidance refers to the amount entry screen, without interpolating a screen title. Keep hashes in transaction tracking data. Try again returns to review rather than silently resubmitting, and unknown transaction outcomes must not offer retry.
 
 Keep root staking and subnet trading as separate flows. Root positions use Add stake and Unstake. Subnet positions have their own position-details screen with Buy more and Sell actions; do not route an existing subnet position to the discovery screen or label its trading flow as root staking. Use the corresponding Figma amount, confirmation, waiting, and result frames.
 

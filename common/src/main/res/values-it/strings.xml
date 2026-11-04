@@ -2461,4 +2461,21 @@
     <string name="deep_linking_staking_asset_not_found">L\'asset in questo link di staking non è stato trovato.</string>
     <string name="deep_linking_staking_not_supported">Lo staking non è supportato per questo asset.</string>
     <string name="staking_new_feature">NUOVO</string>
+    <string name="bittensor_mev_description">Mantiene il tuo ordine crittografato nel mempool pubblico per contribuire a prevenire il front-running.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Potrebbe essere stata applicata una commissione di rete.</string>
+    <string name="bittensor_mev_not_executed">Ordine non eseguito</string>
+    <string name="bittensor_mev_nothing_spent">Non è stato speso nulla.</string>
+    <string name="bittensor_mev_title">Protezione MEV</string>
+    <string name="bittensor_mev_unavailable">La protezione MEV non è disponibile per questo ordine.</string>
+    <string name="bittensor_mev_unchanged">Il tuo ordine non è stato eseguito. Il tuo stake non è cambiato; riprova.</string>
+    <string name="bittensor_result_fee_charged">Potrebbe essere stata applicata una commissione di rete.</string>
+    <string name="bittensor_result_nothing_spent">Non è stato speso nulla.</string>
+    <string name="bittensor_result_price_moved">L\'ordine non è stato eseguito perché il prezzo si è spostato oltre la tua tolleranza allo slippage.</string>
+    <string name="bittensor_result_price_moved_format">L\'ordine non è stato eseguito: il prezzo si è spostato oltre la tua tolleranza allo slippage (%1$s). Puoi modificare lo slippage utilizzando l\'icona delle impostazioni nella schermata di inserimento dell\'importo di %2$s e riprovare.</string>
+    <string name="swap_get_token_alternatives_format">%1$s o %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Si apre nel browser</string>
+    <string name="swap_get_token_dapp_description">%s · si apre nel browser</string>
+    <string name="swap_get_token_dapp_title">Scambia su %s</string>
+    <string name="swap_get_token_third_party">DI TERZE PARTI</string>
+    <string name="bittensor_result_price_moved_with_tolerance">L’ordine non è stato eseguito: il prezzo si è spostato oltre la tua tolleranza allo slippage (%1$s). Puoi modificare lo slippage usando l’icona delle impostazioni nella schermata di inserimento dell’importo e riprovare.</string>
 </resources>

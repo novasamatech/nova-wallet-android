@@ -25,6 +25,7 @@ class ExtrinsicBuilderFactory(
 
     class Options(
         val batchMode: BatchMode,
+        val mortality: Mortality? = null,
     )
 
     suspend fun create(
@@ -40,7 +41,7 @@ class ExtrinsicBuilderFactory(
     ): Sequence<ExtrinsicBuilder> {
         val runtime = chainRegistry.getRuntime(chain.id)
 
-        val mortality = mortalityConstructor.constructMortality(chain.id)
+        val mortality = options.mortality ?: mortalityConstructor.constructMortality(chain.id)
         val metadataProof = metadataShortenerService.generateMetadataProof(chain.id)
 
         return generateSequence {

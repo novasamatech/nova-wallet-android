@@ -25,8 +25,5 @@ fun ViewBittensorSubnetExecutionBinding.showUnconfirmed(state: BittensorStakeRes
     stepContainer.background = context.getBlockDrawable()
     operationIcon.setImageResource(R.drawable.ic_time_24)
     operationLabel.setTextColorRes(R.color.text_secondary)
-    operationLabel.text = listOfNotNull(
-        state.description,
-        state.transactionHash?.let { context.getString(R.string.bittensor_result_transaction_hash, it) }
-    ).joinToString("\n\n")
+    operationLabel.text = state.description
 }

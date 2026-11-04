@@ -9,6 +9,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
@@ -34,7 +36,7 @@ class BittensorPortfolioHistoryRefreshTest {
 
     private val updates = BittensorPositionUpdates()
 
-    private val interactor = BittensorPortfolioChartInteractor(repository, calculator, accounts, chains, updates)
+    private val interactor = BittensorPortfolioChartInteractor(repository, calculator, accounts, chains)
 
     private val chain = mock(Chain::class.java)
 
@@ -51,14 +53,15 @@ class BittensorPortfolioHistoryRefreshTest {
     private val history = BittensorPortfolioHistory(historyAccount, null)
 
     private suspend fun prepare() {
+        `when`(repository.observe(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
+            .thenReturn(flowOf(history))
         `when`(chains.getChain("chain")).thenReturn(chain)
         `when`(accounts.getMetaAccount(1L)).thenReturn(account)
         `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
-        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: "")).thenReturn(history)
     }
 
     @Test
-    fun `initial load periodic refresh and own confirmed operation reload history`() = runTest {
+    fun `repository cache stream owns refresh timing rather than interactor polling`() = runTest {
         prepare()
         var loads = 0
         val job = launch { interactor.observeHistory(request).collect { loads++ } }
@@ -69,15 +72,15 @@ class BittensorPortfolioHistoryRefreshTest {
         assertEquals(1, loads)
         updates.confirmed(1L, "chain", null)
         runCurrent()
-        assertEquals(2, loads)
+        assertEquals(1, loads)
         advanceTimeBy(1)
         runCurrent()
-        assertEquals(3, loads)
+        assertEquals(1, loads)
         job.cancelAndJoin()
         updates.confirmed(1L, "chain", null)
         advanceTimeBy(300_000)
         runCurrent()
-        assertEquals(3, loads)
+        assertEquals(1, loads)
     }
 
     @Test
@@ -96,8 +99,8 @@ class BittensorPortfolioHistoryRefreshTest {
     @Test
     fun `cancelling history observation is not converted to an empty success`() = runTest {
         prepare()
-        `when`(repository.load(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
-            .thenThrow(CancellationException("Switched wallet"))
+        `when`(repository.observe(org.mockito.ArgumentMatchers.eq(request) ?: request, anyString() ?: ""))
+            .thenReturn(flow { throw CancellationException("Switched wallet") })
         var emitted = false
         val job = launch { interactor.observeHistory(request).collect { emitted = true } }
         runCurrent()

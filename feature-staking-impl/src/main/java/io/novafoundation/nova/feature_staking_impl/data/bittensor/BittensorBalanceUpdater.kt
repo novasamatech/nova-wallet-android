@@ -44,7 +44,7 @@ class BittensorBalanceUpdater(
         if (chain.id != ChainGeneses.BITTENSOR) return emptyFlow()
         val coldKey = scopeValue.accountIdIn(chain) ?: return emptyFlow()
 
-        return positionRepository.observePortfolio(chain.id, coldKey)
+        return positionRepository.observePortfolio(chain.id, coldKey, scopeValue.id)
             .mapNotNull { state ->
                 state.positions?.valuation.takeIf { state.status is BittensorDataStatus.Fresh }
             }

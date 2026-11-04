@@ -2447,4 +2447,21 @@
     <string name="deep_linking_staking_asset_not_found">이 Staking 링크의 자산을 찾을 수 없습니다.</string>
     <string name="deep_linking_staking_not_supported">이 자산은 Staking을 지원하지 않습니다.</string>
     <string name="staking_new_feature">NEW</string>
+    <string name="bittensor_mev_description">공개 멤풀에서 주문을 암호화하여 선행 거래를 방지하는 데 도움이 됩니다.</string>
+    <string name="bittensor_mev_fee_may_be_charged">네트워크 수수료가 부과되었을 수 있습니다.</string>
+    <string name="bittensor_mev_not_executed">주문이 실행되지 않음</string>
+    <string name="bittensor_mev_nothing_spent">사용된 금액이 없습니다.</string>
+    <string name="bittensor_mev_title">MEV 보호</string>
+    <string name="bittensor_mev_unavailable">이 주문에는 MEV 보호를 사용할 수 없습니다.</string>
+    <string name="bittensor_mev_unchanged">주문이 실행되지 않았습니다. Stake는 변경되지 않았으니 다시 시도해 주세요.</string>
+    <string name="bittensor_result_fee_charged">네트워크 수수료가 부과되었을 수 있습니다.</string>
+    <string name="bittensor_result_nothing_spent">사용된 금액이 없습니다.</string>
+    <string name="bittensor_result_price_moved">가격이 허용된 슬리피지 범위를 벗어나 주문이 실행되지 않았습니다.</string>
+    <string name="bittensor_result_price_moved_format">가격이 허용된 슬리피지 범위(%1$s)를 벗어나 주문이 실행되지 않았습니다. %2$s 금액 입력 화면의 설정 아이콘에서 슬리피지를 변경한 후 다시 시도할 수 있습니다.</string>
+    <string name="swap_get_token_alternatives_format">%1$s 또는 %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">브라우저에서 열기</string>
+    <string name="swap_get_token_dapp_description">%s · 브라우저에서 열기</string>
+    <string name="swap_get_token_dapp_title">%s에서 교환</string>
+    <string name="swap_get_token_third_party">제3자</string>
+    <string name="bittensor_result_price_moved_with_tolerance">주문이 실행되지 않았습니다. 가격이 슬리피지 허용 범위(%1$s)를 초과하여 변동했습니다. 금액 입력 화면의 설정 아이콘을 사용하여 슬리피지를 변경한 후 다시 시도할 수 있습니다.</string>
 </resources>

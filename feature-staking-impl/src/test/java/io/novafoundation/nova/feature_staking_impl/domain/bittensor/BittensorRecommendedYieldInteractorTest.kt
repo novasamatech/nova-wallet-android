@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -20,7 +20,7 @@ import java.math.BigDecimal
 
 class BittensorRecommendedYieldInteractorTest {
 
-    private val backend = mock(BittensorValidatorBackend::class.java)
+    private val backend = mock(BittensorValidatorSource::class.java)
 
     private val yields = mock(BittensorAlphaYieldRepository::class.java)
 

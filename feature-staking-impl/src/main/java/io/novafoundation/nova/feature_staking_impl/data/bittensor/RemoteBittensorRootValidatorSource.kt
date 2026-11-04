@@ -11,13 +11,13 @@ import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
 
 class RemoteBittensorRootValidatorSource(
-    private val backend: BittensorValidatorBackend,
+    private val validatorSource: BittensorValidatorSource,
     private val logger: io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 ) : BittensorRootValidatorSource {
 
     override suspend fun validatorDetails(chain: Chain): Map<AccountIdKey, BittensorRootValidatorDetails> {
         return try {
-            val response = backend.rootValidators()
+            val response = validatorSource.rootValidators()
             requireBittensorRootYieldWindows(response)
             mapRootValidatorDetails(chain, response.items.orEmpty())
         } catch (e: CancellationException) {
@@ -31,7 +31,7 @@ class RemoteBittensorRootValidatorSource(
 
     override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal? {
         return try {
-            mapBittensorRootYields(chain, backend.rootValidators())[validator.hotkey]
+            mapBittensorRootYields(chain, validatorSource.rootValidators())[validator.hotkey]
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

@@ -35,7 +35,7 @@ class BittensorValidatorTimeoutTest {
 
     private val urls = InfrastructureUrls { "https://infra.example/".toHttpUrl() }
 
-    private val backend = BittensorValidatorBackend(api, urls)
+    private val backend = BittensorValidatorSource(api, urls)
 
     private val storage = object : StorageDataSource by mock(StorageDataSource::class.java) {
         override suspend fun <R> query(

@@ -382,6 +382,47 @@ class BittensorStakeValidationsTest {
         assertEquals(BigInteger.valueOf(6), rounded.postTradePrice())
     }
 
+    @Test
+    fun `subnet 117 order fits the parent block but a later price jump requires a new review`() = runBlocking {
+        // Runtime simulation at block 9403364 for the order rejected in 9403365-17.
+        val subnet = BittensorNetuid.Subnet(117)
+        val simulation = BittensorSwapSimulation(
+            subnet,
+            BittensorSwapDirection.TAO_TO_ALPHA,
+            BigInteger.valueOf(9_965_070),
+            BigInteger.valueOf(2_969_841_325),
+            BigInteger.valueOf(5_020),
+            BigInteger.ZERO,
+            BigInteger.ZERO,
+            BigInteger.valueOf(1_505_026)
+        )
+        val reviewed = BittensorSubnetBuyQuote(
+            subnet,
+            BigInteger.valueOf(10_000_000),
+            BigInteger.valueOf(29_910),
+            simulation,
+            BigInteger.valueOf(3_372_188),
+            BigDecimal("0.003"),
+            BigInteger.valueOf(3_355_411),
+            15_000L
+        )
+        val value = payload.copy(netuid = subnet, quote = reviewed, latestQuote = reviewed, amount = BigDecimal("0.01"))
+        assertEquals(BigInteger.valueOf(3_355_434), reviewed.postTradePrice())
+        assertNull(system.validate(value).getOrThrow().notValidOrNull())
+
+        val moved = reviewed.copy(
+            spotPrice = BigInteger.valueOf(4_214_418),
+            limitPrice = BigInteger.valueOf(4_235_490),
+            simulation = simulation.copy(amountOut = BigInteger.valueOf(2_364_512_200), alphaSlippage = BigInteger.valueOf(1_197_497))
+        )
+        val validation = BittensorSlippageValidation()
+        val failure = validation.validate(value.copy(latestQuote = moved)).notValidOrNull()
+
+        assertEquals(BittensorStakeValidationFailure.SlippageExceeded(reviewed, moved), failure?.reason)
+        assertEquals(DefaultFailureLevel.WARNING, failure?.level)
+        assertEquals(BigInteger.valueOf(3_372_188), reviewed.limitPrice)
+    }
+
     private suspend fun assertFailure(validation: BittensorStakeValidation, value: BittensorStakeValidationPayload, reason: BittensorStakeValidationFailure) {
         assertEquals(reason, validation.validate(value).notValidOrNull()?.reason)
     }

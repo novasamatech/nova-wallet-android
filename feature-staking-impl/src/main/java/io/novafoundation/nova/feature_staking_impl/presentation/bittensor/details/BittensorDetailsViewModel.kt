@@ -219,7 +219,7 @@ class BittensorDetailsViewModel(
         analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
-        flowOf { bittensorPortfolioInteractor.subnets() }
+        bittensorPortfolioInteractor.observeSubnets()
             .map { subnets -> subnets.associateBy { it.id } }
     }
         .shareInBackground()

@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bindMevProtection
 import android.text.TextUtils
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -17,7 +19,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -53,6 +54,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
 
     override fun initViews() = with(binder) {
         toolbar.setTitle(viewModel.title)
+        mevProtection.background = requireContext().getBlockDrawable()
         retryExecution.setOnClickListener { viewModel.failureActionClicked() }
         execution.toolbar.setHomeButtonListener { viewModel.back() }
         toolbar.setHomeButtonListener { viewModel.back() }
@@ -100,12 +102,6 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             width = 18.dp(requireContext())
             height = 18.dp(requireContext())
         }
-        execution.root.setPadding(
-            0,
-            0,
-            0,
-            84.dp(requireContext())
-        )
         execution.validator.setOnClickListener { viewModel.validatorClicked() }
         execution.slippage.showValue(viewModel.slippage)
         slippage.showValue(viewModel.slippage)
@@ -118,6 +114,9 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         observeRetries(viewModel.feeLoaderMixin)
+        combine(viewModel.mevProtection, viewModel.canChangeMevProtection, ::Pair).observe { (state, editable) ->
+            mevProtection.bindMevProtection(state, editable, viewModel::mevProtectionChanged)
+        }
         observeValidations(viewModel)
         viewModel.primaryAmount.observe { it?.let(primaryAmount::setAmount) }
         viewModel.assets.observe {
@@ -193,8 +192,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         }
         viewModel.isExecuting.observe { running ->
             if (running && !viewModel.isRoot) {
-                val remaining = viewModel.remainingExecutionTime()
-                execution.timer.setState(ExecutionTimerView.State.CountdownTimer(remaining))
+                execution.timer.setState(viewModel.executionTimerState())
                 execution.title.setText(R.string.common_do_not_close_app)
                 execution.operationLabel.setText(R.string.bittensor_subnet_execution_operation)
             }
@@ -204,6 +202,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         combine(viewModel.isCompleted, viewModel.executionFailure, ::Pair).observe { (complete, failure) ->
             execution.showFailure(failure)
             retryExecution.isVisible = failure != null
+            updateExecutionBottomPadding()
             retryExecution.setText(if (failure?.canRetry == false) R.string.common_close else R.string.common_try_again)
             // iOS hides Slippage once the sale is done; the tolerance no longer applies.
             execution.slippage.isVisible = !complete
@@ -215,14 +214,22 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             execution.earned.showValue(earned.amount.token, earned.amount.fiat)
             execution.earned.valuePrimary.setTextColorRes(earned.colorRes)
         }
-        viewModel.canFinish.observe { done.isVisible = it && !viewModel.isRoot }
+        viewModel.canFinish.observe {
+            done.isVisible = it && !viewModel.isRoot
+            updateExecutionBottomPadding()
+        }
         viewModel.executionUnconfirmed.observe { state ->
             state?.let {
                 execution.showUnconfirmed(it)
                 retryExecution.isVisible = false
+                updateExecutionBottomPadding()
             }
         }
         bindBittensorStakeResults(viewModel.resultState, viewModel::resultActionClicked)
+    }
+
+    private fun updateExecutionBottomPadding() = with(binder) {
+        execution.root.updatePadding(bottom = if (done.isVisible || retryExecution.isVisible) 84.dp(requireContext()) else 0)
     }
 
     private fun showLegs(legs: List<BittensorExitLegUi>) = with(binder) {

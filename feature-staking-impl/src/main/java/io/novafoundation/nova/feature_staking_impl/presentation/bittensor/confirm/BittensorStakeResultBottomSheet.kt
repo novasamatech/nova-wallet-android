@@ -109,10 +109,7 @@ class BittensorStakeResultBottomSheet(
     private fun showUnconfirmed(state: BittensorStakeResultUi.Unconfirmed) {
         binder.bittensorStakeResultStatusIcon.setImageResource(R.drawable.ic_time_24)
         binder.bittensorStakeResultFailureTitle.text = state.title
-        binder.bittensorStakeResultFailureDescription.text = listOfNotNull(
-            state.description,
-            state.transactionHash?.let { context.getString(R.string.bittensor_result_transaction_hash, it) }
-        ).joinToString("\n\n")
+        binder.bittensorStakeResultFailureDescription.text = state.description
     }
 
     /** One button is the primary one; with two, the first is secondary. */

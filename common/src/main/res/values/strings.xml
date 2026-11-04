@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="bittensor_result_nothing_spent">Nothing was spent.</string>
+
     <string name="bittensor_result_paid_by">Paid by: %1$s</string>
 
     <string name="bittensor_result_unconfirmed_title">Outcome not confirmed</string>
     <string name="bittensor_result_unconfirmed_description">The transaction may have been submitted. Its outcome and any charges are not confirmed. Check your activity before starting another operation.</string>
+    <string name="bittensor_result_price_moved">The order was not executed because the price moved beyond your slippage tolerance.</string>
+    <string name="bittensor_result_price_moved_with_tolerance">The order was not executed: the price moved beyond your slippage tolerance (%1$s). You can change slippage using the settings icon on the amount entry screen and try again.</string>
+    <string name="bittensor_result_fee_charged">A network fee may have been charged.</string>
     <string name="bittensor_result_not_submitted">The transaction was not submitted. No funds were spent on this attempt. Return to review before trying again.</string>
     <string name="bittensor_result_dispatched_failure">The transaction was included in a block but execution failed. A network fee may have been charged. Return to review before trying again.</string>
     <string name="bittensor_result_transaction_hash">Transaction hash: %1$s</string>
@@ -1205,6 +1210,11 @@
     <string name="swap_get_token_cross_chain_description">Transfer %s from another network</string>
     <string name="swap_get_token_receive_description">Receive %s with QR or your address</string>
     <string name="swap_get_token_buy_description">Instantly buy %s with a credit card</string>
+    <string name="swap_get_token_dapp_title">Exchange on %s</string>
+    <string name="swap_get_token_dapp_description">%s · opens in the browser</string>
+    <string name="swap_get_token_dapp_browser_description">Opens in the browser</string>
+    <string name="swap_get_token_alternatives_format">%1$s or %2$s</string>
+    <string name="swap_get_token_third_party">THIRD-PARTY</string>
 
     <string name="common_get_token_format">Get %s</string>
 
@@ -3203,4 +3213,11 @@
     <string name="bittensor_claim_dry_run_cancelled">Signing cancelled. No dry-run request or transaction was sent.</string>
     <string name="debug_disable_node_logs">Disable node logs</string>
     <string name="debug_disable_node_logs_description">Hide socket, state-machine and HTTP logs immediately. Operation logs and exception traces stay enabled.</string>
+    <string name="bittensor_mev_title">MEV protection</string>
+    <string name="bittensor_mev_description">Keeps your order encrypted in the public mempool to help prevent front-running.</string>
+    <string name="bittensor_mev_unavailable">MEV protection is unavailable for this order.</string>
+    <string name="bittensor_mev_not_executed">Order not executed</string>
+    <string name="bittensor_mev_unchanged">Your order wasn\'t executed. Your stake is unchanged, please try again.</string>
+    <string name="bittensor_mev_nothing_spent">Nothing was spent.</string>
+    <string name="bittensor_mev_fee_may_be_charged">A network fee may have been charged.</string>
 </resources>

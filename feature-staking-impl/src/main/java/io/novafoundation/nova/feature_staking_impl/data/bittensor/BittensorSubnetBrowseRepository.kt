@@ -4,64 +4,38 @@ import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
-/**
- * Manual buy catalogue only; held positions must never be filtered through this repository.
- *
- * Feature-scoped so the picker can be reopened offline: a failed or slow read serves the catalogue loaded last, and only
- * without one does the failure reach the screen. The whole read is bounded, since the chain availability read waits
- * for a reconnecting node indefinitely.
- */
+/** Browsing names is independent of node connectivity. Eligibility is checked when selecting and before signing. */
 class BittensorSubnetBrowseRepository(
-    private val catalogueRepository: BittensorSubnetCatalogueRepository,
-    private val subnets: BittensorSubnetRepository,
-    private val availability: BittensorSubnetTradingAvailabilityRepository,
-    private val logger: Logger,
-    private val timeoutMillis: Long = BITTENSOR_REQUEST_TIMEOUT
+    private val catalogueSource: BittensorSubnetCatalogueSource,
+    private val configSource: BittensorConfigSource
 ) {
 
-    @Volatile
-    private var lastLoaded: List<BittensorSubnet>? = null
+    data class Catalogue(val subnets: List<BittensorSubnet>, val stale: Boolean)
 
-    suspend fun subnets(): List<BittensorSubnet> {
-        val loaded = try {
-            withTimeoutOrNull(timeoutMillis) { load() } ?: throw BittensorTimeoutException("Subnet browse catalogue")
-        } catch (e: Exception) {
-            // A child request timing out is a failed read; cancellation of the caller is not.
-            currentCoroutineContext().ensureActive()
-            if (e is CancellationException && e !is TimeoutCancellationException) throw e
-            val cached = lastLoaded ?: throw if (e is TimeoutCancellationException) BittensorTimeoutException("Subnet catalogue", e) else e
-            // Not silent: an online rejection or malformed answer must stay visible in the logs behind the cached list.
-            logger.log("[Bittensor] Subnet browse catalogue read failed; serving the catalogue loaded last")
-            logger.log(e)
-            return cached
-        }
-        lastLoaded = loaded
-        return loaded
+    // Like iOS, logos decorate an already visible list and never delay the catalogue.
+    fun observe(): Flow<Catalogue> = combine(
+        catalogueSource.observeSubnets(),
+        configSource.observeSubnetLogos()
+    ) { snapshot, logos ->
+        val components = snapshot.meta?.components
+        val backendStale = components?.subnetMetadata?.freshness != "FRESH" || components.alphaPrices?.freshness != "FRESH"
+        val subnets = mapCatalogue(snapshot).map { subnet -> subnet.copy(logoUrl = logos[subnet.id]) }
+        Catalogue(subnets, stale = backendStale)
     }
 
-    private suspend fun load(): List<BittensorSubnet> = coroutineScope {
-        val runtime = async { subnets.catalogue() }
-        val response = catalogueRepository.catalogue()
-        val catalogue = runtime.await()
-        val candidates = mapBittensorBrowseSubnets(response, catalogue.subnets, chainVerified = catalogue.fromChain)
-        val enabled = availability.enabledSubnets(candidates.map { it.id })
-        candidates.filter { it.id in enabled }
+    private fun mapCatalogue(remote: BittensorSubnetCatalogueRemote): List<BittensorSubnet> {
+        val metadata = mapBittensorBackendCatalogue(remote)
+        return mapBittensorBrowseSubnets(remote, metadata, chainVerified = false)
     }
 }
 
 /**
  * With a chain catalogue every backend row is cross-checked against the chain (registration, live positive price).
  * When the chain could not supply one ([chainVerified] = false) there is no chain view to compare with: rows are
- * listed on the backend's word with the backend price, and subtoken availability is still read from chain storage.
+ * listed with the backend price. Live trading availability is checked by transaction preflight, not by browsing.
  */
 internal fun mapBittensorBrowseSubnets(
     remote: BittensorSubnetCatalogueRemote,

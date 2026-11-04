@@ -59,6 +59,7 @@ import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import kotlinx.coroutines.flow.filterNotNull
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
@@ -315,12 +316,14 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    val amountModel = position.map { position ->
+    private val subnetLogos = if (isRoot) flowOf { emptyMap<BittensorNetuid.Subnet, String>() } else bittensorExitInteractor.observeSubnetLogos()
+
+    val amountModel = combine(position, subnetLogos) { position, logos ->
         position?.let {
             val icon = if (isRoot) {
                 assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration)
             } else {
-                it.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
+                (logos[it.netuid] ?: it.subnet?.logoUrl)?.asUrlIcon() ?: AssetIconProvider.fallbackIcon
             }
             val symbol = if (isRoot) it.asset.token.configuration.symbol.value else it.subnet.title(payload.netuid, resources)
             ChooseAmountModel(ChooseAmountInputModel(symbol, icon))

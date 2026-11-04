@@ -2461,4 +2461,21 @@
     <string name="deep_linking_staking_asset_not_found">Bu stake bağlantısındaki varlık bulunamadı.</string>
     <string name="deep_linking_staking_not_supported">Bu varlık için stake desteklenmiyor.</string>
     <string name="staking_new_feature">YENİ</string>
+    <string name="bittensor_mev_description">Önceliklendirme saldırılarını önlemeye yardımcı olmak için emrinizi herkese açık mempool\'da şifreli tutar.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Ağ ücreti alınmış olabilir.</string>
+    <string name="bittensor_mev_not_executed">Emir gerçekleştirilmedi</string>
+    <string name="bittensor_mev_nothing_spent">Hiçbir harcama yapılmadı.</string>
+    <string name="bittensor_mev_title">MEV koruması</string>
+    <string name="bittensor_mev_unavailable">Bu emir için MEV koruması kullanılamıyor.</string>
+    <string name="bittensor_mev_unchanged">Emriniz gerçekleştirilmedi. Stake\'iniz değişmedi, lütfen tekrar deneyin.</string>
+    <string name="bittensor_result_fee_charged">Ağ ücreti alınmış olabilir.</string>
+    <string name="bittensor_result_nothing_spent">Hiçbir harcama yapılmadı.</string>
+    <string name="bittensor_result_price_moved">Fiyat, kayma toleransınızı aştığı için emir gerçekleştirilmedi.</string>
+    <string name="bittensor_result_price_moved_format">Emir gerçekleştirilmedi: fiyat, kayma toleransınızı (%1$s) aştı. %2$s tutar giriş ekranındaki ayarlar simgesini kullanarak kaymayı değiştirebilir ve tekrar deneyebilirsiniz.</string>
+    <string name="swap_get_token_alternatives_format">%1$s veya %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Tarayıcıda açılır</string>
+    <string name="swap_get_token_dapp_description">%s · tarayıcıda açılır</string>
+    <string name="swap_get_token_dapp_title">%s üzerinde takas yap</string>
+    <string name="swap_get_token_third_party">ÜÇÜNCÜ TARAF</string>
+    <string name="bittensor_result_price_moved_with_tolerance">İşlem gerçekleştirilemedi: fiyat, kayma toleransınızın (%1$s) ötesinde değişti. Tutar giriş ekranındaki ayarlar simgesini kullanarak kayma toleransını değiştirebilir ve tekrar deneyebilirsiniz.</string>
 </resources>

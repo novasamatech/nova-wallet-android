@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface BittensorEstimatesApi {
@@ -14,8 +13,6 @@ interface BittensorEstimatesApi {
 
     @GET
     suspend fun operations(
-        @Url url: String,
-        @Query("accountSubject") address: String,
-        @Query("page") page: Int
+        @Url url: String
     ): Response<BittensorOperationsRemote>
 }

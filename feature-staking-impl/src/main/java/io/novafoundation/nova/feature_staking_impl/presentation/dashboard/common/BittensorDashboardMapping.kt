@@ -32,6 +32,7 @@ internal fun mapBittensorDashboardItem(
     icons: AssetIconProvider
 ): StakingDashboardModel.HasStakeItem? {
     val details = option.bittensorDetails ?: return null
+    val syncing = !details.stale && option.syncingStage.isSyncingPrimary()
     val pending = details.pricing == BittensorDashboardDetails.Pricing.LOADING
     val total = masking.format {
         val amount = details.totalStakeInPlanks?.let { amountFormatter.formatAmountToAmountModel(it, option.token) }
@@ -65,13 +66,13 @@ internal fun mapBittensorDashboardItem(
     // Root-validator registration is a separate status on the root position screen.
     val status = mapDashboardStakingStatus(StakingStatus.ACTIVE, resources)
     return StakingDashboardModel.HasStakeItem(
-        assetLabel = label.syncingIf(pending || option.syncingStage.isSyncingPrimary()),
+        assetLabel = label.syncingIf(pending || syncing),
         assetId = option.token.configuration.fullId,
         stakingTypeBadge = null,
-        assetIcon = icons.getAssetIconOrFallback(option.token.configuration.icon).syncingIf(option.syncingStage.isSyncingPrimary()),
+        assetIcon = icons.getAssetIconOrFallback(option.token.configuration.icon).syncingIf(syncing),
         rewards = if (pending) ExtendedLoadingState.Loading else ExtendedLoadingState.Loaded(total.syncingIf(false)),
         stake = panel.syncingIf(pending),
-        status = ExtendedLoadingState.Loaded(status.syncingIf(option.syncingStage.isSyncingPrimary())),
+        status = ExtendedLoadingState.Loaded(status.syncingIf(syncing)),
         earnings = mapBittensorPanelYield(details),
         announcement = announcement,
         stakeTitle = panelTitle

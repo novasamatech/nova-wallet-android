@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevReview
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
 
@@ -38,6 +40,9 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 @Module(includes = [ViewModelModule::class])
 class BittensorExitReviewModule {
     @Provides
+    fun provideMevReview(service: BittensorMevService, logger: Logger) = BittensorMevReview(service, logger)
+
+    @Provides
     @IntoMap
     @ViewModelKey(BittensorExitReviewViewModel::class)
     fun review(
@@ -61,6 +66,7 @@ class BittensorExitReviewModule {
         validationExecutor: ValidationExecutor,
         exitValidationSystem: BittensorExitValidationSystem,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        mevReview: BittensorMevReview,
         exitFormatter: BittensorExitFormatter,
         saleCostBasisFormatter: BittensorSaleCostBasisFormatter,
         validatorInteractor: BittensorValidatorInteractor,
@@ -85,6 +91,7 @@ class BittensorExitReviewModule {
             validationExecutor,
             exitValidationSystem,
             feeLoaderMixinFactory,
+            mevReview,
             exitFormatter,
             saleCostBasisFormatter,
             validatorInteractor,

@@ -2447,4 +2447,21 @@
     <string name="deep_linking_staking_asset_not_found">未找到此质押链接中的资产。</string>
     <string name="deep_linking_staking_not_supported">此资产不支持质押。</string>
     <string name="staking_new_feature">新功能</string>
+    <string name="bittensor_mev_description">将您的订单加密并保留在公共内存池中，以帮助防止抢跑交易。</string>
+    <string name="bittensor_mev_fee_may_be_charged">可能已收取网络费用。</string>
+    <string name="bittensor_mev_not_executed">订单未执行</string>
+    <string name="bittensor_mev_nothing_spent">未花费任何资金。</string>
+    <string name="bittensor_mev_title">MEV 保护</string>
+    <string name="bittensor_mev_unavailable">此订单无法使用 MEV 保护。</string>
+    <string name="bittensor_mev_unchanged">您的订单未执行。您的质押金额未发生变化，请重试。</string>
+    <string name="bittensor_result_fee_charged">可能已收取网络费用。</string>
+    <string name="bittensor_result_nothing_spent">未花费任何资金。</string>
+    <string name="bittensor_result_price_moved">由于价格超出您的滑点容忍度，订单未执行。</string>
+    <string name="bittensor_result_price_moved_format">订单未执行：价格超出您的滑点容忍度（%1$s）。您可以在 %2$s 金额输入界面点击设置图标调整滑点，然后重试。</string>
+    <string name="swap_get_token_alternatives_format">%1$s或%2$s</string>
+    <string name="swap_get_token_dapp_browser_description">在浏览器中打开</string>
+    <string name="swap_get_token_dapp_description">%s · 在浏览器中打开</string>
+    <string name="swap_get_token_dapp_title">在%s上兑换</string>
+    <string name="swap_get_token_third_party">第三方</string>
+    <string name="bittensor_result_price_moved_with_tolerance">订单未执行：价格变动超出了您的滑点容差（%1$s）。您可以在金额输入界面点击设置图标来调整滑点，然后重试。</string>
 </resources>

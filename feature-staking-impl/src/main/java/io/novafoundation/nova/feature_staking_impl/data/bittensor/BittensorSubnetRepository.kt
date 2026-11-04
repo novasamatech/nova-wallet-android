@@ -2,33 +2,30 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetLinks
-import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * [fromChain] is false when the backend catalogue or the last good names stood in for a slow or failing node, so it
  * cannot cross-check the backend.
  */
-class BittensorSubnetCatalogue(val subnets: List<BittensorSubnet>, val fromChain: Boolean)
+data class BittensorSubnetCatalogue(val subnets: List<BittensorSubnet>, val fromChain: Boolean)
 
 interface BittensorSubnetRepository {
 
     suspend fun subnets(): List<BittensorSubnet>
+
+    fun observeSubnets(): Flow<List<BittensorSubnet>> = flowOf { subnets() }
 
     suspend fun catalogue(): BittensorSubnetCatalogue
 
@@ -37,54 +34,27 @@ interface BittensorSubnetRepository {
     suspend fun quickPickSubnets(): List<BittensorSubnet>
 }
 
-/**
- * Subnet names and symbols come from the chain (`get_all_dynamic_info`, a heavy call) or, when the node is slow or
- * failing, from the backend `/subnets` catalogue. When both fail, the last good
- * catalogue stands in with its metadata only, so a failing node never blanks subnet names; prices and reserves are never
- * served from that last good catalogue, and the next read asks both sources again.
- */
+/** Composes subnet metadata, independent logo updates and live detail prices. */
 class RealBittensorSubnetRepository(
-    private val runtimeCalls: MultiChainRuntimeCallsApi,
-    private val configRepository: BittensorConfigRepository,
-    private val swapSource: BittensorSwapSource,
-    private val catalogueRepository: BittensorSubnetCatalogueRepository,
-    private val chainPatienceMillis: Long = CHAIN_CATALOGUE_PATIENCE_MILLIS,
-    private val nanoTime: () -> Long = System::nanoTime
+    private val subnetSource: BittensorSubnetSource,
+    private val configSource: BittensorConfigSource,
+    private val swapSource: BittensorSwapSource
 ) : BittensorSubnetRepository {
 
-    private val mutex = Mutex()
-
-    private var cachedCatalogue: BittensorSubnetCatalogue? = null
-
-    private var lastGoodCatalogue: BittensorSubnetCatalogue? = null
-
-    private var catalogueLoadedAtNanos = 0L
-
-    override suspend fun subnets(): List<BittensorSubnet> = catalogue().subnets
-
-    override suspend fun catalogue(): BittensorSubnetCatalogue = mutex.withLock {
-        val cachedCatalogue = cachedCatalogue
-        if (cachedCatalogue != null && nanoTime() - catalogueLoadedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
-            return@withLock cachedCatalogue
-        }
-        val catalogue = try {
-            loadCatalogue()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            return@withLock lastGoodCatalogue ?: throw e
-        }
-        this.cachedCatalogue = catalogue
-        lastGoodCatalogue = catalogue.namesOnly()
-        catalogueLoadedAtNanos = nanoTime()
-        catalogue
+    override suspend fun subnets(): List<BittensorSubnet> {
+        val subnets = catalogue().subnets
+        val logos = configSource.currentSubnetLogos()
+        return subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
     }
 
-    // Prices and reserves move every block: what outlives a failed load names subnets but never values anything.
-    private fun BittensorSubnetCatalogue.namesOnly() = BittensorSubnetCatalogue(
-        subnets.map { it.copy(priceInRao = null, taoReserveInPlanks = null, alphaReserveInPlanks = null) },
-        fromChain = false
-    )
+    override fun observeSubnets(): Flow<List<BittensorSubnet>> = combine(
+        subnetSource.observeCatalogue(),
+        configSource.observeSubnetLogos()
+    ) { catalogue, logos ->
+        catalogue.subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
+    }.distinctUntilChanged()
+
+    override suspend fun catalogue(): BittensorSubnetCatalogue = subnetSource.catalogue()
 
     override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         val catalogue = subnets()
@@ -94,76 +64,7 @@ class RealBittensorSubnetRepository(
         subnet.copy(priceInRao = price)
     } ?: throw BittensorTimeoutException("Subnet details")
 
-    override suspend fun quickPickSubnets(): List<BittensorSubnet> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
-        loadDynamicSubnets(requireComplete = true)
-    } ?: throw BittensorTimeoutException("Subnet quick-pick catalogue")
-
-    private suspend fun loadCatalogue(): BittensorSubnetCatalogue = coroutineScope {
-        val subnetLogos = async { configRepository.subnetLogos() }
-        var catalogue: BittensorSubnetCatalogue? = null
-        // Logos only decorate the catalogue: a config read slower than the catalogue budget costs the logos, not the catalogue.
-        val logos = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
-            catalogue = resolveCatalogue()
-            subnetLogos.await()
-        }
-        subnetLogos.cancel()
-        val resolved = catalogue ?: throw BittensorTimeoutException("Subnet catalogue")
-        BittensorSubnetCatalogue(resolved.subnets.map { it.copy(logoUrl = logos?.get(it.id) ?: it.logoUrl) }, resolved.fromChain)
-    }
-
-    private suspend fun resolveCatalogue(): BittensorSubnetCatalogue = coroutineScope {
-        val chain = async { catching { loadDynamicSubnets() } }
-        // Prefer the chain while it answers promptly. Only a slow or failing node costs an attested backend request,
-        // so a healthy node never spends the Profile-3 rate budget.
-        val promptChain = withTimeoutOrNull(chainPatienceMillis) { chain.await() }?.getOrNull()
-        val catalogue = if (promptChain != null) {
-            BittensorSubnetCatalogue(promptChain, fromChain = true)
-        } else {
-            val backend = async { catching { loadBackendCatalogue() } }
-            firstSuccess(chain, backend).also { backend.cancel() }
-        }
-        chain.cancel()
-        catalogue
-    }
-
-    /** Whichever source answers first with a catalogue; the chain's failure is reported when both fail. */
-    private suspend fun firstSuccess(
-        chain: Deferred<Result<List<BittensorSubnet>>>,
-        backend: Deferred<Result<List<BittensorSubnet>>>
-    ): BittensorSubnetCatalogue {
-        val first = select {
-            chain.onAwait { result -> result.getOrNull()?.let { BittensorSubnetCatalogue(it, fromChain = true) } }
-            backend.onAwait { result -> result.getOrNull()?.let { BittensorSubnetCatalogue(it, fromChain = false) } }
-        }
-        if (first != null) return first
-        backend.await().getOrNull()?.let { return BittensorSubnetCatalogue(it, fromChain = false) }
-        return BittensorSubnetCatalogue(chain.await().getOrThrow(), fromChain = true)
-    }
-
-    private suspend fun loadBackendCatalogue(): List<BittensorSubnet> = mapBittensorBackendCatalogue(catalogueRepository.catalogue())
-
-    private suspend fun <T> catching(load: suspend () -> T): Result<T> = try {
-        Result.success(load())
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        Result.failure(e)
-    }
-
-    private suspend fun loadDynamicSubnets(requireComplete: Boolean = false): List<BittensorSubnet> = runtimeCalls.forChain(ChainGeneses.BITTENSOR)
-        .call(
-            section = "SubnetInfoRuntimeApi",
-            method = "get_all_dynamic_info",
-            arguments = emptyMap(),
-            returnBinding = { decoded -> bindBittensorSubnets(decoded, requireComplete) }
-        )
-
-    private companion object {
-
-        val CATALOGUE_VALIDITY = 30.seconds
-
-        const val CHAIN_CATALOGUE_PATIENCE_MILLIS = 4_000L
-    }
+    override suspend fun quickPickSubnets(): List<BittensorSubnet> = subnetSource.quickPickSubnets()
 }
 
 /**

@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRankingRemote
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
@@ -20,12 +20,12 @@ private val DEEP_POOL_TAO = BigDecimal(25000)
 private val CALMER_VOLATILITY_SCORE = BigDecimal(50)
 
 class BittensorSubnetFactsInteractor(
-    private val backend: BittensorValidatorBackend,
+    private val validatorSource: BittensorValidatorSource,
     private val chainStateRepository: ChainStateRepository
 ) {
 
     suspend fun facts(subnet: BittensorSubnet): BittensorSubnetFacts {
-        val ranking = backend.rankedSubnet(subnet.id, subnet.registrationBlock)
+        val ranking = validatorSource.rankedSubnet(subnet.id, subnet.registrationBlock)
         val blockTime = chainStateRepository.expectedBlockTime(ChainGeneses.BITTENSOR)
         return mapBittensorSubnetFacts(ranking, blockTime)
     }

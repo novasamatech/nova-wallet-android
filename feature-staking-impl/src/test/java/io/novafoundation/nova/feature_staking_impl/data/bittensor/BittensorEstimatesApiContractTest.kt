@@ -7,8 +7,8 @@ import retrofit2.http.Query
 class BittensorEstimatesApiContractTest {
 
     @Test
-    fun `operation history sends only the account and page query parameters`() {
-        assertEquals(setOf("accountSubject", "page"), queryParameters("operations"))
+    fun `operation history accepts the complete URL without adding query parameters`() {
+        assertEquals(emptySet<String>(), queryParameters("operations"))
     }
 
     @Test

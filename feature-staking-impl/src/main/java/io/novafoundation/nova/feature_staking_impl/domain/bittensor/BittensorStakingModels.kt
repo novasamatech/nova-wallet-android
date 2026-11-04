@@ -62,5 +62,6 @@ sealed interface BittensorOperationResult {
 enum class BittensorFailureStage {
     NOT_SUBMITTED,
     DISPATCHED,
+    NOT_EXECUTED,
     UNKNOWN
 }

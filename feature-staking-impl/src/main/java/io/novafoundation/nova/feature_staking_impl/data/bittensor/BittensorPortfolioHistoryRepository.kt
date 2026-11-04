@@ -2,45 +2,29 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistory
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryRequest
-import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withTimeout
+import io.novafoundation.nova.feature_wallet_api.domain.model.HistoricalCoinRate
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
 class BittensorPortfolioHistoryRepository(
-    private val api: BittensorPortfolioHistoryApi,
-    private val urls: InfrastructureUrls,
-    private val coinPriceRepository: CoinPriceRepository
+    private val fxSource: BittensorPortfolioFxSource,
+    private val historySource: BittensorPortfolioHistorySource
 ) {
 
-    suspend fun load(request: BittensorPortfolioHistoryRequest, accountSubject: String): BittensorPortfolioHistory {
+    fun observe(request: BittensorPortfolioHistoryRequest, accountSubject: String): Flow<BittensorPortfolioHistory> {
         require(accountSubject.length in 1..128 && accountSubject.all { it in '!'..'~' }) { "Invalid account subject" }
-        return try {
-            withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
-                loadHistory(request, accountSubject)
-            }
-        } catch (e: TimeoutCancellationException) {
-            currentCoroutineContext().ensureActive()
-            throw BittensorTimeoutException("Portfolio history", e)
-        }
+        return combine(
+            historySource.observePortfolioHistory(request, accountSubject),
+            fxSource.observe(request)
+        ) { snapshot, nativePrices -> mapHistory(snapshot, request, nativePrices) }
     }
 
-    private suspend fun loadHistory(request: BittensorPortfolioHistoryRequest, accountSubject: String): BittensorPortfolioHistory = coroutineScope {
-        val nativePrices = async {
-            if (request.currency.code.equals("USD", ignoreCase = true)) {
-                null
-            } else {
-                val priceId = requireNotNull(request.nativePriceId) { "Missing native FX price identifier" }
-                coinPriceRepository.getLastHistoryForPeriod(priceId, request.currency, request.period.priceSource)
-            }
-        }
-        val url = urls.bittensorBackendUrl("portfolio/history/search")
-        val response = api.history(url, accountSubject, request.period.name)
-        val accountHistory = mapBittensorPortfolioHistory(response, request.period)
-        BittensorPortfolioHistory(accountHistory, nativePrices.await())
+    private fun mapHistory(
+        snapshot: BittensorPortfolioHistoryRemote,
+        request: BittensorPortfolioHistoryRequest,
+        nativePrices: List<HistoricalCoinRate>?
+    ): BittensorPortfolioHistory {
+        val account = mapBittensorPortfolioHistory(snapshot, request.period)
+        return BittensorPortfolioHistory(account, nativePrices)
     }
 }

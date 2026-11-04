@@ -2489,4 +2489,21 @@
     <string name="deep_linking_staking_asset_not_found">Актив из этой ссылки на staking не найден.</string>
     <string name="deep_linking_staking_not_supported">Staking не поддерживается для этого актива.</string>
     <string name="staking_new_feature">НОВОЕ</string>
+    <string name="bittensor_mev_description">Сохраняет ваш ордер зашифрованным в публичном мемпуле, помогая предотвратить опережение транзакций.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Могла взиматься сетевая комиссия.</string>
+    <string name="bittensor_mev_not_executed">Ордер не исполнен</string>
+    <string name="bittensor_mev_nothing_spent">Ничего не потрачено.</string>
+    <string name="bittensor_mev_title">Защита от MEV</string>
+    <string name="bittensor_mev_unavailable">Защита от MEV недоступна для этого ордера.</string>
+    <string name="bittensor_mev_unchanged">Ваш ордер не был исполнен. Ваш stake не изменился, попробуйте ещё раз.</string>
+    <string name="bittensor_result_fee_charged">Могла взиматься сетевая комиссия.</string>
+    <string name="bittensor_result_nothing_spent">Ничего не потрачено.</string>
+    <string name="bittensor_result_price_moved">Ордер не был исполнен, поскольку цена вышла за пределы допустимого проскальзывания.</string>
+    <string name="bittensor_result_price_moved_format">Ордер не был исполнен: цена вышла за пределы допустимого проскальзывания (%1$s). Вы можете изменить проскальзывание с помощью значка настроек на экране ввода суммы %2$s и попробовать ещё раз.</string>
+    <string name="swap_get_token_alternatives_format">%1$s или %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Открывается в браузере</string>
+    <string name="swap_get_token_dapp_description">%s · открывается в браузере</string>
+    <string name="swap_get_token_dapp_title">Обмен на %s</string>
+    <string name="swap_get_token_third_party">СТОРОННИЙ</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Ордер не был исполнен: цена изменилась больше допустимого проскальзывания (%1$s). Вы можете изменить проскальзывание с помощью значка настроек на экране ввода суммы и повторить попытку.</string>
 </resources>

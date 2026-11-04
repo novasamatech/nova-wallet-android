@@ -1,10 +1,12 @@
 package io.novafoundation.nova.core_db
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
 import io.novafoundation.nova.core_db.converters.AssetConverters
 import io.novafoundation.nova.core_db.converters.ChainConverters
 import io.novafoundation.nova.core_db.converters.CryptoTypeConverters
@@ -20,6 +22,7 @@ import io.novafoundation.nova.core_db.converters.ProxyAccountConverters
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
+import io.novafoundation.nova.core_db.dao.ResponseCacheDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
@@ -129,6 +132,7 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.BalanceHoldLocal
+import io.novafoundation.nova.core_db.model.ResponseCacheLocal
 import io.novafoundation.nova.core_db.model.ChainAssetVisibilityLocal
 import io.novafoundation.nova.core_db.model.MetaAccountSettingsLocal
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
@@ -174,7 +178,8 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 75,
+    version = 76,
+    autoMigrations = [AutoMigration(from = 75, to = 76)],
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -222,6 +227,7 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         BrowserTabLocal::class,
         MultisigOperationCallLocal::class,
         GiftLocal::class,
+        ResponseCacheLocal::class,
         AnalyticsEventLocal::class
     ],
 )
@@ -245,6 +251,83 @@ abstract class AppDatabase : RoomDatabase() {
 
         private var instance: AppDatabase? = null
 
+        internal val migrations: Array<Migration> = arrayOf(
+            AddDAppAuthorizations_1_2,
+            AssetTypes_2_3,
+            ChangeAsset_3_4,
+            AddChainColor_4_5,
+            AddNfts_5_6,
+            AddSitePhishing_6_7,
+            AddBuyProviders_7_8,
+            BetterChainDiffing_8_9,
+            AddFavouriteDApps_9_10,
+            ChangeDAppAuthorization_10_11,
+            RemoveChainForeignKeyFromChainAccount_11_12,
+            AddAdditionalFieldToChains_12_13,
+            FixMigrationConflicts_13_14,
+            AddMetaAccountType_14_15,
+            NullableSubstratePublicKey_15_16,
+            WatchOnlyChainAccounts_16_17,
+            RemoveColorFromChains_17_18,
+            AddCurrencies_18_19,
+            ChangeTokens_19_20,
+            ChangeChainNodes_20_21,
+            NullableSubstrateAccountId_21_22,
+            AddLocks_22_23,
+            AddContributions_23_24,
+            AddGovernanceFlagToChains_24_25,
+            AddGovernanceDapps_25_26,
+            GovernanceFlagToEnum_26_27,
+            AddGovernanceExternalApiToChain_27_28,
+            AddSourceToLocalAsset_28_29,
+            AddTransferApisTable_29_30,
+            AddEnabledColumnToChainAssets_30_31,
+            FixBrokenForeignKeys_31_32,
+            AddVersioningToGovernanceDapps_32_33,
+            AddGovernanceNetworkToExternalApi_33_34,
+            AddBrowserHostSettings_34_35,
+            ExtractExternalApiToSeparateTable_35_36,
+            AddRuntimeFlagToChains_36_37,
+            AddExtrinsicContentField_37_38,
+            AddNodeSelectionStrategyField_38_39,
+            AddWalletConnectSessions_39_40,
+            TransferFiatAmount_40_41,
+            AddStakingDashboardItems_41_42,
+            StakingRewardPeriods_42_43,
+            AddRewardAccountToStakingDashboard_43_44,
+            AddStakingTypeToTotalRewards_44_45,
+            AddExternalBalances_45_46,
+            AddPoolIdToOperations_46_47,
+            AddEventIdToOperation_47_48,
+            AddSwapOption_48_49,
+            RefactorOperations_49_50,
+            AddTransactionVersionToRuntime_50_51,
+            AddBalanceModesToAssets_51_52,
+            ChangeSessionTopicToParing_52_53,
+            AddConnectionStateToChains_53_54,
+            AddProxyAccount_54_55,
+            AddFungibleNfts_55_56,
+            ChainPushSupport_56_57,
+            AddLocalMigratorVersionToChainRuntimes_57_58,
+            AddGloballyUniqueIdToMetaAccounts_58_59,
+            ChainNetworkManagement_59_60,
+            AddBalanceHolds_60_61,
+            ChainNetworkManagement_61_62,
+            TinderGovBasket_62_63,
+            AddChainForeignKeyForProxy_63_64,
+            AddBrowserTabs_64_65,
+            AddFavoriteDAppsOrdering_65_66,
+            AddLegacyAddressPrefix_66_67,
+            AddSellProviders_67_68,
+            AddTypeExtrasToMetaAccount_68_69,
+            AddMultisigCalls_69_70,
+            AddMultisigSupportFlag_70_71,
+            AddGifts_71_72,
+            AddFieldsToContributions,
+            AddAnalyticsEvents_73_74,
+            PerWalletTokenState_74_75,
+        )
+
         @Synchronized
         fun get(
             context: Context
@@ -255,39 +338,14 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "app.db"
                 )
-                    .addMigrations(AddDAppAuthorizations_1_2, AssetTypes_2_3, ChangeAsset_3_4)
-                    .addMigrations(AddChainColor_4_5, AddNfts_5_6, AddSitePhishing_6_7, AddBuyProviders_7_8, BetterChainDiffing_8_9)
-                    .addMigrations(AddFavouriteDApps_9_10, ChangeDAppAuthorization_10_11, RemoveChainForeignKeyFromChainAccount_11_12)
-                    .addMigrations(AddAdditionalFieldToChains_12_13, FixMigrationConflicts_13_14, AddMetaAccountType_14_15)
-                    .addMigrations(NullableSubstratePublicKey_15_16, WatchOnlyChainAccounts_16_17, RemoveColorFromChains_17_18)
-                    .addMigrations(AddCurrencies_18_19, ChangeTokens_19_20, ChangeChainNodes_20_21)
-                    .addMigrations(NullableSubstrateAccountId_21_22, AddLocks_22_23, AddContributions_23_24)
-                    .addMigrations(AddGovernanceFlagToChains_24_25, AddGovernanceDapps_25_26, GovernanceFlagToEnum_26_27)
-                    .addMigrations(AddGovernanceExternalApiToChain_27_28)
-                    .addMigrations(AddSourceToLocalAsset_28_29, AddTransferApisTable_29_30, AddEnabledColumnToChainAssets_30_31)
-                    .addMigrations(FixBrokenForeignKeys_31_32, AddVersioningToGovernanceDapps_32_33)
-                    .addMigrations(AddGovernanceNetworkToExternalApi_33_34, AddBrowserHostSettings_34_35)
-                    .addMigrations(ExtractExternalApiToSeparateTable_35_36, AddRuntimeFlagToChains_36_37)
-                    .addMigrations(AddExtrinsicContentField_37_38, AddNodeSelectionStrategyField_38_39)
-                    .addMigrations(AddWalletConnectSessions_39_40, TransferFiatAmount_40_41)
-                    .addMigrations(AddStakingDashboardItems_41_42, StakingRewardPeriods_42_43)
-                    .addMigrations(AddRewardAccountToStakingDashboard_43_44, AddStakingTypeToTotalRewards_44_45, AddExternalBalances_45_46)
-                    .addMigrations(AddPoolIdToOperations_46_47, AddEventIdToOperation_47_48, AddSwapOption_48_49)
-                    .addMigrations(RefactorOperations_49_50, AddTransactionVersionToRuntime_50_51, AddBalanceModesToAssets_51_52)
-                    .addMigrations(ChangeSessionTopicToParing_52_53, AddConnectionStateToChains_53_54, AddProxyAccount_54_55)
-                    .addMigrations(AddFungibleNfts_55_56, ChainPushSupport_56_57)
-                    .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
-                    .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
-                    .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
-                    .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
-                    .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70, AddMultisigSupportFlag_70_71)
-                    .addMigrations(AddGifts_71_72, AddFieldsToContributions, AddAnalyticsEvents_73_74)
-                    .addMigrations(PerWalletTokenState_74_75)
+                    .addMigrations(*migrations)
                     .build()
             }
             return instance!!
         }
     }
+
+    abstract fun responseCacheDao(): ResponseCacheDao
 
     abstract fun nodeDao(): NodeDao
 

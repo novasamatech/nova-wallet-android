@@ -219,7 +219,9 @@ class BittensorSubnetAmountViewModel(
         }
         ).shareInBackground()
 
-    val subnet = subnetState.map { it.dataOrNull }
+    val subnet = combine(subnetState, bittensorSubnetInteractor.observeSubnetLogos()) { state, logos ->
+        state.dataOrNull?.let { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
+    }
         .shareInBackground()
 
     /** "Buy more <subnet>" for an existing position; new positions keep the screen's default title. */
@@ -433,18 +435,19 @@ class BittensorSubnetAmountViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    private val yieldState = subnet.flatMapLatest { subnet ->
-        if (subnet == null) {
+    private val yieldState = subnetState.map { it.dataOrNull?.id }.distinctUntilChanged().flatMapLatest { subnetId ->
+        if (subnetId == null) {
             flowOf<ExtendedLoadingState<Map<AccountIdKey, BigDecimal>?>> { ExtendedLoadingState.Loaded(null) }
         } else {
-            estimatesMixin.observeAlphaYields(walletContext.map { it.chain }, subnet.id)
+            estimatesMixin.observeAlphaYields(walletContext.map { it.chain }, subnetId)
         }
     }
         .shareInBackground()
 
     private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map { wallet ->
-            if (existingPosition) BittensorEstimateContext(wallet.metaId, wallet.chain) else null
+            initialSubnetId?.takeIf { existingPosition }
+                ?.let { BittensorEstimateContext(wallet.metaId, wallet.chain, it) }
         }
     )
         .shareInBackground()
@@ -556,7 +559,7 @@ class BittensorSubnetAmountViewModel(
         showWhenNoOptions = true
     )
 
-    private val subnetFacts = subnet.flatMapLatest { selectedSubnet ->
+    private val subnetFacts = subnetState.map { it.dataOrNull }.flatMapLatest { selectedSubnet ->
         if (selectedSubnet == null) {
             flowOf<BittensorSubnetFacts?> { null }
         } else {
@@ -1028,9 +1031,9 @@ internal fun bittensorStakeValidatorSource(existingPosition: Boolean, selectedAd
     else -> StakingValidatorSource.RECOMMENDED
 }
 
-/** A history still settling an own trade may miss that purchase: without totals for [netuid] it is unknown, never "no purchases". */
+/** Stale history or a trade still being indexed may miss this purchase: absent totals are unknown, never "no purchases". */
 internal fun BittensorPositionCostBasis.buyMoreCostBasis(netuid: Int): ExtendedLoadingState<BittensorEstimatedCostBasis?> =
-    state.map { basis -> basis.takeUnless { isSettling && basis?.forSubnet(netuid) == null } }
+    state.map { basis -> basis.takeUnless { isProvisional && basis?.forSubnet(netuid) == null } }
 
 /** The quick-pick warning above the placeholder card: "Couldn't load rates" / "Unable to fetch validators" as on iOS. */
 class BittensorSelectionFailureUi(val title: String, val message: String)

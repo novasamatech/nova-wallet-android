@@ -1,14 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.utils.flowOfAll
+import kotlinx.coroutines.flow.Flow
+
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetCatalogueSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorPortfolioPrices
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootValidatorNames
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootYields
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -19,8 +23,8 @@ class BittensorValidatorInteractor(
     private val validatorRepository: BittensorSubnetValidatorRepository,
     private val chainRegistry: ChainRegistry,
     private val alphaYields: BittensorAlphaYieldRepository,
-    private val backend: BittensorValidatorBackend,
-    private val subnetCatalogue: BittensorSubnetCatalogueRepository
+    private val validatorSource: BittensorValidatorSource,
+    private val subnetCatalogue: BittensorSubnetCatalogueSource
 ) {
 
     suspend fun chain(): Chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
@@ -34,13 +38,13 @@ class BittensorValidatorInteractor(
             return listOf(BittensorValidatorPreview(validator, canPreselect = true))
         }
         // A STALE generation still recommends: the recommendations contract makes it usable data.
-        val response = backend.rankedValidators(netuid.value)
+        val response = validatorSource.rankedValidators(netuid.value)
         val recommended = response.items.orEmpty().mapNotNull { row ->
             mapBittensorValidatorPreview(chain, row)
         }
         if (recommended.isNotEmpty()) return recommended.map { BittensorValidatorPreview(it, canPreselect = true) }
 
-        val directory = backend.validators(netuid.value)
+        val directory = validatorSource.validators(netuid.value)
         return directory.items.orEmpty().mapNotNull { row ->
             mapBittensorDirectoryPreview(chain, row)?.let { BittensorValidatorPreview(it, canPreselect = false) }
         }
@@ -55,8 +59,8 @@ class BittensorValidatorInteractor(
         if (hotkeys.isEmpty()) return emptyMap()
         val chain = chain()
         // Root names come from the root list, so positions and exits name a root validator as the list does.
-        if (netuid.isRoot()) return mapBittensorRootValidatorNames(chain, backend.rootValidators()).filterKeys { it in hotkeys }
-        val response = backend.validators(netuid.value)
+        if (netuid.isRoot()) return mapBittensorRootValidatorNames(chain, validatorSource.rootValidators()).filterKeys { it in hotkeys }
+        val response = validatorSource.validators(netuid.value)
         return buildMap {
             response.items.orEmpty().forEach { row ->
                 val hotkey = row.hotkey?.let { runCatching { AccountIdKey(chain.accountIdOf(it)) }.getOrNull() } ?: return@forEach
@@ -67,16 +71,26 @@ class BittensorValidatorInteractor(
         }
     }
 
+    fun observeYields(netuid: BittensorNetuid): Flow<Map<AccountIdKey, BigDecimal>> =
+        flowOfAll {
+            val chain = chain()
+            if (netuid is BittensorNetuid.Subnet) {
+                alphaYields.observeAlphaYields(chain, netuid)
+            } else {
+                validatorSource.observeRootValidators().map { mapBittensorRootYields(chain, it) }
+            }
+        }
+
     suspend fun yields(netuid: BittensorNetuid, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {
         val chain = chain()
         if (netuid is BittensorNetuid.Subnet) return alphaYields.alphaYields(chain, netuid, includeUnreliable)
-        return mapBittensorRootYields(chain, backend.rootValidators())
+        return mapBittensorRootYields(chain, validatorSource.rootValidators())
     }
 
     /** Root stake is native already; subnet stake is valued at the FRESH backend price. */
     suspend fun stakeInNative(netuid: BittensorNetuid, reportedStake: BigDecimal): BigDecimal? = when (netuid) {
         BittensorNetuid.Root -> reportedStake
-        is BittensorNetuid.Subnet -> mapBittensorPortfolioPrices(subnetCatalogue.catalogue())[netuid]?.let { price ->
+        is BittensorNetuid.Subnet -> mapBittensorPortfolioPrices(subnetCatalogue.subnets())[netuid]?.let { price ->
             reportedStake * price.toBigDecimal(chain().utilityAsset.precision.value)
         }
     }

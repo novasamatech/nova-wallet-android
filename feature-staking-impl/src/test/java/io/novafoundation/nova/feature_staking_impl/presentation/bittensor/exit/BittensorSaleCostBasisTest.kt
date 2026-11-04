@@ -23,7 +23,7 @@ class BittensorSaleCostBasisTest {
     private val carried = BittensorEstimatedPurchaseTotals(BigInteger.valueOf(7), BigInteger.valueOf(70))
 
     private fun loaded(basis: BittensorEstimatedCostBasis?, settling: Boolean = false) =
-        BittensorPositionCostBasis(ExtendedLoadingState.Loaded(basis), settling)
+        BittensorPositionCostBasis(ExtendedLoadingState.Loaded(basis), isProvisional = settling)
 
     @Test
     fun `settled history distinguishes purchases from no purchases`() {
@@ -45,15 +45,18 @@ class BittensorSaleCostBasisTest {
         assertEquals(ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Unknown), resolveSaleCostBasis(loaded(null), 1))
         val incomplete = BittensorEstimatedCostBasis(listOf(purchase), false)
         assertEquals(ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Unknown), resolveSaleCostBasis(loaded(incomplete), 1))
-        val failed = BittensorPositionCostBasis(ExtendedLoadingState.Error(IllegalStateException()), false)
+        val failed = BittensorPositionCostBasis(ExtendedLoadingState.Error(IllegalStateException()), isProvisional = false)
         assertEquals(ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Unknown), resolveSaleCostBasis(failed, 1))
     }
 
     @Test
     fun `review keeps the setup totals while its own history reloads or fails`() {
         val known = ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Known(carried, true))
-        assertEquals(known, resolveSaleCostBasis(BittensorPositionCostBasis(ExtendedLoadingState.Loading, false), 1, carried))
-        assertEquals(known, resolveSaleCostBasis(BittensorPositionCostBasis(ExtendedLoadingState.Error(IllegalStateException()), false), 1, carried))
+        val loading = BittensorPositionCostBasis(ExtendedLoadingState.Loading, isProvisional = false)
+        val failed = BittensorPositionCostBasis(ExtendedLoadingState.Error(IllegalStateException()), isProvisional = false)
+
+        assertEquals(known, resolveSaleCostBasis(loading, 1, carried))
+        assertEquals(known, resolveSaleCostBasis(failed, 1, carried))
         assertEquals(known, resolveSaleCostBasis(loaded(null), 1, carried))
         assertEquals(known, resolveSaleCostBasis(loaded(withPurchase, settling = true), 1, carried))
         assertEquals(ExtendedLoadingState.Loaded(BittensorSaleCostBasis.Known(purchaseTotals, true)), resolveSaleCostBasis(loaded(withPurchase), 1, carried))

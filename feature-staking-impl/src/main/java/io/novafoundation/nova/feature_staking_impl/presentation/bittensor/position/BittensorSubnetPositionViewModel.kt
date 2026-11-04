@@ -155,7 +155,7 @@ class BittensorSubnetPositionViewModel(
         analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
-        flowOf { subnetMetadataInteractor.subnet(subnetId) }
+        subnetMetadataInteractor.observeSubnet(subnetId)
     }
         .shareInBackground()
 
@@ -241,7 +241,7 @@ class BittensorSubnetPositionViewModel(
         .shareInBackground()
 
     private val costBasisUpdate = estimatesMixin.observePositionCostBasis(
-        portfolio.map { it?.let { BittensorEstimateContext(it.metaId, it.chain) } }
+        portfolio.map { it?.let { BittensorEstimateContext(it.metaId, it.chain, subnetId) } }
     )
         .shareInBackground()
 

@@ -1,0 +1,3365 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 75,
+    "identityHash": "8930986e2efe9d2754825d1d2b7d6bfc",
+    "entities": [
+      {
+        "tableName": "users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`address` TEXT NOT NULL, `username` TEXT NOT NULL, `publicKey` TEXT NOT NULL, `cryptoType` INTEGER NOT NULL, `position` INTEGER NOT NULL, `networkType` INTEGER NOT NULL, PRIMARY KEY(`address`))",
+        "fields": [
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publicKey",
+            "columnName": "publicKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cryptoType",
+            "columnName": "cryptoType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkType",
+            "columnName": "networkType",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "address"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "nodes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `link` TEXT NOT NULL, `networkType` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "link",
+            "columnName": "link",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkType",
+            "columnName": "networkType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "assets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`assetId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `freeInPlanks` TEXT NOT NULL, `frozenInPlanks` TEXT NOT NULL, `reservedInPlanks` TEXT NOT NULL, `transferableMode` INTEGER NOT NULL, `edCountingMode` INTEGER NOT NULL, `bondedInPlanks` TEXT NOT NULL, `redeemableInPlanks` TEXT NOT NULL, `unbondingInPlanks` TEXT NOT NULL, PRIMARY KEY(`assetId`, `chainId`, `metaId`), FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "freeInPlanks",
+            "columnName": "freeInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "frozenInPlanks",
+            "columnName": "frozenInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reservedInPlanks",
+            "columnName": "reservedInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transferableMode",
+            "columnName": "transferableMode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "edCountingMode",
+            "columnName": "edCountingMode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bondedInPlanks",
+            "columnName": "bondedInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redeemableInPlanks",
+            "columnName": "redeemableInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unbondingInPlanks",
+            "columnName": "unbondingInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "assetId",
+            "chainId",
+            "metaId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_assets_metaId",
+            "unique": false,
+            "columnNames": [
+              "metaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_assets_metaId` ON `${TABLE_NAME}` (`metaId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tokens",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tokenSymbol` TEXT NOT NULL, `rate` TEXT, `currencyId` INTEGER NOT NULL, `recentRateChange` TEXT, PRIMARY KEY(`tokenSymbol`, `currencyId`))",
+        "fields": [
+          {
+            "fieldPath": "tokenSymbol",
+            "columnName": "tokenSymbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rate",
+            "columnName": "rate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "currencyId",
+            "columnName": "currencyId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recentRateChange",
+            "columnName": "recentRateChange",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "tokenSymbol",
+            "currencyId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "phishing_addresses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`publicKey` TEXT NOT NULL, PRIMARY KEY(`publicKey`))",
+        "fields": [
+          {
+            "fieldPath": "publicKey",
+            "columnName": "publicKey",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "publicKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "storage",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storageKey` TEXT NOT NULL, `content` TEXT, `chainId` TEXT NOT NULL, PRIMARY KEY(`chainId`, `storageKey`))",
+        "fields": [
+          {
+            "fieldPath": "storageKey",
+            "columnName": "storageKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "content",
+            "columnName": "content",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "storageKey"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "account_staking_accesses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `chainAssetId` INTEGER NOT NULL, `accountId` BLOB NOT NULL, `stashId` BLOB, `controllerId` BLOB, PRIMARY KEY(`chainId`, `chainAssetId`, `accountId`))",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainAssetId",
+            "columnName": "chainAssetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stakingAccessInfo.stashId",
+            "columnName": "stashId",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stakingAccessInfo.controllerId",
+            "columnName": "controllerId",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "chainAssetId",
+            "accountId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "total_reward",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` BLOB NOT NULL, `chainId` TEXT NOT NULL, `chainAssetId` INTEGER NOT NULL, `stakingType` TEXT NOT NULL, `totalReward` TEXT NOT NULL, PRIMARY KEY(`chainId`, `chainAssetId`, `stakingType`, `accountId`))",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainAssetId",
+            "columnName": "chainAssetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stakingType",
+            "columnName": "stakingType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalReward",
+            "columnName": "totalReward",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "chainAssetId",
+            "stakingType",
+            "accountId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "operations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `address` TEXT NOT NULL, `time` INTEGER NOT NULL, `status` INTEGER NOT NULL, `source` INTEGER NOT NULL, `hash` TEXT, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, PRIMARY KEY(`id`, `address`, `chainId`, `assetId`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hash",
+            "columnName": "hash",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "assetId.chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId.assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id",
+            "address",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operations_hash",
+            "unique": false,
+            "columnNames": [
+              "hash"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operations_hash` ON `${TABLE_NAME}` (`hash`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "operation_transfers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`amount` TEXT NOT NULL, `sender` TEXT NOT NULL, `receiver` TEXT NOT NULL, `fee` TEXT, `operationId` TEXT NOT NULL, `address` TEXT NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, PRIMARY KEY(`operationId`, `address`, `chainId`, `assetId`), FOREIGN KEY(`operationId`, `address`, `chainId`, `assetId`) REFERENCES `operations`(`id`, `address`, `chainId`, `assetId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sender",
+            "columnName": "sender",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receiver",
+            "columnName": "receiver",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fee",
+            "columnName": "fee",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "foreignKey.operationId",
+            "columnName": "operationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "operationId",
+            "address",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operation_transfers_operationId_address_chainId_assetId",
+            "unique": false,
+            "columnNames": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_transfers_operationId_address_chainId_assetId` ON `${TABLE_NAME}` (`operationId`, `address`, `chainId`, `assetId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "operations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "referencedColumns": [
+              "id",
+              "address",
+              "chainId",
+              "assetId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "operation_rewards_direct",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`isReward` INTEGER NOT NULL, `amount` TEXT NOT NULL, `eventId` TEXT NOT NULL, `era` INTEGER, `validator` TEXT, `operationId` TEXT NOT NULL, `address` TEXT NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, PRIMARY KEY(`operationId`, `address`, `chainId`, `assetId`), FOREIGN KEY(`operationId`, `address`, `chainId`, `assetId`) REFERENCES `operations`(`id`, `address`, `chainId`, `assetId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "isReward",
+            "columnName": "isReward",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "eventId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "era",
+            "columnName": "era",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "validator",
+            "columnName": "validator",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "foreignKey.operationId",
+            "columnName": "operationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "operationId",
+            "address",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operation_rewards_direct_operationId_address_chainId_assetId",
+            "unique": false,
+            "columnNames": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_rewards_direct_operationId_address_chainId_assetId` ON `${TABLE_NAME}` (`operationId`, `address`, `chainId`, `assetId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "operations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "referencedColumns": [
+              "id",
+              "address",
+              "chainId",
+              "assetId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "operation_rewards_pool",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`isReward` INTEGER NOT NULL, `amount` TEXT NOT NULL, `eventId` TEXT NOT NULL, `poolId` INTEGER NOT NULL, `operationId` TEXT NOT NULL, `address` TEXT NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, PRIMARY KEY(`operationId`, `address`, `chainId`, `assetId`), FOREIGN KEY(`operationId`, `address`, `chainId`, `assetId`) REFERENCES `operations`(`id`, `address`, `chainId`, `assetId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "isReward",
+            "columnName": "isReward",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "eventId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poolId",
+            "columnName": "poolId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.operationId",
+            "columnName": "operationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "operationId",
+            "address",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operation_rewards_pool_operationId_address_chainId_assetId",
+            "unique": false,
+            "columnNames": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_rewards_pool_operationId_address_chainId_assetId` ON `${TABLE_NAME}` (`operationId`, `address`, `chainId`, `assetId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "operations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "referencedColumns": [
+              "id",
+              "address",
+              "chainId",
+              "assetId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "operation_extrinsics",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`contentType` TEXT NOT NULL, `module` TEXT NOT NULL, `call` TEXT, `fee` TEXT NOT NULL, `operationId` TEXT NOT NULL, `address` TEXT NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, PRIMARY KEY(`operationId`, `address`, `chainId`, `assetId`), FOREIGN KEY(`operationId`, `address`, `chainId`, `assetId`) REFERENCES `operations`(`id`, `address`, `chainId`, `assetId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "contentType",
+            "columnName": "contentType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "module",
+            "columnName": "module",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "call",
+            "columnName": "call",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fee",
+            "columnName": "fee",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.operationId",
+            "columnName": "operationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "operationId",
+            "address",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operation_extrinsics_operationId_address_chainId_assetId",
+            "unique": false,
+            "columnNames": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_extrinsics_operationId_address_chainId_assetId` ON `${TABLE_NAME}` (`operationId`, `address`, `chainId`, `assetId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "operations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "referencedColumns": [
+              "id",
+              "address",
+              "chainId",
+              "assetId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "operation_swaps",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`operationId` TEXT NOT NULL, `address` TEXT NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `fee_amount` TEXT NOT NULL, `fee_chainId` TEXT NOT NULL, `fee_assetId` INTEGER NOT NULL, `assetIn_amount` TEXT NOT NULL, `assetIn_chainId` TEXT NOT NULL, `assetIn_assetId` INTEGER NOT NULL, `assetOut_amount` TEXT NOT NULL, `assetOut_chainId` TEXT NOT NULL, `assetOut_assetId` INTEGER NOT NULL, PRIMARY KEY(`operationId`, `address`, `chainId`, `assetId`), FOREIGN KEY(`operationId`, `address`, `chainId`, `assetId`) REFERENCES `operations`(`id`, `address`, `chainId`, `assetId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "fields": [
+          {
+            "fieldPath": "foreignKey.operationId",
+            "columnName": "operationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.address",
+            "columnName": "address",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "foreignKey.assetId.assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fee.amount",
+            "columnName": "fee_amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fee.assetId.chainId",
+            "columnName": "fee_chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fee.assetId.assetId",
+            "columnName": "fee_assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetIn.amount",
+            "columnName": "assetIn_amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetIn.assetId.chainId",
+            "columnName": "assetIn_chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetIn.assetId.assetId",
+            "columnName": "assetIn_assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetOut.amount",
+            "columnName": "assetOut_amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetOut.assetId.chainId",
+            "columnName": "assetOut_chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetOut.assetId.assetId",
+            "columnName": "assetOut_assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "operationId",
+            "address",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_operation_swaps_operationId_address_chainId_assetId",
+            "unique": false,
+            "columnNames": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_operation_swaps_operationId_address_chainId_assetId` ON `${TABLE_NAME}` (`operationId`, `address`, `chainId`, `assetId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "operations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "operationId",
+              "address",
+              "chainId",
+              "assetId"
+            ],
+            "referencedColumns": [
+              "id",
+              "address",
+              "chainId",
+              "assetId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chains",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `parentId` TEXT, `name` TEXT NOT NULL, `icon` TEXT NOT NULL, `prefix` INTEGER NOT NULL, `legacyPrefix` INTEGER, `isEthereumBased` INTEGER NOT NULL, `isTestNet` INTEGER NOT NULL, `hasSubstrateRuntime` INTEGER NOT NULL DEFAULT 1, `pushSupport` INTEGER NOT NULL DEFAULT 0, `hasCrowdloans` INTEGER NOT NULL, `supportProxy` INTEGER NOT NULL DEFAULT 0, `multisigSupport` INTEGER NOT NULL DEFAULT 0, `swap` TEXT NOT NULL, `customFee` TEXT NOT NULL, `governance` TEXT NOT NULL, `additional` TEXT, `connectionState` TEXT NOT NULL, `nodeSelectionStrategy` TEXT NOT NULL DEFAULT 'ROUND_ROBIN', `source` TEXT NOT NULL DEFAULT 'DEFAULT', `url` TEXT, `overridesCommon` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parentId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prefix",
+            "columnName": "prefix",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "legacyPrefix",
+            "columnName": "legacyPrefix",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isEthereumBased",
+            "columnName": "isEthereumBased",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isTestNet",
+            "columnName": "isTestNet",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasSubstrateRuntime",
+            "columnName": "hasSubstrateRuntime",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "pushSupport",
+            "columnName": "pushSupport",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "hasCrowdloans",
+            "columnName": "hasCrowdloans",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supportProxy",
+            "columnName": "supportProxy",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "multisigSupport",
+            "columnName": "multisigSupport",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "swap",
+            "columnName": "swap",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customFee",
+            "columnName": "customFee",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "governance",
+            "columnName": "governance",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "additional",
+            "columnName": "additional",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "connectionState",
+            "columnName": "connectionState",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nodeSelectionStrategy",
+            "columnName": "nodeSelectionStrategy",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'ROUND_ROBIN'"
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'DEFAULT'"
+          },
+          {
+            "fieldPath": "types.url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "types.overridesCommon",
+            "columnName": "overridesCommon",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chain_nodes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `url` TEXT NOT NULL, `name` TEXT NOT NULL, `orderId` INTEGER NOT NULL DEFAULT 0, `source` TEXT NOT NULL DEFAULT 'DEFAULT', PRIMARY KEY(`chainId`, `url`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderId",
+            "columnName": "orderId",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'DEFAULT'"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "url"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_nodes_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_nodes_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chain_assets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `name` TEXT NOT NULL, `symbol` TEXT NOT NULL, `priceId` TEXT, `staking` TEXT NOT NULL, `precision` INTEGER NOT NULL, `icon` TEXT, `type` TEXT, `source` TEXT NOT NULL DEFAULT 'DEFAULT', `buyProviders` TEXT, `sellProviders` TEXT, `typeExtras` TEXT, `enabled` INTEGER NOT NULL DEFAULT 1, PRIMARY KEY(`chainId`, `id`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "priceId",
+            "columnName": "priceId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "staking",
+            "columnName": "staking",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "precision",
+            "columnName": "precision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'DEFAULT'"
+          },
+          {
+            "fieldPath": "buyProviders",
+            "columnName": "buyProviders",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "sellProviders",
+            "columnName": "sellProviders",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "typeExtras",
+            "columnName": "typeExtras",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "enabled",
+            "columnName": "enabled",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_assets_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_assets_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chain_runtimes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `syncedVersion` INTEGER NOT NULL, `remoteVersion` INTEGER NOT NULL, `transactionVersion` INTEGER, `localMigratorVersion` INTEGER NOT NULL, PRIMARY KEY(`chainId`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "syncedVersion",
+            "columnName": "syncedVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remoteVersion",
+            "columnName": "remoteVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transactionVersion",
+            "columnName": "transactionVersion",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "localMigratorVersion",
+            "columnName": "localMigratorVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_runtimes_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_runtimes_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chain_explorers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `name` TEXT NOT NULL, `extrinsic` TEXT, `account` TEXT, `event` TEXT, PRIMARY KEY(`chainId`, `name`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "extrinsic",
+            "columnName": "extrinsic",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "event",
+            "columnName": "event",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "name"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_explorers_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_explorers_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chain_external_apis",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `sourceType` TEXT NOT NULL, `apiType` TEXT NOT NULL, `parameters` TEXT, `url` TEXT NOT NULL, PRIMARY KEY(`chainId`, `url`, `apiType`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceType",
+            "columnName": "sourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "apiType",
+            "columnName": "apiType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parameters",
+            "columnName": "parameters",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "url",
+            "apiType"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_external_apis_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_external_apis_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "meta_accounts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`substratePublicKey` BLOB, `substrateCryptoType` TEXT, `substrateAccountId` BLOB, `ethereumPublicKey` BLOB, `ethereumAddress` BLOB, `name` TEXT NOT NULL, `parentMetaId` INTEGER, `isSelected` INTEGER NOT NULL, `position` INTEGER NOT NULL, `type` TEXT NOT NULL, `status` TEXT NOT NULL DEFAULT 'ACTIVE', `globallyUniqueId` TEXT NOT NULL, `typeExtras` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "substratePublicKey",
+            "columnName": "substratePublicKey",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrateCryptoType",
+            "columnName": "substrateCryptoType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "substrateAccountId",
+            "columnName": "substrateAccountId",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ethereumPublicKey",
+            "columnName": "ethereumPublicKey",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ethereumAddress",
+            "columnName": "ethereumAddress",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parentMetaId",
+            "columnName": "parentMetaId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isSelected",
+            "columnName": "isSelected",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'ACTIVE'"
+          },
+          {
+            "fieldPath": "globallyUniqueId",
+            "columnName": "globallyUniqueId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeExtras",
+            "columnName": "typeExtras",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_meta_accounts_substrateAccountId",
+            "unique": false,
+            "columnNames": [
+              "substrateAccountId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meta_accounts_substrateAccountId` ON `${TABLE_NAME}` (`substrateAccountId`)"
+          },
+          {
+            "name": "index_meta_accounts_ethereumAddress",
+            "unique": false,
+            "columnNames": [
+              "ethereumAddress"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meta_accounts_ethereumAddress` ON `${TABLE_NAME}` (`ethereumAddress`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chain_accounts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `publicKey` BLOB, `accountId` BLOB NOT NULL, `cryptoType` TEXT, PRIMARY KEY(`metaId`, `chainId`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publicKey",
+            "columnName": "publicKey",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cryptoType",
+            "columnName": "cryptoType",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_accounts_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_accounts_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          },
+          {
+            "name": "index_chain_accounts_metaId",
+            "unique": false,
+            "columnNames": [
+              "metaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_accounts_metaId` ON `${TABLE_NAME}` (`metaId`)"
+          },
+          {
+            "name": "index_chain_accounts_accountId",
+            "unique": false,
+            "columnNames": [
+              "accountId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_accounts_accountId` ON `${TABLE_NAME}` (`accountId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "dapp_authorizations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`baseUrl` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `dAppTitle` TEXT, `authorized` INTEGER, PRIMARY KEY(`baseUrl`, `metaId`))",
+        "fields": [
+          {
+            "fieldPath": "baseUrl",
+            "columnName": "baseUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dAppTitle",
+            "columnName": "dAppTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "authorized",
+            "columnName": "authorized",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "baseUrl",
+            "metaId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "nfts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`identifier` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `collectionId` TEXT NOT NULL, `instanceId` TEXT, `metadata` BLOB, `type` TEXT NOT NULL, `wholeDetailsLoaded` INTEGER NOT NULL, `name` TEXT, `label` TEXT, `media` TEXT, `issuanceType` TEXT NOT NULL, `issuanceTotal` TEXT, `issuanceMyEdition` TEXT, `issuanceMyAmount` TEXT, `price` TEXT, `pricedUnits` TEXT, PRIMARY KEY(`identifier`))",
+        "fields": [
+          {
+            "fieldPath": "identifier",
+            "columnName": "identifier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionId",
+            "columnName": "collectionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "instanceId",
+            "columnName": "instanceId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "metadata",
+            "columnName": "metadata",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wholeDetailsLoaded",
+            "columnName": "wholeDetailsLoaded",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "media",
+            "columnName": "media",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "issuanceType",
+            "columnName": "issuanceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "issuanceTotal",
+            "columnName": "issuanceTotal",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "issuanceMyEdition",
+            "columnName": "issuanceMyEdition",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "issuanceMyAmount",
+            "columnName": "issuanceMyAmount",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pricedUnits",
+            "columnName": "pricedUnits",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "identifier"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_nfts_metaId",
+            "unique": false,
+            "columnNames": [
+              "metaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_nfts_metaId` ON `${TABLE_NAME}` (`metaId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "phishing_sites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`host` TEXT NOT NULL, PRIMARY KEY(`host`))",
+        "fields": [
+          {
+            "fieldPath": "host",
+            "columnName": "host",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "host"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "favourite_dapps",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`url` TEXT NOT NULL, `label` TEXT NOT NULL, `icon` TEXT, `orderingIndex` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`url`))",
+        "fields": [
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "orderingIndex",
+            "columnName": "orderingIndex",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "url"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "currencies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`code` TEXT NOT NULL, `name` TEXT NOT NULL, `symbol` TEXT, `category` TEXT NOT NULL, `popular` INTEGER NOT NULL, `id` INTEGER NOT NULL, `coingeckoId` TEXT NOT NULL, `selected` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "popular",
+            "columnName": "popular",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coingeckoId",
+            "columnName": "coingeckoId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selected",
+            "columnName": "selected",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "locks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `type` TEXT NOT NULL, `amount` TEXT NOT NULL, PRIMARY KEY(`metaId`, `chainId`, `assetId`, `type`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId",
+            "assetId",
+            "type"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "contributions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `paraId` TEXT NOT NULL, `amountInPlanks` TEXT NOT NULL, `sourceId` TEXT NOT NULL, `unlockBlock` TEXT NOT NULL, `leaseDepositor` BLOB NOT NULL, PRIMARY KEY(`metaId`, `chainId`, `assetId`, `paraId`, `sourceId`))",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paraId",
+            "columnName": "paraId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amountInPlanks",
+            "columnName": "amountInPlanks",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "sourceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unlockBlock",
+            "columnName": "unlockBlock",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "leaseDepositor",
+            "columnName": "leaseDepositor",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId",
+            "assetId",
+            "paraId",
+            "sourceId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "governance_dapps",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `name` TEXT NOT NULL, `referendumUrlV1` TEXT, `referendumUrlV2` TEXT, `iconUrl` TEXT NOT NULL, `details` TEXT NOT NULL, PRIMARY KEY(`chainId`, `name`))",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "referendumUrlV1",
+            "columnName": "referendumUrlV1",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "referendumUrlV2",
+            "columnName": "referendumUrlV2",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "iconUrl",
+            "columnName": "iconUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "details",
+            "columnName": "details",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "name"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "browser_host_settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`hostUrl` TEXT NOT NULL, `isDesktopModeEnabled` INTEGER NOT NULL, PRIMARY KEY(`hostUrl`))",
+        "fields": [
+          {
+            "fieldPath": "hostUrl",
+            "columnName": "hostUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDesktopModeEnabled",
+            "columnName": "isDesktopModeEnabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "hostUrl"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "wallet_connect_pairings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pairingTopic` TEXT NOT NULL, `metaId` INTEGER NOT NULL, PRIMARY KEY(`pairingTopic`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "pairingTopic",
+            "columnName": "pairingTopic",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pairingTopic"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallet_connect_pairings_metaId",
+            "unique": false,
+            "columnNames": [
+              "metaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_wallet_connect_pairings_metaId` ON `${TABLE_NAME}` (`metaId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "coin_prices",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`priceId` TEXT NOT NULL, `currencyId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `rate` TEXT NOT NULL, PRIMARY KEY(`priceId`, `currencyId`, `timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "priceId",
+            "columnName": "priceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currencyId",
+            "columnName": "currencyId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rate",
+            "columnName": "rate",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "priceId",
+            "currencyId",
+            "timestamp"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "staking_dashboard_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `chainAssetId` INTEGER NOT NULL, `stakingType` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `hasStake` INTEGER NOT NULL, `stake` TEXT, `status` TEXT, `rewards` TEXT, `estimatedEarnings` REAL, `stakeStatusAccount` BLOB, `rewardsAccount` BLOB, PRIMARY KEY(`chainId`, `chainAssetId`, `stakingType`, `metaId`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainAssetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainAssetId",
+            "columnName": "chainAssetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stakingType",
+            "columnName": "stakingType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "hasStake",
+            "columnName": "hasStake",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stake",
+            "columnName": "stake",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rewards",
+            "columnName": "rewards",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "estimatedEarnings",
+            "columnName": "estimatedEarnings",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "stakeStatusAccount",
+            "columnName": "stakeStatusAccount",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rewardsAccount",
+            "columnName": "rewardsAccount",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId",
+            "chainAssetId",
+            "stakingType",
+            "metaId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_staking_dashboard_items_metaId",
+            "unique": false,
+            "columnNames": [
+              "metaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_staking_dashboard_items_metaId` ON `${TABLE_NAME}` (`metaId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainAssetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          },
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "staking_reward_period",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`accountId` BLOB NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `stakingType` TEXT NOT NULL, `periodType` TEXT NOT NULL, `customPeriodStart` INTEGER, `customPeriodEnd` INTEGER, PRIMARY KEY(`accountId`, `chainId`, `assetId`, `stakingType`))",
+        "fields": [
+          {
+            "fieldPath": "accountId",
+            "columnName": "accountId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stakingType",
+            "columnName": "stakingType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "periodType",
+            "columnName": "periodType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "customPeriodStart",
+            "columnName": "customPeriodStart",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "customPeriodEnd",
+            "columnName": "customPeriodEnd",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "accountId",
+            "chainId",
+            "assetId",
+            "stakingType"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "externalBalances",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `type` TEXT NOT NULL, `subtype` TEXT NOT NULL, `amount` TEXT NOT NULL, PRIMARY KEY(`metaId`, `chainId`, `assetId`, `type`, `subtype`), FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subtype",
+            "columnName": "subtype",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId",
+            "assetId",
+            "type",
+            "subtype"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          },
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "proxy_accounts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`proxiedMetaId` INTEGER NOT NULL, `proxyMetaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `proxiedAccountId` BLOB NOT NULL, `proxyType` TEXT NOT NULL, PRIMARY KEY(`proxyMetaId`, `proxiedAccountId`, `chainId`, `proxyType`), FOREIGN KEY(`proxiedMetaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`proxyMetaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "proxiedMetaId",
+            "columnName": "proxiedMetaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "proxyMetaId",
+            "columnName": "proxyMetaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "proxiedAccountId",
+            "columnName": "proxiedAccountId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "proxyType",
+            "columnName": "proxyType",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "proxyMetaId",
+            "proxiedAccountId",
+            "chainId",
+            "proxyType"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "proxiedMetaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "proxyMetaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "holds",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `amount` TEXT NOT NULL, `id_module` TEXT NOT NULL, `id_reason` TEXT NOT NULL, PRIMARY KEY(`metaId`, `chainId`, `assetId`, `id_module`, `id_reason`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id.module",
+            "columnName": "id_module",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id.reason",
+            "columnName": "id_reason",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId",
+            "assetId",
+            "id_module",
+            "id_reason"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "chain_asset_visibility",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `visible` INTEGER NOT NULL, PRIMARY KEY(`metaId`, `chainId`, `assetId`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "visible",
+            "columnName": "visible",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId",
+            "assetId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_chain_asset_visibility_metaId",
+            "unique": false,
+            "columnNames": [
+              "metaId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_asset_visibility_metaId` ON `${TABLE_NAME}` (`metaId`)"
+          },
+          {
+            "name": "index_chain_asset_visibility_assetId_chainId",
+            "unique": false,
+            "columnNames": [
+              "assetId",
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chain_asset_visibility_assetId_chainId` ON `${TABLE_NAME}` (`assetId`, `chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "meta_account_settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `autoAddTokensWithBalance` INTEGER NOT NULL, PRIMARY KEY(`metaId`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "autoAddTokensWithBalance",
+            "columnName": "autoAddTokensWithBalance",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "node_selection_preferences",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chainId` TEXT NOT NULL, `autoBalanceEnabled` INTEGER NOT NULL DEFAULT 1, `selectedNodeUrl` TEXT, PRIMARY KEY(`chainId`), FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "autoBalanceEnabled",
+            "columnName": "autoBalanceEnabled",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
+          },
+          {
+            "fieldPath": "selectedNodeUrl",
+            "columnName": "selectedNodeUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "chainId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_node_selection_preferences_chainId",
+            "unique": false,
+            "columnNames": [
+              "chainId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_node_selection_preferences_chainId` ON `${TABLE_NAME}` (`chainId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tinder_gov_basket",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`referendumId` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `amount` TEXT NOT NULL, `conviction` TEXT NOT NULL, `voteType` TEXT NOT NULL, PRIMARY KEY(`referendumId`, `metaId`, `chainId`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "referendumId",
+            "columnName": "referendumId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conviction",
+            "columnName": "conviction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "voteType",
+            "columnName": "voteType",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "referendumId",
+            "metaId",
+            "chainId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tinder_gov_voting_power",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `amount` TEXT NOT NULL, `conviction` TEXT NOT NULL, PRIMARY KEY(`metaId`, `chainId`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conviction",
+            "columnName": "conviction",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "browser_tabs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `metaId` INTEGER NOT NULL, `currentUrl` TEXT NOT NULL, `creationTime` INTEGER NOT NULL, `pageName` TEXT, `pageIconPath` TEXT, `pagePicturePath` TEXT, `dappMetadata_iconLink` TEXT, PRIMARY KEY(`id`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentUrl",
+            "columnName": "currentUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creationTime",
+            "columnName": "creationTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pageName",
+            "columnName": "pageName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pageIconPath",
+            "columnName": "pageIconPath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pagePicturePath",
+            "columnName": "pagePicturePath",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "knownDAppMetadata.iconLink",
+            "columnName": "dappMetadata_iconLink",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "multisig_operation_call",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `callHash` TEXT NOT NULL, `callInstance` TEXT NOT NULL, PRIMARY KEY(`metaId`, `chainId`, `callHash`), FOREIGN KEY(`metaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`chainId`) REFERENCES `chains`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "metaId",
+            "columnName": "metaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "callHash",
+            "columnName": "callHash",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "callInstance",
+            "columnName": "callInstance",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "metaId",
+            "chainId",
+            "callHash"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chains",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "gifts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`amount` TEXT NOT NULL, `giftAccountId` BLOB NOT NULL, `creatorMetaId` INTEGER NOT NULL, `chainId` TEXT NOT NULL, `assetId` INTEGER NOT NULL, `status` TEXT NOT NULL, `creationDate` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`creatorMetaId`) REFERENCES `meta_accounts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "giftAccountId",
+            "columnName": "giftAccountId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creatorMetaId",
+            "columnName": "creatorMetaId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chainId",
+            "columnName": "chainId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "assetId",
+            "columnName": "assetId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "creationDate",
+            "columnName": "creationDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "meta_accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "creatorMetaId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "chain_assets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "assetId",
+              "chainId"
+            ],
+            "referencedColumns": [
+              "id",
+              "chainId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "analytics_pending_events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eventId` TEXT NOT NULL, `name` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `propsJson` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventId",
+            "columnName": "eventId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "propsJson",
+            "columnName": "propsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8930986e2efe9d2754825d1d2b7d6bfc')"
+    ]
+  }
+}
