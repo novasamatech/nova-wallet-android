@@ -4,9 +4,10 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.BittensorDashboardDetails
 import com.google.gson.Gson
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.createResponseTestCache
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.InMemoryPreferences
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -76,7 +77,13 @@ class BittensorDashboardDetailsSourceTest {
 
     private val portfolioState = MutableStateFlow(BittensorPortfolioState(portfolio, BittensorDataStatus.Fresh))
 
-    private val snapshots = RealBittensorDashboardSnapshotRepository(InMemoryPreferences(), Gson())
+    private val snapshotCache = createResponseTestCache()
+
+    private val preferences = InMemoryPreferences()
+
+    private val gson = Gson()
+
+    private val snapshots = BittensorDashboardSnapshotSource(snapshotCache, preferences, gson, logger)
 
     private val source = BittensorDashboardDetailsSource(positions, validators, recommendations, snapshots, logger)
 
@@ -192,7 +199,7 @@ class BittensorDashboardDetailsSourceTest {
         assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
         verify(recommendations, times(1)).maximumYields()
 
-        snapshots.saveClaimableRootRewards("chain", coldKey, BigInteger.TEN)
+        snapshots.saveClaimableRootRewards("chain", coldKey, 1L, BigInteger.TEN)
         runCurrent()
         assertEquals(BigInteger.TEN, emitted.last().claimableRootRewardsInPlanks)
         assertTrue(emitted.last().showsClaimableRewardsPanel)
@@ -209,7 +216,7 @@ class BittensorDashboardDetailsSourceTest {
         val first = backgroundScope.launch { source.observe(account, listOf(chain)).collect() }
         runCurrent()
         first.cancel()
-        val stored = requireNotNull(snapshots.snapshot("chain", coldKey))
+        val stored = requireNotNull(snapshots.snapshot("chain", coldKey, 1L))
         assertEquals(BigInteger.TEN, stored.rootStakeInPlanks)
         assertEquals(0, BigDecimal.TEN.compareTo(stored.rootAnnualPercentageYield))
 
@@ -223,6 +230,7 @@ class BittensorDashboardDetailsSourceTest {
         assertEquals(BigInteger.TEN, details.panelStakeInPlanks)
         assertEquals(0, BigDecimal.TEN.compareTo(details.panelAnnualPercentageYield))
         assertFalse(details.panelYieldLoading)
+        assertTrue(details.stale)
     }
 
     @Test
@@ -238,12 +246,12 @@ class BittensorDashboardDetailsSourceTest {
         val job = backgroundScope.launch { source.observe(account, listOf(chain)).collect { it["chain"]?.let(emitted::add) } }
         runCurrent()
         assertEquals(BittensorDashboardDetails.Pricing.LOADING, emitted.last().pricing)
-        assertEquals(BigInteger.TEN, snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
+        assertEquals(BigInteger.TEN, snapshots.snapshot("chain", coldKey, 1L)?.totalStakeInPlanks)
 
         portfolioState.value = BittensorPortfolioState(withSubnet, BittensorDataStatus.Fresh, pricesPending = false)
         runCurrent()
         assertEquals(BittensorDashboardDetails.Pricing.UNKNOWN, emitted.last().pricing)
-        assertNull(snapshots.snapshot("chain", coldKey)?.totalStakeInPlanks)
+        assertNull(snapshots.snapshot("chain", coldKey, 1L)?.totalStakeInPlanks)
         job.cancel()
     }
 
@@ -267,7 +275,7 @@ class BittensorDashboardDetailsSourceTest {
         portfolioState.value = noStake
         runCurrent()
         assertEquals(BigDecimal.ONE, emitted.last().maximumAnnualPercentageYield)
-        assertEquals(BigDecimal.ONE, snapshots.snapshot("chain", coldKey)?.maximumAnnualPercentageYield)
+        assertEquals(BigDecimal.ONE, snapshots.snapshot("chain", coldKey, 1L)?.maximumAnnualPercentageYield)
         verify(recommendations, times(2)).maximumYields()
         job.cancel()
     }
@@ -303,11 +311,14 @@ class BittensorDashboardDetailsSourceTest {
     }
 
     private suspend fun prepare() {
+        org.mockito.Mockito.`when`(validators.observeYields(org.mockito.ArgumentMatchers.any(BittensorNetuid::class.java) ?: BittensorNetuid.Root))
+            .thenAnswer { invocation -> kotlinx.coroutines.flow.flow { emit(validators.yields(invocation.getArgument(0))) } }
         `when`(chain.id).thenReturn("chain")
         `when`(chain.assets).thenReturn(listOf(asset))
         `when`(asset.staking).thenReturn(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT))
+        `when`(account.id).thenReturn(1L)
         `when`(account.accountIdIn(chain)).thenReturn(coldKey)
-        `when`(positions.observePortfolio("chain", coldKey)).thenReturn(portfolioState)
+        `when`(positions.observePortfolio("chain", coldKey, metaAccountId = 1L)).thenReturn(portfolioState)
         `when`(validators.yields(BittensorNetuid.Root)).thenReturn(mapOf(hotkey to BigDecimal.TEN))
         `when`(recommendations.maximumYields()).thenReturn(mapOf(subnet to BigDecimal.ONE))
     }

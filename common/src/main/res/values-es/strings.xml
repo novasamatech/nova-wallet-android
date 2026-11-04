@@ -2461,4 +2461,21 @@
     <string name="deep_linking_staking_asset_not_found">No se ha encontrado el activo de este enlace de staking.</string>
     <string name="deep_linking_staking_not_supported">Este activo no admite staking.</string>
     <string name="staking_new_feature">NUEVO</string>
+    <string name="bittensor_mev_description">Mantiene tu orden cifrada en el mempool público para ayudar a prevenir el front-running.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Es posible que se haya cobrado una comisión de red.</string>
+    <string name="bittensor_mev_not_executed">Orden no ejecutada</string>
+    <string name="bittensor_mev_nothing_spent">No se ha gastado nada.</string>
+    <string name="bittensor_mev_title">Protección MEV</string>
+    <string name="bittensor_mev_unavailable">La protección MEV no está disponible para esta orden.</string>
+    <string name="bittensor_mev_unchanged">Tu orden no se ejecutó. Tu stake no ha cambiado; inténtalo de nuevo.</string>
+    <string name="bittensor_result_fee_charged">Es posible que se haya cobrado una comisión de red.</string>
+    <string name="bittensor_result_nothing_spent">No se ha gastado nada.</string>
+    <string name="bittensor_result_price_moved">La orden no se ejecutó porque el precio se movió más allá de tu tolerancia de deslizamiento.</string>
+    <string name="bittensor_result_price_moved_format">La orden no se ejecutó: el precio se movió más allá de tu tolerancia de deslizamiento (%1$s). Puedes cambiar el deslizamiento usando el icono de ajustes en la pantalla de entrada del importe de %2$s e intentarlo de nuevo.</string>
+    <string name="swap_get_token_alternatives_format">%1$s o %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Se abre en el navegador</string>
+    <string name="swap_get_token_dapp_description">%s · se abre en el navegador</string>
+    <string name="swap_get_token_dapp_title">Intercambiar en %s</string>
+    <string name="swap_get_token_third_party">TERCEROS</string>
+    <string name="bittensor_result_price_moved_with_tolerance">La orden no se ejecutó: el precio se movió más allá de tu tolerancia de deslizamiento (%1$s). Puedes cambiar el deslizamiento usando el icono de configuración en la pantalla de introducción del importe e intentarlo de nuevo.</string>
 </resources>

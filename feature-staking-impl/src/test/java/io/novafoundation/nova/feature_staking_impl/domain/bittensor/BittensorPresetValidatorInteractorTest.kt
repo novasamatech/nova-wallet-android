@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlpha
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorRemote
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -35,7 +35,7 @@ class BittensorPresetValidatorInteractorTest {
 
     private val yields = mock(BittensorAlphaYieldRepository::class.java)
 
-    private val backend = mock(BittensorValidatorBackend::class.java)
+    private val backend = mock(BittensorValidatorSource::class.java)
 
     private val chains = mock(ChainRegistry::class.java)
 

@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '11.0.0'
-        versionCode = 278
+        versionName = '11.1.0'
+        versionCode = 279
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -47,7 +47,7 @@ buildscript {
         robolectricVersion = '4.1'
         allureVersion = '2.4.0'
 
-        bouncyCastleVersion = '1.78.1'
+        bouncyCastleVersion = '1.82'
 
         web3jVersion = '4.9.5'
 

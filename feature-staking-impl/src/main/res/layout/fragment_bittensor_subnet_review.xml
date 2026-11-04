@@ -82,6 +82,18 @@
                     app:shouldDrawDivider="false" />
             </io.novafoundation.nova.common.view.TableView>
 
+            <io.novafoundation.nova.common.view.Switch
+                android:id="@+id/mevProtection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="72dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:title="@string/bittensor_mev_title"
+                app:subtitle="@string/bittensor_mev_description" />
+
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

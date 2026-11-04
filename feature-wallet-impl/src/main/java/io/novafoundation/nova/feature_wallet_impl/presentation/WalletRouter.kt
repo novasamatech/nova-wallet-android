@@ -9,4 +9,6 @@ interface WalletRouter {
     fun openReceive(assetPayload: AssetPayload)
 
     fun openBuyToken(chainId: String, assetId: Int)
+
+    fun openDAppBrowser(url: String)
 }

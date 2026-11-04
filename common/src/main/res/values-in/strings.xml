@@ -2447,4 +2447,21 @@
     <string name="deep_linking_staking_asset_not_found">Aset dalam tautan staking ini tidak ditemukan.</string>
     <string name="deep_linking_staking_not_supported">Staking tidak didukung untuk aset ini.</string>
     <string name="staking_new_feature">BARU</string>
+    <string name="bittensor_mev_description">Menjaga pesanan Anda tetap terenkripsi di mempool publik untuk membantu mencegah front-running.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Biaya jaringan mungkin telah dikenakan.</string>
+    <string name="bittensor_mev_not_executed">Pesanan tidak dieksekusi</string>
+    <string name="bittensor_mev_nothing_spent">Tidak ada dana yang digunakan.</string>
+    <string name="bittensor_mev_title">Perlindungan MEV</string>
+    <string name="bittensor_mev_unavailable">Perlindungan MEV tidak tersedia untuk pesanan ini.</string>
+    <string name="bittensor_mev_unchanged">Pesanan Anda tidak dieksekusi. Stake Anda tidak berubah, silakan coba lagi.</string>
+    <string name="bittensor_result_fee_charged">Biaya jaringan mungkin telah dikenakan.</string>
+    <string name="bittensor_result_nothing_spent">Tidak ada dana yang digunakan.</string>
+    <string name="bittensor_result_price_moved">Pesanan tidak dieksekusi karena harga bergerak melampaui toleransi slippage Anda.</string>
+    <string name="bittensor_result_price_moved_format">Pesanan tidak dieksekusi: harga bergerak melampaui toleransi slippage Anda (%1$s). Anda dapat mengubah slippage menggunakan ikon pengaturan pada layar entri jumlah %2$s, lalu mencoba lagi.</string>
+    <string name="swap_get_token_alternatives_format">%1$s atau %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Membuka di browser</string>
+    <string name="swap_get_token_dapp_description">%s · membuka di browser</string>
+    <string name="swap_get_token_dapp_title">Tukar di %s</string>
+    <string name="swap_get_token_third_party">PIHAK KETIGA</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Pesanan tidak dieksekusi: harga bergerak melampaui toleransi slippage Anda (%1$s). Anda dapat mengubah slippage menggunakan ikon pengaturan pada layar input jumlah, lalu mencoba lagi.</string>
 </resources>

@@ -75,6 +75,9 @@ dependencies {
     testImplementation mockitoDep
     testImplementation coroutinesTestDep
 
+    implementation bouncyCastleDep
+    implementation 'com.google.crypto.tink:tink-android:1.8.0'
+
     implementation substrateSdkDep
     compileOnly wsDep
 

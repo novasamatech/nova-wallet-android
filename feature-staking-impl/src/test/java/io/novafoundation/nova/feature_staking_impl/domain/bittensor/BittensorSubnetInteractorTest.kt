@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
@@ -17,13 +17,13 @@ class BittensorSubnetInteractorTest {
     private val portfolioRepository = mock(BittensorPortfolioRepository::class.java)
     private val bittensorSubnetQuoteInteractor = mock(BittensorSubnetQuoteInteractor::class.java)
     private val favorites = mock(BittensorSubnetFavoritesRepository::class.java)
-    private val configRepository = mock(BittensorConfigRepository::class.java)
+    private val configSource = mock(BittensorConfigSource::class.java)
     private val bittensorSubnetInteractor = BittensorSubnetInteractor(
         repository,
         portfolioRepository,
         bittensorSubnetQuoteInteractor,
         favorites,
-        configRepository
+        configSource
     )
 
     @Test

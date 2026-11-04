@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevService
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorOperationHistorySource
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
@@ -36,6 +39,10 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.RETURNS_DEFAULTS
 
 class BittensorRootClaimExecutionTest {
+
+    private val history = mock(BittensorOperationHistorySource::class.java)
+
+    private val logger = mock(Logger::class.java)
 
     private val clock = BittensorClaimClock { 0L }
 
@@ -231,7 +238,9 @@ class BittensorRootClaimExecutionTest {
             }
         }
         val positionUpdates = BittensorPositionUpdates()
-        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, accounts, positionUpdates) { _, _ -> error("Not included") }
+        val resolver = BittensorExtrinsicOutcomeResolver { _, _ -> error("Not included") }
+        val mev = mock(BittensorMevService::class.java)
+        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, accounts, positionUpdates, positions, history, logger, resolver, mev)
         val cancellingInteractor = BittensorRootClaimInteractor(
             chains, accounts, wallets, source, cancellingExtrinsics, realExecutor, constants, immediate, pending, positions, validators
         )

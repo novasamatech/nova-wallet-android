@@ -1,5 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevReview
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mev.BittensorMevReviewFee
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMevFeeRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorMevSwitchState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forMevSelection
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.matchesMevSelection
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeAlertFormat
 import kotlinx.coroutines.flow.onStart
 import io.novafoundation.nova.common.utils.images.Icon
@@ -26,6 +32,7 @@ import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
+import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSlippage
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -65,6 +72,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOpe
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.actualBuyPay
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatMevFailureFee
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorPreSubmissionError
@@ -124,6 +132,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
@@ -148,6 +157,7 @@ class BittensorSubnetReviewViewModel(
     private val validationSystem: BittensorStakePreflightSystem,
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+    private val mevReview: BittensorMevReview,
     private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
     private val fiatFormatter: FiatFormatter,
@@ -193,6 +203,9 @@ class BittensorSubnetReviewViewModel(
     private val preparationRefresh = MutableStateFlow(0)
 
     private val validating = MutableStateFlow(false)
+
+    val canChangeMevProtection = combine(submission, validating) { submission, validating -> submission.canSubmit && !validating }
+        .shareInBackground()
 
     private val retryRequotes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -290,7 +303,7 @@ class BittensorSubnetReviewViewModel(
     private val costBasisState = estimatesMixin.observePositionCostBasis(
         walletContext.map {
             it.takeIf { existingPosition && it.metaId == metaId }
-                ?.let { BittensorEstimateContext(metaId, it.chain) }
+                ?.let { BittensorEstimateContext(metaId, it.chain, subnetId) }
         }
     )
         .shareInBackground()
@@ -345,11 +358,22 @@ class BittensorSubnetReviewViewModel(
         feeContext = feeContext
     )
 
+    private val mevEnabled = MutableStateFlow(true)
+
+    private val mevSupported = flowOf { mevReview.supports(metaId) }
+        .shareInBackground()
+
     val fee = combine(
         acknowledgedDraft,
-        feeLoaderMixin.fee
-    ) { draft, status ->
-        status.forRequest(draft)
+        feeLoaderMixin.fee,
+        mevEnabled
+    ) { draft, status, enabled ->
+        status.forRequest(draft).forMevSelection(enabled)
+    }
+        .shareInBackground()
+
+    val mevProtection = combine(mevSupported, mevEnabled, fee) { supported, enabled, fee ->
+        bittensorMevSwitchState(supported, enabled, fee.loadedFeeOrNull()?.fee)
     }
         .shareInBackground()
 
@@ -361,11 +385,14 @@ class BittensorSubnetReviewViewModel(
 
     val assets = combine(
         nativeToken,
-        preparationState
-    ) { token, preparation -> mapAssets(token, preparation.dataOrNull) }
+        preparationState,
+        bittensorSubnetStakingInteractor.observeSubnetLogos()
+    ) { token, preparation, logos -> mapAssets(token, preparation.dataOrNull, logos[subnetId]) }
         .shareInBackground()
 
     private var executionStartedAt = 0L
+
+    private var executionPeriodMultiplier = 1
 
     private var executionCompletedAt = 0L
 
@@ -429,9 +456,13 @@ class BittensorSubnetReviewViewModel(
         .shareInBackground()
 
     val executionFee = combine(fee, submission) { status, state ->
-        val result = state.result as? BittensorStakeResultUi.Success
-        if (result != null) {
-            FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(result.fee.amount, result.fee.fiatAmount)))
+        val resultFee = when (val result = state.result) {
+            is BittensorStakeResultUi.Success -> result.fee
+            is BittensorStakeResultUi.Failure -> result.fee
+            else -> null
+        }
+        if (resultFee != null) {
+            FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(resultFee.amount, resultFee.fiatAmount)))
         } else {
             status.mapDisplay { display -> FeeDisplay("≈ " + display.title, null) }
         }
@@ -486,12 +517,22 @@ class BittensorSubnetReviewViewModel(
         .shareInBackground()
 
     init {
-        feeLoaderMixin.connectWith(acknowledgedDraft) { _, draft ->
-            draft?.let {
-                val fee = bittensorSubnetStakingInteractor.estimateFee(it)
-                BittensorFeeEstimate(it, fee)
+        val feeRequests = combine(acknowledgedDraft, mevEnabled) { draft, enabled -> BittensorMevFeeRequest(draft, enabled) }
+        feeLoaderMixin.connectWith(feeRequests) { _, request ->
+            request.request?.let { draft ->
+                val fee = bittensorSubnetStakingInteractor.estimateReviewFee(draft, request.enabled, mevReview)
+                BittensorFeeEstimate(draft, fee)
             }
         }
+        requotes.onEach {
+            if (mevSupported.first() && !validating.value && feeLoaderMixin.fee.value is FeeStatus.Loaded) {
+                val draft = acknowledgedDraft.first() ?: return@onEach
+                val enabled = mevEnabled.value
+                feeLoaderMixin.loadFee {
+                    BittensorFeeEstimate(draft, bittensorSubnetStakingInteractor.estimateReviewFee(draft, enabled, mevReview))
+                }
+            }
+        }.launchIn(this)
         launch {
             // A watch-only wallet is reported blocked once the review opens, and leaving it is not an abandonment.
             if (accountRepository.getMetaAccount(metaId).type == LightMetaAccount.Type.WATCH_ONLY) {
@@ -501,8 +542,17 @@ class BittensorSubnetReviewViewModel(
         }
     }
 
+    fun mevProtectionChanged(enabled: Boolean) {
+        if (submission.value.canSubmit && !validating.value) mevEnabled.value = enabled
+    }
+
+    fun executionTimerState(): ExecutionTimerView.State.CountdownTimer {
+        val repeat = duration.replayCache.lastOrNull()?.takeIf { executionPeriodMultiplier == 4 && it.isPositive() }
+        return ExecutionTimerView.State.CountdownTimer(remainingExecutionTime(), repeat)
+    }
+
     fun remainingExecutionTime(): Duration = (
-        (duration.replayCache.lastOrNull() ?: Duration.ZERO) -
+        (duration.replayCache.lastOrNull() ?: Duration.ZERO) * executionPeriodMultiplier -
             (SystemClock.elapsedRealtime() - executionStartedAt).milliseconds
         )
         .coerceAtLeast(Duration.ZERO)
@@ -526,6 +576,7 @@ class BittensorSubnetReviewViewModel(
             ?.takeIf { it.request == prepared } ?: return@launchUnit
         val token = walletContext.first().asset.token
         val subnet = preparedStake.first().dataOrNull?.subnet
+        if (!submission.value.canSubmit || validating.value || !fee.fee.matchesMevSelection(mevEnabled.value)) return@launchUnit
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
@@ -587,7 +638,13 @@ class BittensorSubnetReviewViewModel(
 
     private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
+        if (!fee.matchesMevSelection(mevEnabled.value)) {
+            // A warning can resume after the original confirmation coroutine has finished.
+            validating.value = false
+            return@launchUnit
+        }
         executionStartedAt = SystemClock.elapsedRealtime()
+        executionPeriodMultiplier = if ((fee as? BittensorMevReviewFee)?.isProtected == true) 4 else 1
         submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
             operationAnalytics.startOperation()
@@ -601,7 +658,10 @@ class BittensorSubnetReviewViewModel(
                     null
                 )
             )
-            val result = bittensorSubnetStakingInteractor.execute(prepared)
+            val result = bittensorSubnetStakingInteractor.execute(prepared, (fee as? BittensorMevReviewFee)?.isProtected == true) { hash ->
+                executionCompletedAt = System.currentTimeMillis()
+                submission.value = BittensorOperationResult.Unknown(hash).mapResult(resources).toSubmissionState()
+            }
             operationAnalytics.outcome(result, StakingAnalyticsTarget.SUBNET, StakingFlow.STAKE, mode = analyticsMode)
             executionCompletedAt = System.currentTimeMillis()
             when (result) {
@@ -610,7 +670,13 @@ class BittensorSubnetReviewViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = result.toSubmissionState(resources)
+                    val mapped = result.toSubmissionState(resources, slippage = slippage)
+                    val failure = mapped.result as? BittensorStakeResultUi.Failure
+                    submission.value = if (failure != null) {
+                        BittensorSubmissionState.Failed(failure.copy(fee = result.formatMevFailureFee(fee, chain.await(), tokenFormatter)))
+                    } else {
+                        mapped
+                    }
                 }
                 is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resources).toSubmissionState()
             }
@@ -648,9 +714,9 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
-    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetsView.Model = SwapAssetsView.Model(
+    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?, logoUrl: String?): SwapAssetsView.Model = SwapAssetsView.Model(
         assetIn = mapInputAsset(token),
-        assetOut = mapOutputAsset(token, prepared)
+        assetOut = mapOutputAsset(token, prepared, logoUrl)
     )
 
     private fun mapInputAsset(token: TokenBase): SwapAssetView.Model {
@@ -667,8 +733,8 @@ class BittensorSubnetReviewViewModel(
         )
     }
 
-    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetView.Model = SwapAssetView.Model(
-        assetIcon = prepared?.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
+    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?, logoUrl: String?): SwapAssetView.Model = SwapAssetView.Model(
+        assetIcon = (logoUrl ?: prepared?.subnet?.logoUrl)?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
         amount = mapOutputAmount(token, prepared),
         iconSizeDp = 48,
         clipIconToOutline = true

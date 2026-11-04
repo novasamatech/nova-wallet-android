@@ -10,6 +10,8 @@ class BittensorPortfolioInteractor(
 
     suspend fun subnets() = subnetRepository.subnets()
 
+    fun observeSubnets() = subnetRepository.observeSubnets()
+
     fun observeAsset() = repository.observeAsset()
 
     fun observeRootPortfolio() = repository.observeRootPortfolio()

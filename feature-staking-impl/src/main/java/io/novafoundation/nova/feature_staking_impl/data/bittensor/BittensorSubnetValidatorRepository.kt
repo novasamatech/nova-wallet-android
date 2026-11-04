@@ -55,7 +55,7 @@ interface BittensorSubnetValidatorRepository {
 }
 
 class RealBittensorSubnetValidatorRepository(
-    private val backend: BittensorValidatorBackend,
+    private val validatorSource: BittensorValidatorSource,
     private val storage: StorageDataSource,
     private val rpc: RpcCalls
 ) : BittensorSubnetValidatorRepository {
@@ -108,10 +108,10 @@ class RealBittensorSubnetValidatorRepository(
 
     /** Root lists the root validators resource; a subnet lists its own validator directory. */
     private suspend fun loadListing(chain: Chain, netuid: BittensorNetuid): DirectoryListing = if (netuid.isRoot()) {
-        val response = backend.rootValidators()
+        val response = validatorSource.rootValidators()
         DirectoryListing(mapBittensorRootValidators(chain, response), mapBittensorRootDirectoryStatus(response.meta))
     } else {
-        val response = backend.validators(netuid.value)
+        val response = validatorSource.validators(netuid.value)
         DirectoryListing(mapCandidates(chain, response), mapBittensorDirectoryStatus(response.meta))
     }
 
@@ -168,7 +168,7 @@ class RealBittensorSubnetValidatorRepository(
     }
 
     private suspend fun loadRanking(netuid: BittensorNetuid): Result<BittensorRankedValidatorsRemote> = try {
-        Result.success(withTimeout(RANKING_TIMEOUT_MILLIS) { backend.rankedValidators(netuid.value) })
+        Result.success(withTimeout(RANKING_TIMEOUT_MILLIS) { validatorSource.rankedValidators(netuid.value) })
     } catch (exception: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
         Result.failure(BittensorTimeoutException("Validator recommendations", exception))
@@ -264,7 +264,7 @@ class RealBittensorSubnetValidatorRepository(
         netuid: BittensorNetuid.Subnet,
         validator: BittensorValidator
     ): BittensorSubnetValidator = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
-        val directory = backend.validators(netuid.value)
+        val directory = validatorSource.validators(netuid.value)
         val identifiedValidator = mapCandidates(chain, directory).firstOrNull { it.hotkey == validator.hotkey } ?: validator
         enrich(chain, netuid, listOf(identifiedValidator)).single()
     } ?: throw BittensorTimeoutException("Validator eligibility checks")

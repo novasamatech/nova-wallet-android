@@ -58,7 +58,7 @@ class RealBittensorStakingRepository(
             .flatMapLatest { metaAccount ->
                 combine(
                     walletRepository.assetFlow(metaAccount.id, chain.utilityAsset),
-                    positionRepository.observePositions(chain.id, metaAccount.requireAccountIdIn(chain))
+                    positionRepository.observePositions(chain.id, metaAccount.requireAccountIdIn(chain), metaAccount.id)
                 ) { asset, positionsState ->
                     BittensorRootStakingDetails(
                         metaId = metaAccount.id,

@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRecommendationsRemote
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSource
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -16,7 +16,7 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 
 class BittensorRecommendedYieldInteractor(
-    private val validatorBackend: BittensorValidatorBackend,
+    private val validatorSource: BittensorValidatorSource,
     private val alphaYieldRepository: BittensorAlphaYieldRepository,
     private val chainRegistry: ChainRegistry,
     private val logger: Logger
@@ -25,7 +25,7 @@ class BittensorRecommendedYieldInteractor(
     private data class RecommendedValidator(val subnetId: BittensorNetuid.Subnet, val hotkey: AccountIdKey)
 
     suspend fun maximumYields(): Map<BittensorNetuid.Subnet, BigDecimal> {
-        val recommendations = validatorBackend.recommendedValidators()
+        val recommendations = validatorSource.recommendedValidators()
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val validatorsBySubnet = recommendations
             .mapNotNull { mapValidator(chain, it) }

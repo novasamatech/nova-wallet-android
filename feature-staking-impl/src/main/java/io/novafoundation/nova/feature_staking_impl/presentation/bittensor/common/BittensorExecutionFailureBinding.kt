@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import android.view.Gravity
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -25,12 +27,15 @@ fun ViewBittensorSubnetExecutionBinding.showFailure(failure: BittensorStakeResul
     }
     operationIcon.setImageResource(if (failed) R.drawable.ic_x_clear_filled else R.drawable.ic_bittensor_execution_route)
     operationLabel.setTextColorRes(if (failed) R.color.text_primary else R.color.text_secondary)
+    operationLabel.gravity = if (failed) Gravity.START or Gravity.CENTER_VERTICAL else Gravity.CENTER
 
     if (failure == null) return
 
     timer.setState(ExecutionTimerView.State.Error)
+    failureIcon.setImageResource(R.drawable.ic_close)
+    failureIcon.setImageTintRes(R.color.text_negative)
     failureIcon.background = context.getRoundedCornerDrawable(R.color.error_block_background, cornerSizeInDp = 32)
     root.setPadding(0, 0, 0, 84.dp(context))
-    title.text = if (failure.canRetry) context.getString(R.string.common_failed) else failure.title
-    operationLabel.text = failure.description + "\n" + failure.error
+    title.text = failure.title
+    operationLabel.text = failure.error + "\n\n" + failure.description
 }

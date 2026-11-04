@@ -4,7 +4,7 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
@@ -28,7 +28,7 @@ class StakingDashboardBittensorUpdater(
     private val positionRepository: BittensorPositionRepository,
     private val cache: StakingDashboardCache,
     private val rootClaims: BittensorRootClaimSource,
-    private val snapshots: BittensorDashboardSnapshotRepository,
+    private val snapshots: BittensorDashboardSnapshotSource,
     private val logger: Logger
 ) : BaseStakingDashboardUpdater(chain, chainAsset, Chain.Asset.StakingType.BITTENSOR_ROOT, metaAccount) {
 
@@ -46,7 +46,7 @@ class StakingDashboardBittensorUpdater(
             // never the stored classification, which may predate a full exit.
             var lastClaimable: BigInteger? = null
 
-            positionRepository.observePortfolio(chain.id, coldKey).collect { state ->
+            positionRepository.observePortfolio(chain.id, coldKey, metaAccount.id).collect { state ->
                 val positions = state.positions
                 if (state.status !is BittensorDataStatus.Fresh || positions == null) return@collect
 
@@ -56,10 +56,10 @@ class StakingDashboardBittensorUpdater(
 
                 val claimable = claimableRootRewards(coldKey)
                     ?: lastClaimable
-                    ?: snapshots.claimableRootRewards(chain.id, coldKey)
+                    ?: snapshots.claimableRootRewards(chain.id, coldKey, metaAccount.id)
                     ?: BigInteger.ZERO
                 lastClaimable = claimable
-                snapshots.saveClaimableRootRewards(chain.id, coldKey, claimable)
+                snapshots.saveClaimableRootRewards(chain.id, coldKey, metaAccount.id, claimable)
                 if (!staked) savePosition(positions.totalStake, claimable.isPositive(), coldKey)
 
                 emit(primarySynced())

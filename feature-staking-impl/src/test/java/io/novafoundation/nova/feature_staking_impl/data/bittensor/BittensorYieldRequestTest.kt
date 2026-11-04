@@ -55,16 +55,15 @@ class BittensorYieldRequestTest {
         val client = OkHttpClient.Builder().addInterceptor(backend).build()
         val apiCreator = NetworkApiCreator(client, "https://infra.test/")
         val api = apiCreator.create(BittensorEstimatesApi::class.java)
-        val source = BittensorEstimatesRemoteSource(api, spacingMillis = 0L)
+        val backendSource = createBittensorTestSources(estimatesApi = api)
         val chain = mock(Chain::class.java)
         val subnet = BittensorNetuid.Subnet(64)
         val baseUrl = "https://infra.test/".toHttpUrl()
 
         try {
-            val result = source.yields(baseUrl, chain, subnet)
+            val result = backendSource.yields.alphaYields(baseUrl, chain, subnet)
 
-            assertTrue(result.allPagesRead)
-            assertTrue(result.items.isEmpty())
+            assertTrue(requireNotNull(result.items).isEmpty())
             assertEquals(1, requests.size)
             assertEquals("GET", requests.single().method)
             assertEquals("/v1/bittensor/subnets/64/yields/alpha", requests.single().url.encodedPath)

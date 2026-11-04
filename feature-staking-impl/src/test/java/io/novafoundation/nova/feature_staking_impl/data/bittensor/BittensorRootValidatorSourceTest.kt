@@ -17,7 +17,7 @@ class BittensorRootValidatorSourceTest {
 
     private val chain = mock(Chain::class.java)
 
-    private val backend = mock(BittensorValidatorBackend::class.java)
+    private val backend = mock(BittensorValidatorSource::class.java)
 
     private val logger = mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
 

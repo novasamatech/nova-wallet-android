@@ -1,0 +1,22 @@
+name: Agent instructions
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test instruction checker
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+      - name: Check shared instructions and literal feature boundaries
+        run: python3 scripts/check_agent_instructions.py

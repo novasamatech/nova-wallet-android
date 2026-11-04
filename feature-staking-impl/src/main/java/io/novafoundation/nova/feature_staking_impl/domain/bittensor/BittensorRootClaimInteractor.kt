@@ -33,6 +33,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.StateFlow
 
 class BittensorRootClaimInteractor(
     private val chainRegistry: ChainRegistry,
@@ -47,6 +48,10 @@ class BittensorRootClaimInteractor(
     private val positionRepository: BittensorPositionRepository,
     private val rootValidatorSource: BittensorRootValidatorSource
 ) {
+
+    /** See [BittensorSubmissionExecutor.signingOutsideApp]. */
+    val signingOutsideApp: StateFlow<Boolean>
+        get() = submissionExecutor.signingOutsideApp
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
@@ -105,7 +110,7 @@ class BittensorRootClaimInteractor(
 
     /** The validators of the wallet's root positions; null while the positions are unknown. */
     fun observeRootHotkeys(state: BittensorRootClaimState): Flow<Set<AccountIdKey>?> =
-        positionRepository.observePositions(state.chain.id, state.coldkey.value)
+        positionRepository.observePositions(state.chain.id, state.coldkey.value, state.metaId)
             .map { positions -> positions.positions?.root?.mapTo(mutableSetOf()) { it.validatorHotkey } }
 
     suspend fun validatorDetails(chain: Chain): Map<AccountIdKey, BittensorRootValidatorDetails> = rootValidatorSource.validatorDetails(chain)

@@ -23,7 +23,7 @@ class BittensorPositionsUpdater(
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val coldKey = scopeValue.accountIdIn(chain) ?: return emptyFlow()
 
-        return positionRepository.observePositions(chain.id, coldKey)
+        return positionRepository.observePositions(chain.id, coldKey, scopeValue.id)
             .noSideAffects()
     }
 }

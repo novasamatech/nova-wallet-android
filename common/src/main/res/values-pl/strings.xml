@@ -2489,4 +2489,21 @@
     <string name="deep_linking_staking_asset_not_found">Nie znaleziono aktywa w tym linku staking.</string>
     <string name="deep_linking_staking_not_supported">Staking nie jest obsługiwany dla tego aktywa.</string>
     <string name="staking_new_feature">NOWOŚĆ</string>
+    <string name="bittensor_mev_description">Utrzymuje Twoje zlecenie zaszyfrowane w publicznym mempoolu, aby pomóc zapobiegać front-runningowi.</string>
+    <string name="bittensor_mev_fee_may_be_charged">Mogła zostać naliczona opłata sieciowa.</string>
+    <string name="bittensor_mev_not_executed">Zlecenie nie zostało wykonane</string>
+    <string name="bittensor_mev_nothing_spent">Nic nie wydano.</string>
+    <string name="bittensor_mev_title">Ochrona MEV</string>
+    <string name="bittensor_mev_unavailable">Ochrona MEV jest niedostępna dla tego zlecenia.</string>
+    <string name="bittensor_mev_unchanged">Twoje zlecenie nie zostało wykonane. Twój stake pozostaje bez zmian, spróbuj ponownie.</string>
+    <string name="bittensor_result_fee_charged">Mogła zostać naliczona opłata sieciowa.</string>
+    <string name="bittensor_result_nothing_spent">Nic nie wydano.</string>
+    <string name="bittensor_result_price_moved">Zlecenie nie zostało wykonane, ponieważ cena zmieniła się poza ustalony przez Ciebie poziom tolerancji poślizgu.</string>
+    <string name="bittensor_result_price_moved_format">Zlecenie nie zostało wykonane: cena zmieniła się poza ustalony przez Ciebie poziom tolerancji poślizgu (%1$s). Możesz zmienić poślizg za pomocą ikony ustawień na ekranie wprowadzania kwoty %2$s i spróbować ponownie.</string>
+    <string name="swap_get_token_alternatives_format">%1$s lub %2$s</string>
+    <string name="swap_get_token_dapp_browser_description">Otwiera się w przeglądarce</string>
+    <string name="swap_get_token_dapp_description">%s · otwiera się w przeglądarce</string>
+    <string name="swap_get_token_dapp_title">Wymień na %s</string>
+    <string name="swap_get_token_third_party">FIRMA ZEWNĘTRZNA</string>
+    <string name="bittensor_result_price_moved_with_tolerance">Zlecenie nie zostało zrealizowane: cena zmieniła się poza ustawiony przez Ciebie poziom tolerancji poślizgu (%1$s). Możesz zmienić poślizg za pomocą ikony ustawień na ekranie wprowadzania kwoty i spróbować ponownie.</string>
 </resources>

@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.Pool
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDashboardSnapshotSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.RealStakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.RealStakingStatsDataSource
@@ -79,7 +79,7 @@ class StakingDashboardModule {
         balanceLocksRepository: BalanceLocksRepository,
         bittensorPositionRepository: BittensorPositionRepository,
         bittensorRootClaims: BittensorRootClaimSource,
-        bittensorSnapshots: BittensorDashboardSnapshotRepository,
+        bittensorSnapshots: BittensorDashboardSnapshotSource,
         logger: Logger,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,

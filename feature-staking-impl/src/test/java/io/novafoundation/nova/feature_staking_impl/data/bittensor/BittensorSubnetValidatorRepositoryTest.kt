@@ -52,7 +52,7 @@ class BittensorSubnetValidatorRepositoryTest {
 
     private val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
-    private val backend = BittensorValidatorBackend(api, urls)
+    private val backend = BittensorValidatorSource(api, urls)
 
     private val chain = mock(Chain::class.java)
 
