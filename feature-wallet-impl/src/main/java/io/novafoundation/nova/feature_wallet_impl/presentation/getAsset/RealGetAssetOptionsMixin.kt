@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.getAsset
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -39,6 +41,7 @@ class RealGetAssetOptionsMixinFactory(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val chainRegistry: ChainRegistry,
     private val actionAwaitableFactory: ActionAwaitableMixin.Factory,
+    private val analyticsService: AnalyticsService,
 ) : GetAssetOptionsMixin.Factory {
 
     override fun create(
@@ -57,7 +60,8 @@ class RealGetAssetOptionsMixinFactory(
             actionAwaitableFactory,
             additionalButtonFilter,
             scope,
-            showWhenNoOptions
+            showWhenNoOptions,
+            analyticsService
         )
     }
 }
@@ -72,7 +76,8 @@ class RealGetAssetOptionsMixin(
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     additionalButtonFilter: Flow<Boolean>,
     scope: CoroutineScope,
-    showWhenNoOptions: Boolean
+    showWhenNoOptions: Boolean,
+    private val analyticsService: AnalyticsService
 ) : GetAssetOptionsMixin, CoroutineScope by scope {
 
     // Keep options tied to the asset that produced them, including after a late asset load or an asset change.
@@ -121,7 +126,16 @@ class RealGetAssetOptionsMixin(
             GetAssetOption.Receive -> receiveSelected(chainAsset)
             GetAssetOption.CrossChain -> onCrossChainTransferSelected(chainAsset)
             GetAssetOption.Buy -> buySelected(chainAsset)
-            is GetAssetOption.DApp -> walletRouter.openDAppBrowser(option.url)
+            is GetAssetOption.DApp -> {
+                analyticsService.track(
+                    AnalyticsEvent.AssetFundingDappOpened(
+                        provider = option.name,
+                        asset = chainAsset.symbol.value,
+                        chainId = chainAsset.chainId
+                    )
+                )
+                walletRouter.openDAppBrowser(option.url)
+            }
         }
     }
 

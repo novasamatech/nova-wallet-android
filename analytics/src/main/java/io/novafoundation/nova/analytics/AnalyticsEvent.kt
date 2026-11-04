@@ -297,6 +297,15 @@ sealed class AnalyticsEvent(
         )
     )
 
+    class AssetFundingDappOpened(provider: String, asset: String, chainId: String) : AnalyticsEvent(
+        name = "asset_funding_dapp_opened",
+        properties = mapOf(
+            "provider" to provider,
+            "asset" to asset,
+            "chain_id" to chainId
+        )
+    )
+
     // Governance
 
     class GovernanceVoteCast(

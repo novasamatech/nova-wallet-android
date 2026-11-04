@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -21,6 +22,7 @@ class WalletFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val dependencies = DaggerWalletFeatureComponent_WalletFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .swapCoreApi(getFeature(SwapCoreApi::class.java))

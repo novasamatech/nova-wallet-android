@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -536,6 +537,7 @@ class WalletFeatureModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         chainRegistry: ChainRegistry,
         actionAwaitableFactory: ActionAwaitableMixin.Factory,
+        analyticsService: AnalyticsService,
     ): GetAssetOptionsMixin.Factory {
         return RealGetAssetOptionsMixinFactory(
             assetGetOptionsUseCase,
@@ -543,7 +545,8 @@ class WalletFeatureModule {
             resourceManager,
             selectedAccountUseCase,
             chainRegistry,
-            actionAwaitableFactory
+            actionAwaitableFactory,
+            analyticsService
         )
     }
 

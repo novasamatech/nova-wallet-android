@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di
 import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -69,6 +70,8 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface WalletFeatureDependencies {
+
+    val analyticsService: AnalyticsService
 
     val maskingModeUseCase: MaskingModeUseCase
 

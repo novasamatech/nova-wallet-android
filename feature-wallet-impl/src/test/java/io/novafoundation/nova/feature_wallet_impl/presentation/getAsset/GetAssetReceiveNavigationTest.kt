@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.getAsset
 
+import io.novafoundation.nova.analytics.AnalyticsService
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.domain.config.GlobalConfig
@@ -69,7 +70,7 @@ class GetAssetReceiveNavigationTest {
             val updatedOptions = payload.awaitDAppOptions()
             assertFalse(GetAssetOption.Receive in updatedOptions)
             assertTrue(updatedOptions.any { it is GetAssetOption.DApp })
-            Mockito.verifyNoInteractions(fixture.router)
+            Mockito.verifyNoInteractions(fixture.router, fixture.analytics)
         } finally {
             coroutineContext.cancelChildren()
         }
@@ -98,6 +99,7 @@ class GetAssetReceiveNavigationTest {
                 assertFalse("Unexpected address field: $field", changeNow.url.contains(field))
             }
 
+            Mockito.verifyNoInteractions(fixture.analytics)
             fixture.selection.selected.complete(changeNow)
 
             assertEquals(expectedUrl, withTimeout(5_000) { fixture.openedUrl.await() })
@@ -125,6 +127,7 @@ class GetAssetReceiveNavigationTest {
             assertEquals(payload.chainAsset.id, destination.chainAssetId)
             assertFalse(configReady.isCompleted)
             Mockito.verify(fixture.router, Mockito.only()).openReceive(destination)
+            Mockito.verifyNoInteractions(fixture.analytics)
         } finally {
             coroutineContext.cancelChildren()
         }
@@ -153,7 +156,7 @@ class GetAssetReceiveNavigationTest {
                 assertEquals(tao, payload.chainAsset)
                 assertEquals(setOf(GetAssetOption.Receive, changeNow), updatedOptions)
                 assertEquals(fixture.configuredUrl, changeNow.url)
-                Mockito.verifyNoInteractions(fixture.router)
+                Mockito.verifyNoInteractions(fixture.router, fixture.analytics)
 
                 fixture.selection.selected.complete(changeNow)
 
@@ -181,7 +184,7 @@ class GetAssetReceiveNavigationTest {
             withTimeout(5_000) { fixture.configCancelled.await() }
             assertTrue(fixture.selection.selected.isCancelled)
             assertFalse(configReady.isCompleted)
-            Mockito.verifyNoInteractions(fixture.router)
+            Mockito.verifyNoInteractions(fixture.router, fixture.analytics)
         } finally {
             coroutineContext.cancelChildren()
         }
@@ -217,6 +220,7 @@ class GetAssetReceiveNavigationTest {
             assertEquals(tao.chainId, destination.chainId)
             assertEquals(tao.id, destination.chainAssetId)
             Mockito.verify(fixture.router, Mockito.only()).openReceive(destination)
+            Mockito.verifyNoInteractions(fixture.analytics)
         } finally {
             coroutineContext.cancelChildren()
         }
@@ -230,6 +234,8 @@ class GetAssetReceiveNavigationTest {
     ) {
 
         val router = Mockito.mock(WalletRouter::class.java)
+
+        val analytics = Mockito.mock(AnalyticsService::class.java)
 
         val received = CompletableDeferred<AssetPayload>()
 
@@ -303,7 +309,8 @@ class GetAssetReceiveNavigationTest {
                 Unit
             }.`when`(router).openDAppBrowser(Mockito.anyString())
             mixin = RealGetAssetOptionsMixin(
-                assets, options, router, resources, selectedAccount, chains, actions, buttonFilter, scope, showWhenNoOptions = true
+                assets, options, router, resources, selectedAccount, chains, actions, buttonFilter, scope, showWhenNoOptions = true,
+                analyticsService = analytics
             )
         }
     }
