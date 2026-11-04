@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.domain.asset
 
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
@@ -9,20 +10,22 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.incomingCross
 import io.novafoundation.nova.feature_wallet_api.domain.model.GetAssetOption
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class RealAssetGetOptionsUseCase(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val globalConfigDataSource: GlobalConfigDataSource,
+    private val logger: Logger
 ) : AssetGetOptionsUseCase {
-
-    private val changeNow = GetAssetOption.DApp(
-        name = "ChangeNOW",
-        url = "https://changenow.io/exchange?from=assethub&to=tao&link_id=59409968ba3831",
-        supportedTokens = listOf("DOT", "USDT", "USDC").map { it.asTokenSymbol() }
-    )
 
     override fun observeAssetGetOptionsForSelectedAccount(chainAssetFlow: Flow<Chain.Asset?>): Flow<Set<GetAssetOption>> {
         return combine(
@@ -40,12 +43,34 @@ class RealAssetGetOptionsUseCase(
     }
 
     private fun availableDApps(chainAssetFlow: Flow<Chain.Asset?>): Flow<List<GetAssetOption.DApp>> {
-        return chainAssetFlow.map { asset ->
+        return chainAssetFlow.flatMapLatest { asset ->
             if (asset?.chainId == ChainGeneses.BITTENSOR && asset.type == Chain.Asset.Type.Native) {
-                listOf(changeNow)
+                flow {
+                    emit(emptyList())
+                    emit(listOfNotNull(changeNowOption()))
+                }
             } else {
-                emptyList()
+                flowOf(emptyList())
             }
+        }
+    }
+
+    private suspend fun changeNowOption(): GetAssetOption.DApp? {
+        return runCatching {
+            val configuredUrl = globalConfigDataSource.getGlobalConfig().changeNowTaoUrl ?: return null
+            val url = configuredUrl.toHttpUrlOrNull() ?: return null
+            if (!url.isHttps) return null
+
+            GetAssetOption.DApp(
+                name = "ChangeNOW",
+                url = configuredUrl,
+                supportedTokens = listOf("DOT", "USDT", "USDC").map { it.asTokenSymbol() }
+            )
+        }.getOrElse { error ->
+            if (error is CancellationException) throw error
+            logger.log("[GetAssetOptions] ChangeNOW is unavailable")
+            logger.log(error)
+            null
         }
     }
 

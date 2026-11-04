@@ -7,8 +7,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingValidationStage
-import io.novafoundation.nova.analytics.StakingValidationOutcome
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -55,6 +53,7 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -74,7 +73,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitExceedsAvailable
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorExitValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.BittensorValidatorInfoPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -167,7 +165,7 @@ class BittensorExitAmountViewModel(
     private val exitFormatter: BittensorExitFormatter,
     private val slippageSettings: BittensorSlippageSettings,
     private val costBasisFormatter: BittensorSaleCostBasisFormatter,
-    precisionValidator: BittensorExitPrecisionValidator,
+    exitAmountValidator: BittensorExitAmountValidator,
     private val validatorInteractor: BittensorValidatorInteractor,
     private val rootHoldFormatter: BittensorRootHoldFormatter,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -241,14 +239,6 @@ class BittensorExitAmountViewModel(
     private val validatorNames = exitGroup.map { it?.hotkeys.orEmpty().toSet() }
         .resolvedValidatorNames(validatorNamesRetries) { hotkeys -> validatorInteractor.validatorNames(payload.netuid(), hotkeys) }
         .map { it.orEmpty() }
-        .shareInBackground()
-
-    private val amountValidator = precisionValidator.forPrecision(position.map { it?.amountPrecision })
-
-    // The input whose amount exceeds the maximum: Continue stays available and explains the maximum.
-    private val exceedingInput = MutableStateFlow<ExitAmountInput?>(null)
-
-    val amountError = amountValidator.observe(amount)
         .shareInBackground()
 
     private val preparedState = combine(
@@ -337,6 +327,14 @@ class BittensorExitAmountViewModel(
         val fill = group.maximumFill(selection).coerceAtLeast(BigInteger.ZERO)
         ExitMaximum(BittensorMaxAmount(BigDecimal(maximum, position.amountPrecision), alphaSymbol(position)), BigDecimal(fill, position.amountPrecision))
     }
+        .shareInBackground()
+
+    private val amountValidator = exitAmountValidator.forAmount(
+        precision = position.map { it?.amountPrecision },
+        maximum = maximumAmount.map { it?.display?.amount }
+    )
+
+    val amountError = amountValidator.observe(amount)
         .shareInBackground()
 
     // The Max of the selected validators, so it always passes validation.
@@ -479,15 +477,15 @@ class BittensorExitAmountViewModel(
         validating,
         input,
         isFullyLocked,
-        exceedingInput
-    ) { (position, prepared), validating, input, fullyLocked, exceeding ->
+        amountError
+    ) { (position, prepared), validating, input, fullyLocked, error ->
         val label = resources.getString(R.string.common_continue)
         when {
+            error is FieldValidationResult.Error -> DescriptiveButtonState.Disabled(error.reason)
             validating -> DescriptiveButtonState.Loading
             fullyLocked -> DescriptiveButtonState.Disabled(resources.getString(R.string.bittensor_exit_nothing_available_title))
             input.text.toBigDecimalOrNull()?.isPositive != true -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_enter_amount))
             position.isLoading() || prepared.isLoading() -> DescriptiveButtonState.Loading
-            exceeding == input -> DescriptiveButtonState.Enabled(label)
             prepared.dataOrNull == null -> DescriptiveButtonState.Disabled(label)
             else -> DescriptiveButtonState.Enabled(label)
         }
@@ -521,8 +519,8 @@ class BittensorExitAmountViewModel(
 
     fun continueClicked(): Unit = launchUnit {
         validatorNamesRetries.tryEmit(Unit)
+        if (amountError.first() is FieldValidationResult.Error) return@launchUnit
         if (validating.value || continueButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
-        if (exceedingInput.value == input.value) return@launchUnit showExceedsMaximum()
         val draft = prepared.first().dataOrNull ?: return@launchUnit
         val quoted = requestState.first().dataOrNull ?: return@launchUnit
         if (quoted.exit != BittensorExitRequest(draft.position, draft.quote) || !isCurrent(quoted)) return@launchUnit
@@ -602,13 +600,6 @@ class BittensorExitAmountViewModel(
     private fun exitAll(validated: ExitAmountInput) = launchUnit {
         validating.first { !it }
         if (validated.hasSameIntent(input.value)) maxClicked()
-    }
-
-    private suspend fun showExceedsMaximum() {
-        val maximum = maxAmount.first() ?: return
-        analytics.trackExitValidation(BittensorExitValidationFailure.INSUFFICIENT_STAKE, StakingValidationStage.SETUP, StakingValidationOutcome.BLOCKED, isRoot)
-        val (title, message) = resources.bittensorExitExceedsAvailable(maximum)
-        showError(title, message)
     }
 
     /** Opens the subnet's details to read; selling never changes the subnet, so nothing continues from there. */
@@ -757,7 +748,6 @@ class BittensorExitAmountViewModel(
     }
 
     private suspend fun prepareRequest(request: ExitPreparationRequest): ExitAmountRequest? {
-        exceedingInput.value = null
         val position = request.position ?: return null
         val group = bittensorExitInteractor.exitGroup(position, request.slippageFraction)
         val selection = group.resolve(request.selection)
@@ -779,7 +769,6 @@ class BittensorExitAmountViewModel(
                 null
             }
         }
-        exceedingInput.value = request.input.takeIf { amount > maximum && !estimateOnly }
         quote ?: return null
         return ExitAmountRequest(request, BittensorExitRequest(position, quote), estimateOnly, amount)
     }

@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPrecisionValidator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountValidator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -59,7 +59,7 @@ class BittensorExitAmountModule {
         exitFormatter: BittensorExitFormatter,
         slippageSettings: BittensorSlippageSettings,
         costBasisFormatter: BittensorSaleCostBasisFormatter,
-        precisionValidator: BittensorExitPrecisionValidator,
+        exitAmountValidator: BittensorExitAmountValidator,
         validatorInteractor: BittensorValidatorInteractor,
         rootHoldFormatter: BittensorRootHoldFormatter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -82,7 +82,7 @@ class BittensorExitAmountModule {
             exitFormatter,
             slippageSettings = slippageSettings,
             costBasisFormatter = costBasisFormatter,
-            precisionValidator = precisionValidator,
+            exitAmountValidator = exitAmountValidator,
             validatorInteractor = validatorInteractor,
             rootHoldFormatter = rootHoldFormatter,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory

@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -120,6 +121,8 @@ interface WalletFeatureDependencies {
     val multisigValidationsRepository: MultisigValidationsRepository
 
     val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
+
+    fun globalConfigDataSource(): GlobalConfigDataSource
 
     fun preferences(): Preferences
 

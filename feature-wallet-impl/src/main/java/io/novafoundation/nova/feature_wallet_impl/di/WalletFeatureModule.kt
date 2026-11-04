@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.di
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -124,6 +125,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module
 class WalletFeatureModule {
@@ -513,11 +515,15 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideAssetGetOptionsUseCase(
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        globalConfigDataSource: GlobalConfigDataSource,
+        logger: Logger
     ): AssetGetOptionsUseCase {
         return RealAssetGetOptionsUseCase(
             crossChainTransfersUseCase,
-            accountRepository
+            accountRepository,
+            globalConfigDataSource,
+            logger
         )
     }
 

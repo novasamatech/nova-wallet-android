@@ -53,6 +53,7 @@ class RealGlobalConfigDataSource(
         multisigsApiUrl = multisigsApiUrl,
         proxyApiUrl = proxyApiUrl,
         multiStakingApiUrl = multiStakingApiUrl,
-        infraUrl = infraUrl
+        infraUrl = infraUrl,
+        changeNowTaoUrl = changeNowTaoUrl
     )
 }

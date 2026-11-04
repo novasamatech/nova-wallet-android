@@ -16,6 +16,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -98,10 +102,18 @@ class RealGetAssetOptionsMixin(
     override val observeGetAssetAction = actionAwaitableFactory.create<GetAssetBottomSheet.Payload, GetAssetOption>()
 
     override fun openAssetOptions() = launchUnit {
-        // Read fresh options rather than the button's replay from before the asset became available.
-        val payload = getAssetPayloadFlow.filterNotNull().first()
-        val selectedOption = observeGetAssetAction.awaitAction(payload)
-        onAssetOptionSelected(selectedOption, payload.chainAsset)
+        coroutineScope {
+            val chainAsset = assetFlow.filterNotNull().first()
+            val options = assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(flowOf(chainAsset))
+                .shareIn(this, SharingStarted.Eagerly, replay = 1)
+            try {
+                val payload = GetAssetBottomSheet.Payload(chainAsset, options.first(), options)
+                val selectedOption = observeGetAssetAction.awaitAction(payload)
+                onAssetOptionSelected(selectedOption, chainAsset)
+            } finally {
+                coroutineContext.cancelChildren()
+            }
+        }
     }
 
     private fun onAssetOptionSelected(option: GetAssetOption, chainAsset: Chain.Asset) {

@@ -4,5 +4,6 @@ class GlobalConfigRemote(
     val multisigsApiUrl: String,
     val proxyApiUrl: String,
     val multiStakingApiUrl: String,
-    val infraUrl: String?
+    val infraUrl: String?,
+    val changeNowTaoUrl: String? = null
 )
