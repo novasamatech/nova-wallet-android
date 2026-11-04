@@ -78,7 +78,7 @@ class BittensorSelectValidatorViewModelTest {
         `when`(interactor.yields(BittensorNetuid.Root)).thenReturn(emptyMap())
         `when`(interactor.yields(BittensorNetuid.Root, includeUnreliable = true)).thenReturn(emptyMap())
         `when`(interactor.chain()).thenThrow(IllegalStateException("Optional stake price unavailable"))
-        Unit
+        stubEmptyDirectory()
     }
 
     @After
@@ -247,13 +247,14 @@ class BittensorSelectValidatorViewModelTest {
         val failure = withTimeout(5_000) { viewModel.listFailure.first { it != null } }
         assertEquals(label(arrayOf(R.string.bittensor_validators_fetch_failed_title)), failure?.title)
         assertEquals(label(arrayOf(R.string.bittensor_validators_fetch_failed_message)), failure?.message)
-        assertEquals(false, viewModel.isEmpty.first())
-        assertEquals(ButtonState.DISABLED, viewModel.buttonState.first())
+        // Each screen state is shared independently, so wait until it has seen the failure rather than read its last value.
+        withTimeout(5_000) { viewModel.isEmpty.first { !it } }
+        withTimeout(5_000) { viewModel.buttonState.first { it == ButtonState.DISABLED } }
 
         viewModel.retryList()
 
         withTimeout(5_000) { viewModel.rows.first { it.size == 1 } }
-        assertNull(viewModel.listFailure.first())
+        withTimeout(5_000) { viewModel.listFailure.first { it == null } }
     }
 
     @Test
@@ -316,6 +317,16 @@ class BittensorSelectValidatorViewModelTest {
 
     private fun directory(rows: List<BittensorSubnetValidator>) =
         BittensorValidatorDirectory(rows, mock(BittensorValidatorDirectoryStatus::class.java), null)
+
+    /**
+     * The screen loads its directory in the background as soon as it opens. An unstubbed load returns null and fails
+     * that background work after the test has moved on, which reaches whichever coroutine test runs next.
+     */
+    private suspend fun stubEmptyDirectory() {
+        val empty = directory(emptyList())
+        `when`(interactor.directory(BittensorNetuid.Root)).thenReturn(empty)
+        `when`(interactor.rankDirectory(BittensorNetuid.Root, empty)).thenReturn(empty)
+    }
 
     private val placeholderPayload = BittensorValidatorInfoPayload(0, "")
 
