@@ -102,6 +102,7 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
             binder.fundingCard.icon.setTokenIcon(it.input.tokenIcon, imageLoader)
             binder.quickPickIcon.setTokenIcon(it.input.tokenIcon, imageLoader)
         }
+        viewModel.amountFieldError.observe(binder.bittensorStakeAmount::setError)
         viewModel.amount.observe(::showAmount)
         viewModel.fiatAmount.observe(binder.bittensorStakeAmount::setFiatAmount)
         viewModel.addStakeCaption.observe(binder.addStakeCaption::setTextOrHide)

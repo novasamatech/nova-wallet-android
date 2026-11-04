@@ -28,6 +28,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.isPositive
@@ -35,6 +36,7 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -74,6 +76,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
@@ -116,6 +119,7 @@ class BittensorStakeAmountViewModel(
     private val retryController: BittensorRetryController,
     private val bittensorAmountFormatter: BittensorAmountFormatter,
     private val amountChooserFactory: AmountChooserMixin.Factory,
+    enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
     private val stakeValidationSystem: BittensorStakePreflightSystem,
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
@@ -196,10 +200,13 @@ class BittensorStakeAmountViewModel(
             .deductFee(feeLoaderMixin)
     }
 
+    private val amountValidator = enoughAmountValidatorFactory.create(maxActionProvider)
+
     private val amountChooser = amountChooserFactory.create(
         scope = this,
         assetFlow = stakingDetails.map { it.asset },
-        maxActionProvider = maxActionProvider
+        maxActionProvider = maxActionProvider,
+        fieldValidator = amountValidator
     )
 
     val amount = amountChooser.inputState.map { it.value }
@@ -227,6 +234,9 @@ class BittensorStakeAmountViewModel(
     ) { request, status ->
         status.forRequest(request)
     }
+        .shareInBackground()
+
+    val amountFieldError = amountChooser.fieldError
         .shareInBackground()
 
     val amountModel = amountChooser.assetModel
@@ -351,13 +361,17 @@ class BittensorStakeAmountViewModel(
         loadedContinueButtonState,
         stakingDetailsState,
         needsFunding,
-        fixedValidatorState
-    ) { button, state, needsFunding, fixed ->
+        fixedValidatorState,
+        amountFieldError,
+        amountInPlanks
+    ) { button, state, needsFunding, fixed, fieldError, amount ->
         when {
+            amount?.isPositive() == true && fieldError is FieldValidationResult.Error -> DescriptiveButtonState.Disabled(fieldError.reason)
+            state is ExtendedLoadingState.Loading || fixed is ExtendedLoadingState.Loading -> DescriptiveButtonState.Loading
+            amount?.isPositive() != true -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
             needsFunding -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
             state is ExtendedLoadingState.Error || fixed is ExtendedLoadingState.Error ->
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
-            state is ExtendedLoadingState.Loading || fixed is ExtendedLoadingState.Loading -> DescriptiveButtonState.Loading
             else -> button
         }
     }

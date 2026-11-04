@@ -73,6 +73,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
@@ -123,6 +124,8 @@ interface StakingFeatureDependencies {
     val maskableValueFormatterProvider: MaskableValueFormatterProvider
 
     val amountChooserMixinFactory: AmountChooserMixin.Factory
+
+    val enoughAmountValidatorFactory: EnoughAmountValidatorFactory
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
