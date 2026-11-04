@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
+import io.novafoundation.nova.feature_swap_api.domain.model.quoteIdentity
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.poolTradeLimit
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountIn
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountOut
 import io.novafoundation.nova.feature_swap_impl.domain.validation.priceImpactValidation
+import io.novafoundation.nova.feature_swap_impl.domain.validation.quoteFeeConsistency
 import io.novafoundation.nova.feature_swap_impl.domain.validation.rateNotExceedSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientAmountOutToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringConsumersValidation
@@ -140,7 +142,15 @@ class SwapInteractor(
     }
 
     suspend fun estimateFee(executeArgs: SwapFeeArgs): SwapFee {
-        return swapService.estimateFee(executeArgs)
+        val identity = executeArgs.quoteIdentity()
+        val fee = swapService.estimateFee(executeArgs)
+
+        return SwapFee(
+            segments = fee.segments,
+            intermediateSegmentFeesInAssetIn = fee.intermediateSegmentFeesInAssetIn,
+            additionalMaxAmountDeduction = fee.additionalMaxAmountDeduction,
+            quoteIdentity = identity
+        )
     }
 
     suspend fun slippageConfig(chainId: ChainId): SlippageConfig {
@@ -160,6 +170,8 @@ class SwapInteractor(
         val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService, assetsValidationContext)
 
         return ValidationSystem {
+            quoteFeeConsistency()
+
             positiveAmountIn()
 
             positiveAmountOut()

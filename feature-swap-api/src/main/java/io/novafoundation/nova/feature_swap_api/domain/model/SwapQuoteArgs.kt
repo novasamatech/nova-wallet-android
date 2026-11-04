@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
@@ -17,12 +18,18 @@ data class SwapQuoteArgs(
 )
 
 open class SwapFeeArgs(
-    val assetIn: Chain.Asset,
+    // Reviewed net amounts, kept separately from the gross per-edge execution quotes.
+    val displayedAmountIn: ChainAssetWithAmount,
+    val displayedAmountOut: ChainAssetWithAmount,
     val slippage: Fraction,
     val executionPath: Path<SegmentExecuteArgs>,
     val direction: SwapDirection,
     val firstSegmentFees: FeePaymentCurrency
-)
+) {
+
+    val assetIn: Chain.Asset
+        get() = displayedAmountIn.chainAsset
+}
 
 class SegmentExecuteArgs(
     val quotedSwapEdge: QuotedEdge<SwapGraphEdge>,

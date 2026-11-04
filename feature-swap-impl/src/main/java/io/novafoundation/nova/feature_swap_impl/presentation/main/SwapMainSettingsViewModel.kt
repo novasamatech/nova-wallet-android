@@ -25,13 +25,11 @@ import io.novafoundation.nova.common.utils.formatting.CompoundNumberFormatter
 import io.novafoundation.nova.common.utils.formatting.DynamicPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
 import io.novafoundation.nova.common.utils.formatting.NumberAbbreviation
-import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.skipFirst
-import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
@@ -43,6 +41,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.matchesQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
@@ -72,7 +71,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidat
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.setState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.swapSettingsFlow
@@ -94,11 +92,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
@@ -109,17 +106,19 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -138,6 +137,14 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateReposito
 import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 private val BACKGROUND_FEE_REFRESH_INTERVAL = 10.seconds
+
+private data class SwapFeeRequest(val quoteState: QuotingState, val settings: SwapSettings)
+
+private fun QuotingState.Loaded.matchesSettings(settings: SwapSettings): Boolean {
+    return quoteArgs.tokenIn.configuration.fullId == settings.assetIn?.fullId &&
+        quoteArgs.tokenOut.configuration.fullId == settings.assetOut?.fullId &&
+        quoteArgs.amount == settings.amount && quoteArgs.swapDirection == settings.swapDirection
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SwapMainSettingsViewModel(
@@ -279,6 +286,11 @@ class SwapMainSettingsViewModel(
 
     val validationProgress = _validationProgress
 
+    private val hasCurrentFee = combine(quotingState, swapSettings, feeMixin.fee) { quoteState, settings, feeStatus ->
+        quoteState is QuotingState.Loaded && quoteState.matchesSettings(settings) &&
+            feeStatus.loadedFeeOrNull()?.matchesQuote(quoteState.quote, settings.slippage) == true
+    }
+
     val buttonState: Flow<DescriptiveButtonState> = combine(
         quotingState,
         accumulate(amountInInput.fieldError, amountOutInput.fieldError),
@@ -287,6 +299,9 @@ class SwapMainSettingsViewModel(
         assetOutFlow,
         ::formatButtonStates
     )
+        .combine(hasCurrentFee) { buttonState, currentFee ->
+            if (buttonState is DescriptiveButtonState.Enabled && !currentFee) DescriptiveButtonState.Loading else buttonState
+        }
         .distinctUntilChanged()
         .debounce(100)
         .shareInBackground()
@@ -318,6 +333,8 @@ class SwapMainSettingsViewModel(
     )
 
     private var quotingJob: Job? = null
+
+    private var quoteRequestGeneration = 0L
 
     /** Set when the user moves on to confirmation; anything else counts as leaving the flow. */
     @Volatile
@@ -446,36 +463,23 @@ class SwapMainSettingsViewModel(
 
     private fun setSwapStateAndThen(action: suspend () -> Unit) {
         launch {
-            val quotingState = quotingState.value
-            if (quotingState !is QuotingState.Loaded) return@launch
+            val payload = getValidationPayload() ?: return@launch
+            if (!payload.fee.matchesQuote(payload.swapQuote, payload.slippage)) return@launch
 
-            val swapState = SwapState(
-                quote = quotingState.quote,
-                fee = feeMixin.awaitFee(),
-                slippage = swapSettings.first().slippage
-            )
-            swapStateStoreProvider.getStore(swapFlowScope).setState(swapState)
+            swapStateStoreProvider.getStore(swapFlowScope).setState(payload.toSwapState())
             action()
         }
     }
 
     private fun setSwapStateAfter(action: () -> Unit) {
         launch {
-            val quotingState = quotingState.value
-            if (quotingState !is QuotingState.Loaded) return@launch
+            val payload = getValidationPayload() ?: return@launch
+            if (!payload.fee.matchesQuote(payload.swapQuote, payload.slippage)) return@launch
 
             val store = swapStateStoreProvider.getStore(swapFlowScope)
             store.resetState()
-
             action()
-
-            val swapState = SwapState(
-                quote = quotingState.quote,
-                fee = feeMixin.awaitFee(),
-                slippage = swapSettings.first().slippage
-            )
-
-            store.setState(swapState)
+            store.setState(payload.toSwapState())
         }
     }
 
@@ -537,46 +541,33 @@ class SwapMainSettingsViewModel(
     private fun FeeLoaderMixinV2.Presentation<SwapFee, FeeDisplay>.setupFees() {
         var lastFeeLoadStartedAt = TimeSource.Monotonic.markNow() - BACKGROUND_FEE_REFRESH_INTERVAL
 
-        quotingState
-            .onEach {
-                when (it) {
-                    is QuotingState.Loading -> setFeeLoading()
-                    is QuotingState.Error -> setFeeStatus(FeeStatus.NoFee)
-                    else -> {}
-                }
-            }
-            .filterIsInstance<QuotingState.Loaded>()
-            .debounce(300.milliseconds)
-            .zipWithPrevious()
-            .mapNotNull { (previous, current) ->
-                current.takeIf {
-                    // allow same value in case user quickly switched from this value to another and back without waiting for fee loading
-                    previous?.hasSameQuoteAs(current) != true || feeMixin.fee.value !is FeeStatus.Loaded
-                }
-            }
-            .transformLatest { quoteState ->
-                if (quoteState.origin == QuoteRefreshOrigin.SUBSCRIPTION) {
-                    val remainingDelay = BACKGROUND_FEE_REFRESH_INTERVAL - lastFeeLoadStartedAt.elapsedNow()
-                    if (remainingDelay.isPositive()) {
-                        delay(remainingDelay)
+        launch {
+            combine(quotingState, swapSettings, ::SwapFeeRequest)
+                .distinctUntilChanged()
+                .collectLatest { (quoteState, settings) ->
+                    val currentFee = quoteState is QuotingState.Loaded && quoteState.matchesSettings(settings) &&
+                        fee.value.loadedFeeOrNull()?.matchesQuote(quoteState.quote, settings.slippage) == true
+                    if (currentFee) return@collectLatest
+
+                    setFeeLoading()
+                    if (quoteState !is QuotingState.Loaded || !quoteState.matchesSettings(settings)) {
+                        if (quoteState !is QuotingState.Loading) setFeeStatus(FeeStatus.NoFee)
+                        return@collectLatest
+                    }
+
+                    delay(300.milliseconds)
+                    if (quoteState.origin == QuoteRefreshOrigin.SUBSCRIPTION) {
+                        val remainingDelay = BACKGROUND_FEE_REFRESH_INTERVAL - lastFeeLoadStartedAt.elapsedNow()
+                        if (remainingDelay.isPositive()) delay(remainingDelay)
+                    }
+
+                    lastFeeLoadStartedAt = TimeSource.Monotonic.markNow()
+                    loadFee { feePaymentCurrency ->
+                        val swapArgs = quoteState.quote.toExecuteArgs(settings.slippage, feePaymentCurrency)
+                        swapInteractor.estimateFee(swapArgs)
                     }
                 }
-
-                lastFeeLoadStartedAt = TimeSource.Monotonic.markNow()
-                emit(quoteState)
-            }
-            .onEach { quoteState ->
-                loadFee { feePaymentCurrency ->
-                    val swapArgs = quoteState.quote.toExecuteArgs(
-                        slippage = swapSettings.first().slippage,
-                        firstSegmentFees = feePaymentCurrency
-                    )
-
-                    swapInteractor.estimateFee(swapArgs)
-                }
-            }
-            .inBackground()
-            .launchIn(viewModelScope)
+        }
     }
 
     private fun applyFlipToUi(previousSettings: SwapSettings, newSettings: SwapSettings) {
@@ -665,17 +656,18 @@ class SwapMainSettingsViewModel(
 
     private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
         quotingJob?.cancel()
+        val generation = ++quoteRequestGeneration
+        if (shouldShowLoading) quotingState.value = QuotingState.Loading
         quotingJob = launch {
             val swapQuoteArgs = swapSettings.toQuoteArgs(
                 tokenIn = { assetInFlow.ensureToken(it) },
                 tokenOut = { assetOutFlow.ensureToken(it) },
             ) ?: return@launch
 
-            if (shouldShowLoading) {
-                quotingState.value = QuotingState.Loading
-            }
-
             val quote = swapInteractor.quote(swapQuoteArgs, swapFlowScope)
+            currentCoroutineContext().ensureActive()
+            if (generation != quoteRequestGeneration) return@launch
+            quote.exceptionOrNull()?.let { if (it is CancellationException) throw it }
 
             quotingState.value = quote.fold(
                 onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin) },
@@ -690,10 +682,6 @@ class SwapMainSettingsViewModel(
 
             handleNewQuote(quote, swapSettings)
         }
-    }
-
-    private fun QuotingState.Loaded.hasSameQuoteAs(other: QuotingState.Loaded): Boolean {
-        return quote == other.quote && quoteArgs == other.quoteArgs
     }
 
     private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
@@ -791,13 +779,18 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun getValidationPayload(): SwapValidationPayload? {
-        val quotingState = quotingState.value
-        if (quotingState !is QuotingState.Loaded) return null
+        val settings = swapSettings.first()
+        val quoteState = quotingState.value as? QuotingState.Loaded ?: return null
+        if (!quoteState.matchesSettings(settings)) return null
+        val fee = feeMixin.fee.value.loadedFeeOrNull() ?: return null
 
-        val fee = feeMixin.awaitOptionalFee() ?: return null
-        val slippage = swapSettings.first().slippage
+        // Consistency is checked by the first shared validation, including payloads restored on confirmation.
+        return SwapValidationPayload(fee, quoteState.quote, settings.slippage)
+    }
 
-        return SwapValidationPayload(fee, quotingState.quote, slippage)
+    private fun reloadQuoteAndFee() = launchUnit {
+        feeMixin.setFeeLoading()
+        performQuote(swapSettings.first(), shouldShowLoading = true, origin = QuoteRefreshOrigin.USER_INPUT)
     }
 
     private fun formatValidationFailure(
@@ -810,6 +803,7 @@ class SwapMainSettingsViewModel(
         amountInSwapMaxAction = ::setMaxAvailableAmountIn,
         amountOutSwapMinAction = ::setMinAmountOut,
         amountInSetAction = ::setAmountIn,
+        quoteFeeMismatchAction = { reloadQuoteAndFee() },
     )
 
     private fun setMaxAvailableAmountIn() {

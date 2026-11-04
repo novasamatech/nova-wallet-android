@@ -11,6 +11,8 @@ import java.math.BigDecimal
 
 sealed class SwapValidationFailure {
 
+    object QuoteFeeMismatch : SwapValidationFailure()
+
     object NonPositiveAmount : SwapValidationFailure()
 
     class HighPriceImpact(val priceImpact: Fraction) : SwapValidationFailure()

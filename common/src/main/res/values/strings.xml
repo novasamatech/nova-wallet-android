@@ -3224,4 +3224,6 @@
     <string name="swap_failure_pool_trade_minimum_message">This swap route requires at least %1$s at one of its liquidity pools. Increase the amount or choose another route.</string>
     <string name="swap_failure_pool_trade_limits_unavailable_title">Unable to verify pool limits</string>
     <string name="swap_failure_pool_trade_limits_unavailable_message">Pool trading limits could not be loaded. Please try again.</string>
+    <string name="swap_quote_fee_mismatch_title">Swap details changed</string>
+    <string name="swap_quote_fee_mismatch_message">Refresh the quote and network fee, then review the exchange again.</string>
 </resources>

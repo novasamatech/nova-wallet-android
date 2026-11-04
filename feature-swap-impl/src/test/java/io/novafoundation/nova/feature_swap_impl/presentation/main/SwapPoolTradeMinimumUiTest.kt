@@ -67,6 +67,7 @@ class SwapPoolTradeMinimumUiTest {
             amountInSwapMaxAction = { throw AssertionError("Minimum must not offer Swap Max") },
             amountOutSwapMinAction = { _, _ -> throw AssertionError("Must not replace the user amount with an intermediate minimum") },
             amountInSetAction = { _, _ -> throw AssertionError("Must not replace the user amount with an intermediate minimum") },
+            quoteFeeMismatchAction = { throw AssertionError("Pool minimum must not use quote mismatch recovery") }
         )
     }
 }

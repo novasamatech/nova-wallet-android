@@ -147,7 +147,8 @@ private fun SwapLimit.SpecifiedOut.updateInAmount(newAmountInQuote: Balance): Sw
 
 fun SwapQuote.toExecuteArgs(slippage: Fraction, firstSegmentFees: FeePaymentCurrency): SwapFeeArgs {
     return SwapFeeArgs(
-        assetIn = amountIn.chainAsset,
+        displayedAmountIn = amountIn,
+        displayedAmountOut = amountOut,
         slippage = slippage,
         direction = quotedPath.direction,
         executionPath = quotedPath.path.map { quotedSwapEdge -> SegmentExecuteArgs(quotedSwapEdge) },

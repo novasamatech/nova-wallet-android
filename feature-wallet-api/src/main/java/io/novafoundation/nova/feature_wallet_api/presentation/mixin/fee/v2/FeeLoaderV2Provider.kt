@@ -33,6 +33,10 @@ import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -62,7 +66,8 @@ internal class FeeLoaderV2Provider<F, D>(
     private val configuration: FeeLoaderMixinV2.Configuration<F, D>,
     private val feeInspector: FeeInspector<F>,
     private val feeContextFlow: Flow<FeeContext>,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    private val feeLoadingDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : FeeLoaderMixinV2.Presentation<F, D>,
     CoroutineScope by coroutineScope,
     FeeFormatter.Context {
@@ -120,37 +125,87 @@ internal class FeeLoaderV2Provider<F, D>(
 
     override val retryEvent = MutableLiveData<Event<RetryPayload>>()
 
+    private val feeRequestLock = Any()
+
+    private var latestFeeRequest = 0L
+
     private var latestLoadFeeJob: Job? = null
+
     private var latestFeeConstructor: FeeConstructor<F>? = null
+
     private val retryDialogPending = AtomicBoolean(false)
+
     private val retryDialogSuppressed = AtomicBoolean(false)
+
+    private var pendingRetryEvent: Event<RetryPayload>? = null
 
     init {
         observeSelectedAssetChanges()
     }
 
     override fun loadFee(feeConstructor: FeeConstructor<F>) {
-        latestLoadFeeJob?.cancel()
-        latestLoadFeeJob = launch(Dispatchers.IO) {
+        synchronized(feeRequestLock) {
+            val request = invalidateFeeRequest()
             latestFeeConstructor = feeConstructor
-            fee.emit(feeFormatter.createLoadingStatus())
-
-            val feePaymentCurrency = feeChainAssetFlow.first().toFeePaymentCurrency()
-
-            runCatching { feeConstructor(feePaymentCurrency) }
-                .mapCatching { onFeeLoaded(it, feePaymentCurrency, feeConstructor) }
-                .onFailure { onFeeError(it) }
+            // Invalidate the previous estimate before dispatching any asynchronous work.
+            fee.value = FeeStatus.Loading(visibleDuringProgress = true)
+            latestLoadFeeJob = launch(feeLoadingDispatcher, start = CoroutineStart.LAZY) {
+                try {
+                    val loadingStatus = feeFormatter.createLoadingStatus()
+                    publishFeeStatus(request, loadingStatus)
+                    val feePaymentCurrency = feeChainAssetFlow.first().toFeePaymentCurrency()
+                    ensureCurrentRequest(request)
+                    val newFee = feeConstructor(feePaymentCurrency)
+                    ensureCurrentRequest(request)
+                    onFeeLoaded(newFee, feePaymentCurrency, feeConstructor, request)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Throwable) {
+                    onFeeError(error, request)
+                }
+            }.also { it.start() }
         }
     }
 
-    private suspend fun onFeeError(error: Throwable) {
-        if (error !is CancellationException) {
-            Log.e(LOG_TAG, "Failed to sync fee", error)
+    // Called under feeRequestLock. Input invalidation also prevents currency changes from retrying old inputs.
+    private fun invalidateFeeRequest(clearConstructor: Boolean = true): Long {
+        latestFeeRequest++
+        latestLoadFeeJob?.cancel()
+        latestLoadFeeJob = null
+        if (clearConstructor) latestFeeConstructor = null
+        retryDialogPending.set(false)
+        pendingRetryEvent?.let { event ->
+            // Suppress both a queued postValue and an event already delivered to an inactive observer.
+            event.getContentIfNotHandled()
+            retryEvent.postValue(null)
+        }
+        pendingRetryEvent = null
+        return latestFeeRequest
+    }
 
-            fee.emit(FeeStatus.Error)
+    private suspend fun ensureCurrentRequest(request: Long) {
+        currentCoroutineContext().ensureActive()
+        synchronized(feeRequestLock) {
+            if (request != latestFeeRequest) throw CancellationException("Obsolete fee request")
+        }
+    }
+
+    private suspend fun publishFeeStatus(request: Long, status: FeeStatus<F, D>) {
+        ensureCurrentRequest(request)
+        synchronized(feeRequestLock) {
+            if (request == latestFeeRequest) fee.value = status
+        }
+    }
+
+    private suspend fun onFeeError(error: Throwable, request: Long) {
+        ensureCurrentRequest(request)
+        synchronized(feeRequestLock) {
+            if (request != latestFeeRequest) return
+            Log.e(LOG_TAG, "Failed to sync fee", error)
+            fee.value = FeeStatus.Error
 
             if (configuration.showRetryDialog && !retryDialogSuppressed.get() && retryDialogPending.compareAndSet(false, true)) {
-                showFeeRetry()
+                showFeeRetry(request)
             }
         }
     }
@@ -158,36 +213,46 @@ internal class FeeLoaderV2Provider<F, D>(
     private suspend fun onFeeLoaded(
         newFee: F?,
         requestedFeePaymentCurrency: FeePaymentCurrency,
-        feeConstructor: FeeConstructor<F>
+        feeConstructor: FeeConstructor<F>,
+        request: Long
     ) {
-        retryDialogSuppressed.set(false)
+        ensureCurrentRequest(request)
+        synchronized(feeRequestLock) {
+            if (request == latestFeeRequest) retryDialogSuppressed.set(false)
+        }
 
         if (newFee != null) {
-            setLoadedFee(newFee, requestedFeePaymentCurrency, feeConstructor)
+            setLoadedFee(newFee, requestedFeePaymentCurrency, feeConstructor, request)
         } else {
-            fee.emit(FeeStatus.NoFee)
+            publishFeeStatus(request, FeeStatus.NoFee)
         }
     }
 
-    private fun showFeeRetry() {
-        retryEvent.postValue(
-            Event(
-                RetryPayload(
-                    title = resourceManager.getString(R.string.choose_amount_network_error),
-                    message = resourceManager.getString(R.string.choose_amount_error_fee),
-                    onRetry = {
+    private fun showFeeRetry(request: Long) {
+        val event = Event(
+            RetryPayload(
+                title = resourceManager.getString(R.string.choose_amount_network_error),
+                message = resourceManager.getString(R.string.choose_amount_error_fee),
+                onRetry = {
+                    synchronized(feeRequestLock) {
+                        if (request != latestFeeRequest) return@synchronized
                         retryDialogPending.set(false)
                         retryDialogSuppressed.set(false)
                         reloadFeeWithLatestConstructor()
-                    },
-                    onCancel = {
+                    }
+                },
+                onCancel = {
+                    synchronized(feeRequestLock) {
+                        if (request != latestFeeRequest) return@synchronized
                         retryDialogPending.set(false)
                         retryDialogSuppressed.set(true)
                         configuration.onRetryCancelled()
                     }
-                )
+                }
             )
         )
+        pendingRetryEvent = event
+        retryEvent.postValue(event)
     }
 
     override suspend fun feeAsset(): Asset {
@@ -195,11 +260,8 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     override suspend fun token(chainAsset: Chain.Asset): Token {
-        val submissionFeeToken = feeAsset().token
-        if (submissionFeeToken.configuration.fullId == chainAsset.fullId) {
-            return submissionFeeToken
-        }
-
+        // Formatting may discover a custom fee asset before feeChainAssetFlow changes. Its token must
+        // not wait for the previously selected asset's balance subscription to produce a value.
         return interactor.getToken(chainAsset)
     }
 
@@ -221,16 +283,23 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     override suspend fun setFeeLoading() {
-        fee.emit(feeFormatter.createLoadingStatus())
+        val request = synchronized(feeRequestLock) {
+            val request = invalidateFeeRequest()
+            fee.value = FeeStatus.Loading(visibleDuringProgress = true)
+            request
+        }
+        publishFeeStatus(request, feeFormatter.createLoadingStatus())
     }
 
     override suspend fun setFeeStatus(feeStatus: FeeStatus<F, D>) {
-        feeStatus.onLoaded { feeModel ->
-            val feeAsset = feeInspector.getSubmissionFeeAsset(feeModel.fee)
-            feeChainAssetFlow.emit(feeAsset)
+        synchronized(feeRequestLock) {
+            invalidateFeeRequest(clearConstructor = feeStatus !is FeeStatus.Loaded)
+            feeStatus.onLoaded { feeModel ->
+                val feeAsset = feeInspector.getSubmissionFeeAsset(feeModel.fee)
+                feeChainAssetFlow.tryEmit(feeAsset)
+            }
+            fee.value = feeStatus
         }
-
-        fee.emit(feeStatus)
     }
 
     override suspend fun setFee(fee: F) {
@@ -238,21 +307,40 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     override suspend fun setFeeOrHide(fee: F?) {
+        val request = synchronized(feeRequestLock) {
+            // Send and gift validation can replace the fee of the same operation. Preserve its currency retry constructor.
+            val request = invalidateFeeRequest(clearConstructor = fee == null)
+            this.fee.value = FeeStatus.Loading(visibleDuringProgress = true)
+            request
+        }
         val feeStatus = feeFormatter.formatFeeStatus(fee, feeFormatterConfiguration)
-        setFeeStatus(feeStatus)
+        ensureCurrentRequest(request)
+        synchronized(feeRequestLock) {
+            if (request != latestFeeRequest) return
+            feeStatus.onLoaded { feeModel ->
+                feeChainAssetFlow.tryEmit(feeInspector.getSubmissionFeeAsset(feeModel.fee))
+            }
+            this.fee.value = feeStatus
+        }
     }
 
     private suspend fun setLoadedFee(
         newFee: F,
         requestedFeePaymentCurrency: FeePaymentCurrency,
-        feeConstructor: FeeConstructor<F>
+        feeConstructor: FeeConstructor<F>,
+        request: Long
     ) {
         val selectionMode = paymentCurrencySelectionModeFlow.first()
         val actualFeePaymentAsset = feeInspector.getSubmissionFeeAsset(newFee)
 
         if (selectionMode.shouldDetectFeeAssetFromFee()) {
-            feeChainAssetFlow.emit(actualFeePaymentAsset)
-            fee.value = feeFormatter.formatFeeStatus(newFee, feeFormatterConfiguration)
+            val status = feeFormatter.formatFeeStatus(newFee, feeFormatterConfiguration)
+            ensureCurrentRequest(request)
+            synchronized(feeRequestLock) {
+                if (request != latestFeeRequest) return
+                feeChainAssetFlow.tryEmit(actualFeePaymentAsset)
+                fee.value = status
+            }
         } else {
             val actualPaymentCurrency = actualFeePaymentAsset.toFeePaymentCurrency()
 
@@ -264,30 +352,34 @@ internal class FeeLoaderV2Provider<F, D>(
                 """.trimIndent()
             }
 
-            setFeeWithAutomaticChange(newFee, feeConstructor)
+            setFeeWithAutomaticChange(newFee, feeConstructor, request)
         }
     }
 
     private suspend fun setFeeWithAutomaticChange(
         newFee: F,
-        feeConstructor: suspend (FeePaymentCurrency) -> F?
+        feeConstructor: suspend (FeePaymentCurrency) -> F?,
+        request: Long
     ) {
         val feeStatus = feeFormatter.formatFeeStatus(newFee, feeFormatterConfiguration)
 
         val canChangeFeeAutomatically = canChangeFeeToSelectedAutomatically.first()
         if (!canChangeFeeAutomatically) {
-            fee.value = feeStatus
+            publishFeeStatus(request, feeStatus)
             return
         }
 
         val feeAsset = feeAsset.first()
         if (feeAsset == null || feeAsset.canPayFee(newFee)) {
-            fee.value = feeStatus
+            publishFeeStatus(request, feeStatus)
         } else {
             val selectedChainAsset = feeContextFlow.first().operationAsset
-            feeChainAssetFlow.emit(selectedChainAsset)
-
-            loadFee(feeConstructor)
+            ensureCurrentRequest(request)
+            synchronized(feeRequestLock) {
+                if (request != latestFeeRequest) return
+                feeChainAssetFlow.tryEmit(selectedChainAsset)
+                loadFee(feeConstructor)
+            }
         }
     }
 
@@ -312,7 +404,9 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     private fun reloadFeeWithLatestConstructor() {
-        latestFeeConstructor?.let(::loadFee)
+        synchronized(feeRequestLock) {
+            latestFeeConstructor?.let(::loadFee)
+        }
     }
 
     override fun changePaymentCurrencyClicked() {

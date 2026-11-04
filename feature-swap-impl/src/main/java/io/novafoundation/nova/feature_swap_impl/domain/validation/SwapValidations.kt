@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.Sw
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapPoolTradeLimitsValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapPriceImpactValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapRateChangesValidation
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapQuoteFeeConsistencyValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapSlippageRangeValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.sufficientAmountOutToStayAboveEDValidation
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -27,6 +28,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.sufficientBal
 typealias SwapValidationSystem = ValidationSystem<SwapValidationPayload, SwapValidationFailure>
 typealias SwapValidation = Validation<SwapValidationPayload, SwapValidationFailure>
 typealias SwapValidationSystemBuilder = ValidationSystemBuilder<SwapValidationPayload, SwapValidationFailure>
+
+fun SwapValidationSystemBuilder.quoteFeeConsistency() = validate(SwapQuoteFeeConsistencyValidation())
 
 fun SwapValidationSystemBuilder.priceImpactValidation(
     priceImpactThresholds: PriceImpactThresholds

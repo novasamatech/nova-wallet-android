@@ -25,6 +25,9 @@ class SwapFee(
      * Additional deductions from max amount of asset in that are not directly caused by fees
      */
     val additionalMaxAmountDeduction: SwapMaxAdditionalAmountDeduction,
+
+    // Absent only for fees that were not estimated from a quote. Such fees cannot authorize a swap.
+    val quoteIdentity: SwapFeeQuoteIdentity? = null,
 ) : MaxAvailableDeduction {
 
     data class SwapSegment(

@@ -40,8 +40,25 @@ fun mapSwapValidationFailureToUI(
     amountInSwapMaxAction: () -> Unit,
     amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit,
     amountInSetAction: (Chain.Asset, Balance) -> Unit,
+    quoteFeeMismatchAction: () -> Unit,
 ): TransformedFailure {
     return when (val reason = status.reason) {
+        SwapValidationFailure.QuoteFeeMismatch -> TransformedFailure.Custom(
+            CustomDialogDisplayer.Payload(
+                title = resourceManager.getString(R.string.swap_quote_fee_mismatch_title),
+                message = resourceManager.getString(R.string.swap_quote_fee_mismatch_message),
+                customStyle = R.style.AccentAlertDialogTheme,
+                okAction = CustomDialogDisplayer.Payload.DialogAction(
+                    title = resourceManager.getString(R.string.common_retry),
+                    action = quoteFeeMismatchAction
+                ),
+                cancelAction = CustomDialogDisplayer.Payload.DialogAction(
+                    title = resourceManager.getString(R.string.common_cancel),
+                    action = { }
+                )
+            )
+        )
+
         is NotEnoughFunds.ToPayFeeAndStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
 
         NotEnoughFunds.InUsedAsset -> resourceManager.amountIsTooBig().asDefault()
