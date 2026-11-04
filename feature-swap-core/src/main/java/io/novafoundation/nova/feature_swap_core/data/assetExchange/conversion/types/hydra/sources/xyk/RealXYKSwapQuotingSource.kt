@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.WeightedEdge
+import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.xyk
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -202,6 +203,14 @@ private class RealXYKSwapQuotingSource(
         override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
             return weightAppendingToPath(path, Weights.Hydra.XYK)
         }
+
+        override suspend fun minAllowedAmountIn(): BigInteger {
+            return remoteStorageSource.query(chain.id) {
+                runtime.metadata.xyk().numberConstant("MinTradingLimit", runtime)
+            }
+        }
+
+        override suspend fun minAllowedAmountOut(): BigInteger = minAllowedAmountIn()
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = xykPools.first()

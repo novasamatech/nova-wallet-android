@@ -3220,4 +3220,8 @@
     <string name="bittensor_mev_unchanged">Your order wasn\'t executed. Your stake is unchanged, please try again.</string>
     <string name="bittensor_mev_nothing_spent">Nothing was spent.</string>
     <string name="bittensor_mev_fee_may_be_charged">A network fee may have been charged.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Amount below pool minimum</string>
+    <string name="swap_failure_pool_trade_minimum_message">This swap route requires at least %1$s at one of its liquidity pools. Increase the amount or choose another route.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Unable to verify pool limits</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Pool trading limits could not be loaded. Please try again.</string>
 </resources>

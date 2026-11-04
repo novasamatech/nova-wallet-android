@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.OmniPoolQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.TradeAmountLimitedEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxPoolId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
@@ -57,7 +58,7 @@ private class OmniPoolSwapSource(
 
     private inner class OmniPoolSwapEdge(
         private val delegate: OmniPoolQuotingSource.Edge
-    ) : HydraDxSourceEdge, QuotableEdge by delegate, StandaloneHydraSwap {
+    ) : HydraDxSourceEdge, QuotableEdge by delegate, TradeAmountLimitedEdge by delegate, StandaloneHydraSwap {
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("Omnipool", null)

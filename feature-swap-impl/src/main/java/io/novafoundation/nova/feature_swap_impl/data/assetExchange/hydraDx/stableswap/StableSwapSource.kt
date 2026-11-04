@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.StableSwapQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.TradeAmountLimitedEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxPoolId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
@@ -52,7 +53,7 @@ private class StableSwapSource(
 
     inner class StableSwapEdge(
         private val delegate: StableSwapQuotingSource.Edge
-    ) : HydraDxSourceEdge, QuotableEdge by delegate {
+    ) : HydraDxSourceEdge, QuotableEdge by delegate, TradeAmountLimitedEdge by delegate {
 
         override val standaloneSwap = null
 

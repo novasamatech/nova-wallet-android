@@ -26,6 +26,13 @@ sealed class SwapValidationFailure {
 
     object NotEnoughLiquidity : SwapValidationFailure()
 
+    class AmountBelowPoolTradeMinimum(
+        val limitedAsset: Chain.Asset,
+        val minAmount: Balance
+    ) : SwapValidationFailure()
+
+    class PoolTradeLimitsUnavailable(val cause: Throwable) : SwapValidationFailure()
+
     /**
      * A single trade through one of the route's pools exceeds the pool's trade size limit,
      * e.g. XYK.MaxInRatio / XYK.MaxOutRatio on Hydration
