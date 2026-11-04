@@ -20,7 +20,7 @@ class RealAssetGetOptionsUseCase(
 
     private val changeNow = GetAssetOption.DApp(
         name = "ChangeNOW",
-        url = "https://changenow.io/embeds/exchange-widget/v2/widget.html?from=assethub&to=tao&link_id=59409968ba3831",
+        url = "https://changenow.io/exchange?from=assethub&to=tao&link_id=59409968ba3831",
         supportedTokens = listOf("DOT", "USDT", "USDC").map { it.asTokenSymbol() }
     )
 
