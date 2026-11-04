@@ -14,7 +14,10 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -574,6 +577,33 @@ class ResponseCacheTest {
         assertTrue(observer.isCompleted)
         assertEquals(listOf("old", "new"), observer.await().map { it.value.value })
         assertEquals(1, requests)
+    }
+
+    @Test
+    fun `stale observation publishes a background flight that finished before the observer could join it`() = runTest {
+        val cache = createResponseTestCache(dao, backgroundScope, wallClock, monotonicClock)
+        cache.get(endpoint("subnets"), Payload::class.java) { response("old", "no-store") }
+        wall += 30_000
+        nanos += 30_000_000_000L
+        val release = CompletableDeferred<Unit>()
+        cache.get(endpoint("subnets"), Payload::class.java, allowStale = true) {
+            release.await()
+            response("new")
+        }
+        runCurrent()
+        // Rendezvous delivery parks the observer right after it read the stale row, before it looks for a flight.
+        val values = cache.observe(endpoint("subnets"), Payload::class.java) { error("Duplicated request") }
+            .buffer(Channel.RENDEZVOUS)
+            .produceIn(backgroundScope)
+        runCurrent()
+
+        // The flight stores its response and leaves the registry while the observer still holds the stale row.
+        release.complete(Unit)
+        runCurrent()
+        assertEquals("old", values.receive().value.value)
+        runCurrent()
+
+        assertEquals("new", values.tryReceive().getOrNull()?.value?.value)
     }
 
     @Test
