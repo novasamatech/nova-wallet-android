@@ -2,6 +2,9 @@ apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
+// Bump together with nova-utils: the directory changes whenever the config format stops being backwards compatible
+def xcmConfigVersion = "v9"
+
 android {
 
     defaultConfig {
@@ -12,8 +15,8 @@ android {
         buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readStringSecret("EHTERSCAN_API_KEY_MOONRIVER")
         buildConfigField "String", "EHTERSCAN_API_KEY_ETHEREUM", readStringSecret("EHTERSCAN_API_KEY_ETHEREUM")
 
-        buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v8/transfers_dev.json\""
-        buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v8/transfers_dynamic_dev.json\""
+        buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/${xcmConfigVersion}/transfers_dev.json\""
+        buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/${xcmConfigVersion}/transfers_dynamic_dev.json\""
     }
 
     buildTypes {
@@ -21,8 +24,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v8/transfers.json\""
-            buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v8/transfers_dynamic.json\""
+            buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/${xcmConfigVersion}/transfers.json\""
+            buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/${xcmConfigVersion}/transfers_dynamic.json\""
         }
     }
     namespace 'io.novafoundation.nova.feature_wallet_impl'
