@@ -10,17 +10,17 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/voteFragment"
-        android:enabled="true"
-        android:icon="@drawable/bottom_vote"
-        android:title="@string/vote_vote"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/dAppsFragment"
         android:enabled="true"
         android:icon="@drawable/bottom_dapps"
-        android:title="@string/dapp_dapps"
+        android:title="@string/tabbar_browser_title"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/swapsTabFragment"
+        android:enabled="true"
+        android:icon="@drawable/bottom_swaps"
+        android:title="@string/tabbar_swaps_title"
         app:showAsAction="ifRoom" />
 
     <item
@@ -31,9 +31,9 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/profileFragment"
+        android:id="@+id/moreNavigation"
         android:enabled="true"
-        android:icon="@drawable/bottom_settings"
-        android:title="@string/profile_settings_title"
+        android:icon="@drawable/bottom_more"
+        android:title="@string/tabbar_more_title"
         app:showAsAction="ifRoom" />
 </menu>

@@ -2746,6 +2746,9 @@
     <string name="staking_your_validators">Your validators</string>
     <string name="staking_your_validators_changing_title">Your validators will change in the next era.</string>
     <string name="tabbar_staking_title">Staking</string>
+    <string name="tabbar_browser_title">Browser</string>
+    <string name="tabbar_swaps_title">Swaps</string>
+    <string name="tabbar_more_title">More</string>
     <string name="tabbar_wallet_title">Wallet</string>
     <string name="today">Today</string>
     <string name="transaction_details_copy_hash">Copy hash</string>

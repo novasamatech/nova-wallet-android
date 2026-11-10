@@ -4,7 +4,9 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 
 import io.novafoundation.nova.app.R
@@ -19,12 +21,12 @@ import javax.inject.Inject
 
 class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
-    override fun createBinding() = FragmentMainBinding.inflate(layoutInflater)
-
     @Inject
     lateinit var stakingDashboardNavigator: StakingDashboardNavigator
 
     private var navController: NavController? = null
+
+    private var moreNavigationPopup: MoreNavigationPopup? = null
 
     private val backCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
@@ -32,11 +34,33 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    private val destinationChangedListener = NavController.OnDestinationChangedListener { _, destination, _ ->
+        moreNavigationPopup?.dismiss()
+        backCallback.isEnabled = !isAtHomeTab(destination)
 
+        if (selectedMoreDestination(destination) != null) {
+            binder.bottomNavigationView.menu.findItem(R.id.moreNavigation).isChecked = true
+        }
+
+        viewModel.onDestinationChanged(destination.id)
+    }
+
+    override fun createBinding() = FragmentMainBinding.inflate(layoutInflater)
+
+    override fun onPause() {
+        moreNavigationPopup?.dismiss()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        moreNavigationPopup?.dismiss()
+        moreNavigationPopup = null
+        navController?.removeOnDestinationChangedListener(destinationChangedListener)
+        navController = null
         backCallback.isEnabled = false
         stakingDashboardNavigator.clearStakingTabNavController()
+
+        super.onDestroyView()
     }
 
     override fun applyInsets(rootView: View) {
@@ -50,16 +74,20 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
         binder.bottomNavigationView.setupWithNavController(navController!!)
         binder.bottomNavigationView.itemIconTintList = null
+        binder.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+            if (item.itemId == R.id.moreNavigation) {
+                showMoreNavigation()
+                false
+            } else {
+                moreNavigationPopup?.dismiss()
+                NavigationUI.onNavDestinationSelected(item, navController!!)
+            }
+        }
 
         stakingDashboardNavigator.setStakingTabNavController(navController!!)
 
-        requireActivity().onBackPressedDispatcher.addCallback(backCallback)
-
-        navController!!.addOnDestinationChangedListener { _, destination, _ ->
-            backCallback.isEnabled = !isAtHomeTab(destination)
-
-            viewModel.onDestinationChanged(destination.id)
-        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
+        navController!!.addOnDestinationChangedListener(destinationChangedListener)
     }
 
     override fun inject() {
@@ -71,6 +99,44 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
     override fun subscribe(viewModel: MainViewModel) {
         // Nothing to observe: analytics consent is its own screen now
+    }
+
+    private fun showMoreNavigation() {
+        if (moreNavigationPopup?.isShowing == true) {
+            moreNavigationPopup?.dismiss()
+            return
+        }
+
+        moreNavigationPopup = MoreNavigationPopup(
+            navigationBar = binder.bottomNavigationView,
+            selectedDestinationId = selectedMoreDestination(navController?.currentDestination),
+            onDestinationSelected = ::openMoreDestination
+        ).also { popup ->
+            popup.setOnDismissListener { moreNavigationPopup = null }
+            popup.show()
+        }
+    }
+
+    private fun openMoreDestination(destinationId: Int) {
+        val controller = navController ?: return
+        if (controller.currentDestination?.id == destinationId) return
+
+        // Match the existing bottom-tab navigation: one destination above Assets, without duplicates.
+        val options = NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .setPopUpTo(controller.graph.startDestination, false)
+            .setEnterAnim(R.animator.nav_default_enter_anim)
+            .setExitAnim(R.animator.nav_default_exit_anim)
+            .setPopEnterAnim(R.animator.nav_default_pop_enter_anim)
+            .setPopExitAnim(R.animator.nav_default_pop_exit_anim)
+            .build()
+        controller.navigate(destinationId, null, options)
+    }
+
+    private fun selectedMoreDestination(destination: NavDestination?): Int? {
+        return generateSequence(destination) { it.parent }
+            .firstOrNull { it.id == R.id.voteFragment || it.id == R.id.profileFragment }
+            ?.id
     }
 
     private fun isAtHomeTab(destination: NavDestination) =

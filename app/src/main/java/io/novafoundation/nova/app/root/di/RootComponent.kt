@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
 import io.novafoundation.nova.app.root.presentation.analytics.di.AnalyticsConsentComponent
 import io.novafoundation.nova.app.root.presentation.legal.di.LegalConsentComponent
 import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponent
+import io.novafoundation.nova.app.root.presentation.main.swaps.di.SwapsTabComponent
 import io.novafoundation.nova.app.root.presentation.splitScreen.di.SplitScreenFragmentComponent
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -57,6 +58,8 @@ interface RootComponent {
     fun splitScreenFragmentComponentFactory(): SplitScreenFragmentComponent.Factory
 
     fun mainFragmentComponentFactory(): MainFragmentComponent.Factory
+
+    fun swapsTabComponentFactory(): SwapsTabComponent.Factory
 
     fun legalConsentComponentFactory(): LegalConsentComponent.Factory
 

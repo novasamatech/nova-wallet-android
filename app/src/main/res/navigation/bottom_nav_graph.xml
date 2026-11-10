@@ -5,6 +5,8 @@
     android:id="@+id/bottom_nav_graph"
     app:startDestination="@id/walletFragment">
 
+    <include app:graph="@navigation/staking_dashboard_graph" />
+
     <fragment
         android:id="@+id/profileFragment"
         tools:layout="@layout/fragment_settings"
@@ -23,12 +25,16 @@
         android:name="io.novafoundation.nova.feature_dapp_impl.presentation.main.MainDAppFragment"
         android:label="CrowdloanFragment" />
 
-    <include app:graph="@navigation/staking_dashboard_graph"  />
-
     <action android:id="@+id/action_open_staking"
         app:destination="@+id/staking_dashboard_graph"
         app:popUpTo="@id/staking_dashboard_graph"
         app:popUpToInclusive="true" />
+
+    <fragment
+        android:id="@+id/swapsTabFragment"
+        android:name="io.novafoundation.nova.app.root.presentation.main.swaps.SwapsTabFragment"
+        android:label="SwapsTabFragment"
+        tools:layout="@layout/fragment_swaps_tab" />
 
     <fragment
         android:id="@+id/walletFragment"
