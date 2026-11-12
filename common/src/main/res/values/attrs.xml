@@ -336,6 +336,10 @@
     <declare-styleable name="TipsInputField">
         <attr name="android:hint" />
         <attr name="postfix" format="string" />
+        <attr name="postfixPadding" format="dimension" />
+        <attr name="showClearButton" format="boolean" />
+        <attr name="inputErrorTextColor" format="color" />
+        <attr name="errorMessageMarginTop" format="dimension" />
         <attr name="android:digits" />
         <attr name="android:inputType" />
     </declare-styleable>

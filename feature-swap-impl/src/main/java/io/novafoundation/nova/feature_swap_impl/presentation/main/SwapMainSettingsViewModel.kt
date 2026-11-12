@@ -209,7 +209,7 @@ class SwapMainSettingsViewModel(
 
     private var needsInitialKeyboard = true
 
-    val detailsExpanded = MutableStateFlow(false)
+    val detailsExpanded = MutableStateFlow(true)
 
     private val chainAssetIn = swapSettings
         .map { it.assetIn }
@@ -807,7 +807,8 @@ class SwapMainSettingsViewModel(
                 Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", error)
             }
             .onEach {
-                if (quotingState.value is QuotingState.Loaded) {
+                val state = quotingState.value
+                if ((state is QuotingState.Loaded || state is QuotingState.Error) && quotingJob?.isActive != true) {
                     performQuote(swapSettings.first(), shouldShowLoading = false, origin = QuoteRefreshOrigin.SUBSCRIPTION)
                 }
             }.launchIn(viewModelScope)

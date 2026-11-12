@@ -9,6 +9,8 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 
 import io.novafoundation.nova.common.base.BaseFragment
@@ -66,7 +68,11 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
     }
 
     override fun applyInsets(rootView: View) {
-        if (display == SwapFormDisplay.TAB) rootView.applyStatusBarInsets() else super.applyInsets(rootView)
+        if (display == SwapFormDisplay.TAB) {
+            rootView.applyStatusBarInsets()
+        } else {
+            rootView.applySystemBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
+        }
     }
 
     override fun createBinding() = FragmentMainSwapSettingsBinding.inflate(layoutInflater)

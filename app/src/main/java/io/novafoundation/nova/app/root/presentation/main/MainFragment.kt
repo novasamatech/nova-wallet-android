@@ -2,7 +2,13 @@ package io.novafoundation.nova.app.root.presentation.main
 
 import android.view.View
 import android.os.Bundle
+import android.os.Build
 import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.children
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
@@ -48,6 +54,7 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
         }
 
         viewModel.onDestinationChanged(destination.id)
+        ViewCompat.requestApplyInsets(binder.root)
     }
 
     override fun createBinding() = FragmentMainBinding.inflate(layoutInflater)
@@ -75,7 +82,24 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
     }
 
     override fun applyInsets(rootView: View) {
-        // Bottom Navigation View apply insets by itself so we override it to do nothing
+        val initialBottomPadding = rootView.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { _, insets ->
+            val swapKeyboardVisible = navController?.currentDestination?.id == R.id.swapsTabFragment &&
+                insets.isVisible(WindowInsetsCompat.Type.ime())
+
+            binder.bottomNavigationView.isVisible = !swapKeyboardVisible
+            binder.view2.isVisible = !swapKeyboardVisible
+            rootView.updatePadding(
+                bottom = initialBottomPadding + if (swapKeyboardVisible) insets.getInsets(WindowInsetsCompat.Type.ime()).bottom else 0
+            )
+            if (swapKeyboardVisible) moreNavigationPopup?.dismiss()
+
+            // Keep BaseFragment's inset dispatch for nested fragments on Android 7–10.
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                binder.root.children.forEach { ViewCompat.dispatchApplyWindowInsets(it, insets) }
+            }
+            insets
+        }
     }
 
     override fun initViews() {

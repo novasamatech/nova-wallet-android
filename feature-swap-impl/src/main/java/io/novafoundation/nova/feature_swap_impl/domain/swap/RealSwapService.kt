@@ -13,10 +13,8 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
-import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.allEdges
-import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
 import io.novafoundation.nova.common.utils.graph.numberOfEdges
@@ -120,11 +118,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -594,10 +590,7 @@ internal class RealSwapService(
                     }
             }
 
-            directionsByExchange
-                .accumulateLists()
-                .filter { it.isNotEmpty() }
-                .map { Graph.create(it) }
+            combineSwapDirections(directionsByExchange)
                 .onEach { printGraphStats(it) }
         }
     }
@@ -696,12 +689,6 @@ internal class RealSwapService(
         return computationalCache.useCache(SHARED_SUBSCRIPTIONS, computationScope) {
             RealSharedSwapSubscriptions(computationScope)
         }
-    }
-
-    // Assumes each flow will have only single element
-    private fun <T> List<Flow<List<T>>>.accumulateLists(): Flow<List<T>> {
-        return mergeIfMultiple()
-            .runningFold(emptyList()) { acc, directions -> acc + directions }
     }
 
     private suspend fun quoteTrade(

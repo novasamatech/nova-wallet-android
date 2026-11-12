@@ -3235,4 +3235,5 @@ claimed</string>
     <string name="swap_execution_unknown_title">Status unavailable</string>
     <string name="swap_view_transaction">View transaction</string>
     <string name="swap_slippage_custom">Custom</string>
+    <string name="swap_slippage_custom_hint">Custom, %</string>
 </resources>

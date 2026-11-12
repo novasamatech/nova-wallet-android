@@ -71,18 +71,6 @@ class SwapOptionsViewModel(
 
     val slippageInput = MutableStateFlow("")
 
-    private val customSelected = MutableStateFlow(false)
-
-    val selectedTip = combine(slippageInput, slippageConfig) { input, config ->
-        config.slippageTips.indexOfFirst { it.matches(input.formatToPercent() ?: config.defaultSlippage) }
-    }
-
-    val showCustomInput = combine(selectedTip, customSelected) { selected, custom -> custom || selected == -1 }
-
-    fun customClicked() {
-        customSelected.value = true
-    }
-
     private val slippageFieldValidator = slippageConfig.map { slippageFieldValidatorFactory.create(it) }
         .shareInBackground()
 
@@ -125,7 +113,6 @@ class SwapOptionsViewModel(
     }
 
     fun tipClicked(index: Int) {
-        customSelected.value = false
         launch {
             val slippageTips = slippageConfig.first().slippageTips
             slippageInput.value = formatInput(slippageTips[index])
@@ -148,7 +135,6 @@ class SwapOptionsViewModel(
     }
 
     fun resetClicked() {
-        customSelected.value = false
         slippageInput.value = ""
     }
 

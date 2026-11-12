@@ -16,6 +16,7 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewTipsInputBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
@@ -40,6 +41,10 @@ class TipsInputField @JvmOverloads constructor(
     private var postfixPadding = 4.dp
     private var postfixPosition: PointF? = null
 
+    private var showClearButton = true
+
+    private var inputErrorTextColor = context.getColor(R.color.text_negative)
+
     private val textPaint: Paint
 
     val content: EditText
@@ -51,7 +56,7 @@ class TipsInputField @JvmOverloads constructor(
         binder.tipsInputFieldContainer.background = context.getInputBackground()
 
         content.onTextChanged {
-            binder.tipsInputClear.isVisible = it.isNotEmpty()
+            binder.tipsInputClear.isVisible = showClearButton && it.isNotEmpty()
             binder.tipsInputContainer.isVisible = it.isEmpty()
             measurePostfix(it)
             invalidate()
@@ -79,6 +84,11 @@ class TipsInputField @JvmOverloads constructor(
             content.x + textLeft + textWidth,
             content.y + content.baseline.toFloat()
         )
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        measurePostfix(content.text.toString())
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -131,9 +141,8 @@ class TipsInputField @JvmOverloads constructor(
     override fun showError(error: String) {
         binder.tipsInputError.makeVisible()
         binder.tipsInputError.text = error
-        val color = context.getColor(R.color.text_negative)
-        content.setTextColor(color)
-        textPaint.color = color
+        content.setTextColor(inputErrorTextColor)
+        textPaint.color = inputErrorTextColor
         binder.tipsInputFieldContainer.background = context.getInputBackgroundError()
         invalidate()
     }
@@ -154,6 +163,12 @@ class TipsInputField @JvmOverloads constructor(
         hint?.let { content.hint = hint }
 
         postfix = it.getString(R.styleable.TipsInputField_postfix)
+        postfixPadding = it.getDimensionPixelSize(R.styleable.TipsInputField_postfixPadding, postfixPadding)
+        showClearButton = it.getBoolean(R.styleable.TipsInputField_showClearButton, true)
+        inputErrorTextColor = it.getColor(R.styleable.TipsInputField_inputErrorTextColor, inputErrorTextColor)
+        binder.tipsInputError.updateLayoutParams<MarginLayoutParams> {
+            topMargin = it.getDimensionPixelSize(R.styleable.TipsInputField_errorMessageMarginTop, topMargin)
+        }
 
         val digits = it.getString(R.styleable.TipsInputField_android_digits)
         digits?.let {
