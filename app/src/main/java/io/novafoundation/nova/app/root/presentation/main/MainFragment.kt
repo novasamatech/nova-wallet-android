@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.presentation.main
 
 import android.view.View
+import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -14,6 +15,7 @@ import io.novafoundation.nova.app.databinding.FragmentMainBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.swap.SwapTabNavigator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 
@@ -23,6 +25,9 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
     @Inject
     lateinit var stakingDashboardNavigator: StakingDashboardNavigator
+
+    @Inject
+    lateinit var swapTabNavigator: SwapTabNavigator
 
     private var navController: NavController? = null
 
@@ -52,6 +57,11 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
         super.onPause()
     }
 
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        swapTabNavigator.attach(requireNotNull(navController))
+    }
+
     override fun onDestroyView() {
         moreNavigationPopup?.dismiss()
         moreNavigationPopup = null
@@ -59,6 +69,7 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
         navController = null
         backCallback.isEnabled = false
         stakingDashboardNavigator.clearStakingTabNavController()
+        swapTabNavigator.detach()
 
         super.onDestroyView()
     }

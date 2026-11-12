@@ -4,6 +4,7 @@ import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.swap.SwapTabNavigator
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -47,6 +48,7 @@ class RootFeatureHolder @Inject constructor(
     private val assetsRouter: AssetsRouter,
     private val stakingRouter: StakingRouter,
     private val stakingDashboardNavigator: StakingDashboardNavigator,
+    private val swapTabNavigator: SwapTabNavigator,
     private val delayedNavRouter: DelayedNavigationRouter,
     featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
@@ -89,6 +91,7 @@ class RootFeatureHolder @Inject constructor(
                 accountRouter,
                 stakingRouter,
                 stakingDashboardNavigator,
+                swapTabNavigator,
                 delayedNavRouter,
                 rootFeatureDependencies
             )

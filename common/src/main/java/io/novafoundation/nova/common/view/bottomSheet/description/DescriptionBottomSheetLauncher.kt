@@ -3,7 +3,7 @@ package io.novafoundation.nova.common.view.bottomSheet.description
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseFragmentMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -31,8 +31,8 @@ class RealDescriptionBottomSheetLauncher : DescriptionBottomSheetLauncher {
     }
 }
 
-fun BaseFragment<*, *>.observeDescription(launcher: DescriptionBottomSheetLauncher) {
+fun BaseFragmentMixin<*>.observeDescription(launcher: DescriptionBottomSheetLauncher) {
     launcher.showDescriptionEvent.observeEvent { event ->
-        DescriptionBottomSheet(requireContext(), event.title, event.description).show()
+        DescriptionBottomSheet(fragment.requireContext(), event.title, event.description).show()
     }
 }

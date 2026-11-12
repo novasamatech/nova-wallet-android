@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Animation.Nova.MoreNavigation" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/more_navigation_enter</item>
+        <item name="android:windowExitAnimation">@anim/more_navigation_exit</item>
+    </style>
+
+</resources>

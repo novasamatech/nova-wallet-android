@@ -23,8 +23,8 @@ internal class AssetValidationContextFactory(
     private val assetSourceRegistry: AssetSourceRegistry,
 ) : AssetsValidationContext.Factory {
 
-    override fun create(): AssetsValidationContext {
-        return RealAssetValidationContext(arbitraryAssetUseCase, chainRegistry, assetSourceRegistry)
+    override fun create(metaAccountId: Long?): AssetsValidationContext {
+        return RealAssetValidationContext(arbitraryAssetUseCase, chainRegistry, assetSourceRegistry, metaAccountId)
     }
 }
 
@@ -32,6 +32,7 @@ private class RealAssetValidationContext(
     private val arbitraryAssetUseCase: ArbitraryAssetUseCase,
     private val chainRegistry: ChainRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val metaAccountId: Long?,
 ) : AssetsValidationContext {
 
     private val balanceCache = mutableMapOf<FullChainAssetId, Asset>()
@@ -43,7 +44,11 @@ private class RealAssetValidationContext(
     override suspend fun getAsset(chainAsset: Chain.Asset): Asset {
         return balanceMutex.withLock {
             balanceCache.getOrPut(chainAsset.fullId) {
-                arbitraryAssetUseCase.getAsset(chainAsset)!!
+                if (metaAccountId != null) {
+                    requireNotNull(arbitraryAssetUseCase.getAsset(metaAccountId, chainAsset))
+                } else {
+                    requireNotNull(arbitraryAssetUseCase.getAsset(chainAsset))
+                }
             }
         }
     }

@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFl
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 
 @Module(includes = [ViewModelModule::class])
@@ -46,7 +45,6 @@ class AssetSwapFlowModule {
         resourceManager: ResourceManager,
         payload: SwapFlowPayload,
         executorFactory: SwapFlowExecutorFactory,
-        swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
         networkAssetMapper: NetworkAssetFormatter,
@@ -63,7 +61,6 @@ class AssetSwapFlowModule {
             resourceManager = resourceManager,
             swapFlowExecutor = executorFactory.create(payload),
             swapPayload = payload,
-            swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
             networkAssetMapper = networkAssetMapper,

@@ -35,6 +35,8 @@ class ExpandableView @JvmOverloads constructor(
     private var chevronResId: Int? = null
     private var expandablePartResId: Int? = null
 
+    private var toggleViewResId: Int? = null
+
     private val expandCollapseAnimator = ValueAnimator()
 
     private val chevron: View? by lazy { findViewByIdOrNull(chevronResId) }
@@ -44,9 +46,13 @@ class ExpandableView @JvmOverloads constructor(
 
     private var callback: Callback? = null
 
+    private var state = ExpandableViewState.EXPANDED
+
     init {
         applyAttributes(attrs)
-        setOnClickListener { toggle() }
+        if (toggleViewResId == null) {
+            setOnClickListener { toggle() }
+        }
 
         expandCollapseAnimator.interpolator = AccelerateDecelerateInterpolator()
         expandCollapseAnimator.duration = 300L
@@ -68,6 +74,8 @@ class ExpandableView @JvmOverloads constructor(
     override fun onFinishInflate() {
         super.onFinishInflate()
 
+        findViewByIdOrNull(toggleViewResId)?.setOnClickListener { toggle() }
+
         if (collapsedByDefault) {
             collapseImmediate()
         } else {
@@ -75,12 +83,7 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
-    fun currentState(): ExpandableViewState {
-        return when (isExpanded()) {
-            true -> ExpandableViewState.EXPANDED
-            false -> ExpandableViewState.COLLAPSED
-        }
-    }
+    fun currentState(): ExpandableViewState = state
 
     fun setCallback(callback: Callback) {
         this.callback = callback
@@ -94,12 +97,14 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     fun collapseImmediate() {
+        state = ExpandableViewState.COLLAPSED
         callback?.onStateChanged(ExpandableViewState.COLLAPSED)
         expandablePart?.makeGone()
         chevron?.rotation = -180f
     }
 
     fun expandImmediate() {
+        state = ExpandableViewState.EXPANDED
         callback?.onStateChanged(ExpandableViewState.EXPANDED)
         expandablePart?.makeVisible()
         chevron?.rotation = 0f
@@ -119,17 +124,16 @@ class ExpandableView @JvmOverloads constructor(
             collapsedByDefault = typedArray.getBoolean(R.styleable.ExpandableView_collapsedByDefault, false)
             chevronResId = typedArray.getResourceIdOrNull(R.styleable.ExpandableView_chevronId)
             expandablePartResId = typedArray.getResourceIdOrNull(R.styleable.ExpandableView_expandableId)
+            toggleViewResId = typedArray.getResourceIdOrNull(R.styleable.ExpandableView_toggleViewId)
 
             typedArray.recycle()
         }
     }
 
-    private fun isExpanded() = expandablePart?.isVisible == true
-
     private fun toggle() {
         if (!isExpandable) return
 
-        if (isExpanded()) {
+        if (state == ExpandableViewState.EXPANDED) {
             collapse()
         } else {
             expand()
@@ -138,6 +142,7 @@ class ExpandableView @JvmOverloads constructor(
 
     private fun collapse() {
         if (supportAnimation) {
+            state = ExpandableViewState.COLLAPSED
             callback?.onStateChanged(ExpandableViewState.COLLAPSED)
             expandCollapseAnimator.removeAllListeners()
             expandCollapseAnimator.setFloatValues(0f, -1f)
@@ -150,6 +155,7 @@ class ExpandableView @JvmOverloads constructor(
 
     private fun expand() {
         if (supportAnimation) {
+            state = ExpandableViewState.EXPANDED
             callback?.onStateChanged(ExpandableViewState.EXPANDED)
             expandCollapseAnimator.removeAllListeners()
             expandCollapseAnimator.setFloatValues(-1f, 0f)

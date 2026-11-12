@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.fee.di
 
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
@@ -19,6 +20,7 @@ interface SwapFeeComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
+            @BindsInstance payload: SwapOperationPayload,
         ): SwapFeeComponent
     }
 

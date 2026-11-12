@@ -31,6 +31,7 @@ class MoreNavigationPopup(
         isFocusable = true
         isOutsideTouchable = true
         inputMethodMode = INPUT_METHOD_NOT_NEEDED
+        animationStyle = R.style.Animation_Nova_MoreNavigation
         setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         binder.root.background = context.getRoundedCornerDrawable(

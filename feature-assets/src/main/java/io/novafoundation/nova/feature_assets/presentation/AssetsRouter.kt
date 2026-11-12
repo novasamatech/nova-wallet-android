@@ -72,13 +72,9 @@ interface AssetsRouter {
 
     fun openWalletConnectScan()
 
-    fun openSwapFlow()
-
-    fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
+    fun openSwapTab(payload: SwapSettingsPayload? = null)
 
     fun returnToMainScreen()
-
-    fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload)
 
     fun closeSendFlow()
 
@@ -93,8 +89,6 @@ interface AssetsRouter {
     fun openReceiveNetworks(payload: NetworkFlowPayload)
 
     fun openSwapNetworks(payload: NetworkSwapFlowPayload)
-
-    fun returnToMainSwapScreen()
 
     fun openBuyNetworks(payload: NetworkFlowPayload)
 

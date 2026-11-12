@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.updaters.ChainUpdateScope
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ext.fullId
@@ -21,14 +20,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 class SwapUpdateSystemFactory(
-    private val swapSettingsStateProvider: SwapSettingsStateProvider,
     private val chainRegistry: ChainRegistry,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
     private val accountInfoUpdaterFactory: AccountInfoUpdaterFactory
 ) {
 
-    suspend fun create(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
-        val swapSettingsState = swapSettingsStateProvider.getSwapSettingsState(coroutineScope)
+    suspend fun create(chainFlow: Flow<Chain>, swapSettingsState: SwapSettingsState, coroutineScope: CoroutineScope): UpdateSystem {
         val sharedStateAdapter = SwapSharedStateAdapter(swapSettingsState, chainRegistry, coroutineScope)
 
         val updaters = listOf(

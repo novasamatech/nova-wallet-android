@@ -6,6 +6,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 interface SwapGraphEdge : QuotableEdge {
 
+    /** Stable exchange identifier used to restore a reviewed route from navigation arguments. */
+    val exchangeId: String
+
     /**
      * Begin a fully-constructed, ready to submit operation
      */

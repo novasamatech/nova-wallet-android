@@ -1,5 +1,13 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution
 
+import android.os.Bundle
+import io.novafoundation.nova.feature_swap_impl.databinding.ItemSwapExecutionStepBinding
+import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.setImageTint
+import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapExecutionSavedState
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.animation.AnimationUtils
@@ -16,7 +24,6 @@ import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapExecutionBinding
@@ -26,16 +33,34 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setup
 
 class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapExecutionBinding>() {
 
+    companion object {
+
+        private const val KEY_PAYLOAD = "swap_operation"
+        private const val KEY_EXECUTION = "swap_execution_checkpoint"
+
+        fun getBundle(payload: SwapOperationPayload) = Bundle().apply { putParcelable(KEY_PAYLOAD, payload) }
+    }
+
+    private lateinit var restoredExecution: SwapExecutionSavedState
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        restoredExecution = savedInstanceState?.getParcelable(KEY_EXECUTION) ?: SwapExecutionSavedState(
+            if (savedInstanceState == null) SwapExecutionSavedState.Status.NEW else SwapExecutionSavedState.Status.RUNNING
+        )
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(KEY_EXECUTION, viewModel.saveExecutionState())
+        super.onSaveInstanceState(outState)
+    }
+
     override fun createBinding() = FragmentSwapExecutionBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
-        binder.swapExecutionPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
-        binder.swapExecutionSlippage.setOnClickListener { viewModel.slippageClicked() }
         binder.swapExecutionNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
         binder.swapExecutionRoute.setOnClickListener { viewModel.routeClicked() }
-
-        binder.swapExecutionDetails.collapseImmediate()
 
         onBackPressed { /* suppress back presses */ }
 
@@ -51,11 +76,14 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
     override fun inject() {
         FeatureUtils.getFeature<SwapFeatureComponent>(requireContext(), SwapFeatureApi::class.java)
             .swapExecution()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD), restoredExecution)
             .inject(this)
     }
 
     override fun subscribe(viewModel: SwapExecutionViewModel) {
+        setupExternalActions(viewModel)
+        observeRetries(viewModel)
+
         observeDescription(viewModel)
 
         viewModel.swapProgressModel.observe(::setSwapProgress)
@@ -65,8 +93,6 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
         viewModel.confirmationDetailsFlow.observe {
             binder.swapExecutionAssets.setModel(it.assets)
             binder.swapExecutionRate.showValue(it.rate)
-            binder.swapExecutionPriceDifference.showValueOrHide(it.priceDifference)
-            binder.swapExecutionSlippage.showValue(it.slippage)
             binder.swapExecutionRoute.setSwapRouteModel(it.swapRouteModel)
         }
     }
@@ -76,7 +102,47 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
             is SwapProgressModel.Completed -> setSwapCompleted(model)
             is SwapProgressModel.Failed -> setSwapFailed(model)
             is SwapProgressModel.InProgress -> setSwapInProgress(model)
+            is SwapProgressModel.Interrupted -> setSwapInterrupted(model)
         }
+    }
+
+    private fun showSteps(steps: List<SwapProgressModel.Step>) {
+        binder.swapExecutionSteps.setVisible(steps.isNotEmpty())
+        binder.swapExecutionSteps.removeAllViews()
+        steps.forEach { step ->
+            val item = ItemSwapExecutionStepBinding.inflate(layoutInflater, binder.swapExecutionSteps, true)
+            val color = when (step.status) {
+                SwapProgressModel.StepStatus.COMPLETED -> R.color.text_positive
+                SwapProgressModel.StepStatus.FAILED -> R.color.text_negative
+                SwapProgressModel.StepStatus.UNKNOWN -> R.color.text_warning
+                SwapProgressModel.StepStatus.PENDING -> R.color.text_secondary
+            }
+            val icon = when (step.status) {
+                SwapProgressModel.StepStatus.COMPLETED -> R.drawable.ic_checkmark
+                SwapProgressModel.StepStatus.FAILED -> R.drawable.ic_close_circle
+                SwapProgressModel.StepStatus.UNKNOWN -> R.drawable.ic_warning_filled
+                SwapProgressModel.StepStatus.PENDING -> R.drawable.ic_time_24
+            }
+            item.swapStepStatus.setImageResource(icon)
+            item.swapStepStatus.setImageTint(requireContext().getColor(color))
+            item.swapStepLabel.text = step.label
+            item.swapStepLabel.setTextColorRes(color)
+            item.swapStepTransaction.setVisible(step.hasTransaction)
+            item.swapStepTransaction.setOnClickListener { viewModel.transactionClicked() }
+        }
+    }
+
+    private fun setSwapInterrupted(model: SwapProgressModel.Interrupted) {
+        binder.swapExecutionTimer.setState(ExecutionTimerView.State.Error)
+        binder.swapExecutionTitleSwitcher.setText(getString(R.string.swap_execution_unknown_title), colorRes = R.color.text_warning)
+        binder.swapExecutionSubtitleSwitcher.setText(model.at, colorRes = R.color.text_secondary)
+        binder.swapExecutionStepLabel.text = model.reason
+        binder.swapExecutionStepShimmer.hideShimmer()
+        binder.swapExecutionStepContainer.background = requireContext().getBlockDrawable()
+        showSteps(model.steps)
+        binder.swapExecutionActionButton.makeVisible()
+        binder.swapExecutionActionButton.setText(R.string.common_done)
+        binder.swapExecutionActionButton.setOnClickListener { viewModel.doneClicked() }
     }
 
     private fun setSwapCompleted(model: SwapProgressModel.Completed) {
@@ -97,6 +163,7 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
     }
 
     private fun setSwapFailed(model: SwapProgressModel.Failed) {
+        showSteps(model.steps)
         binder.swapExecutionTimer.setState(ExecutionTimerView.State.Error)
 
         binder.swapExecutionTitleSwitcher.setText(getString(R.string.common_failed), colorRes = R.color.text_negative)

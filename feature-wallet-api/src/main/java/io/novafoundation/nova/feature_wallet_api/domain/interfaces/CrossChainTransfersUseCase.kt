@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
@@ -56,7 +58,8 @@ interface CrossChainTransfersUseCase {
      */
     suspend fun ExtrinsicService.performTransferAndTrackTransfer(
         transfer: AssetTransferBase,
-        computationalScope: CoroutineScope
+        computationalScope: CoroutineScope,
+        onOriginExecuted: suspend (ExtrinsicExecutionResult) -> Unit = {}
     ): Result<Balance>
 
     suspend fun maximumExecutionTime(

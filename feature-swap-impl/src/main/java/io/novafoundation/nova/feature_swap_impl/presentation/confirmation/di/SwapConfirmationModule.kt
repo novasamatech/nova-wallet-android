@@ -17,13 +17,14 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationPayloadMapper
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -52,10 +53,11 @@ class SwapConfirmationModule {
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         assetUseCase: ArbitraryAssetUseCase,
         maxActionProviderFactory: MaxActionProviderFactory,
-        swapStateStoreProvider: SwapStateStoreProvider,
+        operationLoader: SwapOperationLoader,
+        operationPayload: SwapOperationPayload,
+        operationMapper: SwapOperationPayloadMapper,
         confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
         resourceManager: ResourceManager,
-        swapFlowScopeAggregator: SwapFlowScopeAggregator,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
         analyticsService: AnalyticsService,
         usdRateRepository: UsdRateRepository
@@ -71,14 +73,15 @@ class SwapConfirmationModule {
             validationExecutor = validationExecutor,
             tokenRepository = tokenRepository,
             externalActions = externalActions,
-            swapStateStoreProvider = swapStateStoreProvider,
+            operationLoader = operationLoader,
+            operationPayload = operationPayload,
+            operationMapper = operationMapper,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             arbitraryAssetUseCase = assetUseCase,
             maxActionProviderFactory = maxActionProviderFactory,
             swapConfirmationDetailsFormatter = confirmationDetailsFormatter,
             resourceManager = resourceManager,
-            swapFlowScopeAggregator = swapFlowScopeAggregator,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
             analyticsService = analyticsService,
             usdRateRepository = usdRateRepository

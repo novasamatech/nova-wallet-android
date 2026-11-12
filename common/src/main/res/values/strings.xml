@@ -82,7 +82,8 @@
     <string name="claim_gift_success_message">You’ve successfully claimed a gift. Tokens will appear in your balance shortly.</string>
 
     <string name="claim_gift_already_claimed_title">The gift cannot be received</string>
-    <string name="claim_gift_already_claimed_message">Oops, the gift has already been  claimed</string>
+    <string name="claim_gift_already_claimed_message">Oops, the gift has already been
+claimed</string>
 
     <string name="claim_gift_default_error_title">Oops, something went wrong</string>
     <string name="claim_gift_default_error_message">There may be a problem with the server. Please, try again later.</string>
@@ -3223,4 +3224,15 @@
     <string name="bittensor_mev_unchanged">Your order wasn\'t executed. Your stake is unchanged, please try again.</string>
     <string name="bittensor_mev_nothing_spent">Nothing was spent.</string>
     <string name="bittensor_mev_fee_may_be_charged">A network fee may have been charged.</string>
+    <string name="swap_flip_tokens">Swap pay and receive tokens</string>
+    <string name="swap_price_impact_label">Price impact</string>
+    <string name="swap_max_slippage">Max slippage</string>
+    <string name="swap_min_received">Min received</string>
+    <string name="swap_balance_label">Balance: %s</string>
+    <string name="swap_quote_failed">Couldn’t load the quote. Please try again.</string>
+    <string name="swap_review_title">Confirm swap</string>
+    <string name="swap_execution_interrupted">The transaction status could not be verified. Check your transaction history before starting another swap.</string>
+    <string name="swap_execution_unknown_title">Status unavailable</string>
+    <string name="swap_view_transaction">View transaction</string>
+    <string name="swap_slippage_custom">Custom</string>
 </resources>

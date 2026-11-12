@@ -54,4 +54,5 @@ data class ParentQuoterArgs(
     val chainAssetOut: Chain.Asset,
     val amount: Balance,
     val swapDirection: SwapDirection,
+    val metaAccountId: Long? = null,
 )

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.di
 
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
@@ -74,7 +75,6 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
@@ -209,7 +209,7 @@ interface AssetsFeatureDependencies {
 
     val coinPriceRepository: CoinPriceRepository
 
-    val swapSettingsStateProvider: SwapSettingsStateProvider
+    val swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator
 
     val swapService: SwapService
 

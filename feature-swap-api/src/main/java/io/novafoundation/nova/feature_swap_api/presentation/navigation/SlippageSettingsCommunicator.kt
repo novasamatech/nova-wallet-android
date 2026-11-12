@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 interface SlippageSettingsCommunicator : InterScreenCommunicator<SlippageSettingsPayload, SlippageSettingsCommunicator.Response> {
 
     @Parcelize
-    data class Response(val fraction: Double, val method: Method = Method.CUSTOM) : Parcelable
+    data class Response(val fraction: Double, val method: Method = Method.CUSTOM, val requestId: String? = null) : Parcelable
 
     enum class Method { PRESET, CUSTOM, RESET }
 }

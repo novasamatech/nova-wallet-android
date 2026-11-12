@@ -5,12 +5,12 @@ import dagger.Component
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.swap.SwapTabNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
 import io.novafoundation.nova.app.root.presentation.analytics.di.AnalyticsConsentComponent
 import io.novafoundation.nova.app.root.presentation.legal.di.LegalConsentComponent
 import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponent
-import io.novafoundation.nova.app.root.presentation.main.swaps.di.SwapsTabComponent
 import io.novafoundation.nova.app.root.presentation.splitScreen.di.SplitScreenFragmentComponent
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -59,8 +59,6 @@ interface RootComponent {
 
     fun mainFragmentComponentFactory(): MainFragmentComponent.Factory
 
-    fun swapsTabComponentFactory(): SwapsTabComponent.Factory
-
     fun legalConsentComponentFactory(): LegalConsentComponent.Factory
 
     fun analyticsConsentComponentFactory(): AnalyticsConsentComponent.Factory
@@ -78,6 +76,7 @@ interface RootComponent {
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance stakingRouter: StakingRouter,
             @BindsInstance stakingDashboardNavigator: StakingDashboardNavigator,
+            @BindsInstance swapTabNavigator: SwapTabNavigator,
             @BindsInstance delayedNavigationRouter: DelayedNavigationRouter,
             deps: RootDependencies
         ): RootComponent

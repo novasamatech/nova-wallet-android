@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution.di
 
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapExecutionSavedState
 import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
@@ -19,6 +21,8 @@ interface SwapExecutionComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
+            @BindsInstance payload: SwapOperationPayload,
+            @BindsInstance savedState: SwapExecutionSavedState,
         ): SwapExecutionComponent
     }
 

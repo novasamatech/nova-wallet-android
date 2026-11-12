@@ -32,9 +32,9 @@
 
     <fragment
         android:id="@+id/swapsTabFragment"
-        android:name="io.novafoundation.nova.app.root.presentation.main.swaps.SwapsTabFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.main.SwapTabFragment"
         android:label="SwapsTabFragment"
-        tools:layout="@layout/fragment_swaps_tab" />
+        tools:layout="@layout/fragment_main_swap_settings" />
 
     <fragment
         android:id="@+id/walletFragment"
