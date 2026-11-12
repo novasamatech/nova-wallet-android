@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.stateFlow
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
+import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_swap_impl.presentation.route.model.SwapRouteItemModel
 import io.novafoundation.nova.feature_swap_impl.presentation.route.view.TokenAmountModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.FiatAmount
@@ -24,14 +24,14 @@ import kotlinx.coroutines.flow.map
 
 class SwapRouteViewModel(
     private val swapInteractor: SwapInteractor,
-    private val swapStateStoreProvider: SwapStateStoreProvider,
+    private val operationLoader: SwapOperationLoader,
     private val chainRegistry: ChainRegistry,
     private val assetIconProvider: AssetIconProvider,
     private val router: SwapRouter,
     private val resourceManager: ResourceManager
-) : BaseViewModel() {
+) : BaseViewModel(), Retriable by operationLoader {
 
-    val swapRoute = swapStateStoreProvider.stateFlow(viewModelScope)
+    val swapRoute = operationLoader.state(viewModelScope).shareInBackground()
         .map { it.fee.toSwapRouteUi() }
         .withSafeLoading()
         .shareInBackground()

@@ -5,6 +5,7 @@ import dagger.Component
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationHolder
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
+import io.novafoundation.nova.app.root.navigation.navigators.swap.SwapTabNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
 import io.novafoundation.nova.app.root.presentation.analytics.di.AnalyticsConsentComponent
@@ -75,6 +76,7 @@ interface RootComponent {
             @BindsInstance accountRouter: AccountRouter,
             @BindsInstance stakingRouter: StakingRouter,
             @BindsInstance stakingDashboardNavigator: StakingDashboardNavigator,
+            @BindsInstance swapTabNavigator: SwapTabNavigator,
             @BindsInstance delayedNavigationRouter: DelayedNavigationRouter,
             deps: RootDependencies
         ): RootComponent

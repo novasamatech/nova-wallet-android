@@ -91,4 +91,33 @@ class GlobalConfigDataSourceTest {
         val source = RealGlobalConfigDataSource(cancelledApi, preferences, gson, logger)
         assertTrue(runCatching { source.getGlobalConfig() }.exceptionOrNull() is CancellationException)
     }
+
+    @Test
+    fun `default swap pair is optional and validated independently of other global settings`() = runBlocking<Unit> {
+        prepareStorage()
+        val chainId = "a".repeat(64)
+        val pair = SwapPairRemote(SwapPairRemote.Asset(chainId, 0), SwapPairRemote.Asset(chainId, 2))
+        val api = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig() = GlobalConfigRemote("m", "p", "s", "https://infra.test/", pair)
+        }
+        val config = RealGlobalConfigDataSource(api, preferences, gson, logger).getGlobalConfig()
+        assertEquals(0, config.defaultSwapPair!!.assetIn.assetId)
+        assertEquals(2, config.defaultSwapPair!!.assetOut.assetId)
+        val oldApi = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig() = GlobalConfigRemote("m", "p", "s", "https://infra.test/")
+        }
+        org.junit.Assert.assertNull(RealGlobalConfigDataSource(oldApi, preferences, gson, logger).getGlobalConfig().defaultSwapPair)
+    }
+
+    @Test
+    fun `malformed pair does not discard valid infrastructure configuration`() = runBlocking<Unit> {
+        prepareStorage()
+        val badPair = SwapPairRemote(SwapPairRemote.Asset("invalid", null), SwapPairRemote.Asset("invalid", 2))
+        val api = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig() = GlobalConfigRemote("m", "p", "s", "https://infra.test/", badPair)
+        }
+        val config = RealGlobalConfigDataSource(api, preferences, gson, logger).getGlobalConfig()
+        assertEquals("https://infra.test/", config.infraUrl)
+        org.junit.Assert.assertNull(config.defaultSwapPair)
+    }
 }

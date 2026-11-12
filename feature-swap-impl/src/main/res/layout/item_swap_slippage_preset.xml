@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="48dp"
+    android:focusable="true"
+    android:minWidth="48dp">
+
+    <TextView
+        android:id="@+id/swapSlippagePresetLabel"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingHorizontal="12dp"
+        android:textColor="@color/text_primary" />
+</FrameLayout>

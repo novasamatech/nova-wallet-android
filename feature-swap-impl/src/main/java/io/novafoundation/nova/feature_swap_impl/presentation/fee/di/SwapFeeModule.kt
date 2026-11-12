@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.SwapFeeViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -25,14 +25,14 @@ class SwapFeeModule {
         swapInteractor: SwapInteractor,
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        swapStateStoreProvider: SwapStateStoreProvider,
+        operationLoader: SwapOperationLoader,
         amountFormatter: AmountFormatter
     ): ViewModel {
         return SwapFeeViewModel(
             swapInteractor = swapInteractor,
             chainRegistry = chainRegistry,
             resourceManager = resourceManager,
-            swapStateStoreProvider = swapStateStoreProvider,
+            operationLoader = operationLoader,
             amountFormatter = amountFormatter
         )
     }

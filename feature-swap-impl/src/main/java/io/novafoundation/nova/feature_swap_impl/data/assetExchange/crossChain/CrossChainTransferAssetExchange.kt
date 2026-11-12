@@ -117,6 +117,8 @@ class CrossChainTransferAssetExchange(
         val delegate: Edge<FullChainAssetId>
     ) : SwapGraphEdge, Edge<FullChainAssetId> by delegate {
 
+        override val exchangeId: String = "cross-chain"
+
         private var canUseXcmExecute: Boolean? = null
 
         override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
@@ -274,7 +276,15 @@ class CrossChainTransferAssetExchange(
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
             return dryRunTransfer(transfer)
-                .flatMap { with(crossChainTransfersUseCase) { swapHost.extrinsicService().performTransferAndTrackTransfer(transfer, swapHost.scope) } }
+                .flatMap {
+                    with(crossChainTransfersUseCase) {
+                        swapHost.extrinsicService().performTransferAndTrackTransfer(
+                            transfer,
+                            swapHost.scope,
+                            args.onExecuted
+                        )
+                    }
+                }
                 .map(::SwapExecutionCorrection)
         }
 
@@ -287,7 +297,7 @@ class CrossChainTransferAssetExchange(
         }
 
         private suspend fun dryRunTransfer(transfer: AssetTransferBase): Result<Unit> {
-            val metaAccount = accountRepository.getSelectedMetaAccount()
+            val metaAccount = transactionArgs.metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
             val origin = metaAccount.requireAccountIdKeyIn(transfer.originChain)
 
             return crossChainTransfersUseCase.dryRunTransferIfPossible(
@@ -303,7 +313,7 @@ class CrossChainTransferAssetExchange(
             val (originChain, originAsset) = chainRegistry.chainWithAsset(edge.from)
             val (destinationChain, destinationAsset) = chainRegistry.chainWithAsset(edge.to)
 
-            val selectedAccount = accountRepository.getSelectedMetaAccount()
+            val selectedAccount = transactionArgs.metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
 
             return AssetTransferBase(
                 recipient = selectedAccount.requireAddressIn(destinationChain),
@@ -312,7 +322,8 @@ class CrossChainTransferAssetExchange(
                 destinationChain = destinationChain,
                 destinationChainAsset = destinationAsset,
                 feePaymentCurrency = transactionArgs.feePaymentCurrency,
-                amountPlanks = amount
+                amountPlanks = amount,
+                metaAccountId = selectedAccount.id
             )
         }
 

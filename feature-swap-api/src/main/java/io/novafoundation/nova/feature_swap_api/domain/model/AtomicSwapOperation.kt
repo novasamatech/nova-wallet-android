@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.domain.model
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.totalAmount
@@ -61,11 +62,13 @@ interface AtomicSwapOperation {
 class AtomicSwapOperationSubmissionArgs(
     val actualSwapLimit: SwapLimit,
     val isServiceCommissionOperation: Boolean,
+    val onExecuted: suspend (ExtrinsicExecutionResult) -> Unit = {},
 )
 
 class AtomicSwapOperationArgs(
     val estimatedSwapLimit: SwapLimit,
     val feePaymentCurrency: FeePaymentCurrency,
+    val metaAccountId: Long? = null,
 )
 
 fun AtomicSwapOperationFee.amountToLeaveOnOriginToPayTxFees(): Balance {

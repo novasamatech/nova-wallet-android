@@ -26,8 +26,8 @@ class CanReceiveAssetOutValidationFactory @Inject constructor(
 ) {
 
     context(SwapValidationSystemBuilder)
-    fun canReceiveAssetOut(validationContext: AssetsValidationContext) {
-        validate(CanReceiveAssetOutValidation(accountInfoRepository, chainRegistry, accountRepository, validationContext))
+    fun canReceiveAssetOut(validationContext: AssetsValidationContext, metaAccountId: Long? = null) {
+        validate(CanReceiveAssetOutValidation(accountInfoRepository, chainRegistry, accountRepository, validationContext, metaAccountId))
     }
 }
 
@@ -43,6 +43,7 @@ class CanReceiveAssetOutValidation(
     private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val assetsValidationContext: AssetsValidationContext,
+    private val metaAccountId: Long? = null,
 ) : SwapValidation {
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
@@ -52,7 +53,7 @@ class CanReceiveAssetOutValidation(
         val chainAssetOut = value.amountOut.chainAsset
         val chainOut = chainRegistry.getChain(chainAssetOut.chainId)
 
-        val metaAccount = accountRepository.getSelectedMetaAccount()
+        val metaAccount = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
         val recipientAccountId = metaAccount.accountIdIn(chainOut) ?: return valid()
 
         val destinationAccountInfo = accountInfoRepository.getAccountInfo(chainOut.id, recipientAccountId)

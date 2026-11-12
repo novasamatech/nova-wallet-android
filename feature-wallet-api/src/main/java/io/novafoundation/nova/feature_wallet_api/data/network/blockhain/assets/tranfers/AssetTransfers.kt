@@ -36,6 +36,9 @@ interface AssetTransferDirection {
 
 interface AssetTransferBase : AssetTransferDirection {
 
+    val metaAccountId: Long?
+        get() = null
+
     val recipientAccountId: AccountIdKey
         get() = destinationChain.accountIdOrDefault(recipient).intoKey()
 
@@ -51,7 +54,7 @@ fun AssetTransferBase.amount(): BigDecimal {
 }
 
 fun AssetTransferBase.replaceAmount(newAmount: Balance): AssetTransferBase {
-    return AssetTransferBase(recipient, originChain, originChainAsset, destinationChain, destinationChainAsset, feePaymentCurrency, newAmount)
+    return AssetTransferBase(recipient, originChain, originChainAsset, destinationChain, destinationChainAsset, feePaymentCurrency, newAmount, metaAccountId)
 }
 
 // TODO this is too specialized for this module
@@ -88,9 +91,11 @@ fun AssetTransferBase(
     destinationChain: Chain,
     destinationChainAsset: Chain.Asset,
     feePaymentCurrency: FeePaymentCurrency,
-    amountPlanks: Balance
+    amountPlanks: Balance,
+    metaAccountId: Long? = null
 ): AssetTransferBase {
     return object : AssetTransferBase {
+        override val metaAccountId: Long? = metaAccountId
         override val recipient: String = recipient
         override val originChain: Chain = originChain
         override val originChainAsset: Chain.Asset = originChainAsset

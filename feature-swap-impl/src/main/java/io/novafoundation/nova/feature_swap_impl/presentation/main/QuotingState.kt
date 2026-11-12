@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.feature_swap_api.presentation.state.DEFAULT_SLIPPAGE
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -16,6 +18,7 @@ sealed class QuotingState {
         val quote: SwapQuote,
         val quoteArgs: SwapQuoteArgs,
         val origin: QuoteRefreshOrigin,
+        val slippage: Fraction = DEFAULT_SLIPPAGE,
     ) : QuotingState()
 }
 

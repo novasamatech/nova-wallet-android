@@ -311,7 +311,7 @@ class BalanceDetailViewModel(
         launch {
             val chainAsset = assetFlow.first().token.configuration
             val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload(), SwapEntryPoint.ASSET_DETAILS)
-            router.openSwapSetupAmount(payload)
+            router.openSwapTab(payload)
         }
     }
 
