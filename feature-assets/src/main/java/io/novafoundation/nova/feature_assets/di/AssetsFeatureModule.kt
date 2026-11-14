@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.di
 
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -52,7 +51,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatterFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -237,14 +235,6 @@ class AssetsFeatureModule {
     @FeatureScope
     fun provideNovaCardInteractor(repository: NovaCardStateRepository): NovaCardInteractor {
         return RealNovaCardInteractor(repository)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideSwapExecutor(
-        swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator
-    ): SwapFlowExecutorFactory {
-        return SwapFlowExecutorFactory(swapTokenSelectionCommunicator)
     }
 
     @Provides

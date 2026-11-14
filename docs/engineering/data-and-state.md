@@ -4,6 +4,12 @@
 
 Load interactor data with `flowOf { ... }` or an interactor-provided Flow and share it with `shareInBackground()` when reused. Derive loading and presentation values with the established flow operators instead of copying them into `MutableStateFlow` from `init`. Keep mutable flows for user-editable state and explicit operation/retry controls, not redundant copies of loaded data. Name selections after the selected entity. Keep entity lookup by ID in the interactor rather than filtering its catalogue in the ViewModel.
 
+Use the existing `ExtendedLoadingState<T>` for loading, loaded data and failure; do not introduce local
+`Loading` / `Loaded` / `Failed` state hierarchies with the same meaning. Reuse `withSafeLoading()`,
+`mapLoading`, `onError`, `firstIfLoaded` and other existing helpers where their semantics fit. Preserve the
+error cause and coroutine cancellation. A separate domain state is justified only for additional domain
+transitions that this shared loading model cannot express.
+
 Use `withSafeLoading()` only when its loading state is consumed by the UI, including disabling actions while data is loading. Do not add loading wrappers solely to catch exceptions; use `catch` with appropriate error reporting when no loading state is needed. Retry infrastructure must not impose UI loading states; apply loading-state transformations at the consuming ViewModel, per attempt when retries must reset the UI.
 
 Use `mapNotNull` when a derived flow should emit only available values instead of forwarding null and checking it in every consumer. Preserve nullable emissions when null explicitly clears stale UI data, selection, or operation readiness during loading or failure.

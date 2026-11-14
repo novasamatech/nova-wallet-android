@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_swap_token_row"
+    android:foreground="?attr/selectableItemBackground">
+
+    <View
+        android:id="@+id/swapTokenSelectionBar"
+        android:layout_width="3dp"
+        android:layout_height="40dp"
+        android:layout_gravity="start|center_vertical"
+        android:background="@drawable/bg_swap_token_selection_bar"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="7dp">
+
+        <FrameLayout
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <ImageView
+                android:id="@+id/swapTokenIcon"
+                style="@style/Widget.Nova.AssetIcon.Primary"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:padding="1dp" />
+
+            <ImageView
+                android:id="@+id/swapTokenNetworkBadge"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="-1dp" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/swapTokenName"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/swapTokenNetwork"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/swapTokenBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/swapTokenAmount"
+                style="@style/TextAppearance.NovaFoundation.Regular.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="150dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/swapTokenFiat"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="150dp"
+                android:ellipsize="end"
+                android:maxLines="1" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

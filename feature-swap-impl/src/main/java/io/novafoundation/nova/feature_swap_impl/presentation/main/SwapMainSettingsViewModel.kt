@@ -445,19 +445,28 @@ class SwapMainSettingsViewModel(
     }
 
     private fun selectToken(selectingPay: Boolean) = launchUnit {
+        val metaAccountId = initializedMetaAccountId ?: return@launchUnit
         val settings = swapSettings.first()
         val opposite = if (selectingPay) settings.assetOut else settings.assetIn
+        val selected = if (selectingPay) settings.assetIn else settings.assetOut
         val requestId = UUID.randomUUID().toString()
         selectionRequestId = requestId
-        tokenSelectionCommunicator.openRequest(SwapTokenSelectionCommunicator.Request(requestId, selectingPay, opposite?.toAssetPayload()))
+        tokenSelectionCommunicator.openRequest(
+            SwapTokenSelectionCommunicator.Request(requestId, selectingPay, opposite?.toAssetPayload(), selected?.toAssetPayload(), metaAccountId)
+        )
     }
 
     private fun observeSelections() {
         tokenSelectionCommunicator.responseFlow.onEach { response ->
             if (response.requestId != selectionRequestId) return@onEach
-            selectionRequestId = null
             val asset = selectionInteractor.resolve(response.asset.fullChainAssetId) ?: return@onEach
-            if (response.selectingPay) swapSettingsState.setAssetIn(asset) else swapSettingsState.setAssetOut(asset)
+            if (response.requestId != selectionRequestId || response.metaAccountId != initializedMetaAccountId ||
+                response.metaAccountId != selectedAccountUseCase.getSelectedMetaAccount().id
+            ) {
+                return@onEach
+            }
+            selectionRequestId = null
+            swapSettingsState.applyAssetSelection(asset, response.selectingPay, response.clearOpposite)
             rememberSelection()
         }.launchIn(viewModelScope)
         slippageCommunicator.responseFlow.onEach { response ->

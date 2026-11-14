@@ -33,7 +33,18 @@ interface SwapService {
 
     suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
 
-    suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
+    suspend fun availableSwapDirectionsFor(
+        asset: Chain.Asset,
+        computationScope: CoroutineScope,
+        metaAccountId: Long? = null
+    ): Flow<Set<FullChainAssetId>>
+
+    suspend fun availableAssetsForSelection(
+        oppositeAsset: FullChainAssetId,
+        selectingPay: Boolean,
+        metaAccountId: Long,
+        computationScope: CoroutineScope
+    ): Flow<Set<FullChainAssetId>>
 
     suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean>
 

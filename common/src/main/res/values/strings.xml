@@ -3236,4 +3236,19 @@ claimed</string>
     <string name="swap_view_transaction">View transaction</string>
     <string name="swap_slippage_custom">Custom</string>
     <string name="swap_slippage_custom_hint">Custom, %</string>
+    <string name="swap_select_balance_unavailable">—</string>
+    <string name="swap_select_back">Back to tokens</string>
+    <string name="swap_select_pay_title">Select a token to pay</string>
+    <string name="swap_select_receive_title">Select a token to receive</string>
+    <string name="swap_select_search_hint">Search by network or token</string>
+    <string name="swap_select_your_tokens">Your tokens</string>
+    <string name="swap_select_other_tokens">Other tokens</string>
+    <string name="swap_select_not_swappable">Not swappable with %s</string>
+    <string name="swap_select_loading_error">Could not load tokens. Please try again.</string>
+    <string name="swap_select_route_error">Could not check this swap pair. Please try again.</string>
+    <plurals name="swap_select_network_count">
+        <item quantity="one">%d network</item>
+        <item quantity="other">%d networks</item>
+    </plurals>
+    <string name="swap_select_more_networks">%d+</string>
 </resources>

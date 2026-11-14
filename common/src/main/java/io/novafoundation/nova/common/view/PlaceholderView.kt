@@ -8,6 +8,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewPlaceholderBinding
 import io.novafoundation.nova.common.utils.dp
@@ -56,6 +57,10 @@ class PlaceholderView @JvmOverloads constructor(
 
         val imageTint = typedArray.getColorOrNull(R.styleable.PlaceholderView_imageTint)
         imageTint?.let(::setImageTint)
+
+        typedArray.getResourceIdOrNull(R.styleable.PlaceholderView_android_textAppearance)?.let {
+            TextViewCompat.setTextAppearance(binder.viewPlaceholderText, it)
+        }
 
         val showButton = typedArray.getBoolean(R.styleable.PlaceholderView_showButton, true)
         binder.viewPlaceholderButton.isVisible = showButton

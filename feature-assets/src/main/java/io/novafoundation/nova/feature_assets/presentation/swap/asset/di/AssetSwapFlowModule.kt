@@ -3,29 +3,56 @@ package io.novafoundation.nova.feature_assets.presentation.swap.asset.di
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.feature_assets.data.repository.PreferencesSwapNetworkSelectionRepository
+import io.novafoundation.nova.feature_assets.domain.swap.SwapNetworkSelectionRepository
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
+import io.novafoundation.nova.feature_account_api.domain.account.SelectedMetaAccountChangeObserver
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
+import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionInteractor
+import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionFilterFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowViewModel
-import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
+import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapTokenSelectionFormatter
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {
+
+    @Provides
+    fun provideFilterFactory(): SwapTokenSelectionFilterFactory = SwapTokenSelectionFilterFactory()
+
+    @Provides
+    fun provideInteractor(
+        walletRepository: WalletRepository,
+        chainRegistry: ChainRegistry,
+        assetSearchUseCase: AssetSearchUseCase,
+        swapService: SwapService,
+        filterFactory: SwapTokenSelectionFilterFactory
+    ) = SwapTokenSelectionInteractor(walletRepository, chainRegistry, assetSearchUseCase, swapService, filterFactory)
+
+    @Provides
+    fun provideNetworkSelectionRepository(preferences: Preferences): SwapNetworkSelectionRepository = PreferencesSwapNetworkSelectionRepository(preferences)
+
+    @Provides
+    fun provideSelectedMetaAccountChangeObserver(accountRepository: AccountRepository): SelectedMetaAccountChangeObserver {
+        return SelectedMetaAccountChangeObserver(accountRepository)
+    }
+
+    @Provides
+    fun provideFormatter(resourceManager: ResourceManager, assetIconProvider: AssetIconProvider, amountFormatter: AmountFormatter) =
+        SwapTokenSelectionFormatter(resourceManager, assetIconProvider, amountFormatter)
 
     @Provides
     internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): AssetSwapFlowViewModel {
@@ -36,36 +63,24 @@ class AssetSwapFlowModule {
     @IntoMap
     @ViewModelKey(AssetSwapFlowViewModel::class)
     fun provideViewModel(
-        interactorFactory: AssetSearchInteractorFactory,
+        interactor: SwapTokenSelectionInteractor,
+        formatter: SwapTokenSelectionFormatter,
+        networkSelectionRepository: SwapNetworkSelectionRepository,
         router: AssetsRouter,
-        currencyInteractor: CurrencyInteractor,
-        externalBalancesInteractor: ExternalBalancesInteractor,
-        controllableAssetCheck: ControllableAssetCheckMixin,
-        accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
-        payload: SwapFlowPayload,
-        executorFactory: SwapFlowExecutorFactory,
-        assetIconProvider: AssetIconProvider,
-        assetViewModeInteractor: AssetViewModeInteractor,
-        networkAssetMapper: NetworkAssetFormatter,
-        tokenAssetFormatter: TokenAssetFormatter,
-        swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    ): ViewModel {
-        return AssetSwapFlowViewModel(
-            interactorFactory = interactorFactory,
-            router = router,
-            currencyInteractor = currencyInteractor,
-            externalBalancesInteractor = externalBalancesInteractor,
-            controllableAssetCheck = controllableAssetCheck,
-            accountUseCase = accountUseCase,
-            resourceManager = resourceManager,
-            swapFlowExecutor = executorFactory.create(payload),
-            swapPayload = payload,
-            assetIconProvider = assetIconProvider,
-            assetViewModeInteractor = assetViewModeInteractor,
-            networkAssetMapper = networkAssetMapper,
-            tokenAssetFormatter = tokenAssetFormatter,
-            swapFlowScopeAggregator = swapFlowScopeAggregator
-        )
-    }
+        accountRepository: AccountRepository,
+        selectedMetaAccountChangeObserver: SelectedMetaAccountChangeObserver,
+        communicator: SwapTokenSelectionCommunicator,
+        request: SwapTokenSelectionCommunicator.Request
+    ): ViewModel = AssetSwapFlowViewModel(
+        interactor = interactor,
+        formatter = formatter,
+        networkSelectionRepository = networkSelectionRepository,
+        router = router,
+        resourceManager = resourceManager,
+        accountRepository = accountRepository,
+        selectedMetaAccountChangeObserver = selectedMetaAccountChangeObserver,
+        communicator = communicator,
+        request = request
+    )
 }

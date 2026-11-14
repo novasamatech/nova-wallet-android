@@ -67,8 +67,6 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
@@ -509,12 +507,6 @@ class Navigator(
     override fun openReceiveNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_receiveFlow_to_receiveFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openSwapNetworks(payload: NetworkSwapFlowPayload) {
-        navigationBuilder().action(R.id.action_selectAssetSwapFlowFragment_to_swapFlowNetworkFragment)
-            .setArgs(NetworkSwapFlowFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 

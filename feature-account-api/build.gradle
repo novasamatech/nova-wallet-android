@@ -41,4 +41,8 @@ dependencies {
     api substrateSdkDep
 
     api project(':core-api')
+
+    testImplementation jUnitDep
+    testImplementation mockitoDep
+    testImplementation coroutinesTestDep
 }
