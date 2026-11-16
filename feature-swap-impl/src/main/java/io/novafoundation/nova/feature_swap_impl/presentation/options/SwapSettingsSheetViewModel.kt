@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import io.novafoundation.nova.feature_swap_impl.data.SwapChartPreferences
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -32,12 +33,15 @@ class SwapSettingsSheetViewModel(
     private val slippageFieldValidator: SlippageFieldValidator,
     slippageAlertMixinFactory: SlippageAlertMixinFactory,
     private val payload: SlippageSettingsPayload,
-    private val slippageSettingsCommunicator: SlippageSettingsCommunicator
+    private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
+    private val chartPreferences: SwapChartPreferences
 ) : BaseViewModel() {
 
     private class ValidatedSelection(val selection: SwapSlippageSelection, val validation: FieldValidationResult)
 
     private val config = payload.config()
+
+    val chartEnabled = MutableStateFlow(chartPreferences.isEnabled())
 
     val selection = MutableStateFlow(selectionFor(payload.selected.fractions))
 
@@ -81,7 +85,12 @@ class SwapSettingsSheetViewModel(
         selection.value = SwapSlippageSelection.Preset(config.slippageTips[index])
     }
 
+    fun setChartEnabled(enabled: Boolean) {
+        chartEnabled.value = enabled
+    }
+
     fun resetClicked() {
+        chartEnabled.value = true
         selection.value = selectionFor(config.defaultSlippage)
     }
 
@@ -91,6 +100,7 @@ class SwapSettingsSheetViewModel(
             val slippage = selected.slippageOrNull() ?: return@launch
             if (slippageFieldValidator.validate(selected.validationInput()) is FieldValidationResult.Error) return@launch
 
+            chartPreferences.setEnabled(chartEnabled.value)
             val method = slippageChangeMethod(payload.selected.fractions, slippage, config)
             slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method, payload.requestId))
             swapRouter.back()

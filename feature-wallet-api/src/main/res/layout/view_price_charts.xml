@@ -183,6 +183,27 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/priceChartBlockShimmer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:shimmer_auto_start="false"
+        app:shimmer_base_alpha="0.25"
+        app:shimmer_highlight_alpha="1"
+        app:shimmer_tilt="15"
+        app:layout_constraintStart_toStartOf="@id/priceChart"
+        app:layout_constraintEnd_toEndOf="@id/priceChart"
+        app:layout_constraintTop_toTopOf="@id/priceChart"
+        app:layout_constraintBottom_toBottomOf="@id/priceChart">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_shimmering" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
     <LinearLayout
         android:id="@+id/priceChartButtons"
         android:layout_width="match_parent"

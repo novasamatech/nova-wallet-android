@@ -58,6 +58,7 @@ dependencies {
     implementation daggerDep
     ksp daggerCompiler
 
+    testImplementation project(":test-shared")
     testImplementation jUnitDep
     testImplementation mockitoDep
     testImplementation coroutinesTestDep

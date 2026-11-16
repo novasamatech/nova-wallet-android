@@ -71,6 +71,14 @@
             android:textColor="@color/text_warning"
             android:visibility="gone" />
 
+        <io.novafoundation.nova.common.view.Switch
+            android:id="@+id/swapSettingsChart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:title="@string/swap_chart_show" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

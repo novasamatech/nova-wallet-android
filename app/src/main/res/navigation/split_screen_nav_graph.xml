@@ -90,9 +90,9 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_swap_to_balance_details"
-        app:destination="@id/balanceDetailFragment"
-        app:popUpTo="@id/mainFragment" />
+        android:id="@+id/action_finish_swap_flow"
+        app:popUpTo="@id/start_swap_nav_graph"
+        app:popUpToInclusive="true" />
 
     <action
         android:id="@+id/action_open_swapFeeFragment"
@@ -699,26 +699,7 @@
         android:id="@+id/swapExecutionFragment"
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.execution.SwapExecutionFragment"
         android:label="SwapExecutionFragment"
-        tools:layout="@layout/fragment_swap_execution">
-
-        <action
-            android:id="@+id/action_swapExecutionFragment_to_assetDetails"
-            app:destination="@id/balanceDetailFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/mainFragment" />
-
-        <action
-            android:id="@+id/action_swapExecutionFragment_to_swapSettingsFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@+id/start_swap_nav_graph"
-            app:destination="@id/swapSettingsFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_swap_execution" />
 
     <fragment
         android:id="@+id/slippageSettingsFragment"

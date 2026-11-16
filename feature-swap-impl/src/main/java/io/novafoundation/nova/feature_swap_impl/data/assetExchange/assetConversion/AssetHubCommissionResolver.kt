@@ -10,17 +10,12 @@ class AssetHubCommissionResolver(
     private val commission: NovaSwapCommission,
 ) {
 
-    fun resolveRequired(
-        swapLimit: SwapLimit,
-        minimumBalance: Balance,
-    ): Balance? {
+    fun resolveRequired(swapLimit: SwapLimit): Balance? {
         val amount = commission.commissionIncludedIn(swapLimit)
         if (amount == BigInteger.ZERO) return null
 
-        check(commissionFits(amount, swapLimit, minimumBalance)) {
-            "Asset Hub commission does not fit the updated swap amount"
-        }
-
+        // Output ED is validated against the wallet's existing balance plus the net swap output.
+        // Requiring the swap output alone to cover ED rejects small swaps into an already funded account.
         return amount
     }
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main.di
 
+import io.novafoundation.nova.feature_swap_impl.presentation.main.chart.SwapChartMixinFactory
 import androidx.lifecycle.ViewModelStoreOwner
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
@@ -92,6 +93,7 @@ class SwapMainSettingsModule {
         resourceManager: ResourceManager,
         swapSettingsState: SwapSettingsState,
         selectionInteractor: SwapSelectionInteractor,
+        chartMixinFactory: SwapChartMixinFactory,
         tokenSelectionCommunicator: SwapTokenSelectionCommunicator,
         slippageCommunicator: SlippageSettingsCommunicator,
         display: SwapFormDisplay,
@@ -123,6 +125,7 @@ class SwapMainSettingsModule {
             swapInteractor = swapInteractor,
             swapSettingsState = swapSettingsState,
             selectionInteractor = selectionInteractor,
+            chartMixinFactory = chartMixinFactory,
             tokenSelectionCommunicator = tokenSelectionCommunicator,
             slippageCommunicator = slippageCommunicator,
             display = display,

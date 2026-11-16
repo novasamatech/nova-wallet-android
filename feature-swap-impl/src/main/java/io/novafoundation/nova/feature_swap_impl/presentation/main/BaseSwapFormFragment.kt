@@ -1,5 +1,18 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
+import androidx.core.text.inSpans
+import android.text.style.TextAppearanceSpan
+import kotlinx.coroutines.flow.combine
+import io.novafoundation.nova.feature_swap_impl.R
+import io.novafoundation.nova.feature_swap_impl.presentation.main.chart.SwapChartHeaderModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
+import io.novafoundation.nova.common.utils.keyboard.isKeyboardVisible
+import io.novafoundation.nova.common.utils.keyboard.setKeyboardVisibilityListener
+import io.novafoundation.nova.common.utils.setTextOrHide
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 import android.transition.ChangeBounds
 import android.transition.ChangeTransform
 import android.transition.Fade
@@ -78,8 +91,9 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
     override fun createBinding() = FragmentMainSwapSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        setupChart()
         binder.swapMainSettingsContinue.prepareForProgress(this)
-        if (display == SwapFormDisplay.TAB) binder.swapMainSettingsToolbar.hideHomeButton()
+        setupHeader()
         binder.swapMainSettingsRetry.setOnClickListener { viewModel.retryQuote() }
         binder.swapMainSettingsSlippage.setOnClickListener { viewModel.openOptions() }
         if (viewModel.detailsExpanded.value) binder.swapMainSettingsDetails.expandImmediate()
@@ -88,10 +102,6 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
             viewModel.setDetailsExpanded(state == ExpandableViewState.EXPANDED)
         }
         binder.swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.swapMainSettingsToolbar.setRightActionClickListener {
-            hideKeyboard()
-            viewModel.openOptions()
-        }
 
         binder.swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
         binder.swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
@@ -108,6 +118,95 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         }
 
         binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
+    }
+
+    private fun setupHeader() {
+        val isTab = display == SwapFormDisplay.TAB
+        binder.swapMainSettingsToolbar.setVisible(!isTab)
+        binder.swapTabHeader.setVisible(isTab)
+        binder.swapMainSettingsToolbar.setRightActionClickListener { openSettings() }
+        binder.swapTabSettings.setOnClickListener { openSettings() }
+    }
+
+    private fun openSettings() {
+        hideKeyboard()
+        viewModel.openOptions()
+    }
+
+    private fun setupChart() {
+        binder.swapChart.swapChartPlot.apply {
+            setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
+            setLoadingStyle(PriceChartsView.LoadingStyle.BLOCK)
+            setPeriodSpacing(6)
+            setPlotHeight(116)
+            setAxisVisible(true)
+            onPeriodSelected = viewModel.chart::selectPeriod
+            selectionListener = PriceChartSelectionListener(viewModel.chart::selectPoint)
+        }
+        binder.swapChart.swapChartSparkline.apply {
+            setPresentation(PriceChartsView.Presentation.SPARKLINE)
+            setPlotHeight(20)
+        }
+        binder.swapChart.swapChartHeader.setOnClickListener { viewModel.chart.toggleExpanded() }
+        binder.swapChart.swapChartRetry.setOnClickListener { viewModel.chart.retry() }
+        viewModel.chart.setKeyboardVisible(binder.root.isKeyboardVisible())
+        viewLifecycleOwner.lifecycle.setKeyboardVisibilityListener(binder.swapMainSettingsScroll) {
+            viewModel.chart.setKeyboardVisible(it)
+        }
+    }
+
+    private fun observeChart(viewModel: SwapMainSettingsViewModel) {
+        viewModel.chart.enabled.observe { binder.swapChart.root.setVisible(it) }
+        viewModel.chart.expanded.observe { expanded ->
+            val state = if (expanded) ExpandableViewState.EXPANDED else ExpandableViewState.COLLAPSED
+            if (binder.swapChart.root.currentState() != state) {
+                animateDetailsTransition()
+                binder.swapChart.root.setState(state)
+            }
+            binder.swapChart.root.setBackgroundResource(if (expanded) R.drawable.bg_block_16 else R.drawable.bg_block_12)
+            binder.swapChart.swapChartSparkline.setVisible(!expanded)
+        }
+        viewModel.chart.plot.observe { plot ->
+            binder.swapChart.swapChartPlot.setPlotHeight(if (plot.selectedChart is PriceChartModel.Loading) 64 else 116)
+            binder.swapChart.swapChartPlot.setSelectedPeriod(plot.selectedPeriodIndex)
+            binder.swapChart.swapChartPlot.setAxisLabelFormatter(viewModel.chart.axisFormatter(plot))
+            binder.swapChart.swapChartPlot.setCharts(plot.charts)
+            binder.swapChart.swapChartSparkline.setSelectedPeriod(plot.selectedPeriodIndex)
+            binder.swapChart.swapChartSparkline.setCharts(plot.charts)
+            binder.swapChart.swapChartRetry.setVisible(plot.failed)
+        }
+        combine(
+            viewModel.chart.header,
+            viewModel.chart.expanded,
+            ::Pair
+        ).observe { (header, expanded) -> bindChartHeader(header, expanded) }
+    }
+
+    private fun bindChartHeader(header: SwapChartHeaderModel, expanded: Boolean) {
+        val priceStyle = if (expanded) {
+            R.style.TextAppearance_NovaFoundation_SemiBold_SubHeadline_Primary
+        } else {
+            R.style.TextAppearance_NovaFoundation_Regular_Footnote_Secondary
+        }
+        val changeStyle = if (expanded) {
+            R.style.TextAppearance_NovaFoundation_Regular_Footnote
+        } else {
+            R.style.TextAppearance_NovaFoundation_SemiBold_Footnote
+        }
+        binder.swapChart.swapChartTitle.text = buildSpannedString {
+            append(header.ticker)
+            if (header.price.isNotEmpty()) {
+                append("  ")
+                inSpans(TextAppearanceSpan(requireContext(), priceStyle)) { append(header.price) }
+            }
+            if (header.change.isNotEmpty()) {
+                append("  ")
+                color(requireContext().getColor(header.changeColor)) {
+                    inSpans(TextAppearanceSpan(requireContext(), changeStyle)) { append(header.change) }
+                }
+            }
+        }
+        binder.swapChart.swapChartDate.setTextOrHide(header.date)
     }
 
     private fun animateDetailsTransition() {
@@ -133,6 +232,7 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
     }
 
     override fun subscribe(viewModel: SwapMainSettingsViewModel) {
+        observeChart(viewModel)
         observeDescription(viewModel)
         observeValidations(viewModel)
         setupSwapAmountInput(viewModel.amountInInput, binder.swapMainSettingsPayInput, binder.swapMainSettingsMaxAmount)

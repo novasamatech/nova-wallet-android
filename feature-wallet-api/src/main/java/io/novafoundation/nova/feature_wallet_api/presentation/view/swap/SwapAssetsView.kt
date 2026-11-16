@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_wallet_api.presentation.view.swap
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.annotation.ColorRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.setBackgroundTintRes
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewSwapAssetsBinding
 
 class SwapAssetsView @JvmOverloads constructor(
@@ -13,6 +15,10 @@ class SwapAssetsView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     private val binder = ViewSwapAssetsBinding.inflate(inflater(), this)
+
+    fun setArrowBackgroundTint(@ColorRes colorRes: Int) {
+        binder.viewSwapAssetsArrow.setBackgroundTintRes(colorRes)
+    }
 
     fun setModel(model: Model) {
         setAssetIn(model.assetIn)

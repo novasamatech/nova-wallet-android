@@ -13,10 +13,8 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
-import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 class SwapNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
@@ -64,12 +62,13 @@ class SwapNavigator(
         const val RETRY_KEY = "swap.retry"
     }
 
-    override fun openBalanceDetails(assetPayload: AssetPayload) {
-        val bundle = BalanceDetailFragment.getBundle(assetPayload)
-
-        navigationBuilder().action(R.id.action_swap_to_balance_details)
-            .setArgs(bundle)
-            .navigateInFirstAttachedContext()
+    override fun finishSwap(returnToTab: Boolean) {
+        if (returnToTab) {
+            back()
+        } else {
+            navigationBuilder().action(R.id.action_finish_swap_flow)
+                .navigateInFirstAttachedContext()
+        }
     }
 
     override fun openMain() {

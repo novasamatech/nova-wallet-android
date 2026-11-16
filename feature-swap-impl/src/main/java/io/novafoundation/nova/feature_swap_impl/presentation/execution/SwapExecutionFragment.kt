@@ -58,6 +58,7 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
     override fun createBinding() = FragmentSwapExecutionBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.swapExecutionAssets.setArrowBackgroundTint(R.color.swap_pair_arrow_background)
         binder.swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
         binder.swapExecutionNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
         binder.swapExecutionRoute.setOnClickListener { viewModel.routeClicked() }

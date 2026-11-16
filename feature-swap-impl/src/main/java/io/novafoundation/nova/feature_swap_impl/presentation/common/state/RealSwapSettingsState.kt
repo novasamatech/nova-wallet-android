@@ -38,6 +38,20 @@ class RealSwapSettingsState(
         selectedOption.value = selectedOption.value.copy(amount = amount, swapDirection = swapDirection)
     }
 
+    override fun applyAssetSelection(asset: Chain.Asset, selectingPay: Boolean, clearOpposite: Boolean) {
+        val current = selectedOption.value
+        val amount = when {
+            clearOpposite -> null
+            selectingPay -> current.convertedAmountForNewAssetIn(asset)
+            else -> current.convertedAmountForNewAssetOut(asset)
+        }
+        selectedOption.value = current.copy(
+            assetIn = if (selectingPay) asset else current.assetIn.takeUnless { clearOpposite },
+            assetOut = if (!selectingPay) asset else current.assetOut.takeUnless { clearOpposite },
+            amount = amount
+        )
+    }
+
     override fun setSlippage(slippage: Fraction) {
         selectedOption.value = selectedOption.value.copy(slippage = slippage)
     }

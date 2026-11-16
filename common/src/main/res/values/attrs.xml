@@ -170,6 +170,7 @@
     </declare-styleable>
 
     <declare-styleable name="PlaceholderView">
+        <attr name="android:textAppearance" />
         <attr name="android:text" />
         <attr name="showButton" format="boolean" />
         <attr name="image" format="color|reference" />

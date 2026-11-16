@@ -8,17 +8,38 @@ class SwapTabFragment : BaseSwapFormFragment() {
     companion object {
         private const val PAYLOAD = "swap_tab_payload"
 
-        fun getBundle(payload: SwapTabPayload?) = Bundle().apply { putParcelable(PAYLOAD, payload) }
+        private const val INITIAL_PAYLOAD = "swap_tab_initial_payload"
+
+        fun getBundle(payload: SwapSettingsPayload?) = Bundle().apply { putParcelable(PAYLOAD, payload) }
     }
 
     override val display = SwapFormDisplay.TAB
 
-    override fun initialPayload(): SwapSettingsPayload = tabPayload()?.settings ?: SwapSettingsPayload.Restore
+    private var creationPayload: SwapSettingsPayload = SwapSettingsPayload.Restore
 
-    override fun subscribe(viewModel: SwapMainSettingsViewModel) {
-        tabPayload()?.let(viewModel::applyTabPayload)
-        super.subscribe(viewModel)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null && tabPayload() == null) {
+            arguments = getBundle(SwapSettingsPayload.Restore)
+        }
+        creationPayload = savedInstanceState?.getParcelable(INITIAL_PAYLOAD) ?: tabPayload() ?: SwapSettingsPayload.Restore
+        super.onCreate(savedInstanceState)
     }
 
-    private fun tabPayload(): SwapTabPayload? = argumentOrNull(PAYLOAD)
+    override fun onSaveInstanceState(outState: Bundle) {
+        // Only seeds a new ViewModel after process death; a retained ViewModel keeps the current form.
+        outState.putParcelable(INITIAL_PAYLOAD, creationPayload)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun initialPayload(): SwapSettingsPayload = creationPayload
+
+    override fun initViews() {
+        tabPayload()?.let { payload ->
+            arguments?.remove(PAYLOAD)
+            viewModel.applyTabPayload(payload)
+        }
+        super.initViews()
+    }
+
+    private fun tabPayload(): SwapSettingsPayload? = argumentOrNull(PAYLOAD)
 }

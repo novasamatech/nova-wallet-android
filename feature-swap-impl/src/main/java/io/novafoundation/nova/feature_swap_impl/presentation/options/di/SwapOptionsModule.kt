@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options.di
 
+import io.novafoundation.nova.feature_swap_impl.data.SwapChartPreferences
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -73,7 +74,8 @@ class SwapOptionsModule {
         slippageFieldValidator: SlippageFieldValidator,
         slippageAlertMixinFactory: SlippageAlertMixinFactory,
         payload: SlippageSettingsPayload?,
-        slippageSettingsCommunicator: SlippageSettingsCommunicator
+        slippageSettingsCommunicator: SlippageSettingsCommunicator,
+        chartPreferences: SwapChartPreferences
     ): ViewModel {
         return SwapSettingsSheetViewModel(
             swapRouter,
@@ -81,7 +83,8 @@ class SwapOptionsModule {
             slippageFieldValidator,
             slippageAlertMixinFactory,
             requireNotNull(payload),
-            slippageSettingsCommunicator
+            slippageSettingsCommunicator,
+            chartPreferences
         )
     }
 

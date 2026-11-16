@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatFeeLoadingError
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
@@ -116,11 +116,12 @@ internal open class GenericFeeLoaderProvider<F>(
         feeConstructor: suspend (Token) -> F?,
         onRetryCancelled: () -> Unit,
     ) = if (exception !is CancellationException) {
+        val (title, message) = formatFeeLoadingError(exception, resourceManager)
         retryEvent.postValue(
             Event(
                 RetryPayload(
-                    title = resourceManager.getString(R.string.choose_amount_network_error),
-                    message = resourceManager.getString(R.string.choose_amount_error_fee),
+                    title = title,
+                    message = message.toString(),
                     onRetry = { loadFee(retryScope, feeConstructor, onRetryCancelled) },
                     onCancel = onRetryCancelled
                 )

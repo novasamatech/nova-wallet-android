@@ -7,8 +7,6 @@ import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapTabFragment
-import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapTabPayload
-import java.util.UUID
 
 class SwapTabNavigator(registry: NavigationHoldersRegistry) : BaseNavigator(registry) {
 
@@ -29,7 +27,7 @@ class SwapTabNavigator(registry: NavigationHoldersRegistry) : BaseNavigator(regi
     }
 
     fun openSwaps(payload: SwapSettingsPayload? = null) {
-        val navigation = PendingNavigation(payload?.let { SwapTabPayload(UUID.randomUUID().toString(), it) })
+        val navigation = PendingNavigation(payload)
         navigationBuilder().action(R.id.back_to_main).navigateInFirstAttachedContext()
         val controller = tabNavController
         if (controller == null) {
@@ -49,5 +47,5 @@ class SwapTabNavigator(registry: NavigationHoldersRegistry) : BaseNavigator(regi
         controller.navigate(R.id.swapsTabFragment, SwapTabFragment.getBundle(navigation.payload), options)
     }
 
-    private class PendingNavigation(val payload: SwapTabPayload?)
+    private class PendingNavigation(val payload: SwapSettingsPayload?)
 }

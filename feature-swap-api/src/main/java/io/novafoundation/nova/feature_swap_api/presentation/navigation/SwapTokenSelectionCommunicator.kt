@@ -8,8 +8,20 @@ import kotlinx.parcelize.Parcelize
 interface SwapTokenSelectionCommunicator : InterScreenCommunicator<SwapTokenSelectionCommunicator.Request, SwapTokenSelectionCommunicator.Response> {
 
     @Parcelize
-    data class Request(val requestId: String, val selectingPay: Boolean, val oppositeAsset: AssetPayload?) : Parcelable
+    data class Request(
+        val requestId: String,
+        val selectingPay: Boolean,
+        val oppositeAsset: AssetPayload?,
+        val selectedAsset: AssetPayload?,
+        val metaAccountId: Long
+    ) : Parcelable
 
     @Parcelize
-    data class Response(val requestId: String, val selectingPay: Boolean, val asset: AssetPayload) : Parcelable
+    data class Response(
+        val requestId: String,
+        val selectingPay: Boolean,
+        val asset: AssetPayload,
+        val metaAccountId: Long,
+        val clearOpposite: Boolean
+    ) : Parcelable
 }

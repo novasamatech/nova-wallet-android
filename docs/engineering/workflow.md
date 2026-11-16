@@ -13,6 +13,8 @@ Feedback-driven instruction maintenance follows the same boundary: propose it du
    Consult [reference patterns](reference-patterns.md); an example is not blanket approval of every line.
 3. Identify ownership and data flow: input/payload → domain operation → repository/source → presentation.
    Specify where state lives, how it resets, and how errors/cancellation propagate.
+   For nontrivial classes, outline responsibilities and the main method steps before implementation.
+   Name the relevant existing rules and the behavior that must survive decomposition; keep this brief in the task.
 4. Write a short acceptance/checklist plan for nontrivial work: desired behavior, invariants, boundaries,
    verification and non-goals. Keep it in the task unless a reusable design record is needed.
 5. Resolve conflicting rules or missing product choices before encoding them as new conventions.
@@ -23,15 +25,19 @@ Implement an end-to-end slice using existing contracts. Add regression tests for
 tests for new behavior. See [testing](testing.md). Preserve unrelated work.
 Prefer the established solution over a novel framework; avoid both duplicated logic and unnecessary layers.
 
-Review the final changed files and callers, not only the newly added lines, in this order:
+Review the final changed files and callers, not only the newly added lines, in separate passes in this order:
 
 - **Correctness:** inputs, financial units/rounding, boundary cases, same operation at quote/sign time.
 - **State/lifecycle:** one owner, explicit wallet/request identity, stale results, cancellation, retries,
   loading vs empty vs unavailable, screen recreation and navigation where applicable.
 - **Architecture/reuse:** each responsibility in the correct layer; DI; existing component/mixin;
   no transport in UI, business rules in mappers, or hidden state mutation in getters.
-- **Simplicity/readability:** meaningful names/types, focused functions, no speculative abstraction,
-  redundant state, needless wrapper, copied formatter, or duplicated checks already owned by a type.
+- **Simplicity/readability:** read entry methods as a sequence of named domain steps. Identify mixed
+  responsibilities, nested transformations, business rules hidden in lambdas, and names reused for different
+  concepts. Apply [code style](code-style.md) and [flow decomposition](data-and-state.md) with focused methods;
+  preserve subscription lifetime, cancellation and ordering. Check for speculative abstractions, redundant
+  state, needless wrappers, copied formatters, or checks already owned by a type. Build, test and lint success
+  do not replace this pass.
 
 For each finding, name the concrete problem, fix and verification. Refactor within scope before handoff;
 separate behavior changes from behavior-preserving edits. Rerun affected checks after the last fix.
@@ -53,6 +59,9 @@ No instruction file can guarantee that generated code is correct.
 State what changed, what was reused, checks actually run (and their outcome), and anything not verified.
 Separate JVM/static/build evidence from device, live API, process restoration and on-chain evidence.
 Do not say “all tested” when only compilation passed; do not install or submit merely to complete a checklist.
+For nontrivial changes, include a short, concrete result of the structural review: which responsibilities
+were separated and why, or what was reviewed with no remaining findings. Do not substitute a generic
+claim that instructions were followed for this evidence.
 If the user corrected a convention, follow [instruction maintenance](instruction-maintenance.md).
 
 ## Pilot / acceptance of these instructions

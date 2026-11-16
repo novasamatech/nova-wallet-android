@@ -183,12 +183,26 @@ internal class RealSwapService(
 
     override suspend fun availableSwapDirectionsFor(
         asset: Chain.Asset,
-        computationScope: CoroutineScope
+        computationScope: CoroutineScope,
+        metaAccountId: Long?
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map {
-            val filter = nodeVisitFilter(computationScope)
+            val filter = nodeVisitFilter(computationScope, metaAccountId)
             measureExecution("findAllPossibleDestinations") {
                 it.findAllPossibleDestinations(asset.fullId, filter) - asset.fullId
+            }
+        }
+    }
+
+    override suspend fun availableAssetsForSelection(
+        oppositeAsset: FullChainAssetId,
+        selectingPay: Boolean,
+        metaAccountId: Long,
+        computationScope: CoroutineScope
+    ): Flow<Set<FullChainAssetId>> {
+        return directionsGraph(computationScope).map { graph ->
+            withContext(Dispatchers.Default) {
+                graph.assetsForSelection(oppositeAsset, selectingPay, nodeVisitFilter(computationScope, metaAccountId))
             }
         }
     }
