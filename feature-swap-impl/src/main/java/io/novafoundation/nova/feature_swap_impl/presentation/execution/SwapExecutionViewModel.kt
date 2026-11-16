@@ -170,12 +170,8 @@ class SwapExecutionViewModel(
         router.openRetrySwap(retrySwapPayload)
     }
 
-    fun doneClicked() = launchUnit {
-        if (operationPayload.returnToTab) {
-            router.back()
-        } else {
-            router.openBalanceDetails(operationPayload.quote.assetOut)
-        }
+    fun doneClicked() {
+        router.finishSwap(returnToTab = operationPayload.returnToTab)
     }
 
     private fun retrySwapPayload(failedStep: SwapProgressStep): SwapSettingsPayload.RepeatOperation {

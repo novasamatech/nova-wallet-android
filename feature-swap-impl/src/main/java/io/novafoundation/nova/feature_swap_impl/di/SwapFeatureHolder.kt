@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
@@ -32,6 +33,7 @@ class SwapFeatureHolder @Inject constructor(
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .swapCoreApi(getFeature(SwapCoreApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
+            .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
             .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))

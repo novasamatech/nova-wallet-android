@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModelMapper
 import io.novafoundation.nova.feature_wallet_api.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -107,6 +108,7 @@ class BalanceDetailModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         chartsInteractor: ChartsInteractor,
+        priceChartModelMapper: PriceChartModelMapper,
         buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
         amountFormatter: AmountFormatter,
         chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
@@ -129,6 +131,7 @@ class BalanceDetailModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             chartsInteractor = chartsInteractor,
+            priceChartModelMapper = priceChartModelMapper,
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             amountFormatter = amountFormatter,
             chainMigrationInfoUseCase = chainMigrationInfoUseCase,

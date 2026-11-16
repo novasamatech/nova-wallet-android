@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import coil.ImageLoader
@@ -65,6 +68,12 @@ import javax.inject.Named
 import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface SwapFeatureDependencies {
+
+    val coinPriceRepository: CoinPriceRepository
+
+    val fiatFormatter: FiatFormatter
+
+    val currencyRepository: CurrencyRepository
 
     fun analyticsService(): AnalyticsService
 

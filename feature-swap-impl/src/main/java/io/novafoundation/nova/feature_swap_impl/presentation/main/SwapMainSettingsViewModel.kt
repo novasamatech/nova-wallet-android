@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
+import io.novafoundation.nova.feature_swap_impl.presentation.main.chart.SwapChartMixinFactory
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -157,6 +159,7 @@ class SwapMainSettingsViewModel(
     private val swapInteractor: SwapInteractor,
     private val swapSettingsState: SwapSettingsState,
     private val selectionInteractor: SwapSelectionInteractor,
+    chartMixinFactory: SwapChartMixinFactory,
     private val tokenSelectionCommunicator: SwapTokenSelectionCommunicator,
     private val slippageCommunicator: SlippageSettingsCommunicator,
     private val display: SwapFormDisplay,
@@ -191,9 +194,13 @@ class SwapMainSettingsViewModel(
 
     private val entryPayload = MutableStateFlow(payload)
 
-    private var lastTabRequestId: String? = null
-
     private val swapSettings = swapSettingsState.selectedOption
+
+    val chart = chartMixinFactory.create(
+        settings = swapSettings,
+        initiallyCollapsed = display == SwapFormDisplay.STANDALONE || payload != SwapSettingsPayload.Restore,
+        scope = viewModelScope
+    )
 
     private class FeeSnapshot(val quote: QuotingState.Loaded, val fee: SwapFee)
 
@@ -434,14 +441,13 @@ class SwapMainSettingsViewModel(
 
     fun selectReceiveToken() = selectToken(selectingPay = false)
 
-    fun applyTabPayload(payload: SwapTabPayload) {
-        if (lastTabRequestId == payload.requestId) return
-        lastTabRequestId = payload.requestId
-        if (entryPayload.value === payload.settings) return
+    fun applyTabPayload(payload: SwapSettingsPayload) {
+        if (entryPayload.value === payload) return
 
-        needsInitialKeyboard = true
-        analyticsService.track(AnalyticsEvent.SwapScreenOpened(payload.settings.source.toAnalyticsSource()))
-        entryPayload.value = payload.settings
+        needsInitialKeyboard = payload != SwapSettingsPayload.Restore
+        analyticsService.track(AnalyticsEvent.SwapScreenOpened(payload.source.toAnalyticsSource()))
+        chart.onEntry(collapsed = payload != SwapSettingsPayload.Restore)
+        entryPayload.value = payload
     }
 
     private fun selectToken(selectingPay: Boolean) = launchUnit {
@@ -477,7 +483,7 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun rememberSelection() {
-        if (entryPayload.value != SwapSettingsPayload.Restore) return
+        if (display != SwapFormDisplay.TAB) return
         val metaAccountId = initializedMetaAccountId ?: return
         val settings = swapSettings.first()
         selectionInteractor.remember(metaAccountId, settings.assetIn, settings.assetOut)
@@ -554,8 +560,9 @@ class SwapMainSettingsViewModel(
 
     fun openOptions() = launchUnit {
         val settings = swapSettings.first()
-        val asset = settings.assetIn ?: settings.assetOut ?: return@launchUnit
-        val config = swapInteractor.slippageConfig(asset.chainId)
+        val asset = settings.assetIn ?: settings.assetOut
+        val config = asset?.let { swapInteractor.slippageConfig(it.chainId) }
+            ?: SlippageConfig.default()
         val requestId = UUID.randomUUID().toString()
         slippageRequestId = requestId
         slippageCommunicator.openRequest(

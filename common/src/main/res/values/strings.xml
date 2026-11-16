@@ -3251,4 +3251,8 @@ claimed</string>
         <item quantity="other">%d networks</item>
     </plurals>
     <string name="swap_select_more_networks">%d+</string>
+    <string name="swap_chart_ticker">%1$s · %2$s</string>
+    <string name="swap_chart_nothing_to_follow">Nothing to follow</string>
+    <string name="swap_chart_select_token">Select a token to see its price history</string>
+    <string name="swap_chart_show">Show price chart</string>
 </resources>

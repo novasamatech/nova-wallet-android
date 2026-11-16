@@ -9,9 +9,4 @@
         android:name="io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment"
         android:label="SwapMainSettingsFragment" />
 
-    <fragment
-        android:id="@+id/swapOptionsFragment"
-        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
-        android:label="SwapOptionsFragment" />
-
 </navigation>

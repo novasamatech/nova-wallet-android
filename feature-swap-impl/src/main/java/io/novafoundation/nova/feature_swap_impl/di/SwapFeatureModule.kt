@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.price.RealChartsInteractor
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
@@ -61,6 +65,14 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module(includes = [HydraDxExchangeModule::class, AssetConversionExchangeModule::class, CrossChainTransferExchangeModule::class])
 class SwapFeatureModule {
+
+    @Provides
+    fun provideChartsInteractor(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ChartsInteractor {
+        return RealChartsInteractor(coinPriceRepository, currencyRepository)
+    }
 
     @FeatureScope
     @Provides

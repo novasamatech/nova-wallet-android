@@ -63,7 +63,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.CancellationException
@@ -308,8 +307,7 @@ class SwapConfirmationViewModel(
                 this.showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) {
-                    val asset = assetOutFlow.first()
-                    swapRouter.openBalanceDetails(asset.token.configuration.toAssetPayload())
+                    swapRouter.finishSwap(returnToTab = operationPayload.returnToTab)
                 }
             }.onFailure {
                 _validationInProgress.value = false
