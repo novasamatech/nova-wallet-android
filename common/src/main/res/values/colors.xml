@@ -83,6 +83,7 @@
     <color name="cloud_backup_button_background">#FFFFFF</color>
     <color name="selected_dapp_category">#E0FFFFFF</color>
     <color name="android_history_background">#1E223C</color>
+    <color name="swap_pair_arrow_background">#27325F</color>
 
     <color name="gift_block_background">#3D999EC7</color>
     <color name="segmented_tab_active">#3D999EC7</color>
@@ -108,6 +109,7 @@
     <color name="button_background_reject">#E53450</color>
     <color name="button_background_inactive_on_gradient">#1A999EC7</color>
     <color name="button_background_inactive">#181920</color>
+    <color name="swap_settings_secondary_button">#1F212C</color>
 
     <color name="button_wallet_connect_background">#353D67</color>
     <color name="wallet_connections_background">#101636</color>

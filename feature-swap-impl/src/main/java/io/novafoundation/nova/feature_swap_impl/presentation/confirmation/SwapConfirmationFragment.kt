@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapConfirmationBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
@@ -30,6 +31,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
     override fun createBinding() = FragmentSwapConfirmationBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.swapConfirmationAssets.setArrowBackgroundTint(R.color.swap_pair_arrow_background)
         binder.swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.swapConfirmationButton.prepareForProgress(this)
 

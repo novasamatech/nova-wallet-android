@@ -16,7 +16,9 @@ Reuse `ExternalActions.showAddressActions` and `setupExternalActions` for addres
 
 Use the standard `RadioButton` with `wrap_content` dimensions, following existing selection screens. Fixed bounds copied from a design can clip the theme drawable; do not shrink the control's bounds to match the visible circle.
 
-## String resources and localization
+## Resource ownership and localization
+
+Keep resource values in `common/src/main/res/values`, including values used by only one feature. Define colors in `common/src/main/res/values/colors.xml`; do not create feature-local `colors.xml` files. When changing such definitions within a task, move them to `common` and preserve their names and values.
 
 Keep string resources in `strings.xml`, not feature-specific resource files. During feature development, add source strings only to `common/src/main/res/values/strings.xml`. Do not add manual translations to locale-specific resources: translations are handled by the established pre-release pipeline.
 
