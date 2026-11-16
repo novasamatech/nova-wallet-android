@@ -56,6 +56,11 @@ than importing another feature's implementation. Inspect the widget and bound st
 For loading/error/empty/value rendering also read [data and state](data-and-state.md).
 Preserve accessibility, touch targets, font scaling, insets and long/localized content. Use resources
 for dimensions/styles where shared; do not shrink RadioButton bounds to imitate a screenshot.
+Constrain a control's ripple to its visible shape with an explicit mask and the existing pressed-state
+color. Do not put a borderless foreground on a larger rectangular touch container around a circular
+button. When the touch target exceeds the visible button, keep the ripple on the shaped child and
+forward the parent's pressed/focused state with `duplicateParentState`. Check pressed and held states,
+not only the idle appearance.
 For requested iOS parity, inspect the explicit iOS source/design first and map behavior to existing
 Android widgets; do not infer parity from a screenshot or claim it without evidence.
 Check the screen after binding: TextAppearance and custom widgets can override XML attributes.

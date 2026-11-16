@@ -16,6 +16,50 @@
         app:iconRight="@drawable/ic_settings_outline"
         app:titleText="@string/tabbar_swaps_title" />
 
+    <LinearLayout
+        android:id="@+id/swapTabHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/tabbar_swaps_title"
+            android:textColor="@color/text_primary" />
+
+        <FrameLayout
+            android:id="@+id/swapTabSettings"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/swap_settings_title">
+
+            <ImageView
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="@drawable/bg_chip_circle_ripple"
+                android:duplicateParentState="true"
+                android:importantForAccessibility="no"
+                android:padding="11dp"
+                android:src="@drawable/ic_swap_settings" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
     <ScrollView
         android:id="@+id/swapMainSettingsScroll"
         android:layout_width="match_parent"

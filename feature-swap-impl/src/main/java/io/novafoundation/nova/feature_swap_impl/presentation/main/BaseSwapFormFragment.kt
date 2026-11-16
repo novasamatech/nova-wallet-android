@@ -93,7 +93,7 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
     override fun initViews() {
         setupChart()
         binder.swapMainSettingsContinue.prepareForProgress(this)
-        if (display == SwapFormDisplay.TAB) binder.swapMainSettingsToolbar.hideHomeButton()
+        setupHeader()
         binder.swapMainSettingsRetry.setOnClickListener { viewModel.retryQuote() }
         binder.swapMainSettingsSlippage.setOnClickListener { viewModel.openOptions() }
         if (viewModel.detailsExpanded.value) binder.swapMainSettingsDetails.expandImmediate()
@@ -102,10 +102,6 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
             viewModel.setDetailsExpanded(state == ExpandableViewState.EXPANDED)
         }
         binder.swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.swapMainSettingsToolbar.setRightActionClickListener {
-            hideKeyboard()
-            viewModel.openOptions()
-        }
 
         binder.swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
         binder.swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
@@ -122,6 +118,19 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         }
 
         binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
+    }
+
+    private fun setupHeader() {
+        val isTab = display == SwapFormDisplay.TAB
+        binder.swapMainSettingsToolbar.setVisible(!isTab)
+        binder.swapTabHeader.setVisible(isTab)
+        binder.swapMainSettingsToolbar.setRightActionClickListener { openSettings() }
+        binder.swapTabSettings.setOnClickListener { openSettings() }
+    }
+
+    private fun openSettings() {
+        hideKeyboard()
+        viewModel.openOptions()
     }
 
     private fun setupChart() {
