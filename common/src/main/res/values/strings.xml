@@ -2363,6 +2363,7 @@ claimed</string>
     <string name="choose_amount_fee">Transfer fee</string>
     <string name="choose_amount_initial" translatable="false">0</string>
     <string name="choose_amount_network_error">Network not responding</string>
+    <string name="network_fee_error_message">Could not estimate the network fee. Please try again.</string>
     <string name="choose_amount_to">To</string>
     <string name="common_account">Account</string>
     <string name="common_add">Add</string>

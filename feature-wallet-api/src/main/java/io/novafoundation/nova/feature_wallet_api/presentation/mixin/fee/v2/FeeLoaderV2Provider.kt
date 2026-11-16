@@ -12,11 +12,11 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.Asset.Companion.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.toChainAsset
-import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatFeeLoadingError
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.formatFeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.ChooseFeeCurrencyPayload
@@ -150,7 +150,7 @@ internal class FeeLoaderV2Provider<F, D>(
             fee.emit(FeeStatus.Error)
 
             if (configuration.showRetryDialog && !retryDialogSuppressed.get() && retryDialogPending.compareAndSet(false, true)) {
-                showFeeRetry()
+                showFeeRetry(error)
             }
         }
     }
@@ -169,12 +169,13 @@ internal class FeeLoaderV2Provider<F, D>(
         }
     }
 
-    private fun showFeeRetry() {
+    private fun showFeeRetry(error: Throwable) {
+        val (title, message) = formatFeeLoadingError(error, resourceManager)
         retryEvent.postValue(
             Event(
                 RetryPayload(
-                    title = resourceManager.getString(R.string.choose_amount_network_error),
-                    message = resourceManager.getString(R.string.choose_amount_error_fee),
+                    title = title,
+                    message = message.toString(),
                     onRetry = {
                         retryDialogPending.set(false)
                         retryDialogSuppressed.set(false)

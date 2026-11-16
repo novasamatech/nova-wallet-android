@@ -440,8 +440,8 @@ private class AssetConversionExchange(
         }
 
         private suspend fun prepareRequiredCommission(swapLimit: SwapLimit): PreparedCommission? {
-            return prepareCommission(swapLimit) { minimumBalance ->
-                commissionResolver.resolveRequired(swapLimit, minimumBalance)
+            return prepareCommission {
+                commissionResolver.resolveRequired(swapLimit)
             }
         }
 
@@ -454,19 +454,17 @@ private class AssetConversionExchange(
         }
 
         private suspend fun prepareCommissionOrWaive(swapLimit: SwapLimit): PreparedCommission? {
-            return prepareCommission(swapLimit) { minimumBalance ->
+            return prepareCommission {
+                val minimumBalance = assetSourceRegistry.sourceFor(toAsset).balance.existentialDeposit(toAsset)
                 commissionResolver.resolveOrWaive(swapLimit, minimumBalance)
             }
         }
 
         private suspend fun prepareCommission(
-            swapLimit: SwapLimit,
-            resolveAmount: (minimumBalance: Balance) -> Balance?,
+            resolveAmount: suspend () -> Balance?,
         ): PreparedCommission? {
             val recipient = commissionRecipient ?: return null
-            val outputBalance = assetSourceRegistry.sourceFor(toAsset).balance
-            val minimumBalance = outputBalance.existentialDeposit(toAsset)
-            val amount = resolveAmount(minimumBalance) ?: return null
+            val amount = resolveAmount() ?: return null
 
             ensureCommissionRecipientReady(recipient)
 
