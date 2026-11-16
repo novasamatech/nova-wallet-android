@@ -143,7 +143,7 @@ class SwapDetailViewModel(
             direction = direction,
             source = SwapEntryPoint.OPERATION_DETAILS
         )
-        router.openSwapSetupAmount(payload)
+        router.openSwapTab(payload)
     }
 
     private fun showExternalActions(type: ExternalActions.Type) = launch {

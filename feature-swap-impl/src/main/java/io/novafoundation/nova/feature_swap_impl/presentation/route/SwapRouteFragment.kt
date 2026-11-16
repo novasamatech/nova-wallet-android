@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.route
 
+import android.os.Bundle
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import androidx.recyclerview.widget.ConcatAdapter
-import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.domain.onNotLoaded
@@ -15,7 +18,14 @@ import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRout
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRouteViewHolder
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.TimelineItemDecoration
 
-class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>(), SwapRouteHeaderAdapter.Handler {
+class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRouteBinding>(), SwapRouteHeaderAdapter.Handler {
+
+    companion object {
+
+        private const val KEY_PAYLOAD = "swap_operation"
+
+        fun getBundle(payload: SwapOperationPayload) = Bundle().apply { putParcelable(KEY_PAYLOAD, payload) }
+    }
 
     override fun createBinding() = FragmentRouteBinding.inflate(layoutInflater)
 
@@ -44,11 +54,13 @@ class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>
             SwapFeatureApi::class.java
         )
             .swapRoute()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: SwapRouteViewModel) {
+        observeRetries(viewModel)
+
         viewModel.swapRoute.observe { routeState ->
             routeState.onLoaded {
                 binder.swapRouteProgress.makeGone()

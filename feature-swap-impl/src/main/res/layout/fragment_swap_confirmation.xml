@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/secondary_screen_background"
+    android:background="@drawable/bg_swap_screen"
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
@@ -12,16 +12,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/wallet_asset_swap" />
+        app:contentBackground="@android:color/transparent"
+        app:titleText="@string/swap_review_title" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/swapConfirmationToolbar">
+        android:orientation="vertical">
 
         <io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetsView
             android:id="@+id/swapConfirmationAssets"
@@ -36,25 +45,21 @@
             android:layout_marginTop="8dp">
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/swapConfirmationSlippage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/swap_slippage_title"
+                app:titleIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/swapConfirmationRate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/swap_rate_title"
                 app:titleIcon="@drawable/ic_info" />
 
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/swapConfirmationPriceDifference"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/swap_price_difference_title"
-                app:titleIcon="@drawable/ic_info" />
 
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/swapConfirmationSlippage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/swap_slippage_title"
-                app:titleIcon="@drawable/ic_info" />
+
 
             <io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteTableCellView
                 android:id="@+id/swapConfirmationRoute"
@@ -112,7 +117,6 @@
         android:gravity="center"
         android:textColor="@color/text_secondary"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         tools:text="A 0.85% fee is included in the exchange rate shown above."
         tools:visibility="visible" />
 
@@ -124,16 +128,18 @@
         android:layout_marginTop="8dp"
         android:visibility="gone"
         app:alertMode="warning"
-        app:layout_constraintTop_toBottomOf="@+id/swapNovaFeeDisclaimer"
         tools:layout_editor_absoluteX="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/swapConfirmationButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="24dp"
-        android:text="@string/common_confirm"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_marginBottom="16dp"
+        android:enabled="false"
+        android:text="@string/common_confirm" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

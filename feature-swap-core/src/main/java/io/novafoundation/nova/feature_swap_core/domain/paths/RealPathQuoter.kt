@@ -21,7 +21,9 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.math.BigInteger
@@ -51,6 +53,9 @@ private class RealPathQuoter<E : QuotableEdge>(
     private val filter: EdgeVisitFilter<E>?,
 ) : PathQuoter<E> {
 
+    // Paths also depend on the account-specific visit filter captured by this quoter.
+    private val cacheNamespace = UUID.randomUUID().toString()
+
     override suspend fun findBestPath(
         chainAssetIn: Chain.Asset,
         chainAssetOut: Chain.Asset,
@@ -68,11 +73,22 @@ private class RealPathQuoter<E : QuotableEdge>(
             paths
         }
 
-        val quotedPaths = paths.mapAsync { path -> quotePath(path, amount, swapDirection) }
-            .filterNotNull()
+        if (paths.isEmpty()) throw SwapQuoteException.NoRoute
+
+        val results = paths.mapAsync { path ->
+            runCatching { quotePath(path, amount, swapDirection) }
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    Log.w("Swaps", "Failed to quote path", it)
+                }
+        }
+        val quotedPaths = results.mapNotNull { it.getOrNull() }
 
         if (quotedPaths.isEmpty()) {
-            throw SwapQuoteException.NotEnoughLiquidity
+            // A failed network/runtime request must remain retryable, not look like unavailable liquidity.
+            throw results.firstNotNullOfOrNull { result ->
+                result.exceptionOrNull()?.takeUnless { it is SwapQuoteException.NotEnoughLiquidity }
+            } ?: SwapQuoteException.NotEnoughLiquidity
         }
 
         return BestPathQuote(quotedPaths)
@@ -86,7 +102,7 @@ private class RealPathQuoter<E : QuotableEdge>(
     ): List<Path<E>> {
         val graph = graphFlow.first()
 
-        val cacheKey = "$QUOTES_CACHE:${pathsCacheKey(from, to)}:${graph.numberOfEdges()}"
+        val cacheKey = "$QUOTES_CACHE:$cacheNamespace:${pathsCacheKey(from, to)}:${graph.numberOfEdges()}"
 
         return computationalCache.useCache(cacheKey, scope) {
             computation(graph)
@@ -104,11 +120,11 @@ private class RealPathQuoter<E : QuotableEdge>(
         path: Path<E>,
         amount: BigInteger,
         swapDirection: SwapDirection
-    ): QuotedPath<E>? {
+    ): QuotedPath<E> {
         val quote = when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> quotePathSell(path, amount)
             SwapDirection.SPECIFIED_OUT -> quotePathBuy(path, amount)
-        } ?: return null
+        }
 
         val pathRoughFeeEstimation = pathFeeEstimation.roughlyEstimateFeeOrZero(quote)
 
@@ -119,8 +135,8 @@ private class RealPathQuoter<E : QuotableEdge>(
         return this?.roughlyEstimateFee(quote) ?: PathRoughFeeEstimation.zero()
     }
 
-    private suspend fun quotePathBuy(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>>? {
-        return runCatching {
+    private suspend fun quotePathBuy(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>> {
+        return run {
             val initial = mutableListOf<QuotedEdge<E>>() to amount
 
             path.foldRight(initial) { segment, (quotedPath, currentAmount) ->
@@ -130,12 +146,10 @@ private class RealPathQuoter<E : QuotableEdge>(
                 quotedPath to segmentQuote
             }.first
         }
-            .onFailure { Log.w("Swaps", "Failed to quote path", it) }
-            .getOrNull()
     }
 
-    private suspend fun quotePathSell(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>>? {
-        return runCatching {
+    private suspend fun quotePathSell(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>> {
+        return run {
             val initial = mutableListOf<QuotedEdge<E>>() to amount
 
             path.fold(initial) { (quotedPath, currentAmount), segment ->
@@ -145,7 +159,5 @@ private class RealPathQuoter<E : QuotableEdge>(
                 quotedPath to segmentQuote
             }.first
         }
-            .onFailure { Log.w("Swaps", "Failed to quote path", it) }
-            .getOrNull()
     }
 }

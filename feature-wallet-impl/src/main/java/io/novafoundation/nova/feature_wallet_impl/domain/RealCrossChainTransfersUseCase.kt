@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.domain
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -166,10 +168,11 @@ internal class RealCrossChainTransfersUseCase(
 
     override suspend fun ExtrinsicService.performTransferAndTrackTransfer(
         transfer: AssetTransferBase,
-        computationalScope: CoroutineScope
+        computationalScope: CoroutineScope,
+        onOriginExecuted: suspend (ExtrinsicExecutionResult) -> Unit
     ): Result<Balance> {
         val transferConfiguration = transferConfigurationFor(transfer, computationalScope)
-        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer)
+        return crossChainTransactor.performAndTrackTransfer(transferConfiguration, transfer, onOriginExecuted)
     }
 
     override suspend fun maximumExecutionTime(

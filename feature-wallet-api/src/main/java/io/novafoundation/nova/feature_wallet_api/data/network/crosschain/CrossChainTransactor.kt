@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.crosschain
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -34,6 +35,7 @@ interface CrossChainTransactor {
     suspend fun performAndTrackTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
+        onOriginExecuted: suspend (ExtrinsicExecutionResult) -> Unit = {},
     ): Result<Balance>
 
     suspend fun supportsXcmExecute(

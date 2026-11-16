@@ -48,7 +48,7 @@ class SwapOptionsViewModel(
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator
 ) : BaseViewModel(), DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
-    val title = resourceManager.getString(if (payload == null) R.string.swap_settings_title else R.string.common_settings)
+    val title = resourceManager.getString(if (payload == null || payload.requestId != null) R.string.swap_settings_title else R.string.common_settings)
 
     /** Settings opened with a payload (Bittensor) cap a custom value at four decimals of a percent, as iOS does. */
     val limitsInputPrecision = payload != null
@@ -126,7 +126,7 @@ class SwapOptionsViewModel(
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
             if (payload != null) {
                 val method = slippageChangeMethod(payload.selected.fractions, slippage, config)
-                slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method))
+                slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method, payload.requestId))
             } else {
                 swapSettingState.await().setSlippage(slippage)
             }

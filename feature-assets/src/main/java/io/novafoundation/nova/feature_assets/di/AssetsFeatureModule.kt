@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.di
 
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -51,7 +52,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatterFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
@@ -66,7 +66,6 @@ import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updater
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.BittensorBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
@@ -242,20 +241,10 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideInitialSwapFlowExecutor(
-        assetsRouter: AssetsRouter
-    ): InitialSwapFlowExecutor {
-        return InitialSwapFlowExecutor(assetsRouter)
-    }
-
-    @Provides
-    @FeatureScope
     fun provideSwapExecutor(
-        initialSwapFlowExecutor: InitialSwapFlowExecutor,
-        assetsRouter: AssetsRouter,
-        swapSettingsStateProvider: SwapSettingsStateProvider
+        swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator
     ): SwapFlowExecutorFactory {
-        return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
+        return SwapFlowExecutorFactory(swapTokenSelectionCommunicator)
     }
 
     @Provides

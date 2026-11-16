@@ -50,8 +50,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.navigation.R
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
@@ -189,23 +187,15 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideSwapUpdateSystemFactory(
-        swapSettingsStateProvider: SwapSettingsStateProvider,
         chainRegistry: ChainRegistry,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         accountInfoUpdaterFactory: AccountInfoUpdaterFactory
     ): SwapUpdateSystemFactory {
         return SwapUpdateSystemFactory(
-            swapSettingsStateProvider = swapSettingsStateProvider,
             chainRegistry = chainRegistry,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             accountInfoUpdaterFactory = accountInfoUpdaterFactory
         )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideSwapQuoteStoreProvider(computationalCache: ComputationalCache): SwapStateStoreProvider {
-        return RealSwapStateStoreProvider(computationalCache)
     }
 
     @Provides

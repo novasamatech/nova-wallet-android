@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
@@ -68,9 +70,13 @@ interface SwapFeatureDependencies {
 
     fun usdRateRepository(): UsdRateRepository
 
+    val tokenFormatter: TokenFormatter
+
     val amountFormatter: AmountFormatter
 
     val validationExecutor: ValidationExecutor
+
+    fun globalConfigDataSource(): GlobalConfigDataSource
 
     val preferences: Preferences
 

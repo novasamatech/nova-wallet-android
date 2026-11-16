@@ -386,7 +386,7 @@ class BalanceListViewModel(
     }
 
     fun swapClicked() {
-        router.openSwapFlow()
+        router.openSwapTab()
     }
 
     fun giftClicked() = launchUnit {

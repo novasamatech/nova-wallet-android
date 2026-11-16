@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <View
+            style="@style/Widget.Nova.Puller"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/swap_settings_title"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="14dp"
+            android:includeFontPadding="false"
+            android:text="@string/swap_slippage"
+            android:textColor="@color/text_secondary" />
+
+        <LinearLayout
+            android:id="@+id/swapSettingsPresets"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal" />
+
+        <io.novafoundation.nova.common.view.TipsInputField
+            android:id="@+id/swapSettingsCustomInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp"
+            android:hint="@string/swap_slippage_custom_hint"
+            android:inputType="numberDecimal"
+            app:errorMessageMarginTop="12dp"
+            app:inputErrorTextColor="@color/text_primary"
+            app:postfix="@string/common_percent"
+            app:postfixPadding="0dp"
+            app:showClearButton="false" />
+
+        <TextView
+            android:id="@+id/swapSettingsWarning"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_warning"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <io.novafoundation.nova.common.view.PrimaryButton
+                android:id="@+id/swapSettingsReset"
+                style="@style/Widget.Nova.Button.Secondary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_weight="1"
+                android:text="@string/common_reset" />
+
+            <io.novafoundation.nova.common.view.PrimaryButton
+                android:id="@+id/swapSettingsApply"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/common_apply" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

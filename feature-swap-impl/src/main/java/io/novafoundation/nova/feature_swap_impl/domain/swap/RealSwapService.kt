@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.domain.swap
 
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.SharedFlowCache
@@ -12,10 +13,8 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
-import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.allEdges
-import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
 import io.novafoundation.nova.common.utils.graph.numberOfEdges
@@ -49,6 +48,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionEstimate
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.routeId
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -109,16 +109,18 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmittedTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -227,6 +229,25 @@ internal class RealSwapService(
         ).also(::logFee)
     }
 
+    override suspend fun resolveRoute(
+        route: List<SwapRouteEdgeId>,
+        computationScope: CoroutineScope
+    ): List<SwapGraphEdge> {
+        require(route.isNotEmpty())
+        val results = exchangeRegistry(computationScope).allExchanges().mapAsync { exchange ->
+            runCatching { exchange.availableDirectSwapConnections() }.onFailure { currentCoroutineContext().ensureActive() }
+        }
+        val edges = results.mapNotNull { it.getOrNull() }.flatten()
+        return route.map { id ->
+            edges.singleOrNull { it.routeId() == id }
+                ?: throw (results.firstNotNullOfOrNull { it.exceptionOrNull() } ?: IllegalStateException("Reviewed swap route is unavailable"))
+        }
+    }
+
+    override suspend fun constructOperations(args: SwapFeeArgs): List<AtomicSwapOperation> {
+        return args.constructAtomicOperations()
+    }
+
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
         val segments = calculatedFee.segments
         val serviceFeeOperationIndex = segments.indexOfLast { it.operation.chargesServiceCommission }
@@ -253,15 +274,32 @@ internal class RealSwapService(
                     // We cannot execute buy for segments after first one since we deal with actualReceivedAmount there
                     val shouldReplaceBuyWithSell = correction != null
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
+                    var transaction: SwapSubmittedTransaction? = null
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
                         actualSwapLimit = actualSwapLimit,
                         isServiceCommissionOperation = index == serviceFeeOperationIndex,
+                        onExecuted = { receipt ->
+                            val submitted = SwapSubmittedTransaction(
+                                operation.assetIn.chainId,
+                                receipt.extrinsicHash,
+                                receipt.outcome is ExtrinsicDispatch.Failed
+                            )
+                            transaction = submitted
+                            emit(SwapProgress.TransactionTracked(step, submitted))
+                        }
                     )
 
-                    operation.execute(segmentSubmissionArgs).onFailure {
+                    val result = try {
+                        operation.execute(segmentSubmissionArgs)
+                    } catch (error: Exception) {
+                        currentCoroutineContext().ensureActive()
+                        Result.failure(error)
+                    }
+                    result.onFailure {
+                        currentCoroutineContext().ensureActive()
                         Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
 
-                        emit(SwapProgress.Failure(it, attemptedStep = step))
+                        emit(SwapProgress.Failure(it, attemptedStep = step, transaction = transaction))
                     }
                 }
             }.onSuccess {
@@ -324,6 +362,7 @@ internal class RealSwapService(
                     isFirstSegment = index == 0,
                     firstSegmentFees = firstSegmentFees,
                 ),
+                metaAccountId = metaAccountId,
             )
 
             // Initial case - begin first operation
@@ -396,7 +435,8 @@ internal class RealSwapService(
             chainAssetOut = args.tokenOut.configuration,
             amount = args.amount,
             swapDirection = args.swapDirection,
-            computationSharingScope = computationSharingScope
+            computationSharingScope = computationSharingScope,
+            metaAccountId = args.metaAccountId
         )
 
         val serviceFeeCharger = quotedTrade.path.constructAtomicOperationPrototypes()
@@ -448,6 +488,7 @@ internal class RealSwapService(
                     amount = grossFinal,
                     swapDirection = SwapDirection.SPECIFIED_OUT,
                     computationSharingScope = computationSharingScope,
+                    metaAccountId = args.metaAccountId
                 )
                 ServiceFeeAdjustedTrade(
                     trade = grossTrade,
@@ -491,8 +532,9 @@ internal class RealSwapService(
         }.debounce(500.milliseconds)
     }
 
-    override suspend fun isDeepSwapAllowed(): Boolean {
-        val signer = signerProvider.rootSignerFor(accountRepository.getSelectedMetaAccount())
+    override suspend fun isDeepSwapAllowed(metaAccountId: Long?): Boolean {
+        val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
+        val signer = signerProvider.rootSignerFor(account)
         return when (signer.callExecutionType()) {
             CallExecutionType.IMMEDIATE -> true
             CallExecutionType.DELAYED -> false
@@ -548,10 +590,7 @@ internal class RealSwapService(
                     }
             }
 
-            directionsByExchange
-                .accumulateLists()
-                .filter { it.isNotEmpty() }
-                .map { Graph.create(it) }
+            combineSwapDirections(directionsByExchange)
                 .onEach { printGraphStats(it) }
         }
     }
@@ -581,12 +620,13 @@ internal class RealSwapService(
         }
     }
 
-    private suspend fun nodeVisitFilter(computationScope: CoroutineScope): NodeVisitFilter {
-        return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
+    private suspend fun nodeVisitFilter(computationScope: CoroutineScope, metaAccountId: Long? = null): NodeVisitFilter {
+        val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
+        return computationalCache.useCache("$NODE_VISIT_FILTER:${account.id}", computationScope) {
             NodeVisitFilter(
                 computationScope = this,
                 chainsById = chainRegistry.chainsById(),
-                selectedAccount = accountRepository.getSelectedMetaAccount()
+                selectedAccount = account
             )
         }
     }
@@ -651,21 +691,16 @@ internal class RealSwapService(
         }
     }
 
-    // Assumes each flow will have only single element
-    private fun <T> List<Flow<List<T>>>.accumulateLists(): Flow<List<T>> {
-        return mergeIfMultiple()
-            .runningFold(emptyList()) { acc, directions -> acc + directions }
-    }
-
     private suspend fun quoteTrade(
         chainAssetIn: Chain.Asset,
         chainAssetOut: Chain.Asset,
         amount: Balance,
         swapDirection: SwapDirection,
         computationSharingScope: CoroutineScope,
-        logQuotes: Boolean = true
+        logQuotes: Boolean = true,
+        metaAccountId: Long? = null
     ): QuotedTrade {
-        val quoter = getPathQuoter(computationSharingScope)
+        val quoter = getPathQuoter(computationSharingScope, metaAccountId)
 
         val bestPathQuote = quoter.findBestPath(chainAssetIn, chainAssetOut, amount, swapDirection)
         if (debug && logQuotes) {
@@ -675,10 +710,11 @@ internal class RealSwapService(
         return bestPathQuote.bestPath
     }
 
-    private suspend fun getPathQuoter(computationScope: CoroutineScope): PathQuoter<SwapGraphEdge> {
-        return computationalCache.useCache(QUOTER_CACHE, computationScope) {
+    private suspend fun getPathQuoter(computationScope: CoroutineScope, metaAccountId: Long?): PathQuoter<SwapGraphEdge> {
+        val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
+        return computationalCache.useCache("$QUOTER_CACHE:${account.id}", computationScope) {
             val graphFlow = directionsGraph(computationScope)
-            val filter = nodeVisitFilter(computationScope)
+            val filter = nodeVisitFilter(computationScope, account.id)
 
             quoterFactory.create(graphFlow, this, SwapPathFeeEstimator(), filter)
         }
@@ -791,7 +827,8 @@ internal class RealSwapService(
                 amount = quoteArgs.amount,
                 swapDirection = quoteArgs.swapDirection,
                 computationSharingScope = scope,
-                logQuotes = false
+                logQuotes = false,
+                metaAccountId = quoteArgs.metaAccountId
             ).finalQuote()
         }
 

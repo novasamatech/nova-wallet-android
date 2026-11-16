@@ -12,6 +12,7 @@ import kotlin.coroutines.coroutineContext
 class SharedQuoteValidationRetriever(
     private val swapService: SwapService,
     private val assetsValidationContext: AssetsValidationContext,
+    private val metaAccountId: Long? = null,
 ) {
 
     private var result: Result<SwapQuote>? = null
@@ -28,7 +29,7 @@ class SharedQuoteValidationRetriever(
                 SwapDirection.SPECIFIED_OUT -> value.amountOut.amount
             }
 
-            val quoteArgs = SwapQuoteArgs(assetIn.token, assetOut.token, amount, direction)
+            val quoteArgs = SwapQuoteArgs(assetIn.token, assetOut.token, amount, direction, metaAccountId)
 
             result = swapService.quote(quoteArgs, CoroutineScope(coroutineContext))
         }

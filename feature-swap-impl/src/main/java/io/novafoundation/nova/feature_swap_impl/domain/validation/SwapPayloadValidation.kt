@@ -12,6 +12,7 @@ data class SwapValidationPayload(
     val fee: SwapFee,
     val swapQuote: SwapQuote,
     val slippage: Fraction,
+    val metaAccountId: Long? = null,
 ) {
 
     val amountIn: ChainAssetWithAmount = swapQuote.amountIn

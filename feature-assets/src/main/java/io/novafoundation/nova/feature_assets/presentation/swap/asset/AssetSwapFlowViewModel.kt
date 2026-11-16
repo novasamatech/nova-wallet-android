@@ -28,7 +28,6 @@ import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlow
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -43,7 +42,6 @@ class AssetSwapFlowViewModel(
     controllableAssetCheck: ControllableAssetCheckMixin,
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
-    private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val swapFlowExecutor: SwapFlowExecutor,
     private val swapPayload: SwapFlowPayload,
     private val assetIconProvider: AssetIconProvider,
@@ -67,14 +65,10 @@ class AssetSwapFlowViewModel(
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 
-    init {
-        launchInitialSwapSync()
-    }
-
     @StringRes
     fun getTitleRes(): Int {
         return when (swapPayload) {
-            SwapFlowPayload.InitialSelecting, is SwapFlowPayload.ReselectAssetIn -> R.string.assets_swap_flow_pay_title
+            is SwapFlowPayload.ReselectAssetIn -> R.string.assets_swap_flow_pay_title
             is SwapFlowPayload.ReselectAssetOut -> R.string.assets_swap_flow_receive_title
         }
     }
@@ -115,14 +109,6 @@ class AssetSwapFlowViewModel(
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
             tokenAssetFormatter.mapTokenAssetGroupToUi(assetIconProvider, group, assets) { it.groupBalance.transferable }
-        }
-    }
-
-    private fun launchInitialSwapSync() {
-        if (swapPayload is SwapFlowPayload.InitialSelecting) {
-            launch { swapAvailabilityInteractor.warmUpCommonlyUsedChains(swapFlowScope) }
-
-            launch { swapAvailabilityInteractor.sync(swapFlowScope) }
         }
     }
 }

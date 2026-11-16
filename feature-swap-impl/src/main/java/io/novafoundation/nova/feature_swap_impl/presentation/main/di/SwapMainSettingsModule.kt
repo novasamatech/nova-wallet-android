@@ -1,8 +1,18 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main.di
 
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelStoreOwner
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
+import io.novafoundation.nova.feature_swap_api.presentation.state.DEFAULT_SLIPPAGE
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
+import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapFormDisplay
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsState
+import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapSelectionInteractor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
@@ -10,7 +20,6 @@ import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -18,8 +27,6 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
-import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
@@ -27,7 +34,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidat
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationPayloadMapper
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsViewModel
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
@@ -41,6 +48,10 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateReposito
 
 @Module(includes = [ViewModelModule::class])
 class SwapMainSettingsModule {
+
+    @Provides
+    @ScreenScope
+    fun provideFormState(): SwapSettingsState = RealSwapSettingsState(SwapSettings(slippage = DEFAULT_SLIPPAGE))
 
     @Provides
     @ScreenScope
@@ -79,12 +90,15 @@ class SwapMainSettingsModule {
         swapRouter: SwapRouter,
         swapInteractor: SwapInteractor,
         resourceManager: ResourceManager,
-        swapSettingsStateProvider: SwapSettingsStateProvider,
+        swapSettingsState: SwapSettingsState,
+        selectionInteractor: SwapSelectionInteractor,
+        tokenSelectionCommunicator: SwapTokenSelectionCommunicator,
+        slippageCommunicator: SlippageSettingsCommunicator,
+        display: SwapFormDisplay,
         swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
         chainRegistry: ChainRegistry,
         assetUseCase: ArbitraryAssetUseCase,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
         swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
         payload: SwapSettingsPayload,
@@ -94,9 +108,11 @@ class SwapMainSettingsModule {
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapRateFormatter: SwapRateFormatter,
         maxActionProviderFactory: SwapMaxActionProviderFactory,
-        swapStateStoreProvider: SwapStateStoreProvider,
+        operationMapper: SwapOperationPayloadMapper,
+        tokenFormatter: TokenFormatter,
+        priceImpactFormatter: PriceImpactFormatter,
+        priceImpactThresholds: PriceImpactThresholds,
         swapRouteFormatter: SwapRouteFormatter,
-        swapFlowScopeAggregator: SwapFlowScopeAggregator,
         enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
         getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
         analyticsService: AnalyticsService,
@@ -105,13 +121,16 @@ class SwapMainSettingsModule {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
             swapInteractor = swapInteractor,
-            swapSettingsStateProvider = swapSettingsStateProvider,
+            swapSettingsState = swapSettingsState,
+            selectionInteractor = selectionInteractor,
+            tokenSelectionCommunicator = tokenSelectionCommunicator,
+            slippageCommunicator = slippageCommunicator,
+            display = display,
             resourceManager = resourceManager,
             swapAmountInputMixinFactory = swapAmountInputMixinFactory,
             chainRegistry = chainRegistry,
             assetUseCase = assetUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            actionAwaitableFactory = actionAwaitableMixinFactory,
             payload = payload,
             swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
             validationExecutor = validationExecutor,
@@ -122,10 +141,12 @@ class SwapMainSettingsModule {
             swapRateFormatter = swapRateFormatter,
             selectedAccountUseCase = accountUseCase,
             enoughAmountValidatorFactory = enoughAmountValidatorFactory,
-            swapStateStoreProvider = swapStateStoreProvider,
+            operationMapper = operationMapper,
+            tokenFormatter = tokenFormatter,
+            priceImpactFormatter = priceImpactFormatter,
+            priceImpactThresholds = priceImpactThresholds,
             maxActionProviderFactory = maxActionProviderFactory,
             swapRouteFormatter = swapRouteFormatter,
-            swapFlowScopeAggregator = swapFlowScopeAggregator,
             analyticsService = analyticsService,
             usdRateRepository = usdRateRepository
         )
@@ -133,9 +154,9 @@ class SwapMainSettingsModule {
 
     @Provides
     fun provideViewModelCreator(
-        fragment: Fragment,
+        owner: ViewModelStoreOwner,
         viewModelFactory: ViewModelProvider.Factory
     ): SwapMainSettingsViewModel {
-        return ViewModelProvider(fragment, viewModelFactory).get(SwapMainSettingsViewModel::class.java)
+        return ViewModelProvider(owner, viewModelFactory).get(SwapMainSettingsViewModel::class.java)
     }
 }

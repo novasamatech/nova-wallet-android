@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.fee
 
+import android.os.Bundle
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import android.view.View
 import android.widget.LinearLayout.LayoutParams
 import android.widget.LinearLayout.LayoutParams.MATCH_PARENT
@@ -20,6 +23,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
 
 class SwapFeeFragment : BaseBottomSheetFragment<SwapFeeViewModel, FragmentSwapFeeBinding>() {
 
+    companion object {
+
+        private const val KEY_PAYLOAD = "swap_operation"
+
+        fun getBundle(payload: SwapOperationPayload) = Bundle().apply { putParcelable(KEY_PAYLOAD, payload) }
+    }
+
     override fun createBinding() = FragmentSwapFeeBinding.inflate(layoutInflater)
 
     override fun initViews() {}
@@ -30,11 +40,13 @@ class SwapFeeFragment : BaseBottomSheetFragment<SwapFeeViewModel, FragmentSwapFe
             SwapFeatureApi::class.java
         )
             .swapFee()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: SwapFeeViewModel) {
+        observeRetries(viewModel)
+
         viewModel.swapFeeSegments.observe { feeState ->
             feeState.onLoaded(::showFeeSegments)
         }

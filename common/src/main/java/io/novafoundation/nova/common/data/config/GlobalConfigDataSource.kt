@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.data.config
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.domain.config.SwapPairConfig
 import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.domain.config.GlobalConfig
@@ -49,10 +50,22 @@ class RealGlobalConfigDataSource(
     // Different build configurations must never inherit each other's infrastructure origin.
     private fun cacheKey() = "global_config_${BuildConfig.GLOBAL_CONFIG_URL}"
 
+    private fun SwapPairRemote.toDomain(): SwapPairConfig? {
+        fun SwapPairRemote.Asset?.validAsset(): SwapPairConfig.Asset? {
+            val chainId = this?.chainId?.takeIf { it.matches(Regex("[a-fA-F0-9]{64}")) } ?: return null
+            val assetId = this.assetId?.takeIf { it >= 0 } ?: return null
+            return SwapPairConfig.Asset(chainId, assetId)
+        }
+        val assetIn = assetIn.validAsset() ?: return null
+        val assetOut = assetOut.validAsset() ?: return null
+        return SwapPairConfig(assetIn, assetOut).takeIf { assetIn != assetOut }
+    }
+
     private fun GlobalConfigRemote.toDomain() = GlobalConfig(
         multisigsApiUrl = multisigsApiUrl,
         proxyApiUrl = proxyApiUrl,
         multiStakingApiUrl = multiStakingApiUrl,
-        infraUrl = infraUrl
+        infraUrl = infraUrl,
+        defaultSwapPair = defaultSwapPair?.toDomain()
     )
 }

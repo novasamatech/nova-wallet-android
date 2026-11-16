@@ -12,5 +12,16 @@ sealed class SwapProgressModel {
 
     class Completed(val at: String, val operationsLabel: String) : SwapProgressModel()
 
-    class Failed(val reason: String, val at: String) : SwapProgressModel()
+    class Failed(
+        val reason: String,
+        val at: String,
+        val steps: List<Step>,
+        val canRetry: Boolean,
+    ) : SwapProgressModel()
+
+    class Interrupted(val reason: String, val at: String, val steps: List<Step>) : SwapProgressModel()
+
+    data class Step(val label: String, val status: StepStatus, val hasTransaction: Boolean)
+
+    enum class StepStatus { COMPLETED, FAILED, PENDING, UNKNOWN }
 }

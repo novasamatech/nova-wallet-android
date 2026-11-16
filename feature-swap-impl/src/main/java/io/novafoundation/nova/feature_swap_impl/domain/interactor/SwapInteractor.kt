@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.domain.interactor
 
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -109,8 +110,12 @@ class SwapInteractor(
         swapService.sync(coroutineScope)
     }
 
-    suspend fun getUpdateSystem(chainFlow: Flow<Chain>, coroutineScope: CoroutineScope): UpdateSystem {
-        return swapUpdateSystemFactory.create(chainFlow, coroutineScope)
+    suspend fun getUpdateSystem(
+        chainFlow: Flow<Chain>,
+        state: SwapSettingsState,
+        coroutineScope: CoroutineScope
+    ): UpdateSystem {
+        return swapUpdateSystemFactory.create(chainFlow, state, coroutineScope)
     }
 
     suspend fun quote(quoteArgs: SwapQuoteArgs, computationalScope: CoroutineScope): Result<SwapQuote> {
@@ -151,13 +156,13 @@ class SwapInteractor(
         return swapService.runSubscriptions(metaAccount)
     }
 
-    suspend fun isDeepSwapAvailable(): Boolean {
-        return swapService.isDeepSwapAllowed()
+    suspend fun isDeepSwapAvailable(metaAccountId: Long? = null): Boolean {
+        return swapService.isDeepSwapAllowed(metaAccountId)
     }
 
-    fun validationSystem(): SwapValidationSystem {
-        val assetsValidationContext = assetsValidationContextFactory.create()
-        val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService, assetsValidationContext)
+    fun validationSystem(metaAccountId: Long? = null): SwapValidationSystem {
+        val assetsValidationContext = assetsValidationContextFactory.create(metaAccountId)
+        val sharedQuoteValidationRetriever = SharedQuoteValidationRetriever(swapService, assetsValidationContext, metaAccountId)
 
         return ValidationSystem {
             positiveAmountIn()
@@ -172,7 +177,7 @@ class SwapInteractor(
 
             sufficientNativeBalanceToPayFeeConsideringED(assetsValidationContext)
 
-            canReceiveAssetOutValidationFactory.canReceiveAssetOut(assetsValidationContext)
+            canReceiveAssetOutValidationFactory.canReceiveAssetOut(assetsValidationContext, metaAccountId)
 
             availableSlippage(swapService)
 

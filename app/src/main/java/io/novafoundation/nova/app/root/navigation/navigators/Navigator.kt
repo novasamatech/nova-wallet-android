@@ -67,8 +67,6 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SelectSendFragment
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSendFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowFragment
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
@@ -109,7 +107,7 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.created.M
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
+import io.novafoundation.nova.app.root.navigation.navigators.swap.SwapTabNavigator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list.WalletConnectSessionsPayload
@@ -119,7 +117,8 @@ import kotlinx.coroutines.flow.Flow
 class Navigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
     private val walletConnectDelegate: WalletConnectRouter,
-    private val analyticsPromptState: AnalyticsPromptState
+    private val analyticsPromptState: AnalyticsPromptState,
+    private val swapTabNavigator: SwapTabNavigator,
 ) : BaseNavigator(navigationHoldersRegistry),
     SplashRouter,
     OnboardingRouter,
@@ -590,32 +589,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun returnToMainSwapScreen() {
-        navigationBuilder().action(R.id.action_return_to_swap_settings)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openSwapFlow() {
-        val payload = SwapFlowPayload.InitialSelecting
-        navigationBuilder().action(R.id.action_mainFragment_to_swapFlow)
-            .setArgs(AssetSwapFlowFragment.getBundle(payload))
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
-        navigationBuilder().action(R.id.action_open_swapSetupAmount)
-            .setArgs(SwapMainSettingsFragment.getBundle(swapSettingsPayload))
-            .navigateInFirstAttachedContext()
+    override fun openSwapTab(payload: SwapSettingsPayload?) {
+        swapTabNavigator.openSwaps(payload)
     }
 
     override fun returnToMainScreen() {
         navigationBuilder().action(R.id.action_returnToMainScreen)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun finishSelectAndOpenSwapSetupAmount(swapSettingsPayload: SwapSettingsPayload) {
-        navigationBuilder().action(R.id.action_finish_and_open_swap_settings)
-            .setArgs(SwapMainSettingsFragment.getBundle(swapSettingsPayload))
             .navigateInFirstAttachedContext()
     }
 
