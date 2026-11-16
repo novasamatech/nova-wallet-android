@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.formatPercents
+import io.novafoundation.nova.common.utils.formatting.FixedPrecisionFormatter
+import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
@@ -22,6 +24,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
@@ -63,6 +66,13 @@ fun mapSwapValidationFailureToUI(
         NonPositiveAmount -> handleNonPositiveAmount(resourceManager).asDefault()
 
         NotEnoughLiquidity -> TitleAndMessage(resourceManager.getString(R.string.swap_not_enought_liquidity_failure), second = null).asDefault()
+
+        is SwapValidationFailure.AmountBelowPoolTradeMinimum -> handlePoolTradeMinimum(reason, resourceManager)
+
+        is SwapValidationFailure.PoolTradeLimitsUnavailable -> TitleAndMessage(
+            resourceManager.getString(R.string.swap_failure_pool_trade_limits_unavailable_title),
+            resourceManager.getString(R.string.swap_failure_pool_trade_limits_unavailable_message)
+        ).asDefault()
 
         is AmountExceedsPoolTradeLimit -> handlePoolTradeLimit(reason, resourceManager, amountInSetAction, amountOutSwapMinAction)
 
@@ -137,6 +147,20 @@ fun mapSwapValidationFailureToUI(
             )
         ).asDefault()
     }
+}
+
+private fun handlePoolTradeMinimum(
+    reason: SwapValidationFailure.AmountBelowPoolTradeMinimum,
+    resourceManager: ResourceManager
+): TransformedFailure {
+    val amountFormatter = FixedPrecisionFormatter(reason.limitedAsset.precision.value)
+    val minimum = reason.limitedAsset.amountFromPlanks(reason.minAmount)
+    val formattedMinimum = amountFormatter.format(minimum).withTokenSymbol(reason.limitedAsset.symbol)
+
+    return TitleAndMessage(
+        resourceManager.getString(R.string.swap_failure_pool_trade_minimum_title),
+        resourceManager.getString(R.string.swap_failure_pool_trade_minimum_message, formattedMinimum)
+    ).asDefault()
 }
 
 private fun handlePoolTradeLimit(

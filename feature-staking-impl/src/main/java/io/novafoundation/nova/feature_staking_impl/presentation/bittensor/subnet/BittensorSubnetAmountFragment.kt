@@ -143,6 +143,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
             fundingCard.title.text = getString(R.string.bittensor_get_asset_title, it.input.tokenSymbol)
             fundingCard.icon.setTokenIcon(it.input.tokenIcon, FeatureUtils.getCommonApi(requireContext()).imageLoader())
         }
+        viewModel.amountFieldError.observe(amount::setError)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)
         viewModel.amount.observe {

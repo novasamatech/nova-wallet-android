@@ -11,6 +11,8 @@ The manual Bittensor picker is a flat list: show Stake to root immediately, then
 
 ## Operation presentation and explicit exceptions
 
+All Bittensor amount-entry screens (root Stake/Unstake and subnet Buy/Sell) show a field error and disable Continue when the entered amount exceeds the current Max. Use the same availability limit as that screen's Max, including the selected validators, holds and dust constraints. Preserve precision validation and distinguish an unavailable limit from a known zero; the planned amount filled by Max may be below the available limit to avoid a swept remainder.
+
 Bittensor presents Nova commission as a percentage disclosure on confirmation, not as a separate token or fiat amount on amount-entry, execution or result screens. Keep the exact fee in transaction calculations and carry the quoted commission rate in navigation payloads; do not reconstruct the configured percentage from a rounded fee amount. Use the Swap rate label and Bittensor-specific information sheets with actual symbols, slippage and quoted commission.
 
 Sale confirmation orders trade details before the wallet/account card. Keep the network fee with the trade parameters, retain separators between all rows, and show You will earn as signed, color-coded profit with an optional fiat estimate. Like iOS, this estimate deducts Nova commission but is before the network fee. Average purchase price comes from successfully loaded history; show the per-subnet-token caption and distinguish no purchases from unavailable or incomplete history. Account operation-history requests accept only accountSubject and page; page size is server-owned, even though the response reports pageSize.

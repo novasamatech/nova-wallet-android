@@ -66,6 +66,7 @@ class RealGlobalConfigDataSource(
         proxyApiUrl = proxyApiUrl,
         multiStakingApiUrl = multiStakingApiUrl,
         infraUrl = infraUrl,
-        defaultSwapPair = defaultSwapPair?.toDomain()
+        defaultSwapPair = defaultSwapPair?.toDomain(),
+        changeNowTaoUrl = changeNowTaoUrl
     )
 }

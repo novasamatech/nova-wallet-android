@@ -5,7 +5,8 @@ class GlobalConfigRemote(
     val proxyApiUrl: String,
     val multiStakingApiUrl: String,
     val infraUrl: String?,
-    val defaultSwapPair: SwapPairRemote? = null
+    val defaultSwapPair: SwapPairRemote? = null,
+    val changeNowTaoUrl: String? = null
 )
 
 class SwapPairRemote(val assetIn: Asset?, val assetOut: Asset?) {

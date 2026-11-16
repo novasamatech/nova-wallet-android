@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,24 +19,58 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class GetAssetBottomSheet(
     context: Context,
-    onCancel: () -> Unit,
+    private val onCancel: () -> Unit,
     private val payload: Payload,
     private val onClicked: (GetAssetOption) -> Unit,
 ) : FixedListBottomSheet<BottomSheeetFixedListBinding>(
     context,
-    viewConfiguration = ViewConfiguration.default(context),
-    onCancel = onCancel
+    viewConfiguration = ViewConfiguration.default(context)
 ) {
 
     class Payload(
         val chainAsset: Chain.Asset,
-        val availableOptions: Set<GetAssetOption>
+        val availableOptions: Set<GetAssetOption>,
+        val optionUpdates: Flow<Set<GetAssetOption>>? = null
     )
+
+    private val headerViewCount = binder.fixedListSheetItemContainer.childCount
+
+    private var availableOptions = payload.availableOptions
+
+    private var actionCompleted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle(formatWithAssetSymbol(R.string.swap_get_token_using))
+        renderOptions()
+        payload.optionUpdates
+            ?.onEach { options ->
+                if (options != availableOptions) {
+                    availableOptions = options
+                    renderOptions()
+                }
+            }
+            ?.launchIn(this)
+    }
+
+    override fun dismiss() {
+        super.dismiss()
+        if (!actionCompleted) {
+            actionCompleted = true
+            onCancel()
+        }
+    }
+
+    private fun selectOption(option: GetAssetOption) {
+        if (actionCompleted) return
+        actionCompleted = true
+        onClicked(option)
+    }
+
+    private fun renderOptions() {
+        val container = binder.fixedListSheetItemContainer
+        container.removeViews(headerViewCount, container.childCount - headerViewCount)
 
         getAssetInItem(
             title = context.getString(R.string.wallet_cross_chain_transfer),
@@ -56,7 +93,7 @@ class GetAssetBottomSheet(
             option = GetAssetOption.Buy
         )
 
-        payload.availableOptions.filterIsInstance<GetAssetOption.DApp>()
+        availableOptions.filterIsInstance<GetAssetOption.DApp>()
             .forEach(::dAppItem)
     }
 
@@ -68,7 +105,7 @@ class GetAssetBottomSheet(
             itemBinder.dappSubtitle.text = dAppDescription(option.supportedTokens)
 
             itemBinder.root.setDismissingClickListener {
-                onClicked(option)
+                selectOption(option)
             }
         }
     }
@@ -100,10 +137,10 @@ class GetAssetBottomSheet(
             title = title,
             description = description,
             iconRes = iconRes,
-            enabled = option in payload.availableOptions,
+            enabled = option in availableOptions,
             showArrowWhenEnabled = true
         ) {
-            onClicked(option)
+            selectOption(option)
         }
     }
 

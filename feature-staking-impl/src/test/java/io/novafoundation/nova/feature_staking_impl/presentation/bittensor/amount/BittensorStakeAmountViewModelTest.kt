@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
@@ -45,6 +46,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountFieldValidator
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -198,6 +201,21 @@ class BittensorStakeAmountViewModelTest {
 
     private val chooser = mock(AmountChooserMixin.Presentation::class.java)
 
+    private val fieldValidation = MutableStateFlow<FieldValidationResult>(FieldValidationResult.Ok)
+
+    private val amountValidator = object : EnoughAmountFieldValidator {
+        override fun observe(inputStream: Flow<String>) = fieldValidation
+    }
+
+    private lateinit var validationMaxProvider: MaxActionProvider
+
+    private val enoughAmountValidatorFactory = object : EnoughAmountValidatorFactory {
+        override fun create(maxAvailableProvider: MaxActionProvider, errorMessageRes: Int): EnoughAmountFieldValidator {
+            validationMaxProvider = maxAvailableProvider
+            return amountValidator
+        }
+    }
+
     private val chooserFactory = object : AmountChooserMixin.Factory {
         override fun create(
             scope: CoroutineScope,
@@ -205,9 +223,10 @@ class BittensorStakeAmountViewModelTest {
             maxActionProvider: MaxActionProvider?,
             fieldValidator: FieldValidator?
         ): AmountChooserMixin.Presentation {
-            val base = BaseAmountChooserProvider(scope, emptyFlow(), maxActionProvider)
+            val base = BaseAmountChooserProvider(scope, emptyFlow(), maxActionProvider, fieldValidator = fieldValidator)
             `when`(chooser.inputState).thenReturn(base.inputState)
             `when`(chooser.maxAction).thenReturn(base.maxAction)
+            `when`(chooser.fieldError).thenReturn(base.fieldError)
             return chooser
         }
     }
@@ -291,6 +310,7 @@ class BittensorStakeAmountViewModelTest {
             retryController = retryController,
             bittensorAmountFormatter = amountFormatter,
             amountChooserFactory = chooserFactory,
+            enoughAmountValidatorFactory = enoughAmountValidatorFactory,
             stakeValidationSystem = validationSystem,
             validationExecutor = validationExecutor,
             feeLoaderMixinFactory = feeLoaderFactory,
@@ -305,6 +325,70 @@ class BittensorStakeAmountViewModelTest {
     fun cleanUp() = runBlocking<Unit> {
         if (::viewModel.isInitialized) viewModel.coroutineContext.job.cancelAndJoin()
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `field validation uses the spendable Max after reserve and fee and disables Continue with the field reason`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            defaultValidator = estimateValidator
+            val wallet = details(1)
+            `when`(wallet.asset.transferableInPlanks).thenReturn(BigInteger("60490000"))
+            `when`(estimateFee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger("1040000"))
+            assets.emit(wallet)
+            viewModel.amountChanged("50.03")
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger("50030000000"))
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, FeeDisplay("network fee", null)))
+
+            val available = validationMaxProvider.maxAvailableBalance.first { it.actualBalance == BigInteger("49450000") }
+            assertEquals(BigInteger("49450000"), available.displayedBalance)
+            val failure = FieldValidationResult.Error("Not enough tokens", EnoughAmountFieldValidator.ERROR_TAG)
+            fieldValidation.value = failure
+            assertEquals(failure, viewModel.amountFieldError.first { it is FieldValidationResult.Error })
+            val button = viewModel.continueButtonState.first {
+                it is DescriptiveButtonState.Disabled && it.reason == "Not enough tokens"
+            }
+            assertEquals("Not enough tokens", (button as DescriptiveButtonState.Disabled).reason)
+            assertEquals("50.03", viewModel.amount.first())
+
+            fieldValidation.value = FieldValidationResult.Ok
+            assertEquals(FieldValidationResult.Ok, viewModel.amountFieldError.first { it is FieldValidationResult.Ok })
+        }
+    }
+
+    @Test
+    fun `exact spendable Max remains valid without deducting the fee reserve twice`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            defaultValidator = estimateValidator
+            val wallet = details(1)
+            `when`(wallet.asset.transferableInPlanks).thenReturn(BigInteger("60490000"))
+            `when`(estimateFee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger("1040000"))
+            assets.emit(wallet)
+            viewModel.amountChanged("0.04945")
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger("49450000"))
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, FeeDisplay("network fee", null)))
+
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Enabled("Continue") }
+            assertEquals(BigInteger("49450000"), validationMaxProvider.maxAvailableBalance.first().actualBalance)
+            assertEquals(FieldValidationResult.Ok, viewModel.amountFieldError.first())
+        }
+    }
+
+    @Test
+    fun `empty wallet keeps the field error ahead of funding and empty input asks for an amount`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            assets.emit(details(0))
+            viewModel.needsFunding.first { it }
+            viewModel.amountChanged("1")
+            fieldValidation.value = FieldValidationResult.Error("Not enough tokens", EnoughAmountFieldValidator.ERROR_TAG)
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Disabled("Not enough tokens") }
+            assertEquals(BigInteger.ZERO, validationMaxProvider.maxAvailableBalance.first().actualBalance)
+
+            viewModel.amountChanged("")
+            fieldValidation.value = FieldValidationResult.Ok
+            viewModel.continueButtonState.first { it == DescriptiveButtonState.Disabled("Enter amount") }
+        }
     }
 
     @Test

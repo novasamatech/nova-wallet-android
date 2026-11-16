@@ -7,12 +7,18 @@ import java.math.BigInteger
  * that reject trades consuming more than `reserve / XYK.MaxInRatio` of the pool
  *
  * The limits are expressed against the quoted amount of the edge:
- * [maxAllowedAmountIn] bounds the input amount when quoting with [SwapDirection.SPECIFIED_IN],
- * [maxAllowedAmountOut] bounds the output amount when quoting with [SwapDirection.SPECIFIED_OUT]
+ * [minAllowedAmountIn] and [maxAllowedAmountIn] bound the input amount for [SwapDirection.SPECIFIED_IN],
+ * [minAllowedAmountOut] and [maxAllowedAmountOut] bound the output amount for [SwapDirection.SPECIFIED_OUT].
+ * Boundaries are inclusive and expressed in the corresponding asset's base units.
  *
- * Both default to `null`, meaning the edge does not limit the trade size
+ * `null` means there is no applicable bound, not that loading failed. Implementations must propagate
+ * failures when a required runtime constant or pool state is unavailable.
  */
 interface TradeAmountLimitedEdge {
+
+    suspend fun minAllowedAmountIn(): BigInteger? = null
+
+    suspend fun minAllowedAmountOut(): BigInteger? = null
 
     suspend fun maxAllowedAmountIn(): BigInteger? = null
 

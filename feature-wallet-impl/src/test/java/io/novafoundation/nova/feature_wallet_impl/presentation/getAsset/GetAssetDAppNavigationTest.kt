@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.getAsset
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import org.mockito.ArgumentCaptor
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -18,6 +21,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
@@ -29,7 +33,7 @@ import org.mockito.Mockito
 class GetAssetDAppNavigationTest {
 
     private val firstService = GetAssetOption.DApp(
-        name = "ExampleSwap",
+        name = "ChangeNOW",
         url = "https://swap.example/buy?asset=tao",
         supportedTokens = listOf("DOT", "USDC").map { it.asTokenSymbol() }
     )
@@ -67,7 +71,9 @@ class GetAssetDAppNavigationTest {
         )
         val assetFlow = flowOf(asset)
         val optionsUseCase = Mockito.mock(AssetGetOptionsUseCase::class.java)
-        Mockito.`when`(optionsUseCase.observeAssetGetOptionsForSelectedAccount(assetFlow)).thenReturn(flowOf(options))
+        Mockito.`when`(
+            optionsUseCase.observeAssetGetOptionsForSelectedAccount(Mockito.any<Flow<Chain.Asset?>>() ?: assetFlow)
+        ).thenReturn(flowOf(options))
 
         val openedUrl = CompletableDeferred<String>()
         val router = Mockito.mock(WalletRouter::class.java)
@@ -84,6 +90,7 @@ class GetAssetDAppNavigationTest {
         val actionFactory = Mockito.mock(ActionAwaitableMixin.Factory::class.java)
         Mockito.`when`(actionFactory.create<GetAssetBottomSheet.Payload, GetAssetOption>()).thenReturn(selection)
         val buttonFilter = flowOf(true)
+        val analytics = Mockito.mock(AnalyticsService::class.java)
 
         val mixin = RealGetAssetOptionsMixin(
             assetFlow = assetFlow,
@@ -95,7 +102,8 @@ class GetAssetDAppNavigationTest {
             actionAwaitableFactory = actionFactory,
             additionalButtonFilter = buttonFilter,
             scope = this,
-            showWhenNoOptions = false
+            showWhenNoOptions = false,
+            analyticsService = analytics
         )
 
         try {
@@ -107,6 +115,13 @@ class GetAssetDAppNavigationTest {
             assertEquals(options, selection.payload.availableOptions)
             Mockito.verify(router, Mockito.only()).openDAppBrowser(url)
             Mockito.verifyNoInteractions(chainRegistry, selectedAccountUseCase)
+            val eventCaptor = ArgumentCaptor.forClass(AnalyticsEvent::class.java)
+            Mockito.verify(analytics, Mockito.only()).track(eventCaptor.capture() ?: AnalyticsEvent.SessionStarted)
+            assertEquals("asset_funding_dapp_opened", eventCaptor.value.name)
+            assertEquals(
+                mapOf("provider" to selected.name, "asset" to "TAO", "chain_id" to asset.chainId),
+                eventCaptor.value.properties
+            )
         } finally {
             coroutineContext.cancelChildren()
         }
