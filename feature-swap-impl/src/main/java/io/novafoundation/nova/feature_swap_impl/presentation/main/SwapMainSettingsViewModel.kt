@@ -143,6 +143,7 @@ import java.math.BigDecimal
 import kotlin.time.Duration.Companion.seconds
 import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 private val QUOTE_LOADING_TIMEOUT = 30.seconds
 
@@ -464,6 +465,10 @@ class SwapMainSettingsViewModel(
                 return@onEach
             }
             selectionRequestId = null
+            if (response.clearOpposite) {
+                amountInInput.clearInput()
+                amountOutInput.clearInput()
+            }
             swapSettingsState.applyAssetSelection(asset, response.selectingPay, response.clearOpposite)
             rememberSelection()
         }.launchIn(viewModelScope)
@@ -715,8 +720,12 @@ class SwapMainSettingsViewModel(
     }
 
     private fun applyFlipToUi(previousSettings: SwapSettings, newSettings: SwapSettings) {
-        val amount = previousSettings.amount ?: return
         val swapDirection = previousSettings.swapDirection ?: return
+        val amount = previousSettings.amount
+        if (amount == null) {
+            swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+            return
+        }
 
         when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> {
@@ -781,8 +790,14 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupPerSwapSettingQuoting() {
+        var previousSettings: SwapSettings? = null
         combine(swapSettings, active) { settings, isActive -> settings to isActive }
             .onEach { (settings, isActive) ->
+                if (settings != swapSettings.first()) return@onEach
+
+                settings.invalidateCalculatedInput(previousSettings, amountInInput, amountOutInput)
+                previousSettings = settings
+
                 if (isActive) performQuote(settings, shouldShowLoading = true, origin = QuoteRefreshOrigin.USER_INPUT)
             }.launchIn(viewModelScope)
     }
@@ -804,14 +819,16 @@ class SwapMainSettingsViewModel(
             }.launchIn(viewModelScope)
     }
 
-    private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
+    private fun performQuote(settings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
+        if (!active.value) return
+
         quotingJob?.cancel()
         if (shouldShowLoading) {
             feeSnapshot.value = null
             quotingState.value = QuotingState.Loading
         }
         quotingJob = launch {
-            val swapQuoteArgs = swapSettings.toQuoteArgs(
+            val swapQuoteArgs = settings.toQuoteArgs(
                 tokenIn = { assetInFlow.ensureToken(it) },
                 tokenOut = { assetOutFlow.ensureToken(it) },
             ) ?: run {
@@ -823,9 +840,15 @@ class SwapMainSettingsViewModel(
                 swapInteractor.quote(swapQuoteArgs, swapFlowScope)
             } ?: Result.failure(IOException("Swap quote timed out"))
 
+            val selectedMetaAccountId = selectedAccountUseCase.getSelectedMetaAccount().id
+            val currentSettings = swapSettings.first()
             coroutineContext.ensureActive()
+            // A quote can finish after the form changes or before it resets for the newly selected wallet.
+            if (!active.value || settings != currentSettings) return@launch
+            if (swapQuoteArgs.metaAccountId != selectedMetaAccountId || selectedMetaAccountId != initializedMetaAccountId) return@launch
+
             quotingState.value = quote.fold(
-                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin, swapSettings) },
+                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin, settings) },
                 onFailure = {
                     if (it is CancellationException) {
                         throw it
@@ -835,7 +858,7 @@ class SwapMainSettingsViewModel(
                 }
             )
 
-            handleNewQuote(quote, swapSettings)
+            handleNewQuote(quote, settings)
         }
     }
 
@@ -857,10 +880,7 @@ class SwapMainSettingsViewModel(
                 SwapDirection.SPECIFIED_OUT -> amountInInput.updateInput(quote.assetIn, quote.planksIn)
             }
         }.onFailure {
-            when (swapSettings.swapDirection!!) {
-                SwapDirection.SPECIFIED_OUT -> amountInInput.clearInput()
-                SwapDirection.SPECIFIED_IN -> amountOutInput.clearInput()
-            }
+            swapSettings.swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
         }
     }
 
@@ -868,17 +888,19 @@ class SwapMainSettingsViewModel(
         tokenIn: (Chain.Asset) -> Token,
         tokenOut: (Chain.Asset) -> Token
     ): SwapQuoteArgs? {
-        return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
-            SwapQuoteArgs(
-                tokenIn = tokenIn(assetIn!!),
-                tokenOut = tokenOut(assetOut!!),
-                amount = amount!!,
-                swapDirection = swapDirection!!,
-                metaAccountId = initializedMetaAccountId,
-            )
-        } else {
-            null
-        }
+        val assetIn = assetIn ?: return null
+        val assetOut = assetOut ?: return null
+        val direction = swapDirection ?: return null
+        val amount = amount?.takeIf { it.isPositive() } ?: return null
+        val metaAccountId = initializedMetaAccountId
+
+        return SwapQuoteArgs(
+            tokenIn = tokenIn(assetIn),
+            tokenOut = tokenOut(assetOut),
+            amount = amount,
+            swapDirection = direction,
+            metaAccountId = metaAccountId,
+        )
     }
 
     private fun handleInputChanges(
@@ -895,10 +917,6 @@ class SwapMainSettingsViewModel(
                 if (planks == null && settings.amount == null) return@onEach
                 swapSettingsState.setAmount(planks, swapDirection)
             }.launchIn(viewModelScope)
-    }
-
-    private fun SwapAmountInputMixin.clearInput() {
-        inputState.value = InputState(value = "", initiatedByUser = false, inputKind = InputKind.REGULAR)
     }
 
     private fun SwapAmountInputMixin.updateInput(chainAsset: Chain.Asset, planks: Balance) {
@@ -991,4 +1009,29 @@ class SwapMainSettingsViewModel(
 
         super.onCleared()
     }
+}
+
+internal fun SwapSettings.invalidateCalculatedInput(
+    previousSettings: SwapSettings?,
+    amountInInput: SwapAmountInputMixin,
+    amountOutInput: SwapAmountInputMixin,
+) {
+    val amountInputsChanged = assetIn != previousSettings?.assetIn || assetOut != previousSettings?.assetOut ||
+        amount != previousSettings?.amount || swapDirection != previousSettings?.swapDirection
+
+    if (amountInputsChanged) {
+        swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+    }
+}
+
+private fun SwapDirection?.clearCalculatedInput(amountInInput: SwapAmountInputMixin, amountOutInput: SwapAmountInputMixin) {
+    when (this) {
+        SwapDirection.SPECIFIED_IN -> amountOutInput.clearInput()
+        SwapDirection.SPECIFIED_OUT -> amountInInput.clearInput()
+        null -> Unit
+    }
+}
+
+private fun SwapAmountInputMixin.clearInput() {
+    inputState.value = InputState(value = "", initiatedByUser = false, inputKind = InputKind.REGULAR)
 }
