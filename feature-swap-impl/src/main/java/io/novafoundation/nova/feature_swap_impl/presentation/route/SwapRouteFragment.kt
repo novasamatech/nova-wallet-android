@@ -9,10 +9,11 @@ import androidx.recyclerview.widget.ConcatAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.domain.onLoaded
-import io.novafoundation.nova.common.domain.onNotLoaded
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
@@ -66,12 +67,14 @@ class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRo
         observeRetries(viewModel)
 
         viewModel.swapRoute.observe { routeState ->
-            routeState.onLoaded {
-                binder.swapRouteProgress.makeGone()
-                routeAdapter.submitList(it)
-            }.onNotLoaded {
-                binder.swapRouteProgress.makeVisible()
-                routeAdapter.submitList(emptyList())
+            binder.swapRouteProgress.setVisible(routeState.isLoading)
+            routeAdapter.submitList(routeState.dataOrNull.orEmpty())
+
+            if (routeState is ExtendedLoadingState.Error) {
+                errorDialog(requireContext(), onConfirm = viewModel::backClicked) {
+                    setMessage(R.string.common_undefined_error_message)
+                    setOnCancelListener { viewModel.backClicked() }
+                }
             }
         }
     }

@@ -3256,7 +3256,6 @@ claimed</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_chart_nothing_to_follow">Nothing to follow</string>
     <string name="swap_chart_select_token">Select a token to see its price history</string>
-    <string name="swap_chart_show">Show price chart</string>
     <string name="swap_failure_pool_trade_minimum_title">Amount below pool minimum</string>
     <string name="swap_failure_pool_trade_minimum_message">This swap route requires at least %1$s at one of its liquidity pools. Increase the amount or choose another route.</string>
     <string name="swap_failure_pool_trade_limits_unavailable_title">Unable to verify pool limits</string>

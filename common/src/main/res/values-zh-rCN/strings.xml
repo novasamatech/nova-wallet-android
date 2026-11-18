@@ -2468,7 +2468,6 @@
     <string name="swap_balance_label">余额：%s</string>
     <string name="swap_chart_nothing_to_follow">没有可跟踪的数据</string>
     <string name="swap_chart_select_token">选择一个代币以查看其价格历史</string>
-    <string name="swap_chart_show">显示价格图表</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">无法验证交易状态。在开始新的兑换前，请检查您的交易历史记录。</string>
     <string name="swap_execution_unknown_title">状态不可用</string>

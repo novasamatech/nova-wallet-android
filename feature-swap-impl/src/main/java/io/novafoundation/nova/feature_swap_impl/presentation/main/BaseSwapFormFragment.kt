@@ -155,7 +155,6 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
     }
 
     private fun observeChart(viewModel: SwapMainSettingsViewModel) {
-        viewModel.chart.enabled.observe { binder.swapChart.root.setVisible(it) }
         viewModel.chart.expanded.observe { expanded ->
             val state = if (expanded) ExpandableViewState.EXPANDED else ExpandableViewState.COLLAPSED
             if (binder.swapChart.root.currentState() != state) {

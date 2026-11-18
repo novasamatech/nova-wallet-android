@@ -2468,7 +2468,6 @@
     <string name="swap_balance_label">残高：%s</string>
     <string name="swap_chart_nothing_to_follow">表示できるデータがありません</string>
     <string name="swap_chart_select_token">価格履歴を表示するトークンを選択してください</string>
-    <string name="swap_chart_show">価格チャートを表示</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">トランザクションのステータスを確認できませんでした。別のスワップを開始する前に、トランザクション履歴を確認してください。</string>
     <string name="swap_execution_unknown_title">ステータスを利用できません</string>

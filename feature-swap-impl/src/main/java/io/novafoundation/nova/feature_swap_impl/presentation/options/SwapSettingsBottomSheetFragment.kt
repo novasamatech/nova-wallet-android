@@ -77,7 +77,6 @@ class SwapSettingsBottomSheetFragment : BaseBottomSheetFragment<SwapSettingsShee
                 }
             }
         }
-        binder.swapSettingsChart.field.setOnCheckedChangeListener { _, checked -> viewModel.setChartEnabled(checked) }
         setupPresets()
     }
 
@@ -91,7 +90,6 @@ class SwapSettingsBottomSheetFragment : BaseBottomSheetFragment<SwapSettingsShee
             fromT = { (it as? SwapSlippageSelection.Custom)?.input.orEmpty() }
         )
         binder.swapSettingsCustomInput.observeErrors(viewModel.slippageInputValidationResult, scope)
-        viewModel.chartEnabled.observe { binder.swapSettingsChart.field.isChecked = it }
         viewModel.selectedTip.observe(::updatePresetSelection)
         viewModel.slippageWarningState.observe(binder.swapSettingsWarning::setTextOrHide)
         viewModel.buttonState.observe { binder.swapSettingsApply.setState(it) }

@@ -2510,7 +2510,6 @@
     <string name="swap_balance_label">Баланс: %s</string>
     <string name="swap_chart_nothing_to_follow">Нет данных для отслеживания</string>
     <string name="swap_chart_select_token">Выберите токен, чтобы посмотреть историю его цены</string>
-    <string name="swap_chart_show">Показать график цены</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">Не удалось проверить статус транзакции. Проверьте историю транзакций, прежде чем начинать новый обмен.</string>
     <string name="swap_execution_unknown_title">Статус недоступен</string>

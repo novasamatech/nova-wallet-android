@@ -2468,7 +2468,6 @@
     <string name="swap_balance_label">Số dư: %s</string>
     <string name="swap_chart_nothing_to_follow">Không có dữ liệu để theo dõi</string>
     <string name="swap_chart_select_token">Chọn một token để xem lịch sử giá của token đó</string>
-    <string name="swap_chart_show">Hiển thị biểu đồ giá</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">Không thể xác minh trạng thái giao dịch. Hãy kiểm tra lịch sử giao dịch trước khi bắt đầu một lần swap khác.</string>
     <string name="swap_execution_unknown_title">Không có trạng thái</string>

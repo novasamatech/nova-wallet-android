@@ -85,7 +85,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidat
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationPayloadMapper
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
@@ -225,10 +224,6 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    val swapRouteState = quotingState
-        .map { quoteState -> quoteState.toSwapRouteState() }
-        .shareInBackground()
-
     val swapExecutionTime = quotingState
         .map { it.toExecutionEstimate() }
         .shareInBackground()
@@ -279,6 +274,15 @@ class SwapMainSettingsViewModel(
             )
         )
     )
+
+    val swapRouteState = combine(quotingState, feeSnapshot, feeMixin.fee) { quote, snapshot, fee ->
+        when {
+            quote !is QuotingState.Loaded -> quote.toLoadingState { null }
+            fee is FeeStatus.Error -> ExtendedLoadingState.Loaded(null)
+            fee !is FeeStatus.Loaded || snapshot?.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) != true -> ExtendedLoadingState.Loading
+            else -> ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(snapshot.quote.quote))
+        }
+    }.shareInBackground()
 
     val minimumReceived = combine(quotingState, feeSnapshot) { quote, snapshot ->
         snapshot?.takeIf { quote is QuotingState.Loaded && it.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) }?.let {
@@ -845,10 +849,6 @@ class SwapMainSettingsViewModel(
 
             handleNewQuote(quote, settings)
         }
-    }
-
-    private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
-        return toLoadingState { swapRouteFormatter.formatSwapRoute(it) }
     }
 
     private fun QuotingState.toExecutionEstimate(): ExtendedLoadingState<String?> {

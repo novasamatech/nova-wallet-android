@@ -2482,7 +2482,6 @@
     <string name="swap_balance_label">Solde : %s</string>
     <string name="swap_chart_nothing_to_follow">Rien à suivre</string>
     <string name="swap_chart_select_token">Sélectionnez un token pour voir l’historique de son prix</string>
-    <string name="swap_chart_show">Afficher le graphique des prix</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">Le statut de la transaction n’a pas pu être vérifié. Consultez votre historique des transactions avant de commencer un autre échange.</string>
     <string name="swap_execution_unknown_title">Statut indisponible</string>

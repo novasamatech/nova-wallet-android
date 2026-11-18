@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main.chart
 
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -64,8 +65,6 @@ class SwapChartMixinTest {
 
     private val selectedCurrency = MutableStateFlow(usd)
 
-    private val chartEnabled = MutableStateFlow(true)
-
     private val pay = asset(0, "DOT", "polkadot")
 
     private val receive = asset(1, "USDT", "tether")
@@ -111,7 +110,6 @@ class SwapChartMixinTest {
     @Before
     fun setUp() {
         `when`(currencies.observeSelectCurrency()).thenReturn(selectedCurrency)
-        `when`(preferences.enabled()).thenReturn(chartEnabled)
         `when`(preferences.isExpanded()).thenReturn(true)
         `when`(tokens.observeToken(pay)).thenReturn(payToken)
         `when`(tokens.observeToken(receive)).thenReturn(receiveToken)
@@ -264,15 +262,17 @@ class SwapChartMixinTest {
     }
 
     @Test
-    fun `disabled chart waits until enabled to load selected token and period`() = runBlocking<Unit> {
-        chartEnabled.value = false
-        val mixin = create()
-        mixin.selectPeriod(swapChartPeriods.indexOf(PricePeriod.YEAR))
-        chartEnabled.value = true
-        val plot = mixin.loaded()
-        assertEquals(PricePeriod.YEAR, plot.context.period)
-        verify(charts).chartFlow("tether", usd, PricePeriod.YEAR)
-        verify(charts, never()).chartFlow("tether", usd, PricePeriod.WEEK)
+    fun `chart loads with a legacy disabled preference and keeps its collapsed state`() = runBlocking<Unit> {
+        val storage = mock(Preferences::class.java)
+        `when`(storage.booleanFlow("swap.chart.enabled", defaultValue = true)).thenReturn(flowOf(false))
+        `when`(storage.getBoolean("swap.chart.enabled", defaultValue = true)).thenReturn(false)
+        val chartPreferences = SwapChartPreferences(storage)
+        val factory = SwapChartMixinFactory(charts, currencies, tokens, chartPreferences, formatter)
+
+        val mixin = factory.create(settings, initiallyCollapsed = false, scope = scope)
+
+        assertEquals(receive, mixin.loaded().context.asset)
+        assertFalse(withTimeout(5_000) { mixin.expanded.first() })
     }
 
     private fun create(initiallyCollapsed: Boolean = false) = factory.create(settings, initiallyCollapsed, scope)

@@ -2482,7 +2482,6 @@
     <string name="swap_balance_label">Egyenleg: %s</string>
     <string name="swap_chart_nothing_to_follow">Nincs követhető adat</string>
     <string name="swap_chart_select_token">Válasszon tokent az árfolyamelőzmények megtekintéséhez</string>
-    <string name="swap_chart_show">Árfolyamdiagram megjelenítése</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">A tranzakció állapotát nem sikerült ellenőrizni. Mielőtt újabb cserét indítana, ellenőrizze a tranzakciós előzményeit.</string>
     <string name="swap_execution_unknown_title">Az állapot nem érhető el</string>

@@ -2482,7 +2482,6 @@
     <string name="swap_balance_label">Bakiye: %s</string>
     <string name="swap_chart_nothing_to_follow">Takip edilecek bir şey yok</string>
     <string name="swap_chart_select_token">Fiyat geçmişini görmek için bir token seçin</string>
-    <string name="swap_chart_show">Fiyat grafiğini göster</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">İşlem durumu doğrulanamadı. Yeni bir takas başlatmadan önce işlem geçmişinizi kontrol edin.</string>
     <string name="swap_execution_unknown_title">Durum kullanılamıyor</string>

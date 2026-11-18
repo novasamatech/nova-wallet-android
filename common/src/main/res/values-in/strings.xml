@@ -2468,7 +2468,6 @@
     <string name="swap_balance_label">Saldo: %s</string>
     <string name="swap_chart_nothing_to_follow">Tidak ada yang dapat diikuti</string>
     <string name="swap_chart_select_token">Pilih token untuk melihat riwayat harganya</string>
-    <string name="swap_chart_show">Tampilkan grafik harga</string>
     <string name="swap_chart_ticker">%1$s · %2$s</string>
     <string name="swap_execution_interrupted">Status transaksi tidak dapat diverifikasi. Periksa riwayat transaksi Anda sebelum memulai swap lainnya.</string>
     <string name="swap_execution_unknown_title">Status tidak tersedia</string>

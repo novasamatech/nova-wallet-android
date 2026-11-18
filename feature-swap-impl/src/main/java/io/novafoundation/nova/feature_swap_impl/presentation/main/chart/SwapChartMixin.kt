@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -81,17 +80,13 @@ class SwapChartMixin(
     ) { asset, currency, period -> SwapChartContext(asset, currency, period) }
         .distinctUntilChanged()
 
-    val enabled = preferences.enabled()
-
     val expanded = combine(
         manualExpanded,
         keyboardVisible
     ) { expanded, keyboardVisible -> expanded && !keyboardVisible }
         .distinctUntilChanged()
 
-    val plot = enabled.flatMapLatest { enabled ->
-        if (enabled) context.flatMapLatest(::observePlot) else emptyFlow()
-    }
+    val plot = context.flatMapLatest(::observePlot)
         .shareInBackground()
 
     val header = combine(
