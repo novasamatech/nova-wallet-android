@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     android:orientation="vertical"
     android:background="@drawable/bg_swap_screen">
 
@@ -71,6 +72,7 @@
         android:paddingBottom="16dp">
 
         <LinearLayout
+            android:id="@+id/swapFormContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -83,6 +85,7 @@
                 android:layout_marginBottom="16dp" />
 
             <LinearLayout
+                android:id="@+id/swapMainSettingsPayHeader"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:gravity="center_vertical">
@@ -302,12 +305,21 @@
                 android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/swapMainSettingsContinue"
+
+    <FrameLayout
+        android:id="@+id/swapContinueContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:enabled="false"
-        tools:text="Enter amount" />
+        android:layout_height="wrap_content">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/swapMainSettingsContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            tools:text="Enter amount" />
+
+    </FrameLayout>
+
 </LinearLayout>

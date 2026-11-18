@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import android.os.Bundle
+import androidx.core.view.doOnLayout
+import androidx.core.view.doOnPreDraw
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import androidx.core.text.buildSpannedString
 import androidx.core.text.color
@@ -19,12 +22,11 @@ import android.transition.Fade
 import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.view.View
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
-import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -57,22 +59,11 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
     override fun onResume() {
         super.onResume()
         viewModel.setActive(true)
-        showInitialKeyboard()
     }
 
-    private fun showInitialKeyboard() {
-        binder.swapMainSettingsPayInput.post {
-            viewLifecycleOwner.lifecycleScope.launch {
-                val input = when (viewModel.initialKeyboardDirection()) {
-                    SwapDirection.SPECIFIED_IN -> binder.swapMainSettingsPayInput.amountInput
-                    SwapDirection.SPECIFIED_OUT -> binder.swapMainSettingsReceiveInput.amountInput
-                }
-                if (input.isShown && viewModel.consumeInitialKeyboard()) {
-                    input.requestFocus()
-                    input.showSoftKeyboard()
-                }
-            }
-        }
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        binder.root.requestFocus()
     }
 
     override fun onPause() {
@@ -82,9 +73,9 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
 
     override fun applyInsets(rootView: View) {
         if (display == SwapFormDisplay.TAB) {
-            rootView.applyStatusBarInsets()
+            rootView.applyStatusBarInsets(consume = false)
         } else {
-            rootView.applySystemBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
+            rootView.applySystemBarInsets(consume = false, imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
         }
     }
 
@@ -92,6 +83,7 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
 
     override fun initViews() {
         setupChart()
+        setupKeyboard()
         binder.swapMainSettingsContinue.prepareForProgress(this)
         setupHeader()
         binder.swapMainSettingsRetry.setOnClickListener { viewModel.retryQuote() }
@@ -103,8 +95,14 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         }
         binder.swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        binder.swapMainSettingsPayInput.setSelectTokenClickListener { viewModel.selectPayToken() }
-        binder.swapMainSettingsReceiveInput.setSelectTokenClickListener { viewModel.selectReceiveToken() }
+        binder.swapMainSettingsPayInput.setSelectTokenClickListener {
+            finishEditing()
+            viewModel.selectPayToken()
+        }
+        binder.swapMainSettingsReceiveInput.setSelectTokenClickListener {
+            finishEditing()
+            viewModel.selectReceiveToken()
+        }
         binder.swapMainSettingsFlip.setOnClickListener {
             viewModel.flipAssets()
         }
@@ -149,9 +147,48 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         }
         binder.swapChart.swapChartHeader.setOnClickListener { viewModel.chart.toggleExpanded() }
         binder.swapChart.swapChartRetry.setOnClickListener { viewModel.chart.retry() }
-        viewModel.chart.setKeyboardVisible(binder.root.isKeyboardVisible())
-        viewLifecycleOwner.lifecycle.setKeyboardVisibilityListener(binder.swapMainSettingsScroll) {
-            viewModel.chart.setKeyboardVisible(it)
+    }
+
+    private fun setupKeyboard() {
+        val doneListener = TextView.OnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                finishEditing()
+                true
+            } else {
+                false
+            }
+        }
+        binder.swapMainSettingsPayInput.amountInput.setOnEditorActionListener(doneListener)
+        binder.swapMainSettingsReceiveInput.amountInput.setOnEditorActionListener(doneListener)
+
+        renderKeyboard(binder.root.isKeyboardVisible())
+        viewLifecycleOwner.lifecycle.setKeyboardVisibilityListener(binder.swapMainSettingsScroll, ::renderKeyboard)
+    }
+
+    private fun finishEditing() {
+        hideKeyboard()
+        binder.root.requestFocus()
+    }
+
+    private fun renderKeyboard(visible: Boolean) {
+        binder.swapContinueContainer.setVisible(!visible)
+        binder.swapChart.swapChartHeader.isEnabled = !visible
+        viewModel.chart.setKeyboardVisible(visible)
+        if (visible) {
+            scrollToPayHeader()
+        } else {
+            binder.swapFormContent.minimumHeight = 0
+        }
+    }
+
+    private fun scrollToPayHeader() {
+        binder.swapMainSettingsScroll.doOnPreDraw { scroll ->
+            if (!binder.root.isKeyboardVisible()) return@doOnPreDraw
+
+            val payTop = binder.swapMainSettingsPayHeader.top
+            // A short form (e.g. before a quote) still needs enough scroll range to reach You pay.
+            binder.swapFormContent.minimumHeight = scroll.height - scroll.paddingBottom - scroll.paddingTop + payTop
+            scroll.doOnLayout { it.scrollTo(0, binder.swapMainSettingsPayHeader.top) }
         }
     }
 
@@ -160,7 +197,7 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         viewModel.chart.expanded.observe { expanded ->
             val state = if (expanded) ExpandableViewState.EXPANDED else ExpandableViewState.COLLAPSED
             if (binder.swapChart.root.currentState() != state) {
-                animateDetailsTransition()
+                if (!binder.root.isKeyboardVisible()) animateDetailsTransition()
                 binder.swapChart.root.setState(state)
             }
             binder.swapChart.root.setBackgroundResource(if (expanded) R.drawable.bg_block_16 else R.drawable.bg_block_12)
@@ -241,8 +278,6 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
 
         viewModel.feeMixin.setupFeeLoading(binder.swapMainSettingsDetailsNetworkFee)
 
-        viewModel.amountInInput.assetModel.observe { if (it.showInput) showInitialKeyboard() }
-        viewModel.amountOutInput.assetModel.observe { if (it.showInput) showInitialKeyboard() }
         viewModel.receiveBalance.observe { binder.swapMainSettingsReceiveBalance.text = it }
         viewModel.quoteProblem.observe(binder.swapMainSettingsAlert::setMessageOrHide)
         viewModel.quoteFailed.observe { binder.swapMainSettingsRetry.setVisible(it) }
