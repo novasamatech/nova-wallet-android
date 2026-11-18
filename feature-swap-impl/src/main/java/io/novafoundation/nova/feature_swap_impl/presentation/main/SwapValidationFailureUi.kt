@@ -305,7 +305,7 @@ fun highPriceImpact(
             message = resourceManager.getString(R.string.high_price_impact_detacted_message),
             customStyle = R.style.AccentNegativeAlertDialogTheme_Reversed,
             okAction = CustomDialogDisplayer.Payload.DialogAction(
-                title = resourceManager.getString(R.string.common_continue),
+                title = resourceManager.getString(R.string.common_proceed),
                 action = {
                     actions.resumeFlow()
                 }

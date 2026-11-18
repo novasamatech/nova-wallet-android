@@ -273,13 +273,14 @@
                             android:id="@+id/swapMainSettingsPriceImpact"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:title="@string/swap_price_impact_label" />
+                            android:visibility="gone"
+                            app:title="@string/swap_price_difference_title" />
 
                         <io.novafoundation.nova.common.view.TableCellView
                             android:id="@+id/swapMainSettingsSlippage"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:title="@string/swap_max_slippage"
+                            app:title="@string/swap_slippage_title"
                             app:titleIcon="@drawable/ic_info" />
 
                         <io.novafoundation.nova.common.view.TableCellView
@@ -291,15 +292,6 @@
                     </io.novafoundation.nova.common.view.TableView>
                 </FrameLayout>
             </io.novafoundation.nova.common.view.ExpandableView>
-            <TextView
-                android:id="@+id/swapNovaFeeDisclaimer"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
     <io.novafoundation.nova.common.view.PrimaryButton

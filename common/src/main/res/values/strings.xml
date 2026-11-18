@@ -472,7 +472,7 @@ claimed</string>
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 
 
-    <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
+    <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size or splitting your trade into multiple transactions.</string>
 
     <string name="popular_dapps_title">Popular</string>
 
@@ -1175,6 +1175,7 @@ claimed</string>
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Select a token to pay</string>
     <string name="swap_main_settings_asset_out_not_selecting_button_state">Select a token to receive</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
+    <string name="swap_not_enough_asset">Not enough %s</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
 
     <string name="swap_field_validation_not_enough_liquidity">Not enough liquidity</string>

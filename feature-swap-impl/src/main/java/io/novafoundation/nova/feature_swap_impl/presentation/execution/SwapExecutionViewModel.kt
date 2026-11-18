@@ -45,6 +45,8 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationP
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -66,6 +68,7 @@ class SwapExecutionViewModel(
     private val resourceManager: ResourceManager,
     private val router: SwapRouter,
     private val chainRegistry: ChainRegistry,
+    private val tokenFormatter: TokenFormatter,
     private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
@@ -242,7 +245,7 @@ class SwapExecutionViewModel(
     }
 
     private suspend fun SwapProgress.StepStarted.toUi(swapState: SwapState): SwapProgressModel.InProgress {
-        val stepDescription = step.displayData.createInProgressLabel()
+        val stepDescription = step.displayData.formatStep()
         val remainingExecutionTime = swapState.quote.executionEstimate.remainingTimeWhenExecuting(step.index)
 
         return SwapProgressModel.InProgress(
@@ -282,7 +285,7 @@ class SwapExecutionViewModel(
     private suspend fun stepModels(state: SwapState, failedIndex: Int, unknown: Boolean): List<SwapProgressModel.Step> {
         return state.fee.segments.mapIndexed { index, segment ->
             SwapProgressModel.Step(
-                label = segment.operation.constructDisplayData(segment.netFlow).createErrorLabel(),
+                label = segment.operation.constructDisplayData(segment.netFlow).formatStep(),
                 status = when {
                     index < failedIndex -> SwapProgressModel.StepStatus.COMPLETED
                     index > failedIndex -> SwapProgressModel.StepStatus.PENDING
@@ -313,7 +316,7 @@ class SwapExecutionViewModel(
 
     private suspend fun SwapProgress.Failure.createSwapFailureMessage(): String {
         val failedStepNumber = attemptedStep.index + 1
-        val label = attemptedStep.displayData.createErrorLabel()
+        val label = attemptedStep.displayData.formatStep(forFailureMessage = true)
 
         val genericErrorMessage = resourceManager.getString(
             R.string.swap_execution_failure,
@@ -342,59 +345,31 @@ class SwapExecutionViewModel(
         }
     }
 
-    private suspend fun AtomicOperationDisplayData.createErrorLabel(): String {
+    private suspend fun AtomicOperationDisplayData.formatStep(forFailureMessage: Boolean = false): String {
         return when (this) {
             is AtomicOperationDisplayData.Swap -> {
-                val fromAsset = chainRegistry.asset(from.chainAssetId)
+                val (chain, fromAsset) = chainRegistry.chainWithAsset(from.chainAssetId)
                 val toAsset = chainRegistry.asset(to.chainAssetId)
-                val on = chainRegistry.getChain(fromAsset.chainId)
 
+                val label = if (forFailureMessage) R.string.swap_execution_failure_swap_label else R.string.swap_execution_progress_swap_label
                 resourceManager.getString(
-                    R.string.swap_execution_failure_swap_label,
-                    fromAsset.symbol.value,
-                    toAsset.symbol.value,
-                    on.name
+                    label,
+                    tokenFormatter.formatToken(from.amount, fromAsset),
+                    tokenFormatter.formatToken(to.amount, toAsset),
+                    chain.name
                 )
             }
 
             is AtomicOperationDisplayData.Transfer -> {
                 val (chainFrom, assetFrom) = chainRegistry.chainWithAsset(from)
                 val chainTo = chainRegistry.getChain(to.chainId)
+                val formattedAmount = tokenFormatter.formatToken(amount, assetFrom)
 
-                resourceManager.getString(
-                    R.string.swap_execution_failure_transfer_label,
-                    assetFrom.symbol.value,
-                    chainFrom.name,
-                    chainTo.name,
-                )
-            }
-        }
-    }
-
-    private suspend fun AtomicOperationDisplayData.createInProgressLabel(): String {
-        return when (this) {
-            is AtomicOperationDisplayData.Swap -> {
-                val fromAsset = chainRegistry.asset(from.chainAssetId)
-                val toAsset = chainRegistry.asset(to.chainAssetId)
-                val on = chainRegistry.getChain(fromAsset.chainId)
-
-                resourceManager.getString(
-                    R.string.swap_execution_progress_swap_label,
-                    fromAsset.symbol.value,
-                    toAsset.symbol.value,
-                    on.name
-                )
-            }
-
-            is AtomicOperationDisplayData.Transfer -> {
-                val (_, assetFrom) = chainRegistry.chainWithAsset(from)
-                val chainTo = chainRegistry.getChain(to.chainId)
-
-                resourceManager.getString(
-                    R.string.swap_execution_progress_transfer_label,
-                    assetFrom.symbol.value,
-                    chainTo.name
-                )
+                if (forFailureMessage) {
+                    resourceManager.getString(R.string.swap_execution_failure_transfer_label, formattedAmount, chainFrom.name, chainTo.name)
+                } else {
+                    resourceManager.getString(R.string.swap_execution_progress_transfer_label, formattedAmount, chainTo.name)
+                }
             }
         }
     }

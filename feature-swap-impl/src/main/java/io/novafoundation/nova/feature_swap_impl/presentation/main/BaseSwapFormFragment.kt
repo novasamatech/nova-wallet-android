@@ -33,6 +33,7 @@ import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.ExpandableViewState
 import io.novafoundation.nova.common.view.setMessageOrHide
@@ -116,8 +117,6 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
 
             hideKeyboard()
         }
-
-        binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
     }
 
     private fun setupHeader() {
@@ -247,7 +246,7 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         viewModel.quoteProblem.observe(binder.swapMainSettingsAlert::setMessageOrHide)
         viewModel.quoteFailed.observe { binder.swapMainSettingsRetry.setVisible(it) }
         viewModel.priceImpactWarning.observe(binder.swapMainSettingsPriceImpactAlert::setMessageOrHide)
-        viewModel.priceImpactDetails.observe { binder.swapMainSettingsPriceImpact.showValue(it ?: "—") }
+        viewModel.priceImpactDetails.observe(binder.swapMainSettingsPriceImpact::showValueOrHide)
         viewModel.slippageDetails.observe(binder.swapMainSettingsSlippage::showValue)
         viewModel.minimumReceived.observe { binder.swapMainSettingsMinReceived.showValue(it ?: "—") }
 
@@ -270,7 +269,5 @@ abstract class BaseSwapFormFragment : BaseFragment<SwapMainSettingsViewModel, Fr
         }
 
         viewModel.validationProgress.observe(binder.swapMainSettingsContinue::setProgressState)
-
-        viewModel.showNovaFeeDisclaimer.observe { binder.swapNovaFeeDisclaimer.setVisible(it) }
     }
 }

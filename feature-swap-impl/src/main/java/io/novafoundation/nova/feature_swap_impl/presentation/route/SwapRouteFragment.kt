@@ -1,16 +1,21 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.route
 
 import android.os.Bundle
+import android.view.View
+import androidx.core.view.doOnLayout
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import androidx.recyclerview.widget.ConcatAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.domain.onNotLoaded
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentRouteBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRouteAdapter
@@ -18,7 +23,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRout
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRouteViewHolder
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.TimelineItemDecoration
 
-class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRouteBinding>(), SwapRouteHeaderAdapter.Handler {
+class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRouteBinding>() {
 
     companion object {
 
@@ -33,7 +38,6 @@ class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRo
     private lateinit var routeAdapter: SwapRouteAdapter
 
     override fun initViews() {
-        binder.swapRouteContent.setHasFixedSize(true)
         binder.swapRouteContent.itemAnimator = null
 
         val timelineDecoration = TimelineItemDecoration(
@@ -42,7 +46,7 @@ class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRo
         )
         binder.swapRouteContent.addItemDecoration(timelineDecoration)
 
-        headerAdapter = SwapRouteHeaderAdapter(this)
+        headerAdapter = SwapRouteHeaderAdapter()
         routeAdapter = SwapRouteAdapter()
 
         binder.swapRouteContent.adapter = ConcatAdapter(headerAdapter, routeAdapter)
@@ -70,9 +74,5 @@ class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRo
                 routeAdapter.submitList(emptyList())
             }
         }
-    }
-
-    override fun backClicked() {
-        viewModel.backClicked()
     }
 }

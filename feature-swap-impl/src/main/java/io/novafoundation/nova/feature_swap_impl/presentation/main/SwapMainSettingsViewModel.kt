@@ -64,9 +64,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
-import io.novafoundation.nova.feature_swap_impl.domain.swap.includesNovaFee
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
@@ -255,7 +253,7 @@ class SwapMainSettingsViewModel(
     }
 
     val priceImpactDetails = priceImpact.map { impact ->
-        impact?.let { priceImpactFormatter.format(it) ?: it.formatPercents() }
+        impact?.let(priceImpactFormatter::format)
     }
 
     val slippageDetails = swapSettings.map { it.slippage.formatPercents() }
@@ -325,23 +323,6 @@ class SwapMainSettingsViewModel(
     }
         .distinctUntilChanged()
         .shareInBackground()
-
-    val showNovaFeeDisclaimer: Flow<Boolean> = quotingState.mapNotNull {
-        when (it) {
-            is QuotingState.Loaded -> it.quote.includesNovaFee()
-            is QuotingState.Default,
-            is QuotingState.Error -> false
-
-            is QuotingState.Loading -> null
-        }
-    }
-        .distinctUntilChanged()
-        .shareInBackground()
-
-    val novaFeeDisclaimerText: String = resourceManager.getString(
-        R.string.swap_nova_fee_disclaimer,
-        NovaSwapCommission.FEE_PERCENT_DISPLAY
-    )
 
     private val _validationProgress = MutableStateFlow(false)
 
@@ -767,6 +748,10 @@ class SwapMainSettingsViewModel(
 
             inputs.all { it.value.isEmpty() } -> {
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
+            }
+
+            errorStates.any { it.isErrorWithTag(EnoughAmountFieldValidator.ERROR_TAG) } -> {
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_not_enough_asset, assetIn.token.configuration.symbol.value))
             }
 
             errorStates.any { it is FieldValidationResult.Error } -> {

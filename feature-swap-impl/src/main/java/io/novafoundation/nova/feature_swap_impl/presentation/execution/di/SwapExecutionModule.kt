@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.details.Swap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.SwapExecutionViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
@@ -39,6 +40,7 @@ class SwapExecutionModule {
         resourceManager: ResourceManager,
         router: SwapRouter,
         chainRegistry: ChainRegistry,
+        tokenFormatter: TokenFormatter,
         confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
@@ -55,6 +57,7 @@ class SwapExecutionModule {
             resourceManager = resourceManager,
             router = router,
             chainRegistry = chainRegistry,
+            tokenFormatter = tokenFormatter,
             confirmationDetailsFormatter = confirmationDetailsFormatter,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,

@@ -20,26 +20,24 @@ class RealPriceImpactFormatter(
     private val resourceManager: ResourceManager
 ) : PriceImpactFormatter {
 
-    private val thresholdsToColors = listOf(
-        priceImpactThresholds.highPriceImpact to R.color.text_negative,
-        priceImpactThresholds.mediumPriceImpact to R.color.text_warning,
-        priceImpactThresholds.lowPriceImpact to R.color.text_secondary,
-    )
-
     override fun format(priceImpact: Fraction): CharSequence? {
-        val color = getColor(priceImpact) ?: return null
+        val color = priceImpactThresholds.colorFor(priceImpact) ?: return null
         return priceImpact.formatPercents().toSpannable(colorSpan(resourceManager.getColor(color)))
     }
 
     override fun formatWithBrackets(priceImpact: Fraction): CharSequence? {
-        val color = getColor(priceImpact) ?: return null
+        val color = priceImpactThresholds.colorFor(priceImpact) ?: return null
 
         val formattedImpact = "(${priceImpact.formatPercents()})"
         return formattedImpact.toSpannable(colorSpan(resourceManager.getColor(color)))
     }
+}
 
-    private fun getColor(priceImpact: Fraction): Int? {
-        return thresholdsToColors.firstOrNull { priceImpact > it.first }
-            ?.second
+internal fun PriceImpactThresholds.colorFor(priceImpact: Fraction): Int? {
+    return when {
+        priceImpact > highPriceImpact -> R.color.text_negative
+        priceImpact > mediumPriceImpact -> R.color.text_warning
+        priceImpact >= lowPriceImpact -> R.color.text_secondary
+        else -> null
     }
 }
