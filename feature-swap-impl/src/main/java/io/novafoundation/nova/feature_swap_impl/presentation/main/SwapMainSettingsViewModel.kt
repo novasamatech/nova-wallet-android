@@ -203,8 +203,6 @@ class SwapMainSettingsViewModel(
 
     private var slippageRequestId: String? = null
 
-    private var needsInitialKeyboard = true
-
     val detailsExpanded = MutableStateFlow(true)
 
     private val chainAssetIn = swapSettings
@@ -395,7 +393,6 @@ class SwapMainSettingsViewModel(
         swapRouter.observeSwapRetries().onEach { retry ->
             val account = selectedAccountUseCase.getSelectedMetaAccount()
             if (retry.metaAccountId != null && retry.metaAccountId != account.id) return@onEach
-            needsInitialKeyboard = true
             entryPayload.value = retry
         }.launchIn(viewModelScope)
 
@@ -422,7 +419,6 @@ class SwapMainSettingsViewModel(
     fun applyTabPayload(payload: SwapSettingsPayload) {
         if (entryPayload.value === payload) return
 
-        needsInitialKeyboard = payload != SwapSettingsPayload.Restore
         analyticsService.track(AnalyticsEvent.SwapScreenOpened(payload.source.toAnalyticsSource()))
         chart.onEntry(collapsed = payload != SwapSettingsPayload.Restore)
         entryPayload.value = payload
@@ -474,16 +470,6 @@ class SwapMainSettingsViewModel(
     fun setActive(isActive: Boolean) {
         active.value = isActive
         if (!isActive) quotingJob?.cancel()
-    }
-
-    fun consumeInitialKeyboard(): Boolean {
-        if (!active.value || initializedMetaAccountId == null) return false
-        return needsInitialKeyboard.also { needsInitialKeyboard = false }
-    }
-
-    suspend fun initialKeyboardDirection(): SwapDirection {
-        val settings = swapSettings.first()
-        return settings.swapDirection ?: if (settings.assetIn != null) SwapDirection.SPECIFIED_IN else SwapDirection.SPECIFIED_OUT
     }
 
     fun setDetailsExpanded(expanded: Boolean) {

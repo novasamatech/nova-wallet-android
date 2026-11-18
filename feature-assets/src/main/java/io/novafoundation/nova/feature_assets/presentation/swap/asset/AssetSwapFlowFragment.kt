@@ -17,7 +17,7 @@ import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.utils.bindTo
-import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawableWithRipple
 import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
@@ -37,7 +37,7 @@ class AssetSwapFlowFragment : BaseBottomSheetFragment<AssetSwapFlowViewModel, Fr
 
     @Inject lateinit var imageLoader: ImageLoader
 
-    private val tokensAdapter by lazy { SwapTokenSelectionAdapter(imageLoader, viewModel::rowClicked) }
+    private val tokensAdapter by lazy { SwapTokenSelectionAdapter(imageLoader, ::tokenClicked) }
     private val chipsAdapter by lazy { SwapNetworkChipAdapter(imageLoader, ::chipClicked) }
     private val loadingAdapter = CustomPlaceholderAdapter(R.layout.item_swap_tokens_loading)
     private var model: SwapTokenSelectionModel? = null
@@ -114,6 +114,16 @@ class AssetSwapFlowFragment : BaseBottomSheetFragment<AssetSwapFlowViewModel, Fr
         getBehaviour().peekHeight = min(collapsedHeight, height)
     }
 
+    private fun finishSearch() {
+        binder.swapTokenSearch.content.hideSoftKeyboard()
+        binder.root.requestFocus()
+    }
+
+    private fun tokenClicked(row: SwapTokenRow) {
+        finishSearch()
+        viewModel.rowClicked(row)
+    }
+
     private fun chipClicked(chip: SwapNetworkChip) {
         if (chip is SwapNetworkChip.More) {
             showNetworkFilter()
@@ -125,8 +135,7 @@ class AssetSwapFlowFragment : BaseBottomSheetFragment<AssetSwapFlowViewModel, Fr
 
     private fun showNetworkFilter() {
         val model = model ?: return
-        hideKeyboard()
-        binder.swapTokenSearch.content.clearFocus()
+        finishSearch()
         networksSheet?.dismiss()
         networksSheet = SwapNetworksBottomSheet(requireContext(), imageLoader, model.networks, viewModel::saveNetworks).also { sheet ->
             sheet.setOnDismissListener { networksSheet = null }
