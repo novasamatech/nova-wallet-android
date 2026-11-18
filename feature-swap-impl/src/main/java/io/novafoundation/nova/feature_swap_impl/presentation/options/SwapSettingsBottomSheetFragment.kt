@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapSettingsSheetBinding
 import io.novafoundation.nova.feature_swap_impl.databinding.ItemSwapSlippagePresetBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
+import io.novafoundation.nova.feature_swap_impl.presentation.common.views.setupSwapDecimalInput
 
 class SwapSettingsBottomSheetFragment : BaseBottomSheetFragment<SwapSettingsSheetViewModel, FragmentSwapSettingsSheetBinding>() {
 
@@ -66,7 +67,7 @@ class SwapSettingsBottomSheetFragment : BaseBottomSheetFragment<SwapSettingsShee
             viewModel.applyClicked()
         }
         binder.swapSettingsCustomInput.content.apply {
-            filters += SlippagePrecisionInputFilter()
+            setupSwapDecimalInput(SLIPPAGE_MAX_FRACTION_DIGITS)
             imeOptions = EditorInfo.IME_ACTION_DONE
             setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {

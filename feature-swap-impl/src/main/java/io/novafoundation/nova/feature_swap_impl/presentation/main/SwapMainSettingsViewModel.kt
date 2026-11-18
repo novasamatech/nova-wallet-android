@@ -892,7 +892,9 @@ class SwapMainSettingsViewModel(
 
     private fun SwapAmountInputMixin.updateInput(chainAsset: Chain.Asset, planks: Balance) {
         val amount = chainAsset.amountFromPlanks(planks)
-        inputState.value = InputState(amountInputFormatter.format(amount), initiatedByUser = false, InputKind.REGULAR)
+        // In editable amounts a comma always means a decimal separator.
+        val ungroupedAmount = amountInputFormatter.format(amount).replace(",", "")
+        inputState.value = InputState(ungroupedAmount, initiatedByUser = false, InputKind.REGULAR)
     }
 
     private fun Flow<SwapSettings>.assetFlowOf(extractor: (SwapSettings) -> Chain.Asset?): Flow<Asset?> {

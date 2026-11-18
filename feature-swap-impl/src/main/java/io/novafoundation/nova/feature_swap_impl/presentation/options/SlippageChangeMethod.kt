@@ -7,6 +7,8 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.abs
 
+internal const val SLIPPAGE_MAX_FRACTION_DIGITS = 4
+
 /** A plain, locale-independent percent with at most [SLIPPAGE_MAX_FRACTION_DIGITS] decimals, e.g. 0.0125. */
 internal fun slippageInputText(slippage: Fraction): String = BigDecimal(slippage.inPercents)
     .setScale(SLIPPAGE_MAX_FRACTION_DIGITS, RoundingMode.HALF_UP)
