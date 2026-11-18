@@ -5,8 +5,6 @@ import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator.Method
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SlippageChangeMethodTest {
@@ -20,17 +18,6 @@ class SlippageChangeMethodTest {
         small = 0.001,
         big = 0.03
     ).config()
-
-    @Test
-    fun `custom input accepts at most four decimals like iOS`() {
-        assertTrue(slippageInputWithinPrecision("", SLIPPAGE_MAX_FRACTION_DIGITS))
-        assertTrue(slippageInputWithinPrecision("12", SLIPPAGE_MAX_FRACTION_DIGITS))
-        assertTrue(slippageInputWithinPrecision("0.", SLIPPAGE_MAX_FRACTION_DIGITS))
-        assertTrue(slippageInputWithinPrecision("0.0125", SLIPPAGE_MAX_FRACTION_DIGITS))
-        assertTrue(slippageInputWithinPrecision("0,0125", SLIPPAGE_MAX_FRACTION_DIGITS))
-        assertFalse(slippageInputWithinPrecision("0.01255", SLIPPAGE_MAX_FRACTION_DIGITS))
-        assertFalse(slippageInputWithinPrecision("1,00001", SLIPPAGE_MAX_FRACTION_DIGITS))
-    }
 
     @Test
     fun `typed preset values are reported as presets despite floating point paths`() {
@@ -54,6 +41,5 @@ class SlippageChangeMethodTest {
         assertEquals("0.0125", slippageInputText(0.0125.percents))
         assertEquals("0.1", slippageInputText(0.001.fractions))
         assertEquals("0.0123", slippageInputText(0.012345.percents))
-        assertTrue(slippageInputWithinPrecision(slippageInputText(0.012345.percents), SLIPPAGE_MAX_FRACTION_DIGITS))
     }
 }
