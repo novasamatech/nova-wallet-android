@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -36,7 +37,7 @@ class SwapMaxActionProviderTest {
     private val factory = SwapMaxActionProviderFactory(registry, deduction)
 
     @Test
-    fun `button and input reserve ED before fees and update together when fee arrives`() = runBlocking {
+    fun `input and confirmation use the same maximum once the fee arrives`() = runBlocking {
         val chain = mock(Chain::class.java)
         val input = mock(Chain.Asset::class.java)
         val output = mock(Chain.Asset::class.java)
@@ -56,7 +57,7 @@ class SwapMaxActionProviderTest {
         `when`(token.configuration).thenReturn(input)
         `when`(asset.token).thenReturn(token)
         `when`(asset.transferableInPlanks).thenReturn(BigInteger.valueOf(1000))
-        `when`(asset.balanceCountedTowardsEDInPlanks).thenReturn(BigInteger.valueOf(1000))
+        `when`(asset.balanceCountedTowardsEDInPlanks).thenReturn(BigInteger.valueOf(1040))
         `when`(fee.additionalMaxAmountDeduction).thenReturn(reserve)
         `when`(fee.totalFeeAmount(input)).thenReturn(BigInteger.TEN)
         val inputId = input.fullId
@@ -66,17 +67,26 @@ class SwapMaxActionProviderTest {
         `when`(segment.operation).thenReturn(operation)
         `when`(fee.segments).thenReturn(listOf(segment))
         val fees = MutableStateFlow<FeeStatus<SwapFee, Unit>>(FeeStatus.NoFee)
+        val inputFeeLoader = mock<FeeLoaderMixinV2<SwapFee, Unit>>()
+        `when`(inputFeeLoader.fee).thenReturn(fees)
         val job = SupervisorJob()
         val scope = CoroutineScope(Dispatchers.Default + job)
         try {
-            val provider = factory.create(scope, flowOf(asset), flowOf(output), fees)
+            val provider = factory.create(scope, flowOf(asset), flowOf(output), inputFeeLoader)
             val initial = withTimeout(5000) { provider.maxAvailableBalance.first() }
-            assertEquals(BigInteger.valueOf(900), initial.actualBalance)
+            assertEquals(BigInteger.valueOf(940), initial.actualBalance)
             assertEquals(initial.actualBalance, initial.displayedBalance)
 
-            fees.value = FeeStatus.Loaded(FeeModel(fee, Unit))
-            val loaded = withTimeout(5000) { provider.maxAvailableBalance.first { it.actualBalance == BigInteger.valueOf(890) } }
+            val feeStatus = FeeStatus.Loaded(FeeModel(fee, Unit))
+            fees.value = feeStatus
+            val loaded = withTimeout(5000) { provider.maxAvailableBalance.first { it.actualBalance == BigInteger.valueOf(930) } }
             assertEquals(loaded.actualBalance, loaded.displayedBalance)
+
+            val confirmationFeeLoader = mock<FeeLoaderMixinV2<SwapFee, Unit>>()
+            `when`(confirmationFeeLoader.fee).thenReturn(MutableStateFlow(feeStatus))
+            val confirmationProvider = factory.create(scope, flowOf(asset), flowOf(output), confirmationFeeLoader)
+            val confirmed = withTimeout(5000) { confirmationProvider.maxAvailableBalance.first() }
+            assertEquals(loaded, confirmed)
         } finally {
             scope.cancel()
         }

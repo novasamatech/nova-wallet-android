@@ -55,6 +55,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSw
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
@@ -76,7 +77,7 @@ class SwapFeatureModule {
 
     @FeatureScope
     @Provides
-    fun provideSwapService(
+    internal fun provideSwapService(
         assetConversionFactory: AssetConversionExchangeFactory,
         hydraDxExchangeFactory: HydraDxExchangeFactory,
         crossChainTransferAssetExchangeFactory: CrossChainTransferAssetExchangeFactory,
@@ -88,6 +89,7 @@ class SwapFeatureModule {
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry,
+        swapInputReserve: SwapInputReserve,
         chainStateRepository: ChainStateRepository,
         signerProvider: SignerProvider
     ): SwapService {
@@ -103,6 +105,7 @@ class SwapFeatureModule {
             tokenRepository = tokenRepository,
             assetSourceRegistry = assetSourceRegistry,
             accountRepository = accountRepository,
+            swapInputReserve = swapInputReserve,
             chainStateRepository = chainStateRepository,
             signerProvider = signerProvider
         )
@@ -125,11 +128,12 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSwapInteractor(
+    internal fun provideSwapInteractor(
         priceImpactThresholds: PriceImpactThresholds,
         swapService: SwapService,
         tokenRepository: TokenRepository,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
+        swapInputReserve: SwapInputReserve,
         assetsValidationContextFactory: AssetsValidationContext.Factory,
         canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
         showReceivedAssetUseCase: ShowReceivedAssetUseCase,
@@ -139,6 +143,7 @@ class SwapFeatureModule {
             swapService = swapService,
             canReceiveAssetOutValidationFactory = canReceiveAssetOutValidationFactory,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
+            swapInputReserve = swapInputReserve,
             assetsValidationContextFactory = assetsValidationContextFactory,
             tokenRepository = tokenRepository,
             showReceivedAssetUseCase = showReceivedAssetUseCase

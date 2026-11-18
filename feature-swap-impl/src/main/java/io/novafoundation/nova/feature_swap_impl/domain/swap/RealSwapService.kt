@@ -84,6 +84,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -147,6 +148,7 @@ internal class RealSwapService(
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val swapInputReserve: SwapInputReserve,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val chainStateRepository: ChainStateRepository,
@@ -234,12 +236,10 @@ internal class RealSwapService(
         val segments = buildSwapSegments(fees, atomicOperations)
         val convertedFees = segments.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
-        val firstOperation = atomicOperations.first()
-
         return SwapFee(
             segments = segments,
             intermediateSegmentFeesInAssetIn = convertedFees,
-            additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction(),
+            additionalMaxAmountDeduction = swapInputReserve.requiredFor(executeArgs.assetIn, segments.first()),
         ).also(::logFee)
     }
 

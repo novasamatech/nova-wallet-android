@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.canPayAllFees
@@ -52,11 +53,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedA
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
-class SwapInteractor(
+class SwapInteractor internal constructor(
     private val priceImpactThresholds: PriceImpactThresholds,
     private val swapService: SwapService,
     private val tokenRepository: TokenRepository,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
+    private val swapInputReserve: SwapInputReserve,
     private val assetsValidationContextFactory: AssetsValidationContext.Factory,
     private val canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
     private val showReceivedAssetUseCase: ShowReceivedAssetUseCase,
@@ -193,7 +195,7 @@ class SwapInteractor(
 
             sufficientBalanceConsideringNonSufficientAssetsValidation(assetsValidationContext)
 
-            sufficientBalanceConsideringConsumersValidation(assetsValidationContext)
+            sufficientBalanceConsideringConsumersValidation(assetsValidationContext, swapInputReserve)
 
             swapSmallRemainingBalance(assetsValidationContext)
 

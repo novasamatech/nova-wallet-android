@@ -87,6 +87,7 @@ sealed class SwapValidationFailure {
         class BalanceNotConsiderConsumers(
             val assetIn: Chain.Asset,
             val assetInED: Balance,
+            val maxSwapAmount: Balance,
             val feeAsset: Chain.Asset,
             val fee: Balance
         ) : SwapValidationFailure()
