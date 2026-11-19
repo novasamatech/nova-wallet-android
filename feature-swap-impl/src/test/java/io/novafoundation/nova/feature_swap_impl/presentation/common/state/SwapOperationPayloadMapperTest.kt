@@ -68,6 +68,7 @@ class SwapOperationPayloadMapperTest {
         assertEquals(BigInteger.valueOf(1950), restored.fee.segments.single().netFlow.amountOutMin)
         assertEquals(BigInteger.valueOf(1983), restored.fee.segments.single().netFlow.amountOut)
         assertEquals(42L, operationArgs!!.metaAccountId)
+        assertEquals(listOf(edge.routeId()), restored.fee.route)
         assertEquals(BigInteger.valueOf(2000), operationArgs!!.executionPath.single().quotedSwapEdge.quote)
         assertEquals(BigInteger.valueOf(20), restored.quote.quotedPath.roughFeeEstimation.inAssetOut)
         assertEquals(BigInteger.valueOf(10), restored.quote.quotedPath.roughFeeEstimation.inAssetIn)
@@ -153,7 +154,8 @@ class SwapOperationPayloadMapperTest {
                     )
                 ),
                 SubstrateFeeBase(BigInteger.ZERO, input),
-                SwapMaxAdditionalAmountDeduction(BigInteger.valueOf(100))
+                SwapMaxAdditionalAmountDeduction(BigInteger.valueOf(100)),
+                route = listOf(edge.routeId())
             ),
             0.005.fractions
         )

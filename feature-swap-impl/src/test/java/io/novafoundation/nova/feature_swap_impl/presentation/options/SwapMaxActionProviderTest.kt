@@ -1,12 +1,15 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
+import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -23,6 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -36,59 +40,166 @@ class SwapMaxActionProviderTest {
 
     private val factory = SwapMaxActionProviderFactory(registry, deduction)
 
+    private val input = chainAsset(0)
+
+    private val output = chainAsset(1)
+
+    private val assets = MutableStateFlow(balance(10_000))
+
+    private val feeResetVersion = MutableStateFlow(0)
+
+    private val maxActive = MutableStateFlow(false)
+
+    private val fees = MutableStateFlow<FeeStatus<SwapFee, Unit>>(FeeStatus.NoFee)
+
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    @After
+    fun tearDown() {
+        scope.cancel()
+    }
+
     @Test
-    fun `input and confirmation use the same maximum once the fee arrives`() = runBlocking {
+    fun `input and confirmation use the same buffered maximum once the fee arrives`() = runBlocking {
+        prepareReserve()
+        val inputProvider = createProvider(fees)
+        inputProvider.awaitBalance(9_940)
+
+        val feeStatus = feeStatus(1_000)
+        fees.value = feeStatus
+        inputProvider.awaitBalance(8_930)
+        inputProvider.affordableBalanceProvider.awaitBalance(8_940)
+
+        val confirmationProvider = createProvider(MutableStateFlow(feeStatus))
+        confirmationProvider.awaitBalance(8_930)
+    }
+
+    @Test
+    fun `active max keeps the fee that set the amount within one percent while validation uses the new fee`() = runBlocking {
+        maxActive.value = true
+        fees.value = feeStatus(1_000)
+        val provider = createProvider(fees)
+        provider.awaitBalance(8_930)
+
+        fees.value = feeStatus(1_008)
+        provider.affordableBalanceProvider.awaitBalance(8_932)
+        assertEquals(BigInteger.valueOf(8_930), provider.maxAvailableBalance.first().actualBalance)
+
+        fees.value = feeStatus(1_010)
+        provider.affordableBalanceProvider.awaitBalance(8_930)
+        assertEquals(BigInteger.valueOf(8_930), provider.maxAvailableBalance.first().actualBalance)
+
+        fees.value = feeStatus(1_016)
+        provider.affordableBalanceProvider.awaitBalance(8_924)
+        provider.awaitBalance(8_914)
+
+        fees.value = feeStatus(1_008)
+        provider.affordableBalanceProvider.awaitBalance(8_932)
+        assertEquals(BigInteger.valueOf(8_914), provider.maxAvailableBalance.first().actualBalance)
+
+        maxActive.value = false
+        provider.awaitBalance(8_922)
+    }
+
+    @Test
+    fun `route fee asset and reserve changes each reset the max fee anchor`() = runBlocking {
+        maxActive.value = true
+        fees.value = feeStatus(1_000)
+        val provider = createProvider(fees)
+        provider.awaitBalance(8_930)
+
+        fees.value = feeStatus(1_008, pool = "new")
+        provider.awaitBalance(8_922)
+
+        val feeAsset = chainAsset(2)
+        fees.value = feeStatus(1_016, pool = "new", feeAsset = feeAsset)
+        provider.awaitBalance(8_914)
+
+        fees.value = feeStatus(1_024, pool = "new", feeAsset = feeAsset, reserve = 150)
+        provider.awaitBalance(8_856)
+
+        assets.value = balance(11_000)
+        provider.awaitBalance(9_856)
+    }
+
+    @Test
+    fun `reset discards the previous fee for the same asset pair`() = runBlocking {
+        prepareReserve()
+        maxActive.value = true
+        fees.value = feeStatus(1_000)
+        val provider = createProvider(fees)
+        provider.awaitBalance(8_930)
+
+        fees.value = FeeStatus.NoFee
+        feeResetVersion.value = 1
+        provider.awaitBalance(9_940)
+        fees.value = feeStatus(1_008)
+        provider.awaitBalance(8_922)
+    }
+
+    private suspend fun prepareReserve() {
         val chain = mock(Chain::class.java)
-        val input = mock(Chain.Asset::class.java)
-        val output = mock(Chain.Asset::class.java)
-        val token = mock(Token::class.java)
-        val asset = mock(Asset::class.java)
-        val fee = mock(SwapFee::class.java)
-        val operation = mock(AtomicSwapOperation::class.java)
-        val segment = mock(SwapFee.SwapSegment::class.java)
-        val reserve = SwapMaxAdditionalAmountDeduction(BigInteger.valueOf(100))
-        `when`(input.chainId).thenReturn("hub")
-        `when`(input.id).thenReturn(0)
-        `when`(output.chainId).thenReturn("hub")
-        `when`(output.id).thenReturn(1)
         `when`(registry.getChain("hub")).thenReturn(chain)
         `when`(chain.swap).thenReturn(listOf(Chain.Swap.ASSET_CONVERSION))
         `when`(deduction.invoke(input, output, true)).thenReturn(BigInteger.valueOf(100))
+    }
+
+    private fun createProvider(feeStatuses: MutableStateFlow<FeeStatus<SwapFee, Unit>>) =
+        factory.create(
+            scope = scope,
+            assets = assets,
+            outputAssets = flowOf(output),
+            maxActive = maxActive,
+            feeLoaderMixin = mock<FeeLoaderMixinV2<SwapFee, Unit>>().also { `when`(it.fee).thenReturn(feeStatuses) },
+            feeResetVersion = feeResetVersion
+        )
+
+    private suspend fun MaxActionProvider.awaitBalance(amount: Long) {
+        val expected = BigInteger.valueOf(amount)
+        val balance = withTimeout(5_000) { maxAvailableBalance.first { it.actualBalance == expected } }
+        assertEquals(expected, balance.displayedBalance)
+    }
+
+    private fun chainAsset(id: Int) = mock(Chain.Asset::class.java).also {
+        `when`(it.chainId).thenReturn("hub")
+        `when`(it.id).thenReturn(id)
+    }
+
+    private fun balance(amount: Long): Asset {
+        val token = mock(Token::class.java)
         `when`(token.configuration).thenReturn(input)
-        `when`(asset.token).thenReturn(token)
-        `when`(asset.transferableInPlanks).thenReturn(BigInteger.valueOf(1000))
-        `when`(asset.balanceCountedTowardsEDInPlanks).thenReturn(BigInteger.valueOf(1040))
-        `when`(fee.additionalMaxAmountDeduction).thenReturn(reserve)
-        `when`(fee.totalFeeAmount(input)).thenReturn(BigInteger.TEN)
+
+        return mock(Asset::class.java).also {
+            `when`(it.token).thenReturn(token)
+            `when`(it.transferableInPlanks).thenReturn(BigInteger.valueOf(amount))
+            `when`(it.balanceCountedTowardsEDInPlanks).thenReturn(BigInteger.valueOf(amount + 40))
+        }
+    }
+
+    private fun feeStatus(amount: Long, pool: String = "pool", feeAsset: Chain.Asset = input, reserve: Long = 100) =
+        FeeStatus.Loaded(FeeModel(fee(amount, pool, feeAsset, reserve), Unit))
+
+    private fun fee(amount: Long, pool: String, feeAsset: Chain.Asset, reserve: Long): SwapFee {
         val inputId = input.fullId
         val outputId = output.fullId
+        val operation = mock(AtomicSwapOperation::class.java)
         `when`(operation.assetIn).thenReturn(inputId)
         `when`(operation.assetOut).thenReturn(outputId)
+
+        val segment = mock(SwapFee.SwapSegment::class.java)
         `when`(segment.operation).thenReturn(operation)
-        `when`(fee.segments).thenReturn(listOf(segment))
-        val fees = MutableStateFlow<FeeStatus<SwapFee, Unit>>(FeeStatus.NoFee)
-        val inputFeeLoader = mock<FeeLoaderMixinV2<SwapFee, Unit>>()
-        `when`(inputFeeLoader.fee).thenReturn(fees)
-        val job = SupervisorJob()
-        val scope = CoroutineScope(Dispatchers.Default + job)
-        try {
-            val provider = factory.create(scope, flowOf(asset), flowOf(output), inputFeeLoader)
-            val initial = withTimeout(5000) { provider.maxAvailableBalance.first() }
-            assertEquals(BigInteger.valueOf(940), initial.actualBalance)
-            assertEquals(initial.actualBalance, initial.displayedBalance)
 
-            val feeStatus = FeeStatus.Loaded(FeeModel(fee, Unit))
-            fees.value = feeStatus
-            val loaded = withTimeout(5000) { provider.maxAvailableBalance.first { it.actualBalance == BigInteger.valueOf(930) } }
-            assertEquals(loaded.actualBalance, loaded.displayedBalance)
+        val submissionFee = mock(SubmissionFeeWithLabel::class.java)
+        `when`(submissionFee.asset).thenReturn(feeAsset)
+        val route = listOf(SwapRouteEdgeId(inputId, outputId, "swap", pool))
+        val deduction = SwapMaxAdditionalAmountDeduction(BigInteger.valueOf(reserve))
 
-            val confirmationFeeLoader = mock<FeeLoaderMixinV2<SwapFee, Unit>>()
-            `when`(confirmationFeeLoader.fee).thenReturn(MutableStateFlow(feeStatus))
-            val confirmationProvider = factory.create(scope, flowOf(asset), flowOf(output), confirmationFeeLoader)
-            val confirmed = withTimeout(5000) { confirmationProvider.maxAvailableBalance.first() }
-            assertEquals(loaded, confirmed)
-        } finally {
-            scope.cancel()
+        return mock(SwapFee::class.java).also {
+            `when`(it.additionalMaxAmountDeduction).thenReturn(deduction)
+            `when`(it.totalFeeAmount(input)).thenReturn(BigInteger.valueOf(amount))
+            `when`(it.initialSubmissionFee).thenReturn(submissionFee)
+            `when`(it.segments).thenReturn(listOf(segment))
+            `when`(it.route).thenReturn(route)
         }
     }
 }

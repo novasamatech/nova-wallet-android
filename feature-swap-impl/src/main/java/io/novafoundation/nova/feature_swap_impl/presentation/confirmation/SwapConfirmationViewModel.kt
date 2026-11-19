@@ -167,6 +167,7 @@ class SwapConfirmationViewModel(
         scope = viewModelScope,
         assets = assetInFlow,
         outputAssets = confirmationStateFlow.map { it.swapQuote.assetOut },
+        maxActive = maxActionFlow.map { it == MaxAction.ACTIVE },
         feeLoaderMixin = feeMixin,
     )
 
@@ -477,9 +478,11 @@ class SwapConfirmationViewModel(
                 quoteUpdateJob?.join()
                 if (maxActionFlow.value != MaxAction.ACTIVE) return@onEach
 
-                val confirmationState = confirmationStateFlow.first()
+                val quoteArgs = confirmationStateFlow.first().swapQuoteArgs
+                // Max sets the pay amount, while a SPECIFIED_OUT quote stores the receive amount.
+                if (quoteArgs.amount == amount && quoteArgs.swapDirection == SwapDirection.SPECIFIED_IN) return@onEach
                 calculateQuote(
-                    confirmationState.swapQuoteArgs.copy(
+                    quoteArgs.copy(
                         amount = amount,
                         swapDirection = SwapDirection.SPECIFIED_IN
                     )

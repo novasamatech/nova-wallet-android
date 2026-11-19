@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
 import io.novafoundation.nova.feature_swap_api.domain.model.WithDebugLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
+import io.novafoundation.nova.feature_swap_api.domain.model.routeId
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapFeeAmountPayload
@@ -115,7 +116,8 @@ class SwapOperationPayloadMapper @Inject constructor(
         val fee = SwapFee(
             segments = segments,
             intermediateSegmentFeesInAssetIn = payload.fee.intermediateFees.restore(),
-            additionalMaxAmountDeduction = SwapMaxAdditionalAmountDeduction(payload.fee.maxAdditionalDeduction)
+            additionalMaxAmountDeduction = SwapMaxAdditionalAmountDeduction(payload.fee.maxAdditionalDeduction),
+            route = route.map { it.routeId() }
         )
         return SwapState(quote, fee, payload.slippage.fractions)
     }

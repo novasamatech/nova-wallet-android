@@ -87,6 +87,26 @@ class FeeLoaderV2ProviderTest {
     }
 
     @Test
+    fun `background refresh keeps the loaded fee until the new fee is ready`() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val formatter = TestFeeFormatter()
+        val subject = createSubject(backgroundScope, dispatcher, formatter)
+        val release = CompletableDeferred<Unit>()
+        subject.setFee("old")
+
+        subject.loadFee(keepCurrentFee = true) {
+            release.await()
+            "new"
+        }
+        runCurrent()
+        assertEquals("old", subject.fee.value.loadedFeeOrNull())
+
+        release.complete(Unit)
+        runCurrent()
+        assertEquals("new", subject.fee.value.loadedFeeOrNull())
+    }
+
+    @Test
     fun `setFeeLoading cancels the active constructor`() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val formatter = TestFeeFormatter()
