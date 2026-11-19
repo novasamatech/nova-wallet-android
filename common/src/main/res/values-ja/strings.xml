@@ -2494,4 +2494,9 @@
     <string name="tabbar_browser_title">ブラウザー</string>
     <string name="tabbar_more_title">その他</string>
     <string name="tabbar_swaps_title">スワップ</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">プールの取引制限を読み込めませんでした。もう一度お試しください。</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">プールの制限を確認できません</string>
+    <string name="swap_failure_pool_trade_minimum_message">このスワップルートでは、いずれかの流動性プールで少なくとも%1$sが必要です。金額を増やすか、別のルートを選択してください。</string>
+    <string name="swap_failure_pool_trade_minimum_title">プールの最低額を下回っています</string>
+    <string name="swap_not_enough_asset">%sが不足しています</string>
 </resources>

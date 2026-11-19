@@ -2494,4 +2494,9 @@
     <string name="tabbar_browser_title">Peramban</string>
     <string name="tabbar_more_title">Lainnya</string>
     <string name="tabbar_swaps_title">Swap</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Batas perdagangan pool tidak dapat dimuat. Silakan coba lagi.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Tidak dapat memverifikasi batas pool</string>
+    <string name="swap_failure_pool_trade_minimum_message">Rute swap ini memerlukan setidaknya %1$s di salah satu pool likuiditasnya. Tingkatkan jumlahnya atau pilih rute lain.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Jumlah di bawah minimum pool</string>
+    <string name="swap_not_enough_asset">%s tidak mencukupi</string>
 </resources>

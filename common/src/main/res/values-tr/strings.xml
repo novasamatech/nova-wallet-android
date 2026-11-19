@@ -2508,4 +2508,9 @@
     <string name="tabbar_browser_title">Tarayıcı</string>
     <string name="tabbar_more_title">Daha fazla</string>
     <string name="tabbar_swaps_title">Takaslar</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Havuz işlem limitleri yüklenemedi. Lütfen tekrar deneyin.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Havuz limitleri doğrulanamadı</string>
+    <string name="swap_failure_pool_trade_minimum_message">Bu takas rotası, likidite havuzlarından birinde en az %1$s gerektiriyor. Miktarı artırın veya başka bir rota seçin.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Miktar havuz minimumunun altında</string>
+    <string name="swap_not_enough_asset">Yeterli %s yok</string>
 </resources>

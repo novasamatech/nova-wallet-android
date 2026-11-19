@@ -2494,4 +2494,9 @@
     <string name="tabbar_browser_title">브라우저</string>
     <string name="tabbar_more_title">더 보기</string>
     <string name="tabbar_swaps_title">스왑</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">풀 거래 한도를 불러올 수 없습니다. 다시 시도해 주세요.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">풀 한도를 확인할 수 없음</string>
+    <string name="swap_failure_pool_trade_minimum_message">이 스왑 경로는 유동성 풀 중 하나에서 최소 %1$s가 필요합니다. 금액을 늘리거나 다른 경로를 선택하세요.</string>
+    <string name="swap_failure_pool_trade_minimum_title">풀 최소 금액 미만</string>
+    <string name="swap_not_enough_asset">%s 부족</string>
 </resources>
