@@ -4,9 +4,17 @@ import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -104,6 +112,9 @@ class SwapMaxActionProviderTest {
         fees.value = feeStatus(1_008)
         provider.affordableBalanceProvider.awaitBalance(8_932)
         assertEquals(BigInteger.valueOf(8_930), provider.maxAvailableBalance.first().actualBalance)
+        assertEquals(SwapDustCheckFee.MaxFeeWithMargin(1_010.toBigInteger()), provider.dustCheckFeeFor(quote(8_930)))
+        assertEquals(SwapDustCheckFee.QuoteFee, provider.dustCheckFeeFor(quote(8_929)))
+        assertEquals(SwapDustCheckFee.QuoteFee, provider.dustCheckFeeFor(quote(8_930, pool = "new")))
 
         fees.value = feeStatus(1_010)
         provider.affordableBalanceProvider.awaitBalance(8_930)
@@ -157,6 +168,30 @@ class SwapMaxActionProviderTest {
         provider.awaitBalance(9_940)
         fees.value = feeStatus(1_008)
         provider.awaitBalance(8_922)
+    }
+
+    private fun quote(amount: Long, pool: String = "pool"): SwapQuote {
+        val amountIn = BigInteger.valueOf(amount)
+        val inputId = input.fullId
+        val outputId = output.fullId
+        val poolId = SwapPoolId(input.chainId, pool)
+        val edge = mock(SwapGraphEdge::class.java)
+        `when`(edge.from).thenReturn(inputId)
+        `when`(edge.to).thenReturn(outputId)
+        `when`(edge.exchangeId).thenReturn("swap")
+        `when`(edge.poolId).thenReturn(poolId)
+        val path = QuotedPath(
+            direction = SwapDirection.SPECIFIED_IN,
+            path = listOf(QuotedEdge(amountIn, BigInteger.ONE, edge)),
+            roughFeeEstimation = PathRoughFeeEstimation.zero()
+        )
+
+        return mock(SwapQuote::class.java).also {
+            `when`(it.direction).thenReturn(SwapDirection.SPECIFIED_IN)
+            `when`(it.assetIn).thenReturn(input)
+            `when`(it.planksIn).thenReturn(amountIn)
+            `when`(it.quotedPath).thenReturn(path)
+        }
     }
 
     private suspend fun prepareReserve() {

@@ -2,10 +2,15 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main.input
 
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
+import io.novafoundation.nova.feature_swap_api.domain.model.routeId
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.domain.swapMaxFeeMargin
 import io.novafoundation.nova.feature_swap_impl.domain.swapMaximum
 import io.novafoundation.nova.feature_swap_impl.domain.withSwapMaxFeeMargin
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
@@ -22,16 +27,37 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
+internal data class SwapMaxEstimate(
+    val balance: MaxAvailableBalance,
+    val dustCheckFee: SwapDustCheckFee,
+    val route: List<SwapRouteEdgeId>,
+)
+
 internal class SwapMaxActionProvider(
-    override val maxAvailableBalance: Flow<MaxAvailableBalance>,
+    private val maxEstimates: Flow<SwapMaxEstimate>,
     val affordableBalanceProvider: MaxActionProvider,
-) : MaxActionProvider
+) : MaxActionProvider {
+
+    override val maxAvailableBalance = maxEstimates.map { it.balance }.distinctUntilChanged()
+
+    suspend fun dustCheckFeeFor(quote: SwapQuote): SwapDustCheckFee {
+        if (quote.direction != SwapDirection.SPECIFIED_IN) return SwapDustCheckFee.QuoteFee
+
+        val estimate = maxEstimates.first()
+        val matchesAmount = estimate.balance.chainAsset.fullId == quote.assetIn.fullId && estimate.balance.actualBalance == quote.planksIn
+        if (!matchesAmount) return SwapDustCheckFee.QuoteFee
+        if (estimate.route != quote.quotedPath.path.map { it.edge.routeId() }) return SwapDustCheckFee.QuoteFee
+
+        return estimate.dustCheckFee
+    }
+}
 
 class SwapMaxActionProviderFactory @Inject constructor(
     private val chainRegistry: ChainRegistry,
@@ -64,7 +90,7 @@ class SwapMaxActionProviderFactory @Inject constructor(
         }
 
         return SwapMaxActionProvider(
-            maxAvailableBalance = balances.map { it.maximum }.distinctUntilChanged(),
+            maxEstimates = balances.map { it.maximum },
             affordableBalanceProvider = affordableBalanceProvider
         )
     }
@@ -80,13 +106,19 @@ class SwapMaxActionProviderFactory @Inject constructor(
             .flatMapLatest { fees ->
                 val reserve = fees?.latest?.additionalMaxAmountDeduction?.fromCountedTowardsEd ?: minimumBeforeQuote(swapAssets)
                 val latestFee = fees?.latest?.totalFeeAmount(swapAssets.input) ?: Balance.ZERO
-                val maxFee = fees?.anchor?.totalFeeAmount(swapAssets.input)?.withSwapMaxFeeMargin() ?: Balance.ZERO
+                val maxFee = fees?.anchor?.let { anchor ->
+                    SwapDustCheckFee.MaxFeeWithMargin(anchor.totalFeeAmount(swapAssets.input).withSwapMaxFeeMargin())
+                }
 
                 assets.mapNotNull { asset ->
                     if (asset.token.configuration.fullId != swapAssets.input.fullId) return@mapNotNull null
 
                     SwapBalances(
-                        maximum = MaxAvailableBalance.fromSingle(swapAssets.input, asset.swapMaximum(reserve, maxFee)),
+                        maximum = SwapMaxEstimate(
+                            balance = MaxAvailableBalance.fromSingle(swapAssets.input, asset.swapMaximum(reserve, maxFee?.amount ?: Balance.ZERO)),
+                            dustCheckFee = maxFee ?: SwapDustCheckFee.QuoteFee,
+                            route = fees?.anchor?.route.orEmpty()
+                        ),
                         affordable = MaxAvailableBalance.fromSingle(swapAssets.input, asset.swapMaximum(reserve, latestFee))
                     )
                 }
@@ -140,5 +172,5 @@ class SwapMaxActionProviderFactory @Inject constructor(
 
     private data class MaxFees(val latest: SwapFee, val anchor: SwapFee)
 
-    private data class SwapBalances(val maximum: MaxAvailableBalance, val affordable: MaxAvailableBalance)
+    private data class SwapBalances(val maximum: SwapMaxEstimate, val affordable: MaxAvailableBalance)
 }

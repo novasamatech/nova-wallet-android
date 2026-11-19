@@ -79,6 +79,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
@@ -532,11 +533,16 @@ class SwapMainSettingsViewModel(
             _validationProgress.value = false
             return@launchUnit
         }
+        val dustCheckFee = if (amountInInputState.value.inputKind.isMaxAction()) {
+            maxAssetInProvider.dustCheckFeeFor(payload.swapQuote)
+        } else {
+            SwapDustCheckFee.QuoteFee
+        }
         val validationSystem = swapInteractor.validationSystem(payload.metaAccountId)
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
-            payload = payload,
+            payload = payload.copy(dustCheckFee = dustCheckFee),
             progressConsumer = _validationProgress.progressConsumer(),
             validationFailureTransformerCustom = ::formatValidationFailure,
         ) { validPayload ->
@@ -613,7 +619,11 @@ class SwapMainSettingsViewModel(
 
     private fun openSwapConfirmation(validPayload: SwapValidationPayload) = launchUnit {
         swapRouter.openSwapConfirmation(
-            operationMapper.toPayload(validPayload.toSwapState(), requireNotNull(validPayload.metaAccountId), returnToTab = display == SwapFormDisplay.TAB)
+            operationMapper.toPayload(
+                state = validPayload.toSwapState(),
+                metaAccountId = requireNotNull(validPayload.metaAccountId),
+                returnToTab = display == SwapFormDisplay.TAB
+            )
         )
     }
 

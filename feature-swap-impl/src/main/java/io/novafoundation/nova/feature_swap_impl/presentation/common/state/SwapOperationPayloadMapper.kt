@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperat
 import io.novafoundation.nova.feature_swap_api.domain.model.routeId
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDustCheckFeePayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapFeeAmountPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapFeeComponentPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapFeePayload
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.toParcel
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -74,7 +76,8 @@ class SwapOperationPayloadMapper @Inject constructor(
             ),
             slippage = state.slippage.inFraction,
             fee = state.fee.toPayload(),
-            returnToTab = returnToTab
+            returnToTab = returnToTab,
+            dustCheckFee = state.dustCheckFee.toPayload()
         )
     }
 
@@ -119,7 +122,17 @@ class SwapOperationPayloadMapper @Inject constructor(
             additionalMaxAmountDeduction = SwapMaxAdditionalAmountDeduction(payload.fee.maxAdditionalDeduction),
             route = route.map { it.routeId() }
         )
-        return SwapState(quote, fee, payload.slippage.fractions)
+        return SwapState(quote, fee, payload.slippage.fractions, payload.dustCheckFee.toDomain())
+    }
+
+    private fun SwapDustCheckFee.toPayload(): SwapDustCheckFeePayload = when (this) {
+        SwapDustCheckFee.QuoteFee -> SwapDustCheckFeePayload.QuoteFee
+        is SwapDustCheckFee.MaxFeeWithMargin -> SwapDustCheckFeePayload.MaxFeeWithMargin(amount)
+    }
+
+    private fun SwapDustCheckFeePayload.toDomain(): SwapDustCheckFee = when (this) {
+        SwapDustCheckFeePayload.QuoteFee -> SwapDustCheckFee.QuoteFee
+        is SwapDustCheckFeePayload.MaxFeeWithMargin -> SwapDustCheckFee.MaxFeeWithMargin(amount)
     }
 
     private fun SwapFee.toPayload() = SwapFeePayload(

@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmoun
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
@@ -84,6 +85,7 @@ private data class SwapConfirmationState(
     val swapQuoteArgs: SwapQuoteArgs,
     val swapQuote: SwapQuote,
     val fee: SwapFee,
+    val reviewedDustCheckFee: SwapDustCheckFee = SwapDustCheckFee.QuoteFee,
 )
 
 enum class MaxAction {
@@ -367,12 +369,18 @@ class SwapConfirmationViewModel(
 
     private suspend fun getValidationPayload(): SwapValidationPayload {
         val confirmationState = confirmationStateFlow.first()
+        val dustCheckFee = if (maxActionFlow.value == MaxAction.ACTIVE) {
+            maxActionProvider.dustCheckFeeFor(confirmationState.swapQuote)
+        } else {
+            confirmationState.reviewedDustCheckFee
+        }
 
         return SwapValidationPayload(
             swapQuote = confirmationState.swapQuote,
             fee = confirmationState.fee,
             slippage = slippageFlow.first(),
-            metaAccountId = operationPayload.metaAccountId
+            metaAccountId = operationPayload.metaAccountId,
+            dustCheckFee = dustCheckFee
         )
     }
 
@@ -463,7 +471,7 @@ class SwapConfirmationViewModel(
 
             feeMixin.setFee(swapState.fee)
 
-            val newState = SwapConfirmationState(quoteArgs, swapQuote, swapState.fee)
+            val newState = SwapConfirmationState(quoteArgs, swapQuote, swapState.fee, swapState.dustCheckFee)
             confirmationStateFlow.emit(newState)
         }
     }
