@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -9,7 +10,13 @@ import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDedu
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.BaseAmountChooserProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -22,8 +29,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.After
@@ -48,7 +57,7 @@ class SwapMaxActionProviderTest {
 
     private val feeResetVersion = MutableStateFlow(0)
 
-    private val maxActive = MutableStateFlow(false)
+    private val amountInputState = MutableStateFlow(InputState.empty())
 
     private val fees = MutableStateFlow<FeeStatus<SwapFee, Unit>>(FeeStatus.NoFee)
 
@@ -76,10 +85,21 @@ class SwapMaxActionProviderTest {
 
     @Test
     fun `active max keeps the fee that set the amount within one percent while validation uses the new fee`() = runBlocking {
-        maxActive.value = true
         fees.value = feeStatus(1_000)
         val provider = createProvider(fees)
+        val amountChooser = BaseAmountChooserProvider(
+            coroutineScope = scope,
+            tokenFlow = flowOf(null),
+            maxActionProvider = provider,
+            inputState = amountInputState
+        )
         provider.awaitBalance(8_930)
+
+        val maxInput = withTimeout(5_000) {
+            amountChooser.invokeMaxClick()
+            amountInputState.first { it.inputKind.isMaxAction() }
+        }
+        assertEquals("8930", maxInput.value)
 
         fees.value = feeStatus(1_008)
         provider.affordableBalanceProvider.awaitBalance(8_932)
@@ -88,22 +108,24 @@ class SwapMaxActionProviderTest {
         fees.value = feeStatus(1_010)
         provider.affordableBalanceProvider.awaitBalance(8_930)
         assertEquals(BigInteger.valueOf(8_930), provider.maxAvailableBalance.first().actualBalance)
+        assertEquals(maxInput, amountInputState.value)
 
         fees.value = feeStatus(1_016)
         provider.affordableBalanceProvider.awaitBalance(8_924)
         provider.awaitBalance(8_914)
+        withTimeout(5_000) { amountInputState.first { it.value == "8914" } }
 
         fees.value = feeStatus(1_008)
         provider.affordableBalanceProvider.awaitBalance(8_932)
         assertEquals(BigInteger.valueOf(8_914), provider.maxAvailableBalance.first().actualBalance)
 
-        maxActive.value = false
+        amountChooser.setAmountInput("5000", initiatedByUser = true)
         provider.awaitBalance(8_922)
     }
 
     @Test
     fun `route fee asset and reserve changes each reset the max fee anchor`() = runBlocking {
-        maxActive.value = true
+        amountInputState.value = InputState("8930", initiatedByUser = true, inputKind = InputKind.MAX_ACTION)
         fees.value = feeStatus(1_000)
         val provider = createProvider(fees)
         provider.awaitBalance(8_930)
@@ -125,7 +147,7 @@ class SwapMaxActionProviderTest {
     @Test
     fun `reset discards the previous fee for the same asset pair`() = runBlocking {
         prepareReserve()
-        maxActive.value = true
+        amountInputState.value = InputState("8930", initiatedByUser = true, inputKind = InputKind.MAX_ACTION)
         fees.value = feeStatus(1_000)
         val provider = createProvider(fees)
         provider.awaitBalance(8_930)
@@ -149,7 +171,7 @@ class SwapMaxActionProviderTest {
             scope = scope,
             assets = assets,
             outputAssets = flowOf(output),
-            maxActive = maxActive,
+            maxActive = amountInputState.map { it.inputKind.isMaxAction() }.distinctUntilChanged(),
             feeLoaderMixin = mock<FeeLoaderMixinV2<SwapFee, Unit>>().also { `when`(it.fee).thenReturn(feeStatuses) },
             feeResetVersion = feeResetVersion
         )
@@ -163,6 +185,7 @@ class SwapMaxActionProviderTest {
     private fun chainAsset(id: Int) = mock(Chain.Asset::class.java).also {
         `when`(it.chainId).thenReturn("hub")
         `when`(it.id).thenReturn(id)
+        `when`(it.precision).thenReturn(Precision(0))
     }
 
     private fun balance(amount: Long): Asset {
