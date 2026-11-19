@@ -3,6 +3,11 @@ package io.novafoundation.nova.feature_swap_impl.domain
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
+import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
+import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBalanceConsideringConsumersValidation
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughAssetInToPayForSwapAndFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
@@ -19,6 +24,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import java.math.BigDecimal
 import org.junit.Test
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
@@ -63,6 +69,42 @@ class SwapInputEdValidationTest {
         `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, maximum))
         assertTrue(system.validate(payload).getOrThrow() is ValidationStatus.NotValid)
         `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, maximum - ed))
+        assertTrue(system.validate(payload).getOrThrow() is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `consumer added after quote offers a maximum that passes revalidation`() = runBlocking {
+        val ed = BigInteger("100000000")
+        val totalFees = BigInteger("12600000")
+        val transferable = BigInteger("157294258315")
+        val expectedMaximum = transferable - ed - totalFees
+        val reserve = mock(SwapInputReserve::class.java)
+        val account = ByteArray(32)
+        val origin = SubmissionOrigin(account, account)
+        val submissionFee = SubmissionFeeWithLabel(SubstrateFee(totalFees, origin, input))
+        `when`(input.chainId).thenReturn("asset-hub")
+        `when`(input.precision).thenReturn(Precision(10))
+        `when`(context.getAsset(input)).thenReturn(asset)
+        `when`(reserve.canDropBelowEd(input, account)).thenReturn(false)
+        `when`(context.getExistentialDeposit(FullChainAssetId("asset-hub", 0))).thenReturn(ed)
+        `when`(asset.transferableInPlanks).thenReturn(transferable)
+        `when`(asset.balanceCountedTowardsEDInPlanks).thenReturn(transferable)
+        `when`(fee.additionalMaxAmountDeduction).thenReturn(SwapMaxAdditionalAmountDeduction(BigInteger.ZERO))
+        `when`(fee.initialSubmissionFee).thenReturn(submissionFee)
+        `when`(fee.totalFeeAmount(input)).thenReturn(totalFees)
+        `when`(payload.fee).thenReturn(fee)
+        val system = ValidationSystem<SwapValidationPayload, SwapValidationFailure> {
+            enoughAssetInToPayForSwapAndFee(context)
+            sufficientBalanceConsideringConsumersValidation(context, reserve)
+        }
+
+        `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, expectedMaximum + BigInteger.ONE))
+        val rejected = system.validate(payload).getOrThrow() as ValidationStatus.NotValid
+        val failure = rejected.reason as SwapValidationFailure.InsufficientBalance.BalanceNotConsiderConsumers
+        verify(reserve).canDropBelowEd(input, account)
+        assertEquals(expectedMaximum, failure.maxSwapAmount)
+
+        `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, failure.maxSwapAmount))
         assertTrue(system.validate(payload).getOrThrow() is ValidationStatus.Valid)
     }
 

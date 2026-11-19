@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_swap_impl.domain.swapMaximum
-import java.math.BigInteger
 import io.novafoundation.nova.common.validation.Validation
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
@@ -46,17 +46,20 @@ fun SwapValidationSystemBuilder.swapSmallRemainingBalance(
     SwapDoNotLooseAssetInDustValidation(assetsValidationContext)
 )
 
-fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
-    assetsValidationContext: AssetsValidationContext
+internal fun SwapValidationSystemBuilder.sufficientBalanceConsideringConsumersValidation(
+    assetsValidationContext: AssetsValidationContext,
+    swapInputReserve: SwapInputReserve
 ) = sufficientBalanceConsideringConsumersValidation(
     assetsValidationContext = assetsValidationContext,
     assetExtractor = { it.amountIn.chainAsset },
+    canDropBelowEd = { payload, asset -> swapInputReserve.canDropBelowEd(asset, payload.fee.initialSubmissionFee.submissionOrigin.executingAccount) },
     feeExtractor = { it.fee.totalFeeAmount(it.amountIn.chainAsset) },
     amountExtractor = { it.amountIn.amount },
-    error = { payload, existentialDeposit ->
+    error = { payload, existentialDeposit, asset ->
         SwapValidationFailure.InsufficientBalance.BalanceNotConsiderConsumers(
             assetIn = payload.amountIn.chainAsset,
             assetInED = existentialDeposit,
+            maxSwapAmount = asset.swapMaximum(existentialDeposit, payload.fee.totalFeeAmount(payload.amountIn.chainAsset)),
             fee = payload.fee.initialSubmissionFee.amountByExecutingAccount,
             feeAsset = payload.fee.initialSubmissionFee.asset
         )
@@ -100,12 +103,8 @@ fun SwapValidationSystemBuilder.enoughAssetInToPayForSwapAndFee(
 ) = sufficientBalanceGeneric(
     available = {
         val asset = assetsValidationContext.getAsset(it.amountIn.chainAsset)
-        val available = swapMaximum(
-            transferable = asset.transferableInPlanks,
-            countedTowardsEd = asset.balanceCountedTowardsEDInPlanks,
-            minimumBalance = it.fee.additionalMaxAmountDeduction.fromCountedTowardsEd,
-            fee = BigInteger.ZERO // The generic validation subtracts and displays the fee separately.
-        )
+        // The generic validation subtracts and displays the fee separately.
+        val available = asset.swapMaximum(it.fee.additionalMaxAmountDeduction.fromCountedTowardsEd)
         it.amountIn.chainAsset.amountFromPlanks(available)
     },
     amount = { it.amountIn.decimalAmount },

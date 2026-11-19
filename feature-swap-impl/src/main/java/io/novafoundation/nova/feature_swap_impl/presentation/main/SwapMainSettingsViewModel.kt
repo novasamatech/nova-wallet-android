@@ -590,7 +590,7 @@ class SwapMainSettingsViewModel(
             scope = viewModelScope,
             assets = assetInFlow.filterNotNull(),
             outputAssets = swapSettings.map { it.assetOut },
-            fees = feeMixin.fee,
+            feeLoaderMixin = feeMixin,
         )
     }
 

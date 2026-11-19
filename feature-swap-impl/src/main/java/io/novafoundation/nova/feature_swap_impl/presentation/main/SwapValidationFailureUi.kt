@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
 import io.novafoundation.nova.common.base.TitleAndMessage
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.formatPercents
@@ -86,17 +87,21 @@ fun mapSwapValidationFailureToUI(
                 reason.feeAmount.formatTokenAmount(reason.assetIn)
             ),
             resourceManager = resourceManager,
+            hasUsableMaximum = !reason.maxSwapAmount.isZero,
             positiveButtonClick = amountInSwapMaxAction
         )
 
-        is InsufficientBalance.BalanceNotConsiderConsumers -> TitleAndMessage(
-            resourceManager.getString(R.string.common_not_enough_funds_title),
-            resourceManager.getString(
+        is InsufficientBalance.BalanceNotConsiderConsumers -> handleInsufficientBalance(
+            title = resourceManager.getString(R.string.common_not_enough_funds_title),
+            message = resourceManager.getString(
                 R.string.swap_failure_balance_not_consider_consumers,
                 reason.assetInED.formatPlanks(reason.assetIn),
                 reason.fee.formatPlanks(reason.feeAsset)
-            )
-        ).asDefault()
+            ),
+            resourceManager = resourceManager,
+            hasUsableMaximum = !reason.maxSwapAmount.isZero,
+            positiveButtonClick = { amountInSetAction(reason.assetIn, reason.maxSwapAmount) }
+        )
 
         is InsufficientBalance.BalanceNotConsiderInsufficientReceiveAsset -> TitleAndMessage(
             resourceManager.getString(R.string.common_not_enough_funds_title),
@@ -214,8 +219,11 @@ fun handleInsufficientBalance(
     title: String,
     message: String,
     resourceManager: ResourceManager,
+    hasUsableMaximum: Boolean = true,
     positiveButtonClick: () -> Unit
 ): TransformedFailure {
+    if (!hasUsableMaximum) return TitleAndMessage(title, message).asDefault()
+
     return handleErrorToSwapMax(
         title = title,
         message = message,
