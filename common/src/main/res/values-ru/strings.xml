@@ -2536,4 +2536,9 @@
     <string name="tabbar_browser_title">Браузер</string>
     <string name="tabbar_more_title">Ещё</string>
     <string name="tabbar_swaps_title">Обмены</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Не удалось загрузить торговые лимиты пула. Попробуйте ещё раз.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Не удалось проверить лимиты пула</string>
+    <string name="swap_failure_pool_trade_minimum_message">Для этого маршрута обмена требуется как минимум %1$s в одном из пулов ликвидности. Увеличьте сумму или выберите другой маршрут.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Сумма ниже минимальной для пула</string>
+    <string name="swap_not_enough_asset">Недостаточно %s</string>
 </resources>

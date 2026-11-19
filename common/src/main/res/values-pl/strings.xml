@@ -2536,4 +2536,9 @@
     <string name="tabbar_browser_title">Przeglądarka</string>
     <string name="tabbar_more_title">Więcej</string>
     <string name="tabbar_swaps_title">Swapy</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Nie udało się załadować limitów transakcji puli. Spróbuj ponownie.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Nie można zweryfikować limitów puli</string>
+    <string name="swap_failure_pool_trade_minimum_message">Ta trasa wymiany wymaga co najmniej %1$s w jednej ze swoich pul płynności. Zwiększ kwotę lub wybierz inną trasę.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Kwota poniżej minimum puli</string>
+    <string name="swap_not_enough_asset">Niewystarczająca ilość %s</string>
 </resources>

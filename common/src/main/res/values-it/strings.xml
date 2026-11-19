@@ -2508,4 +2508,9 @@
     <string name="tabbar_browser_title">Browser</string>
     <string name="tabbar_more_title">Altro</string>
     <string name="tabbar_swaps_title">Swap</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Impossibile caricare i limiti di trading del pool. Riprova.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Impossibile verificare i limiti del pool</string>
+    <string name="swap_failure_pool_trade_minimum_message">Questo percorso di scambio richiede almeno %1$s in uno dei suoi pool di liquidità. Aumenta l\'importo o scegli un altro percorso.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Importo inferiore al minimo del pool</string>
+    <string name="swap_not_enough_asset">%s insufficienti</string>
 </resources>

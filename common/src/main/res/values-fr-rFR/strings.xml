@@ -2508,4 +2508,9 @@
     <string name="tabbar_browser_title">Navigateur</string>
     <string name="tabbar_more_title">Plus</string>
     <string name="tabbar_swaps_title">Échanges</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Les limites de trading du pool n’ont pas pu être chargées. Veuillez réessayer.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Impossible de vérifier les limites du pool</string>
+    <string name="swap_failure_pool_trade_minimum_message">Cette route d’échange nécessite au moins %1$s dans l’un de ses pools de liquidité. Augmentez le montant ou choisissez une autre route.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Montant inférieur au minimum du pool</string>
+    <string name="swap_not_enough_asset">Pas assez de %s</string>
 </resources>

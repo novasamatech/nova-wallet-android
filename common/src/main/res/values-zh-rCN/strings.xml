@@ -2494,4 +2494,9 @@
     <string name="tabbar_browser_title">浏览器</string>
     <string name="tabbar_more_title">更多</string>
     <string name="tabbar_swaps_title">兑换</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">无法加载流动性池交易限额。请重试。</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">无法验证流动性池限额</string>
+    <string name="swap_failure_pool_trade_minimum_message">此兑换路径要求其某个流动性池中至少有 %1$s。请增加金额或选择其他路径。</string>
+    <string name="swap_failure_pool_trade_minimum_title">金额低于流动性池最低限额</string>
+    <string name="swap_not_enough_asset">%s 不足</string>
 </resources>

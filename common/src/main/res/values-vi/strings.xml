@@ -2494,4 +2494,9 @@
     <string name="tabbar_browser_title">Trình duyệt</string>
     <string name="tabbar_more_title">Thêm</string>
     <string name="tabbar_swaps_title">Đổi token</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Không thể tải giới hạn giao dịch của pool. Vui lòng thử lại.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Không thể xác minh giới hạn của pool</string>
+    <string name="swap_failure_pool_trade_minimum_message">Tuyến swap này yêu cầu tối thiểu %1$s tại một trong các pool thanh khoản. Hãy tăng số lượng hoặc chọn tuyến khác.</string>
+    <string name="swap_failure_pool_trade_minimum_title">Số lượng thấp hơn mức tối thiểu của pool</string>
+    <string name="swap_not_enough_asset">Không đủ %s</string>
 </resources>
