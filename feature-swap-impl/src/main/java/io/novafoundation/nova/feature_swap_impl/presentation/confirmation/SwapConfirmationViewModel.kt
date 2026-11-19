@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmoun
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
@@ -84,6 +85,7 @@ private data class SwapConfirmationState(
     val swapQuoteArgs: SwapQuoteArgs,
     val swapQuote: SwapQuote,
     val fee: SwapFee,
+    val reviewedDustCheckFee: SwapDustCheckFee = SwapDustCheckFee.QuoteFee,
 )
 
 enum class MaxAction {
@@ -167,6 +169,7 @@ class SwapConfirmationViewModel(
         scope = viewModelScope,
         assets = assetInFlow,
         outputAssets = confirmationStateFlow.map { it.swapQuote.assetOut },
+        maxActive = maxActionFlow.map { it == MaxAction.ACTIVE },
         feeLoaderMixin = feeMixin,
     )
 
@@ -366,12 +369,18 @@ class SwapConfirmationViewModel(
 
     private suspend fun getValidationPayload(): SwapValidationPayload {
         val confirmationState = confirmationStateFlow.first()
+        val dustCheckFee = if (maxActionFlow.value == MaxAction.ACTIVE) {
+            maxActionProvider.dustCheckFeeFor(confirmationState.swapQuote)
+        } else {
+            confirmationState.reviewedDustCheckFee
+        }
 
         return SwapValidationPayload(
             swapQuote = confirmationState.swapQuote,
             fee = confirmationState.fee,
             slippage = slippageFlow.first(),
-            metaAccountId = operationPayload.metaAccountId
+            metaAccountId = operationPayload.metaAccountId,
+            dustCheckFee = dustCheckFee
         )
     }
 
@@ -462,7 +471,7 @@ class SwapConfirmationViewModel(
 
             feeMixin.setFee(swapState.fee)
 
-            val newState = SwapConfirmationState(quoteArgs, swapQuote, swapState.fee)
+            val newState = SwapConfirmationState(quoteArgs, swapQuote, swapState.fee, swapState.dustCheckFee)
             confirmationStateFlow.emit(newState)
         }
     }
@@ -477,9 +486,11 @@ class SwapConfirmationViewModel(
                 quoteUpdateJob?.join()
                 if (maxActionFlow.value != MaxAction.ACTIVE) return@onEach
 
-                val confirmationState = confirmationStateFlow.first()
+                val quoteArgs = confirmationStateFlow.first().swapQuoteArgs
+                // Max sets the pay amount, while a SPECIFIED_OUT quote stores the receive amount.
+                if (quoteArgs.amount == amount && quoteArgs.swapDirection == SwapDirection.SPECIFIED_IN) return@onEach
                 calculateQuote(
-                    confirmationState.swapQuoteArgs.copy(
+                    quoteArgs.copy(
                         amount = amount,
                         swapDirection = SwapDirection.SPECIFIED_IN
                     )

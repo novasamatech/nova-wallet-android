@@ -65,6 +65,10 @@ interface AmountChooserMixinBase : CoroutineScope {
         val inputKind: InputKind
     ) {
 
+        companion object {
+            fun empty(): InputState<String> = InputState(value = "", initiatedByUser = true, inputKind = InputKind.REGULAR)
+        }
+
         enum class InputKind {
             REGULAR, MAX_ACTION, BLOCKED
         }

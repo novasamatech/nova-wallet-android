@@ -52,11 +52,10 @@ open class BaseAmountChooserProvider(
     private val maxActionProvider: MaxActionProvider?,
     fiatFormatter: AmountChooserMixinBase.FiatFormatter = DefaultFiatFormatter(),
     private val fieldValidator: FieldValidator? = null,
+    final override val inputState: MutableStateFlow<InputState<String>> = MutableStateFlow(InputState.empty()),
 ) : AmountChooserMixinBase.Presentation,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
-
-    final override val inputState = MutableStateFlow(defaultState())
 
     @Deprecated(
         message = "Use `inputState` instead",
@@ -66,7 +65,7 @@ open class BaseAmountChooserProvider(
         )
     )
     final override val amountInput = inputState.map { it.value }
-        .stateIn(this, SharingStarted.Eagerly, initialValue = "")
+        .stateIn(this, SharingStarted.Eagerly, initialValue = inputState.value.value)
 
     @Suppress("DEPRECATION")
     override val fieldError: Flow<FieldValidationResult> = fieldValidator?.observe(amountInput)
@@ -113,8 +112,6 @@ open class BaseAmountChooserProvider(
 
         return replace(",", "").toBigDecimalOrNull()
     }
-
-    private fun defaultState(): InputState<String> = InputState(value = "", initiatedByUser = true, inputKind = InputKind.REGULAR)
 
     private fun <T, R> InputState<T>.map(valueTransform: (T) -> R): InputState<R> {
         return InputState(valueTransform(value), initiatedByUser, inputKind)

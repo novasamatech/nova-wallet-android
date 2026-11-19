@@ -39,7 +39,7 @@ class SwapInputEdValidationTest {
     private val validation = SwapKeepsNecessaryAmountOfAssetIn(context)
 
     @Test
-    fun `fee amount validation accepts Max with covered ED and suggests the same Max`() = runBlocking {
+    fun `fee validation accepts the full affordable amount and suggests buffered Max`() = runBlocking {
         val transferable = BigInteger("4714246059")
         val locked = BigInteger("5000000000")
         val totalFees = BigInteger("13600000")
@@ -62,7 +62,7 @@ class SwapInputEdValidationTest {
         `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, maximum + BigInteger.ONE))
         val status = system.validate(payload).getOrThrow() as ValidationStatus.NotValid
         val failure = status.reason as SwapValidationFailure.InsufficientBalance.CannotPayFeeDueToAmount
-        assertEquals(0, failure.maxSwapAmount.compareTo(BigDecimal("0.4700646059")))
+        assertEquals(0, failure.maxSwapAmount.compareTo(BigDecimal("0.4700510059")))
 
         // Without an ED-covering balance, the same amount must still be rejected.
         `when`(asset.balanceCountedTowardsEDInPlanks).thenReturn(transferable)
@@ -77,7 +77,8 @@ class SwapInputEdValidationTest {
         val ed = BigInteger("100000000")
         val totalFees = BigInteger("12600000")
         val transferable = BigInteger("157294258315")
-        val expectedMaximum = transferable - ed - totalFees
+        val affordableAmount = transferable - ed - totalFees
+        val expectedMaximum = affordableAmount - BigInteger("126000")
         val reserve = mock(SwapInputReserve::class.java)
         val account = ByteArray(32)
         val origin = SubmissionOrigin(account, account)
@@ -98,7 +99,7 @@ class SwapInputEdValidationTest {
             sufficientBalanceConsideringConsumersValidation(context, reserve)
         }
 
-        `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, expectedMaximum + BigInteger.ONE))
+        `when`(payload.amountIn).thenReturn(ChainAssetWithAmount(input, affordableAmount + BigInteger.ONE))
         val rejected = system.validate(payload).getOrThrow() as ValidationStatus.NotValid
         val failure = rejected.reason as SwapValidationFailure.InsufficientBalance.BalanceNotConsiderConsumers
         verify(reserve).canDropBelowEd(input, account)
