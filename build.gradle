@@ -276,7 +276,7 @@ dependencies {
 }
 
 // Source sets covered by ktlint and ktlintFormat.
-def ktlintSourceSets = ['main']
+def ktlintSourceSets = ['main', 'test']
 
 // -PktlintFiles=<comma-separated paths> narrows a run to the listed files (scripts/git-hooks/pre-push
 // relies on it). Paths outside the source sets above are dropped, so a narrowed run never checks

@@ -1,7 +1,7 @@
 # Code style and focused refactoring
 
 Read .editorconfig and the current Gradle lint configuration; they are the executable formatting baseline.
-The root ktlint task uses Android rules and scans main sources, not tests. Do not introduce a second formatter.
+The root ktlint task uses Android rules and scans main and unit-test sources, not androidTest. Do not introduce a second formatter.
 Do not reorder imports or rename files just to enforce rules disabled by this project. Do not chain calls from a parenthesized `if`/`when` expression; select the value into a descriptively named variable, then apply the call chain.
 Context receivers are already used; do not migrate language features as incidental cleanup.
 

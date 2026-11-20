@@ -10,7 +10,7 @@ Do not copy toolchain versions or module counts from old prose; README and build
 | Fast module compile (example) | `./gradlew :feature-swap-impl:compileDebugKotlin` |
 | Targeted unit tests (example) | `./gradlew :feature-staking-impl:testDebugUnitTest` |
 | Single regression class | `./gradlew :feature-staking-impl:testDebugUnitTest --tests 'fully.qualified.TestClass'` |
-| Main-source style | `./gradlew ktlint` |
+| Main and unit-test source style | `./gradlew ktlint` |
 | Style of selected files | `./gradlew ktlint -PktlintFiles=<comma-separated paths>` |
 | CI lint + unit tests in one local run | `./gradlew runTest` |
 | Develop build | `./gradlew assembleDevelop` |
@@ -21,8 +21,8 @@ Do not copy toolchain versions or module counts from old prose; README and build
 Substitute the affected existing module/test class; these examples do not imply all modules expose each task.
 `runTest` runs clean + ktlint + testDebugUnitTest; it is deliberately slower than the targeted loop.
 `runModuleTests` exists only where tests.gradle is applied. The root lint task is not `:module:ktlintCheck`.
-Lint currently scans `**/src/main/**/*.kt`, so inspect test-source style separately.
-`ktlintFormat` edits main sources across the project; do not run it blindly on a dirty checkout.
+Lint scans Kotlin under `src/main` and `src/test`. `src/androidTest` is not linted; inspect its style separately.
+`ktlintFormat` edits the same sources across the project; do not run it blindly on a dirty checkout.
 `ktlintFiles` narrows `ktlint` and `ktlintFormat` to the listed files and ignores paths outside the linted source sets.
 
 ## CI layout and the pre-push hook
