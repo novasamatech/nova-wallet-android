@@ -137,7 +137,6 @@ class BittensorPortfolioRowMapperTest {
         assertEquals("2 ALPHA".ltrIsolated(), failed.subtitle)
     }
 
-
     @Test
     fun `weekly change has one decimal and a negative change is falling`() {
         val row = mapper.map(

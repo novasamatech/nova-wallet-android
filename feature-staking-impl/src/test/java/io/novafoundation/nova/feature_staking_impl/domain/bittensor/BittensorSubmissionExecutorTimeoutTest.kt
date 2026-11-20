@@ -368,10 +368,12 @@ class BittensorSubmissionExecutorTimeoutTest {
             onUnconfirmed(HASH)
             awaitCancellation()
         }
-        val pending = launch { executeProtected { hash ->
-            assertEquals(HASH, hash)
-            notified.complete(Unit)
-        } }
+        val pending = launch {
+            executeProtected { hash ->
+                assertEquals(HASH, hash)
+                notified.complete(Unit)
+            }
+        }
         notified.await()
 
         verify(positions).invalidate(chain.id, coldKey, METAID)

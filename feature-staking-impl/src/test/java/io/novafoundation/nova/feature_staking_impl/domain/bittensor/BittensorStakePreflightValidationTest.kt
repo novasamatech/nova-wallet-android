@@ -106,7 +106,14 @@ class BittensorStakePreflightValidationTest {
     private val immediateValidation = BittensorImmediateStakeValidation()
 
     private val validation = BittensorStakePreflightValidation(
-        repository, accounts, wallets, stakeValidationSystem, subnetInteractor, validators, immediateExecution, immediateValidation
+        repository,
+        accounts,
+        wallets,
+        stakeValidationSystem,
+        subnetInteractor,
+        validators,
+        immediateExecution,
+        immediateValidation
     )
 
     private val system = ValidationSystem(validation)

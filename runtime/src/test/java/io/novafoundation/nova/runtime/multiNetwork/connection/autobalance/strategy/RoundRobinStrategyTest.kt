@@ -7,7 +7,6 @@ import org.junit.Test
 
 class RoundRobinStrategyTest {
 
-
     private val nodes = listOf(
         createFakeNode("1"),
         createFakeNode("2"),

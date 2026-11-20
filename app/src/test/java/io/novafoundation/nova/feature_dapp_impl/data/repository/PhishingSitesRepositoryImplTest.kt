@@ -38,7 +38,6 @@ class PhishingSitesRepositoryImplTest {
         PhishingSitesRepositoryImpl(phishingDao, phishingSitesApi, phishingDetectingService)
     }
 
-
     @Test
     fun isPhishing() {
         runBlocking {

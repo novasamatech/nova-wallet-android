@@ -112,7 +112,7 @@ class TestModuleMocker {
         return testInnerCall
     }
 
-    operator fun component2():GenericEvent.Instance {
+    operator fun component2(): GenericEvent.Instance {
         return testEvent
     }
 }
@@ -125,14 +125,13 @@ suspend fun ExtrinsicWalk.walkSingleIgnoringBranches(extrinsicWithEvents: Extrin
 }
 
 suspend fun ExtrinsicWalk.walkToList(extrinsicWithEvents: ExtrinsicWithEvents): List<ExtrinsicVisit> {
-   return walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT)
+    return walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT)
 }
 
 suspend fun ExtrinsicWalk.walkEmpty(extrinsicWithEvents: ExtrinsicWithEvents) {
     val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT).ignoreBranches()
     Assert.assertTrue(visits.isEmpty())
 }
-
 
 suspend fun ExtrinsicWalk.walkMultipleIgnoringBranches(extrinsicWithEvents: ExtrinsicWithEvents, expectedSize: Int): List<ExtrinsicVisit> {
     val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT).ignoreBranches()

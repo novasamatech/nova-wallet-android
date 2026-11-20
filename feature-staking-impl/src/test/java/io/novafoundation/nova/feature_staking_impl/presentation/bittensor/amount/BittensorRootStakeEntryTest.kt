@@ -13,7 +13,10 @@ class BittensorRootStakeEntryTest {
 
     @Test
     fun `where to stake root opens the quick pick`() {
-        assertEquals(BittensorRootStakeEntry.QUICK_PICK, bittensorRootStakeEntry(BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true)))
+        assertEquals(
+            BittensorRootStakeEntry.QUICK_PICK,
+            bittensorRootStakeEntry(BittensorStakeAmountPayload(metaId = null, validatorAddress = null, quickPick = true))
+        )
     }
 
     @Test

@@ -53,7 +53,6 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
 
-
 @RunWith(MockitoJUnitRunner::class)
 class RealLocalAccountsCloudBackupFacadeTest {
 
@@ -84,7 +83,6 @@ class RealLocalAccountsCloudBackupFacadeTest {
     lateinit var gson: Gson
 
     private val ethereumDerivationPath = "//44//60//0/0/0"
-
 
     @Before
     fun setup() {
@@ -224,7 +222,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                     chainAccount(accountId = bytes32) {
                         entropy(bytes32)
                         seed(bytes32)
-                        derivationPath("//${walletIndex}")
+                        derivationPath("//$walletIndex")
                         keypair(BaseKeypair(bytes32, bytes32))
                     }
                 }
@@ -269,7 +267,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(accountId = bytes32) {
                             entropy(bytes32)
                             seed(bytes32)
-                            derivationPath("//${index}")
+                            derivationPath("//$index")
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
                     }
@@ -498,7 +496,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(accountId = bytes32) {
                             entropy(bytes32)
                             seed(bytes32)
-                            derivationPath("//${index}")
+                            derivationPath("//$index")
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
                     }
@@ -573,7 +571,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                     chainAccount(accountId = bytes32) {
                         entropy(bytes32)
                         seed(bytes32)
-                        derivationPath("//${walletIndex}")
+                        derivationPath("//$walletIndex")
                         keypair(BaseKeypair(bytes32, bytes32))
                     }
                 }
@@ -618,7 +616,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(accountId = bytes32) {
                             entropy(bytes32)
                             seed(bytes32)
-                            derivationPath("//${index}")
+                            derivationPath("//$index")
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
                     }
@@ -698,7 +696,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                     chainAccount(accountId = bytes32) {
                         entropy(bytes32)
                         seed(bytes32)
-                        derivationPath("//${walletIndex}")
+                        derivationPath("//$walletIndex")
                         keypair(BaseKeypair(bytes32, bytes32))
                     }
                 }
@@ -743,7 +741,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(accountId = bytes32) {
                             entropy(bytes32)
                             seed(bytes32)
-                            derivationPath("//${index}")
+                            derivationPath("//$index")
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
                     }
@@ -794,15 +792,19 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val uuid = walletUUid(0)
 
         // Meta account got updated with new accountId but ethereum address stays the same
-        verify(metaAccountDao).updateMetaAccount(argThat {
-            it.globallyUniqueId == uuid && it.substrateAccountId.contentEquals(changedBytes32) &&
-                it.ethereumAddress.contentEquals(oldBytes20)
-        })
+        verify(metaAccountDao).updateMetaAccount(
+            argThat {
+                it.globallyUniqueId == uuid && it.substrateAccountId.contentEquals(changedBytes32) &&
+                    it.ethereumAddress.contentEquals(oldBytes20)
+            }
+        )
 
         // Chain account was removed
-        verify(metaAccountDao).deleteChainAccounts(argThat {
-            it.size == 1 && it.single().accountId.contentEquals(oldBytes32)
-        })
+        verify(metaAccountDao).deleteChainAccounts(
+            argThat {
+                it.size == 1 && it.single().accountId.contentEquals(oldBytes32)
+            }
+        )
 
         // No new chain accounts were inserted
         verify(metaAccountDao, never()).insertChainAccounts(any())
@@ -1075,14 +1077,18 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val uuid = walletUUid(0)
 
         // Meta account got updated with new accountId but ethereum address stays the same
-        verify(metaAccountDao).updateMetaAccount(argThat {
-            it.globallyUniqueId == uuid && it.substrateAccountId == null && it.ethereumAddress == null
-        })
+        verify(metaAccountDao).updateMetaAccount(
+            argThat {
+                it.globallyUniqueId == uuid && it.substrateAccountId == null && it.ethereumAddress == null
+            }
+        )
 
         // Old chain account was removed
-        verify(metaAccountDao).deleteChainAccounts(argThat {
-            it.size == 1 && it.single().accountId.contentEquals(oldBytes32)
-        })
+        verify(metaAccountDao).deleteChainAccounts(
+            argThat {
+                it.size == 1 && it.single().accountId.contentEquals(oldBytes32)
+            }
+        )
 
         // No new chain accounts were inserted
         verify(metaAccountDao).insertChainAccounts(singleChainAccountWithAccountId(changedBytes32))
@@ -1145,7 +1151,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
                         chainAccount(accountId = bytes32) {
                             entropy(bytes32)
                             seed(bytes32)
-                            derivationPath("//${index}")
+                            derivationPath("//$index")
                             keypair(KeyPairSecrets(bytes32, bytes32, nonce = null))
                         }
                     }
@@ -1160,11 +1166,13 @@ class RealLocalAccountsCloudBackupFacadeTest {
         val bytes32 = bytes32of(0)
 
         verify(metaAccountDao).insertMetaAccount(metaAccountWithUuid(walletUUid(0)))
-        verify(metaAccountDao).insertChainAccounts(argThat {
-            val item = it.single()
+        verify(metaAccountDao).insertChainAccounts(
+            argThat {
+                val item = it.single()
 
-            item.accountId.contentEquals(bytes32) && item.cryptoType == CryptoType.ECDSA
-        })
+                item.accountId.contentEquals(bytes32) && item.cryptoType == CryptoType.ECDSA
+            }
+        )
     }
 
     private suspend fun verifyEvent(event: MetaAccountChangesEventBus.Event?) {
@@ -1176,7 +1184,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
     }
 
     private fun expectedLegacyLedgerDerivationPathKey(chainId: ChainId): String {
-        return "LedgerChainAccount.derivationPath.${chainId}"
+        return "LedgerChainAccount.derivationPath.$chainId"
     }
 
     private fun expectedGenericLedgerDerivationPathKey(): String {
@@ -1237,11 +1245,11 @@ class RealLocalAccountsCloudBackupFacadeTest {
         }
     }
 
-    private fun walletUUid(idx: Int) = "id${idx}"
+    private fun walletUUid(idx: Int) = "id$idx"
     private fun bytes32of(byte: Int) = ByteArray(32) { byte.toByte() }
     private fun bytes20of(byte: Int) = ByteArray(20) { byte.toByte() }
 
-    private fun chainId(idx: Long) = "0x${idx}"
+    private fun chainId(idx: Long) = "0x$idx"
 
     private suspend fun chainIsEvm(chainId: ChainId, isEvm: Boolean) {
         return chainsAreEvm(mapOf(chainId to isEvm))

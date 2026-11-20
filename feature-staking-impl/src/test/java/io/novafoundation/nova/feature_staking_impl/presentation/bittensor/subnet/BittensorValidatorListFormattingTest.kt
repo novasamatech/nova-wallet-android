@@ -21,7 +21,10 @@ class BittensorValidatorListFormattingTest {
         }
         val generic = bittensorValidatorListFailure(java.io.IOException("Gateway timeout"), resources)
         val device = bittensorValidatorListFailure(
-            java.io.IOException("Profile-3 authentication failed", io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException("No integrity")),
+            java.io.IOException(
+                "Profile-3 authentication failed",
+                io.novafoundation.nova.infrastructure.attestation.AttestationUnsupportedException("No integrity")
+            ),
             resources
         )
 

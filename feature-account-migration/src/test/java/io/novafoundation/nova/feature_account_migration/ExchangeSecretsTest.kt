@@ -8,7 +8,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.experimental.xor
 
-
 class ExchangeSecretsTest {
 
     private val keyExchangeUtils = KeyExchangeUtils()
@@ -20,7 +19,7 @@ class ExchangeSecretsTest {
         val peerA = keyExchangeUtils.generateEphemeralKeyPair()
         val peerB = keyExchangeUtils.generateEphemeralKeyPair()
 
-        val encoded = keyExchangeUtils.encrypt( encodingData.toByteArray(), peerA, peerB.public)
+        val encoded = keyExchangeUtils.encrypt(encodingData.toByteArray(), peerA, peerB.public)
 
         val decoded = keyExchangeUtils.decrypt(encoded, peerB, peerA.public)
 

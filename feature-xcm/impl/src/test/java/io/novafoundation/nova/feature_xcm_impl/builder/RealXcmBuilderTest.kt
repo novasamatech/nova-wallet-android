@@ -40,7 +40,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.math.BigInteger
 
-
 class RealXcmBuilderTest {
 
     val amount = 100000000000000.toBigInteger()
@@ -55,12 +54,11 @@ class RealXcmBuilderTest {
     val pah = ChainLocation(Chain.Geneses.POLKADOT_ASSET_HUB, ParachainId(1000).asLocation())
     val hydration = ChainLocation(Chain.Geneses.HYDRA_DX, ParachainId(2034).asLocation())
 
-    val dot =  Here.asLocation()
+    val dot = Here.asLocation()
     val dotLocation = AssetLocation(FullChainAssetId(Chain.Geneses.POLKADOT, 0), dot)
     val dotOnPolkadot = MultiAssetId(dot.fromPointOfViewOf(polkadot.location))
     val dotOnPah = MultiAssetId(dot.fromPointOfViewOf(pah.location))
     val dotOnHydration = MultiAssetId(dot.fromPointOfViewOf(hydration.location))
-
 
     val xcmVersion = XcmVersion.V4
 

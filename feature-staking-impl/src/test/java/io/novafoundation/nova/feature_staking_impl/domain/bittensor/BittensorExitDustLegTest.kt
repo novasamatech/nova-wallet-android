@@ -16,7 +16,11 @@ class BittensorExitDustLegTest {
     )
 
     private fun position(id: Int, amount: Long, locked: Long = 0) = BittensorExitBasisPosition(
-        AccountIdKey(ByteArray(32) { id.toByte() }), BigInteger.valueOf(amount), BigInteger.valueOf(locked), false, false
+        AccountIdKey(ByteArray(32) { id.toByte() }),
+        BigInteger.valueOf(amount),
+        BigInteger.valueOf(locked),
+        false,
+        false
     )
 
     private fun group(positions: List<BittensorExitBasisPosition>, bounds: BittensorExitFloors = floors) =

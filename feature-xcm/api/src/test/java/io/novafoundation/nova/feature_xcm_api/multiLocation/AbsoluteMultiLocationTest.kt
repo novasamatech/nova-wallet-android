@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Juncti
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-
 class AbsoluteMultiLocationTest {
 
     @Test
@@ -22,7 +21,7 @@ class AbsoluteMultiLocationTest {
     fun `reanchor no common junctions`() {
         val initial = AbsoluteMultiLocation(ParachainId(1000))
         val pov = AbsoluteMultiLocation(ParachainId(2000))
-        val expected = RelativeMultiLocation(parents=1, interior = Junctions(ParachainId(1000)))
+        val expected = RelativeMultiLocation(parents = 1, interior = Junctions(ParachainId(1000)))
 
         val result = initial.fromPointOfViewOf(pov)
 
@@ -33,7 +32,7 @@ class AbsoluteMultiLocationTest {
     fun `reanchor one common junction`() {
         val initial = AbsoluteMultiLocation(ParachainId(1000), ParachainId(2000))
         val pov = AbsoluteMultiLocation(ParachainId(1000), ParachainId(3000))
-        val expected = RelativeMultiLocation(parents=1, interior = Junctions(ParachainId(2000)))
+        val expected = RelativeMultiLocation(parents = 1, interior = Junctions(ParachainId(2000)))
 
         val result = initial.fromPointOfViewOf(pov)
 
@@ -44,7 +43,7 @@ class AbsoluteMultiLocationTest {
     fun `reanchor all common junction`() {
         val initial = AbsoluteMultiLocation(ParachainId(1000), ParachainId(2000))
         val pov = AbsoluteMultiLocation(ParachainId(1000), ParachainId(2000))
-        val expected = RelativeMultiLocation(parents=0, interior = Interior.Here)
+        val expected = RelativeMultiLocation(parents = 0, interior = Interior.Here)
 
         val result = initial.fromPointOfViewOf(pov)
 
@@ -66,7 +65,7 @@ class AbsoluteMultiLocationTest {
     fun `reanchor pov is successor of initial`() {
         val initial = AbsoluteMultiLocation(Interior.Here)
         val pov = AbsoluteMultiLocation(ParachainId(1000))
-        val expected = RelativeMultiLocation(parents=1, interior = Interior.Here)
+        val expected = RelativeMultiLocation(parents = 1, interior = Interior.Here)
 
         val result = initial.fromPointOfViewOf(pov)
 
@@ -77,7 +76,7 @@ class AbsoluteMultiLocationTest {
     fun `reanchor initial is successor of pov`() {
         val initial = AbsoluteMultiLocation(ParachainId(1000), ParachainId(2000))
         val pov = AbsoluteMultiLocation(ParachainId(1000))
-        val expected = RelativeMultiLocation(parents=0, interior = Junctions(ParachainId(2000)))
+        val expected = RelativeMultiLocation(parents = 0, interior = Junctions(ParachainId(2000)))
 
         val result = initial.fromPointOfViewOf(pov)
 

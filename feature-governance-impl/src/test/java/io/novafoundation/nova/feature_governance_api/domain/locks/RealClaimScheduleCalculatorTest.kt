@@ -13,7 +13,6 @@ class RealClaimScheduleCalculatorTest {
         }
 
         expect {
-
         }
     }
 
@@ -160,7 +159,6 @@ class RealClaimScheduleCalculatorTest {
         }
     }
 
-
     @Test
     fun `should include shadowed actions`() = ClaimScheduleTest {
         given {
@@ -226,7 +224,6 @@ class RealClaimScheduleCalculatorTest {
         }
     }
 
-
     @Test
     fun `gap should be limited with other locks`() = ClaimScheduleTest {
         given {
@@ -285,7 +282,6 @@ class RealClaimScheduleCalculatorTest {
             nonClaimable(amount = 10, claimAt = 1100)
         }
     }
-
 
     @Test
     fun `should not dublicate unlock command with both prior and gap present`() = ClaimScheduleTest {
@@ -363,7 +359,7 @@ class RealClaimScheduleCalculatorTest {
     }
 
     @Test
-    fun `should handle standalone delegation`() = ClaimScheduleTest{
+    fun `should handle standalone delegation`() = ClaimScheduleTest {
         given {
             track(0) {
                 delegating {
@@ -378,7 +374,7 @@ class RealClaimScheduleCalculatorTest {
     }
 
     @Test
-    fun `should take delegation prior lock into account`() = ClaimScheduleTest{
+    fun `should take delegation prior lock into account`() = ClaimScheduleTest {
         given {
             currentBlock(1000)
 
@@ -398,7 +394,7 @@ class RealClaimScheduleCalculatorTest {
     }
 
     @Test
-    fun `delegation plus gap case`() = ClaimScheduleTest{
+    fun `delegation plus gap case`() = ClaimScheduleTest {
         given {
             currentBlock(1000)
 
@@ -420,7 +416,7 @@ class RealClaimScheduleCalculatorTest {
     }
 
     @Test
-    fun `delegate plus voting case`() = ClaimScheduleTest{
+    fun `delegate plus voting case`() = ClaimScheduleTest {
         given {
             currentBlock(1000)
 
@@ -440,7 +436,6 @@ class RealClaimScheduleCalculatorTest {
         }
 
         expect {
-
             // 5 is claimable from track 1 priors
             claimable(amount = 5) {
                 unlock(1)
