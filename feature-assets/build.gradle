@@ -80,6 +80,7 @@ dependencies {
 
     implementation bouncyCastleDep
 
+    testImplementation project(':test-shared')
     testImplementation jUnitDep
     testImplementation mockitoDep
     testImplementation coroutinesTestDep

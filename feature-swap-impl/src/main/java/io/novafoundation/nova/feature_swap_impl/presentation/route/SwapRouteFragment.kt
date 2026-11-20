@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.route
 
 import android.os.Bundle
-import android.view.View
-import androidx.core.view.doOnLayout
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import androidx.recyclerview.widget.ConcatAdapter
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -14,7 +11,6 @@ import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.errorDialog
-import io.novafoundation.nova.common.view.shape.getTopRoundedCornerDrawable
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentRouteBinding
