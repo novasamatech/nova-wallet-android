@@ -1,0 +1,10 @@
+name: Lint and test rc branch
+
+on:
+  push:
+    branches: ['rc/**']
+
+jobs:
+  test:
+    uses: ./.github/workflows/reusable_android_build.yml
+    secrets: inherit

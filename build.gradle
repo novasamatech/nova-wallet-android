@@ -275,6 +275,28 @@ dependencies {
     }
 }
 
+// Source sets covered by ktlint and ktlintFormat.
+def ktlintSourceSets = ['main']
+
+// -PktlintFiles=<comma-separated paths> narrows a run to the listed files (scripts/git-hooks/pre-push
+// relies on it). Paths outside the source sets above are dropped, so a narrowed run never checks
+// more than the full one.
+def ktlintTargets = {
+    def requestedFiles = project.findProperty('ktlintFiles')
+    if (requestedFiles == null) {
+        return ktlintSourceSets.collect { "$project.rootDir/**/src/$it/**/*.kt".toString() }
+    }
+
+    def coveredFile = ~/(.*\/)?src\/(${ktlintSourceSets.join('|')})\/.*\.kt/
+    return requestedFiles.toString()
+        .split(',')
+        .collect { it.trim() }
+        .findAll { it ==~ coveredFile }
+}()
+
+// ktlint called without patterns checks every Kotlin file under the working directory.
+def hasKtlintTargets = { !ktlintTargets.isEmpty() }
+
 task ktlint(type: JavaExec, group: "verification") {
     description = "Check Kotlin code style."
     classpath = configurations.ktlint
@@ -282,7 +304,8 @@ task ktlint(type: JavaExec, group: "verification") {
     args "--reporter=plain"
     args "--android"
     args "--reporter=checkstyle,output=${project.buildDir}/reports/checkstyle/ktlint.xml"
-    args "$project.rootDir/**/src/main/**/*.kt"
+    args ktlintTargets
+    onlyIf hasKtlintTargets
 }
 
 task ktlintFormat(type: JavaExec, group: "formatting") {
@@ -290,9 +313,11 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     classpath = configurations.ktlint
     main = "com.pinterest.ktlint.Main"
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
-    args "-F", "$project.rootDir/**/src/main/**/*.kt"
+    args "-F"
+    args ktlintTargets
     args "--android"
     jvmArgs "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    onlyIf hasKtlintTargets
 }
 
 task runTest(type: GradleBuild) {
