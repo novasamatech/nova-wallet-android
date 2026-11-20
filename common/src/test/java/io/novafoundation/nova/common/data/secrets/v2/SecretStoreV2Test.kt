@@ -26,7 +26,6 @@ class SecretStoreV2Test {
 
     @Test
     fun `should save and retrieve meta account secrets`() = runBlocking {
-
         val secrets = createMetaSecrets()
 
         secretStore.putMetaAccountSecrets(META_ID, secrets)

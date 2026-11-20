@@ -3,12 +3,10 @@ package io.novafoundation.nova.web3names
 import com.google.gson.Gson
 import io.novafoundation.nova.web3names.data.endpoints.TransferRecipientsApi
 import io.novafoundation.nova.web3names.data.serviceEndpoint.ServiceEndpoint
-import io.novafoundation.nova.web3names.data.serviceEndpoint.W3NServiceEndpointHandlerV1
 import io.novafoundation.nova.web3names.data.serviceEndpoint.W3NServiceEndpointHandlerV2
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.mock
-
 
 class We3NamesIntegrityVerifierTestV2 {
 

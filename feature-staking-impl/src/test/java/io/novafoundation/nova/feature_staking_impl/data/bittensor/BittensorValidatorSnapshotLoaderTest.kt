@@ -40,10 +40,15 @@ class BittensorValidatorSnapshotLoaderTest {
         val first = BittensorValidatorLink(validator.hotkey, 1)
         val second = BittensorValidatorLink(validator.hotkey, 64)
         val absent = BittensorValidatorLink(validator.hotkey, 65)
-        val context = RecordingQueryContext(runtime, delegate, expectedReads = 2, links = mapOf(
-            "ParentKeys" to setOf(first),
-            "ChildKeys" to setOf(first, second)
-        ))
+        val context = RecordingQueryContext(
+            runtime,
+            delegate,
+            expectedReads = 2,
+            links = mapOf(
+                "ParentKeys" to setOf(first),
+                "ChildKeys" to setOf(first, second)
+            )
+        )
 
         val result = withTimeout(5_000) { context.loadBittensorValidatorLinks(listOf(first, first, second, absent)) }
 
@@ -59,7 +64,10 @@ class BittensorValidatorSnapshotLoaderTest {
             context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator))
         }
 
-        assertEquals(setOf("ValidatorPermit", "LastUpdate", "Number", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates", "ParentKeys", "ChildKeys"), context.requests)
+        assertEquals(
+            setOf("ValidatorPermit", "LastUpdate", "Number", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates", "ParentKeys", "ChildKeys"),
+            context.requests
+        )
         assertEquals(mapOf(validator.hotkey to 0), snapshot.uids)
         assertEquals(mapOf(validator.hotkey to BigInteger.ZERO), snapshot.commissionsInU16)
         assertEquals(listOf(true), snapshot.permits)

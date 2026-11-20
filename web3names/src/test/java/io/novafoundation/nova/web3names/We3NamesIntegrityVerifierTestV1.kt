@@ -8,7 +8,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.mock
 
-
 class We3NamesIntegrityVerifierTestV1 {
 
     private val endpointHandler = W3NServiceEndpointHandlerV1(

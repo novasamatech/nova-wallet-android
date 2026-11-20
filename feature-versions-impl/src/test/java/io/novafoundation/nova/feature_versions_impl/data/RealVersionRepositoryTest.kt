@@ -96,7 +96,6 @@ internal class RealVersionRepositoryTest {
         )
     }
 
-
     private suspend fun runHasImportantUpdatesTest(
         appVersion: String,
         updates: List<Pair<String, String>>, // [(version, priority)]

@@ -5,7 +5,7 @@ import io.novafoundation.nova.test_shared.whenever
 import org.mockito.Mockito
 
 object Mocks {
-    fun chain(id: String) : Chain {
+    fun chain(id: String): Chain {
         val chain = Mockito.mock(Chain::class.java)
 
         whenever(chain.id).thenReturn(id)

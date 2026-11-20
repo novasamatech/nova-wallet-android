@@ -9,7 +9,6 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 
-
 class CommonsTest {
 
     @Test
@@ -33,7 +32,7 @@ class CommonsTest {
                 "0x61d8c5647f4181f2c35996c62a6272967f5739a8",
                 "0xaCCaCE4056A930745218328BF086369Fbd61c212"
             ),
-            threshold =2,
+            threshold = 2,
             expected = "0xb4e55b61678623fd5ece9c24e79d6c0532bee057",
         )
     }

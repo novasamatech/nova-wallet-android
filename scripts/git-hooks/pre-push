@@ -1,0 +1,76 @@
+#!/bin/sh
+# Pre-push hook: runs the project's ktlint on the Kotlin files touched by the commits being pushed.
+#
+#   Enabled by any local Gradle run (scripts/git-hooks.gradle) while core.hooksPath is unset.
+#   Enable by hand:      git config core.hooksPath scripts/git-hooks
+#   Opt out:             git config core.hooksPath .git/hooks
+#   Skip for one push:   git push --no-verify
+#
+# The check reads the working tree, so it only applies when the pushed commit is the checked-out one;
+# other refs (tags, branches that are not checked out) are left to CI.
+
+# Above this many files the list is no longer worth passing to Gradle: a full run takes about as long,
+# and the list would approach the operating system's argument-length limits.
+MAX_LISTED_FILES=200
+
+is_zero_sha() {
+    case "$1" in
+        *[!0]*) return 1 ;;
+        *) return 0 ;;
+    esac
+}
+
+repo_root=$(git rev-parse --show-toplevel) || exit 1
+cd "$repo_root" || exit 1
+head_sha=$(git rev-parse --verify --quiet HEAD) || exit 0
+
+pushed_files=""
+
+# stdin: "<local ref> <local sha> <remote ref> <remote sha>" for every ref being pushed.
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+    [ "$local_sha" = "$head_sha" ] || continue
+
+    remote_tip=""
+    if ! is_zero_sha "$remote_sha" && git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+        remote_tip="^$remote_sha"
+    fi
+
+    # Commits the remote does not have yet: not reachable from the ref being updated nor from any
+    # remote-tracking branch. -c also lists files a merge commit changed itself.
+    ref_files=$(
+        git -c core.quotePath=false log -c --name-only --diff-filter=ACMR --pretty=format: \
+            "$local_sha" ${remote_tip:+"$remote_tip"} --not --remotes -- '*.kt'
+    ) || exit 1
+
+    pushed_files="$pushed_files
+$ref_files"
+done
+
+files_to_check=$(
+    printf '%s\n' "$pushed_files" | sort -u | while IFS= read -r file; do
+        if [ -f "$file" ]; then
+            printf '%s\n' "$file"
+        fi
+    done
+)
+
+[ -n "$files_to_check" ] || exit 0
+
+file_count=$(printf '%s\n' "$files_to_check" | wc -l | tr -d ' ')
+
+# --configure-on-demand configures the root project only, which is all the ktlint task needs.
+if [ "$file_count" -le "$MAX_LISTED_FILES" ]; then
+    echo "pre-push: ktlint on $file_count changed Kotlin file(s)"
+    ./gradlew :ktlint --configure-on-demand --quiet \
+        -PktlintFiles="$(printf '%s\n' "$files_to_check" | paste -sd, -)" </dev/null
+else
+    echo "pre-push: ktlint on all sources ($file_count changed Kotlin files)"
+    ./gradlew :ktlint --configure-on-demand --quiet </dev/null
+fi
+ktlint_status=$?
+
+if [ "$ktlint_status" -ne 0 ]; then
+    echo "pre-push: ktlint failed, push aborted. Fix the violations above, commit and push again." >&2
+    echo "pre-push: ./gradlew ktlintFormat -PktlintFiles=<comma-separated paths> fixes most of them." >&2
+    exit 1
+fi

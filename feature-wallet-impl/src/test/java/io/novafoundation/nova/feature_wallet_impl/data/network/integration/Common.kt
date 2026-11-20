@@ -12,7 +12,7 @@ class StdoutLogger : Logger {
     }
 }
 
-class NoOpLogger: Logger {
+class NoOpLogger : Logger {
     override fun log(message: String?) {
         // pass
     }

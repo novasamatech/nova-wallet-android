@@ -126,7 +126,6 @@ private class ClaimableActionsBuilder : ClaimScheduleTestBuilder.Expect.Claimabl
 
     private val actions = mutableListOf<ClaimAction>()
 
-
     override fun unlock(trackId: Int) {
         val action = ClaimAction.Unlock(TrackId(trackId.toBigInteger()))
         actions.add(action)
@@ -189,7 +188,6 @@ private class GivenBuilder : ClaimScheduleTestBuilder.Given {
             voteLockingPeriod = BlockNumber.ZERO
         )
     }
-
 }
 
 private fun PriorLock(): PriorLock = PriorLock(BlockNumber.ZERO, Balance.ZERO)

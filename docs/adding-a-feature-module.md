@@ -107,7 +107,7 @@ Feature modules may own layouts, drawables and `attrs.xml`; shared widgets belon
 
 ```bash
 ./gradlew :feature-<name>-impl:compileDebugKotlin   # fast feedback
-./gradlew ktlint                                   # root task; scans src/main only
+./gradlew ktlint                                   # root task; scans src/main and src/test
 ./gradlew assembleDevelop                          # what CI builds
 ```
 
