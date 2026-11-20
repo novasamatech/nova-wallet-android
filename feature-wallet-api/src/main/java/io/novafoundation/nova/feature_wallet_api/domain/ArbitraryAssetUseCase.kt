@@ -18,6 +18,10 @@ interface ArbitraryAssetUseCase {
 
     fun assetFlow(chainAsset: Chain.Asset): Flow<Asset>
 
+    fun assetFlow(metaAccountId: Long, chainAsset: Chain.Asset): Flow<Asset>
+
+    suspend fun getAsset(metaAccountId: Long, chainAsset: Chain.Asset): Asset?
+
     suspend fun getAsset(chainAsset: Chain.Asset): Asset?
 }
 
@@ -39,6 +43,14 @@ class RealArbitraryAssetUseCase(
         return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
             walletRepository.assetFlow(metaAccount.id, chainAsset)
         }
+    }
+
+    override fun assetFlow(metaAccountId: Long, chainAsset: Chain.Asset): Flow<Asset> {
+        return walletRepository.assetFlow(metaAccountId, chainAsset)
+    }
+
+    override suspend fun getAsset(metaAccountId: Long, chainAsset: Chain.Asset): Asset? {
+        return walletRepository.getAsset(metaAccountId, chainAsset)
     }
 
     override suspend fun getAsset(chainAsset: Chain.Asset): Asset? {

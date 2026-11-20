@@ -1,28 +1,25 @@
 package io.novafoundation.nova.feature_swap_impl.presentation
 
+import kotlinx.coroutines.flow.Flow
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.common.navigation.ReturnableRouter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 interface SwapRouter : ReturnableRouter {
 
-    fun openSwapConfirmation()
+    fun openSwapConfirmation(payload: SwapOperationPayload)
 
-    fun openSwapRoute()
+    fun openSwapRoute(payload: SwapOperationPayload)
 
-    fun openSwapFee()
+    fun openSwapFee(payload: SwapOperationPayload)
 
-    fun openSwapExecution()
+    fun openSwapExecution(payload: SwapOperationPayload)
 
-    fun selectAssetIn(selectedAsset: AssetPayload?)
+    fun observeSwapRetries(): Flow<SwapSettingsPayload.RepeatOperation>
 
-    fun selectAssetOut(selectedAsset: AssetPayload?)
+    fun openRetrySwap(payload: SwapSettingsPayload.RepeatOperation)
 
-    fun openSwapOptions()
-
-    fun openRetrySwap(payload: SwapSettingsPayload)
-
-    fun openBalanceDetails(assetPayload: AssetPayload)
+    fun finishSwap(returnToTab: Boolean)
 
     fun openMain()
 }

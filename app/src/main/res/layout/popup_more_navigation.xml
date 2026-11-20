@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToOutline="true"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/moreNavigationGovernance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="53dp"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/common_governance"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/container_border" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/moreNavigationSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="53dp"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/profile_settings_title"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body" />
+
+</LinearLayout>

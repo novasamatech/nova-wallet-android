@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.presentation.getAsset
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,12 +18,19 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -32,6 +41,7 @@ class RealGetAssetOptionsMixinFactory(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val chainRegistry: ChainRegistry,
     private val actionAwaitableFactory: ActionAwaitableMixin.Factory,
+    private val analyticsService: AnalyticsService,
 ) : GetAssetOptionsMixin.Factory {
 
     override fun create(
@@ -50,7 +60,8 @@ class RealGetAssetOptionsMixinFactory(
             actionAwaitableFactory,
             additionalButtonFilter,
             scope,
-            showWhenNoOptions
+            showWhenNoOptions,
+            analyticsService
         )
     }
 }
@@ -65,19 +76,25 @@ class RealGetAssetOptionsMixin(
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
     additionalButtonFilter: Flow<Boolean>,
     scope: CoroutineScope,
-    showWhenNoOptions: Boolean
+    showWhenNoOptions: Boolean,
+    private val analyticsService: AnalyticsService
 ) : GetAssetOptionsMixin, CoroutineScope by scope {
 
-    private val getAssetOptionsFlow = assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(assetFlow)
-        .shareInBackground()
+    // Keep options tied to the asset that produced them, including after a late asset load or an asset change.
+    private val getAssetPayloadFlow = assetFlow
+        .distinctUntilChanged()
+        .flatMapLatest { asset ->
+            assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(flowOf(asset)).map { options ->
+                asset?.let { GetAssetBottomSheet.Payload(it, options) }
+            }
+        }
 
     override val getAssetOptionsButtonState = combine(
-        assetFlow.filterNotNull(),
-        getAssetOptionsFlow,
+        getAssetPayloadFlow,
         additionalButtonFilter
-    ) { assetIn, getAssetInOptions, shouldShownButton ->
-        if (shouldShowGetAssetButton(shouldShownButton, getAssetInOptions, showWhenNoOptions)) {
-            val symbol = assetIn.symbol
+    ) { payload, shouldShownButton ->
+        if (payload != null && shouldShowGetAssetButton(shouldShownButton, payload.availableOptions, showWhenNoOptions)) {
+            val symbol = payload.chainAsset.symbol
             DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_get_token_format, symbol))
         } else {
             DescriptiveButtonState.Gone
@@ -90,29 +107,39 @@ class RealGetAssetOptionsMixin(
     override val observeGetAssetAction = actionAwaitableFactory.create<GetAssetBottomSheet.Payload, GetAssetOption>()
 
     override fun openAssetOptions() = launchUnit {
-        val assetIn = assetFlow.first() ?: return@launchUnit
-        val availableOptions = getAssetOptionsFlow.first()
-
-        val payload = GetAssetBottomSheet.Payload(
-            chainAsset = assetIn,
-            availableOptions = availableOptions
-        )
-
-        val selectedOption = observeGetAssetAction.awaitAction(payload)
-        onAssetOptionSelected(selectedOption)
-    }
-
-    private fun onAssetOptionSelected(option: GetAssetOption) {
-        when (option) {
-            GetAssetOption.Receive -> receiveSelected()
-            GetAssetOption.CrossChain -> onCrossChainTransferSelected()
-            GetAssetOption.Buy -> buySelected()
-            is GetAssetOption.DApp -> walletRouter.openDAppBrowser(option.url)
+        coroutineScope {
+            val chainAsset = assetFlow.filterNotNull().first()
+            val options = assetGetOptionsUseCase.observeAssetGetOptionsForSelectedAccount(flowOf(chainAsset))
+                .shareIn(this, SharingStarted.Eagerly, replay = 1)
+            try {
+                val payload = GetAssetBottomSheet.Payload(chainAsset, options.first(), options)
+                val selectedOption = observeGetAssetAction.awaitAction(payload)
+                onAssetOptionSelected(selectedOption, chainAsset)
+            } finally {
+                coroutineContext.cancelChildren()
+            }
         }
     }
 
-    private fun onCrossChainTransferSelected() = launch {
-        val chainAssetIn = assetFlow.first() ?: return@launch
+    private fun onAssetOptionSelected(option: GetAssetOption, chainAsset: Chain.Asset) {
+        when (option) {
+            GetAssetOption.Receive -> receiveSelected(chainAsset)
+            GetAssetOption.CrossChain -> onCrossChainTransferSelected(chainAsset)
+            GetAssetOption.Buy -> buySelected(chainAsset)
+            is GetAssetOption.DApp -> {
+                analyticsService.track(
+                    AnalyticsEvent.AssetFundingDappOpened(
+                        provider = option.name,
+                        asset = chainAsset.symbol.value,
+                        chainId = chainAsset.chainId
+                    )
+                )
+                walletRouter.openDAppBrowser(option.url)
+            }
+        }
+    }
+
+    private fun onCrossChainTransferSelected(chainAssetIn: Chain.Asset) = launch {
         val assetInChain = chainRegistry.getChain(chainAssetIn.chainId)
 
         val currentAddress = selectedAccountUseCase.getSelectedMetaAccount().addressIn(assetInChain)
@@ -120,13 +147,11 @@ class RealGetAssetOptionsMixin(
         walletRouter.openSendCrossChain(AssetPayload(chainAssetIn.chainId, chainAssetIn.id), currentAddress)
     }
 
-    private fun buySelected() = launch {
-        val chainAssetIn = assetFlow.first() ?: return@launch
+    private fun buySelected(chainAssetIn: Chain.Asset) {
         walletRouter.openBuyToken(chainAssetIn.chainId, chainAssetIn.id)
     }
 
-    private fun receiveSelected() = launch {
-        val chainAssetIn = assetFlow.first() ?: return@launch
+    private fun receiveSelected(chainAssetIn: Chain.Asset) {
         walletRouter.openReceive(AssetPayload(chainAssetIn.chainId, chainAssetIn.id))
     }
 }

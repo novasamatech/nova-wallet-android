@@ -44,6 +44,6 @@ class RealSwapRouteFormatter(
             }
         }
 
-        return foundChains.takeIf { foundChains.size >= 2 }
+        return foundChains
     }
 }

@@ -14,6 +14,7 @@ data class SwapQuoteArgs(
     val tokenOut: Token,
     val amount: Balance,
     val swapDirection: SwapDirection,
+    val metaAccountId: Long? = null,
 )
 
 open class SwapFeeArgs(
@@ -21,7 +22,8 @@ open class SwapFeeArgs(
     val slippage: Fraction,
     val executionPath: Path<SegmentExecuteArgs>,
     val direction: SwapDirection,
-    val firstSegmentFees: FeePaymentCurrency
+    val firstSegmentFees: FeePaymentCurrency,
+    val metaAccountId: Long? = null
 )
 
 class SegmentExecuteArgs(

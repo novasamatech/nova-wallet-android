@@ -1,6 +1,12 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapExecutionSavedState
+import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapExecutionSavedState.Status
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmittedTransaction
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapEntryPoint
 import io.novafoundation.nova.analytics.AmountBucket
 import io.novafoundation.nova.analytics.AnalyticsEvent
@@ -9,11 +15,9 @@ import io.novafoundation.nova.analytics.DurationBucket
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.launchUnit
-import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
@@ -25,7 +29,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.remainingTimeWhenExe
 import io.novafoundation.nova.feature_swap_api.domain.model.swapDirection
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.toParcel
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -37,13 +40,14 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.analytics.to
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -56,34 +60,48 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateReposito
 import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class SwapExecutionViewModel(
-    private val swapStateStoreProvider: SwapStateStoreProvider,
+    private val operationLoader: SwapOperationLoader,
+    private val operationPayload: SwapOperationPayload,
+    private val savedState: SwapExecutionSavedState,
+    private val externalActions: ExternalActions.Presentation,
     private val swapInteractor: SwapInteractor,
     private val resourceManager: ResourceManager,
     private val router: SwapRouter,
     private val chainRegistry: ChainRegistry,
+    private val tokenFormatter: TokenFormatter,
     private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val tokenRepository: TokenRepository,
     private val analyticsService: AnalyticsService,
     private val usdRateRepository: UsdRateRepository,
 ) : BaseViewModel(),
+    Retriable by operationLoader,
+    ExternalActions by externalActions,
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
-    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+    private val swapStateFlow = operationLoader.state(viewModelScope).shareInBackground()
 
-    private val swapStateFlow = flowOf { swapStateStoreProvider.getStateOrThrow(swapFlowScope) }
+    private val swapProgressFlow = MutableStateFlow<SwapProgress?>(null)
 
-    private val swapProgressFlow = singleReplaySharedFlow<SwapProgress>()
+    private var checkpoint = if (savedState.status == Status.NEW) savedState.copy(status = Status.RUNNING) else savedState
+
+    fun saveExecutionState(): SwapExecutionSavedState = checkpoint
 
     private val totalSteps = swapStateFlow.map { it.fee.segments.size }
 
     val swapProgressModel = combine(swapStateFlow, swapProgressFlow) { swapState, swapProgress ->
-        swapProgress.toUi(swapState)
-    }.shareInBackground()
+        when {
+            swapProgress != null -> swapProgress.toUi(swapState)
+            savedState.status == Status.RUNNING -> SwapProgressModel.Interrupted(
+                resourceManager.getString(R.string.swap_execution_interrupted),
+                resourceManager.formatDateTime(checkpoint.at),
+                stepModels(swapState, checkpoint.stepIndex, unknown = true)
+            )
+            else -> null
+        }
+    }.filterNotNull().shareInBackground()
 
     val feeMixin = feeLoaderMixinFactory.createForSwap(
         chainAssetIn = swapStateFlow.map { it.quote.assetIn },
@@ -97,7 +115,31 @@ class SwapExecutionViewModel(
     init {
         setFee()
 
-        executeSwap()
+        if (savedState.status == Status.NEW) executeSwap() else restoreProgress()
+    }
+
+    private fun restoreProgress() = launchUnit {
+        val state = swapStateFlow.first()
+        when (savedState.status) {
+            Status.COMPLETED -> swapProgressFlow.value = SwapProgress.Done
+            Status.FAILED -> {
+                val segment = state.fee.segments.getOrNull(savedState.stepIndex) ?: return@launchUnit
+                val step = SwapProgressStep(savedState.stepIndex, segment.operation.constructDisplayData(segment.netFlow), segment.operation)
+                swapProgressFlow.value = SwapProgress.Failure(IllegalStateException(savedState.reason), step, savedTransaction())
+            }
+            Status.NEW, Status.RUNNING -> Unit // Never submit again when Android restores an execution screen.
+        }
+    }
+
+    private fun savedTransaction(): SwapSubmittedTransaction? {
+        val hash = checkpoint.transactionHash ?: return null
+        val chain = checkpoint.transactionChainId ?: return null
+        return SwapSubmittedTransaction(chain, hash, checkpoint.transactionFailed)
+    }
+
+    fun transactionClicked() = launchUnit {
+        val transaction = savedTransaction() ?: return@launchUnit
+        externalActions.showExternalActions(ExternalActions.Type.Extrinsic(transaction.hash), chainRegistry.getChain(transaction.chainId))
     }
 
     fun rateClicked() = launchUnit {
@@ -114,15 +156,16 @@ class SwapExecutionViewModel(
     }
 
     fun networkFeeClicked() {
-        router.openSwapFee()
+        router.openSwapFee(operationPayload)
     }
 
     fun routeClicked() {
-        router.openSwapRoute()
+        router.openSwapRoute(operationPayload)
     }
 
     fun retryClicked() = launchUnit {
         val swapFailure = swapProgressFlow.first() as? SwapProgress.Failure ?: return@launchUnit
+        if (checkpoint.status != Status.FAILED) return@launchUnit
         val failedStep = swapFailure.attemptedStep
 
         val retrySwapPayload = retrySwapPayload(failedStep)
@@ -130,12 +173,11 @@ class SwapExecutionViewModel(
         router.openRetrySwap(retrySwapPayload)
     }
 
-    fun doneClicked() = launchUnit {
-        val assetOut = swapStateFlow.first().quote.assetOut.fullId.toAssetPayload()
-        router.openBalanceDetails(assetOut)
+    fun doneClicked() {
+        router.finishSwap(returnToTab = operationPayload.returnToTab)
     }
 
-    private fun retrySwapPayload(failedStep: SwapProgressStep): SwapSettingsPayload {
+    private fun retrySwapPayload(failedStep: SwapProgressStep): SwapSettingsPayload.RepeatOperation {
         val failedOperation = failedStep.operation
 
         return SwapSettingsPayload.RepeatOperation(
@@ -144,6 +186,8 @@ class SwapExecutionViewModel(
             amount = failedOperation.estimatedSwapLimit.quotedAmount,
             direction = failedOperation.estimatedSwapLimit.swapDirection.toParcel(),
             source = SwapEntryPoint.RETRY,
+            metaAccountId = operationPayload.metaAccountId,
+            slippage = operationPayload.slippage,
         )
     }
 
@@ -156,8 +200,11 @@ class SwapExecutionViewModel(
         val executionStartedAt = System.currentTimeMillis()
 
         swapInteractor.executeSwap(fee)
-            .onEach { trackSwapProgress(it, executionStartedAt) }
-            .onEach(swapProgressFlow::emit)
+            .onEach { progress ->
+                updateCheckpoint(progress)
+                trackSwapProgress(progress, executionStartedAt)
+                swapProgressFlow.emit(progress)
+            }
             .inBackground()
             .collect()
     }
@@ -166,7 +213,7 @@ class SwapExecutionViewModel(
         when (progress) {
             is SwapProgress.Done -> trackSwapCompleted(executionStartedAt)
             is SwapProgress.Failure -> analyticsService.track(AnalyticsEvent.SwapFailed(progress.error.toSwapFailureReason()))
-            is SwapProgress.StepStarted -> {}
+            is SwapProgress.StepStarted, is SwapProgress.TransactionTracked -> {}
         }
     }
 
@@ -191,13 +238,14 @@ class SwapExecutionViewModel(
     private suspend fun SwapProgress.toUi(swapState: SwapState): SwapProgressModel {
         return when (this) {
             is SwapProgress.Done -> createCompletedStatus()
-            is SwapProgress.Failure -> toUi()
+            is SwapProgress.Failure -> toUi(swapState)
             is SwapProgress.StepStarted -> toUi(swapState)
+            is SwapProgress.TransactionTracked -> SwapProgress.StepStarted(step).toUi(swapState)
         }
     }
 
     private suspend fun SwapProgress.StepStarted.toUi(swapState: SwapState): SwapProgressModel.InProgress {
-        val stepDescription = step.displayData.createInProgressLabel()
+        val stepDescription = step.displayData.formatStep()
         val remainingExecutionTime = swapState.quote.executionEstimate.remainingTimeWhenExecuting(step.index)
 
         return SwapProgressModel.InProgress(
@@ -221,20 +269,54 @@ class SwapExecutionViewModel(
     }
 
     private fun createAtLabel(): String {
-        val currentTime = System.currentTimeMillis()
-        return resourceManager.formatDateTime(currentTime)
+        return resourceManager.formatDateTime(checkpoint.at)
     }
 
-    private suspend fun SwapProgress.Failure.toUi(): SwapProgressModel.Failed {
-        return SwapProgressModel.Failed(
-            reason = createSwapFailureMessage(),
-            at = createAtLabel()
-        )
+    private suspend fun SwapProgress.Failure.toUi(state: SwapState): SwapProgressModel {
+        val unknown = !hasKnownOutcome() && savedState.status != Status.FAILED
+        val steps = stepModels(state, attemptedStep.index, unknown)
+        return if (unknown) {
+            SwapProgressModel.Interrupted(resourceManager.getString(R.string.swap_execution_interrupted), createAtLabel(), steps)
+        } else {
+            SwapProgressModel.Failed(checkpoint.reason ?: createSwapFailureMessage(), createAtLabel(), steps, canRetry = true)
+        }
+    }
+
+    private suspend fun stepModels(state: SwapState, failedIndex: Int, unknown: Boolean): List<SwapProgressModel.Step> {
+        return state.fee.segments.mapIndexed { index, segment ->
+            SwapProgressModel.Step(
+                label = segment.operation.constructDisplayData(segment.netFlow).formatStep(),
+                status = when {
+                    index < failedIndex -> SwapProgressModel.StepStatus.COMPLETED
+                    index > failedIndex -> SwapProgressModel.StepStatus.PENDING
+                    unknown -> SwapProgressModel.StepStatus.UNKNOWN
+                    else -> SwapProgressModel.StepStatus.FAILED
+                },
+                hasTransaction = index == failedIndex && checkpoint.transactionHash != null
+            )
+        }
+    }
+
+    private suspend fun updateCheckpoint(progress: SwapProgress) {
+        checkpoint = when (progress) {
+            is SwapProgress.StepStarted -> SwapExecutionSavedState(Status.RUNNING, progress.step.index)
+            is SwapProgress.TransactionTracked -> checkpoint.copy(
+                transactionChainId = progress.transaction.chainId,
+                transactionHash = progress.transaction.hash,
+                transactionFailed = progress.transaction.failedOnChain
+            )
+            is SwapProgress.Done -> checkpoint.copy(status = Status.COMPLETED, at = System.currentTimeMillis())
+            is SwapProgress.Failure -> checkpoint.copy(
+                status = if (progress.hasKnownOutcome()) Status.FAILED else Status.RUNNING,
+                at = System.currentTimeMillis(),
+                reason = progress.createSwapFailureMessage()
+            )
+        }
     }
 
     private suspend fun SwapProgress.Failure.createSwapFailureMessage(): String {
         val failedStepNumber = attemptedStep.index + 1
-        val label = attemptedStep.displayData.createErrorLabel()
+        val label = attemptedStep.displayData.formatStep(forFailureMessage = true)
 
         val genericErrorMessage = resourceManager.getString(
             R.string.swap_execution_failure,
@@ -263,59 +345,31 @@ class SwapExecutionViewModel(
         }
     }
 
-    private suspend fun AtomicOperationDisplayData.createErrorLabel(): String {
+    private suspend fun AtomicOperationDisplayData.formatStep(forFailureMessage: Boolean = false): String {
         return when (this) {
             is AtomicOperationDisplayData.Swap -> {
-                val fromAsset = chainRegistry.asset(from.chainAssetId)
+                val (chain, fromAsset) = chainRegistry.chainWithAsset(from.chainAssetId)
                 val toAsset = chainRegistry.asset(to.chainAssetId)
-                val on = chainRegistry.getChain(fromAsset.chainId)
 
+                val label = if (forFailureMessage) R.string.swap_execution_failure_swap_label else R.string.swap_execution_progress_swap_label
                 resourceManager.getString(
-                    R.string.swap_execution_failure_swap_label,
-                    fromAsset.symbol.value,
-                    toAsset.symbol.value,
-                    on.name
+                    label,
+                    tokenFormatter.formatToken(from.amount, fromAsset),
+                    tokenFormatter.formatToken(to.amount, toAsset),
+                    chain.name
                 )
             }
 
             is AtomicOperationDisplayData.Transfer -> {
                 val (chainFrom, assetFrom) = chainRegistry.chainWithAsset(from)
                 val chainTo = chainRegistry.getChain(to.chainId)
+                val formattedAmount = tokenFormatter.formatToken(amount, assetFrom)
 
-                resourceManager.getString(
-                    R.string.swap_execution_failure_transfer_label,
-                    assetFrom.symbol.value,
-                    chainFrom.name,
-                    chainTo.name,
-                )
-            }
-        }
-    }
-
-    private suspend fun AtomicOperationDisplayData.createInProgressLabel(): String {
-        return when (this) {
-            is AtomicOperationDisplayData.Swap -> {
-                val fromAsset = chainRegistry.asset(from.chainAssetId)
-                val toAsset = chainRegistry.asset(to.chainAssetId)
-                val on = chainRegistry.getChain(fromAsset.chainId)
-
-                resourceManager.getString(
-                    R.string.swap_execution_progress_swap_label,
-                    fromAsset.symbol.value,
-                    toAsset.symbol.value,
-                    on.name
-                )
-            }
-
-            is AtomicOperationDisplayData.Transfer -> {
-                val (_, assetFrom) = chainRegistry.chainWithAsset(from)
-                val chainTo = chainRegistry.getChain(to.chainId)
-
-                resourceManager.getString(
-                    R.string.swap_execution_progress_transfer_label,
-                    assetFrom.symbol.value,
-                    chainTo.name
-                )
+                if (forFailureMessage) {
+                    resourceManager.getString(R.string.swap_execution_failure_transfer_label, formattedAmount, chainFrom.name, chainTo.name)
+                } else {
+                    resourceManager.getString(R.string.swap_execution_progress_transfer_label, formattedAmount, chainTo.name)
+                }
             }
         }
     }

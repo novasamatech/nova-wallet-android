@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
@@ -52,6 +54,7 @@ interface SwapFeatureComponent : SwapFeatureApi {
             deps: SwapFeatureDependencies,
             @BindsInstance router: SwapRouter,
             @BindsInstance slippageSettingsCommunicator: SlippageSettingsCommunicator,
+            @BindsInstance swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator,
         ): SwapFeatureComponent
     }
 
@@ -61,6 +64,7 @@ interface SwapFeatureComponent : SwapFeatureApi {
             CommonApi::class,
             RuntimeApi::class,
             WalletFeatureApi::class,
+            CurrencyFeatureApi::class,
             AccountFeatureApi::class,
             BuyFeatureApi::class,
             DbApi::class,

@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.price.RealChartsInteractor
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
@@ -50,9 +54,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.navigation.R
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.RealSwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsStateProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
@@ -64,9 +67,17 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 @Module(includes = [HydraDxExchangeModule::class, AssetConversionExchangeModule::class, CrossChainTransferExchangeModule::class])
 class SwapFeatureModule {
 
+    @Provides
+    fun provideChartsInteractor(
+        coinPriceRepository: CoinPriceRepository,
+        currencyRepository: CurrencyRepository
+    ): ChartsInteractor {
+        return RealChartsInteractor(coinPriceRepository, currencyRepository)
+    }
+
     @FeatureScope
     @Provides
-    fun provideSwapService(
+    internal fun provideSwapService(
         assetConversionFactory: AssetConversionExchangeFactory,
         hydraDxExchangeFactory: HydraDxExchangeFactory,
         crossChainTransferAssetExchangeFactory: CrossChainTransferAssetExchangeFactory,
@@ -78,6 +89,7 @@ class SwapFeatureModule {
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry,
+        swapInputReserve: SwapInputReserve,
         chainStateRepository: ChainStateRepository,
         signerProvider: SignerProvider
     ): SwapService {
@@ -93,6 +105,7 @@ class SwapFeatureModule {
             tokenRepository = tokenRepository,
             assetSourceRegistry = assetSourceRegistry,
             accountRepository = accountRepository,
+            swapInputReserve = swapInputReserve,
             chainStateRepository = chainStateRepository,
             signerProvider = signerProvider
         )
@@ -115,11 +128,12 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSwapInteractor(
+    internal fun provideSwapInteractor(
         priceImpactThresholds: PriceImpactThresholds,
         swapService: SwapService,
         tokenRepository: TokenRepository,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
+        swapInputReserve: SwapInputReserve,
         assetsValidationContextFactory: AssetsValidationContext.Factory,
         canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
         showReceivedAssetUseCase: ShowReceivedAssetUseCase,
@@ -129,6 +143,7 @@ class SwapFeatureModule {
             swapService = swapService,
             canReceiveAssetOutValidationFactory = canReceiveAssetOutValidationFactory,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
+            swapInputReserve = swapInputReserve,
             assetsValidationContextFactory = assetsValidationContextFactory,
             tokenRepository = tokenRepository,
             showReceivedAssetUseCase = showReceivedAssetUseCase
@@ -189,23 +204,15 @@ class SwapFeatureModule {
     @Provides
     @FeatureScope
     fun provideSwapUpdateSystemFactory(
-        swapSettingsStateProvider: SwapSettingsStateProvider,
         chainRegistry: ChainRegistry,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         accountInfoUpdaterFactory: AccountInfoUpdaterFactory
     ): SwapUpdateSystemFactory {
         return SwapUpdateSystemFactory(
-            swapSettingsStateProvider = swapSettingsStateProvider,
             chainRegistry = chainRegistry,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             accountInfoUpdaterFactory = accountInfoUpdaterFactory
         )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideSwapQuoteStoreProvider(computationalCache: ComputationalCache): SwapStateStoreProvider {
-        return RealSwapStateStoreProvider(computationalCache)
     }
 
     @Provides

@@ -13,7 +13,8 @@ data class SlippageSettingsPayload(
     val minimum: Double,
     val maximum: Double,
     val small: Double,
-    val big: Double
+    val big: Double,
+    val requestId: String? = null
 ) : Parcelable {
 
     fun config() = SlippageConfig(default.fractions, tips.map { it.fractions }, minimum.fractions, maximum.fractions, small.fractions, big.fractions)

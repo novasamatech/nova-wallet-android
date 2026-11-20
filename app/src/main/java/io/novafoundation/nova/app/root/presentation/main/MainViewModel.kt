@@ -62,6 +62,7 @@ class MainViewModel(
 
     private fun tabNameFor(destinationId: Int): String? = when (destinationId) {
         R.id.walletFragment -> "assets"
+        R.id.swapsTabFragment -> "swaps"
         R.id.voteFragment -> "vote"
         R.id.dAppsFragment -> "dapps"
         R.id.stakingDashboardFragment -> "staking"

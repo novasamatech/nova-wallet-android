@@ -63,9 +63,9 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
         BittensorSaleCostBasis.Unknown -> AmountModel("—", null)
     }
 
-    /** Earned needs settled totals: a still-settling history may miss the latest purchase. */
+    /** Sale estimates use the available purchase totals, matching the average price shown beside them. */
     fun profit(sale: BittensorSaleCostBasis?, quote: BittensorExitQuote?, token: TokenBase?): BittensorSaleProfitUi {
-        val totals = (sale as? BittensorSaleCostBasis.Known)?.takeIf { it.settled }?.totals
+        val totals = (sale as? BittensorSaleCostBasis.Known)?.totals
         if (totals == null || quote == null) return profit(null, null)
         return profit(token?.amountFromPlanks(estimatedSaleProfit(totals, quote)), token)
     }
@@ -151,7 +151,7 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
 internal fun estimatedSaleProfit(totals: BittensorEstimatedPurchaseTotals, quote: BittensorExitQuote) =
     totals.estimatedProfit(quote.amount, quote.estimatedTaoOut - quote.serviceFee)
 
-/** Only settled totals back "You will earn", so only they may back "You earned". */
+/** Completed sale results use settled totals; setup and review may display an estimate from provisional totals. */
 internal fun settledPurchaseTotals(sale: BittensorSaleCostBasis?): BittensorEstimatedPurchaseTotals? =
     (sale as? BittensorSaleCostBasis.Known)?.takeIf { it.settled }?.totals
 

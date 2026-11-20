@@ -1,13 +1,18 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.route
 
+import android.os.Bundle
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import androidx.recyclerview.widget.ConcatAdapter
-import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.domain.onLoaded
-import io.novafoundation.nova.common.domain.onNotLoaded
-import io.novafoundation.nova.common.utils.makeGone
-import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentRouteBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRouteAdapter
@@ -15,7 +20,14 @@ import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRout
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.SwapRouteViewHolder
 import io.novafoundation.nova.feature_swap_impl.presentation.route.list.TimelineItemDecoration
 
-class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>(), SwapRouteHeaderAdapter.Handler {
+class SwapRouteFragment : BaseBottomSheetFragment<SwapRouteViewModel, FragmentRouteBinding>() {
+
+    companion object {
+
+        private const val KEY_PAYLOAD = "swap_operation"
+
+        fun getBundle(payload: SwapOperationPayload) = Bundle().apply { putParcelable(KEY_PAYLOAD, payload) }
+    }
 
     override fun createBinding() = FragmentRouteBinding.inflate(layoutInflater)
 
@@ -23,7 +35,6 @@ class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>
     private lateinit var routeAdapter: SwapRouteAdapter
 
     override fun initViews() {
-        binder.swapRouteContent.setHasFixedSize(true)
         binder.swapRouteContent.itemAnimator = null
 
         val timelineDecoration = TimelineItemDecoration(
@@ -32,7 +43,7 @@ class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>
         )
         binder.swapRouteContent.addItemDecoration(timelineDecoration)
 
-        headerAdapter = SwapRouteHeaderAdapter(this)
+        headerAdapter = SwapRouteHeaderAdapter()
         routeAdapter = SwapRouteAdapter()
 
         binder.swapRouteContent.adapter = ConcatAdapter(headerAdapter, routeAdapter)
@@ -44,23 +55,23 @@ class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>
             SwapFeatureApi::class.java
         )
             .swapRoute()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: SwapRouteViewModel) {
+        observeRetries(viewModel)
+
         viewModel.swapRoute.observe { routeState ->
-            routeState.onLoaded {
-                binder.swapRouteProgress.makeGone()
-                routeAdapter.submitList(it)
-            }.onNotLoaded {
-                binder.swapRouteProgress.makeVisible()
-                routeAdapter.submitList(emptyList())
+            binder.swapRouteProgress.setVisible(routeState.isLoading)
+            routeAdapter.submitList(routeState.dataOrNull.orEmpty())
+
+            if (routeState is ExtendedLoadingState.Error) {
+                errorDialog(requireContext(), onConfirm = viewModel::backClicked) {
+                    setMessage(R.string.common_undefined_error_message)
+                    setOnCancelListener { viewModel.backClicked() }
+                }
             }
         }
-    }
-
-    override fun backClicked() {
-        viewModel.backClicked()
     }
 }

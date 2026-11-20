@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.domain.swap
 
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.SharedFlowCache
@@ -12,10 +13,8 @@ import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
-import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.allEdges
-import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
 import io.novafoundation.nova.common.utils.graph.numberOfEdges
@@ -49,6 +48,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionEstimate
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
+import io.novafoundation.nova.feature_swap_api.domain.model.routeId
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -84,12 +84,13 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromFiatOrZero
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
@@ -109,16 +110,18 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmittedTransaction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -145,6 +148,7 @@ internal class RealSwapService(
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val swapInputReserve: SwapInputReserve,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val chainStateRepository: ChainStateRepository,
@@ -181,12 +185,26 @@ internal class RealSwapService(
 
     override suspend fun availableSwapDirectionsFor(
         asset: Chain.Asset,
-        computationScope: CoroutineScope
+        computationScope: CoroutineScope,
+        metaAccountId: Long?
     ): Flow<Set<FullChainAssetId>> {
         return directionsGraph(computationScope).map {
-            val filter = nodeVisitFilter(computationScope)
+            val filter = nodeVisitFilter(computationScope, metaAccountId)
             measureExecution("findAllPossibleDestinations") {
                 it.findAllPossibleDestinations(asset.fullId, filter) - asset.fullId
+            }
+        }
+    }
+
+    override suspend fun availableAssetsForSelection(
+        oppositeAsset: FullChainAssetId,
+        selectingPay: Boolean,
+        metaAccountId: Long,
+        computationScope: CoroutineScope
+    ): Flow<Set<FullChainAssetId>> {
+        return directionsGraph(computationScope).map { graph ->
+            withContext(Dispatchers.Default) {
+                graph.assetsForSelection(oppositeAsset, selectingPay, nodeVisitFilter(computationScope, metaAccountId))
             }
         }
     }
@@ -218,13 +236,31 @@ internal class RealSwapService(
         val segments = buildSwapSegments(fees, atomicOperations)
         val convertedFees = segments.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
-        val firstOperation = atomicOperations.first()
-
         return SwapFee(
             segments = segments,
             intermediateSegmentFeesInAssetIn = convertedFees,
-            additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction(),
-        ).also(::logFee)
+            additionalMaxAmountDeduction = swapInputReserve.requiredFor(executeArgs.assetIn, segments.first()),
+            route = executeArgs.executionPath.map { it.quotedSwapEdge.edge.routeId() },
+        ).also { logFee(it, executeArgs.assetIn) }
+    }
+
+    override suspend fun resolveRoute(
+        route: List<SwapRouteEdgeId>,
+        computationScope: CoroutineScope
+    ): List<SwapGraphEdge> {
+        require(route.isNotEmpty())
+        val results = exchangeRegistry(computationScope).allExchanges().mapAsync { exchange ->
+            runCatching { exchange.availableDirectSwapConnections() }.onFailure { currentCoroutineContext().ensureActive() }
+        }
+        val edges = results.mapNotNull { it.getOrNull() }.flatten()
+        return route.map { id ->
+            edges.singleOrNull { it.routeId() == id }
+                ?: throw (results.firstNotNullOfOrNull { it.exceptionOrNull() } ?: IllegalStateException("Reviewed swap route is unavailable"))
+        }
+    }
+
+    override suspend fun constructOperations(args: SwapFeeArgs): List<AtomicSwapOperation> {
+        return args.constructAtomicOperations()
     }
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
@@ -253,15 +289,32 @@ internal class RealSwapService(
                     // We cannot execute buy for segments after first one since we deal with actualReceivedAmount there
                     val shouldReplaceBuyWithSell = correction != null
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
+                    var transaction: SwapSubmittedTransaction? = null
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
                         actualSwapLimit = actualSwapLimit,
                         isServiceCommissionOperation = index == serviceFeeOperationIndex,
+                        onExecuted = { receipt ->
+                            val submitted = SwapSubmittedTransaction(
+                                operation.assetIn.chainId,
+                                receipt.extrinsicHash,
+                                receipt.outcome is ExtrinsicDispatch.Failed
+                            )
+                            transaction = submitted
+                            emit(SwapProgress.TransactionTracked(step, submitted))
+                        }
                     )
 
-                    operation.execute(segmentSubmissionArgs).onFailure {
+                    val result = try {
+                        operation.execute(segmentSubmissionArgs)
+                    } catch (error: Exception) {
+                        currentCoroutineContext().ensureActive()
+                        Result.failure(error)
+                    }
+                    result.onFailure {
+                        currentCoroutineContext().ensureActive()
                         Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
 
-                        emit(SwapProgress.Failure(it, attemptedStep = step))
+                        emit(SwapProgress.Failure(it, attemptedStep = step, transaction = transaction))
                     }
                 }
             }.onSuccess {
@@ -324,6 +377,7 @@ internal class RealSwapService(
                     isFirstSegment = index == 0,
                     firstSegmentFees = firstSegmentFees,
                 ),
+                metaAccountId = metaAccountId,
             )
 
             // Initial case - begin first operation
@@ -396,7 +450,8 @@ internal class RealSwapService(
             chainAssetOut = args.tokenOut.configuration,
             amount = args.amount,
             swapDirection = args.swapDirection,
-            computationSharingScope = computationSharingScope
+            computationSharingScope = computationSharingScope,
+            metaAccountId = args.metaAccountId
         )
 
         val serviceFeeCharger = quotedTrade.path.constructAtomicOperationPrototypes()
@@ -448,6 +503,7 @@ internal class RealSwapService(
                     amount = grossFinal,
                     swapDirection = SwapDirection.SPECIFIED_OUT,
                     computationSharingScope = computationSharingScope,
+                    metaAccountId = args.metaAccountId
                 )
                 ServiceFeeAdjustedTrade(
                     trade = grossTrade,
@@ -491,8 +547,9 @@ internal class RealSwapService(
         }.debounce(500.milliseconds)
     }
 
-    override suspend fun isDeepSwapAllowed(): Boolean {
-        val signer = signerProvider.rootSignerFor(accountRepository.getSelectedMetaAccount())
+    override suspend fun isDeepSwapAllowed(metaAccountId: Long?): Boolean {
+        val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
+        val signer = signerProvider.rootSignerFor(account)
         return when (signer.callExecutionType()) {
             CallExecutionType.IMMEDIATE -> true
             CallExecutionType.DELAYED -> false
@@ -548,10 +605,7 @@ internal class RealSwapService(
                     }
             }
 
-            directionsByExchange
-                .accumulateLists()
-                .filter { it.isNotEmpty() }
-                .map { Graph.create(it) }
+            combineSwapDirections(directionsByExchange)
                 .onEach { printGraphStats(it) }
         }
     }
@@ -581,12 +635,13 @@ internal class RealSwapService(
         }
     }
 
-    private suspend fun nodeVisitFilter(computationScope: CoroutineScope): NodeVisitFilter {
-        return computationalCache.useCache(NODE_VISIT_FILTER, computationScope) {
+    private suspend fun nodeVisitFilter(computationScope: CoroutineScope, metaAccountId: Long? = null): NodeVisitFilter {
+        val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
+        return computationalCache.useCache("$NODE_VISIT_FILTER:${account.id}", computationScope) {
             NodeVisitFilter(
                 computationScope = this,
                 chainsById = chainRegistry.chainsById(),
-                selectedAccount = accountRepository.getSelectedMetaAccount()
+                selectedAccount = account
             )
         }
     }
@@ -651,21 +706,16 @@ internal class RealSwapService(
         }
     }
 
-    // Assumes each flow will have only single element
-    private fun <T> List<Flow<List<T>>>.accumulateLists(): Flow<List<T>> {
-        return mergeIfMultiple()
-            .runningFold(emptyList()) { acc, directions -> acc + directions }
-    }
-
     private suspend fun quoteTrade(
         chainAssetIn: Chain.Asset,
         chainAssetOut: Chain.Asset,
         amount: Balance,
         swapDirection: SwapDirection,
         computationSharingScope: CoroutineScope,
-        logQuotes: Boolean = true
+        logQuotes: Boolean = true,
+        metaAccountId: Long? = null
     ): QuotedTrade {
-        val quoter = getPathQuoter(computationSharingScope)
+        val quoter = getPathQuoter(computationSharingScope, metaAccountId)
 
         val bestPathQuote = quoter.findBestPath(chainAssetIn, chainAssetOut, amount, swapDirection)
         if (debug && logQuotes) {
@@ -675,10 +725,11 @@ internal class RealSwapService(
         return bestPathQuote.bestPath
     }
 
-    private suspend fun getPathQuoter(computationScope: CoroutineScope): PathQuoter<SwapGraphEdge> {
-        return computationalCache.useCache(QUOTER_CACHE, computationScope) {
+    private suspend fun getPathQuoter(computationScope: CoroutineScope, metaAccountId: Long?): PathQuoter<SwapGraphEdge> {
+        val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
+        return computationalCache.useCache("$QUOTER_CACHE:${account.id}", computationScope) {
             val graphFlow = directionsGraph(computationScope)
-            val filter = nodeVisitFilter(computationScope)
+            val filter = nodeVisitFilter(computationScope, account.id)
 
             quoterFactory.create(graphFlow, this, SwapPathFeeEstimator(), filter)
         }
@@ -791,7 +842,8 @@ internal class RealSwapService(
                 amount = quoteArgs.amount,
                 swapDirection = quoteArgs.swapDirection,
                 computationSharingScope = scope,
-                logQuotes = false
+                logQuotes = false,
+                metaAccountId = quoteArgs.metaAccountId
             ).finalQuote()
         }
 
@@ -800,7 +852,7 @@ internal class RealSwapService(
         }
     }
 
-    private fun logFee(fee: SwapFee) {
+    private fun logFee(fee: SwapFee, assetIn: Chain.Asset) {
         if (!debug) return
 
         val route = fee.segments.joinToString(separator = "\n") { segment ->
@@ -810,11 +862,13 @@ internal class RealSwapService(
                 addAll(segment.fee.postSubmissionFees.paidFromAmount)
             }
 
-            allFees.joinToString { "${it.amount.formatPlanks(it.asset)} (${it.debugLabel})" }
+            allFees.joinToString { "${it.amount.formatExactForLog(it.asset)} (${it.debugLabel})" }
         }
 
         Log.d("Swaps", "---- Fees -----")
         Log.d("Swaps", route)
+        Log.d("Swaps", "Total in input asset: ${fee.totalFeeAmount(assetIn).formatExactForLog(assetIn)}")
+        Log.d("Swaps", "Input reserve: ${fee.additionalMaxAmountDeduction.fromCountedTowardsEd.formatExactForLog(assetIn)}")
         Log.d("Swaps", "---- End Fees -----")
     }
 
@@ -850,12 +904,12 @@ internal class RealSwapService(
 
                 if (index == 0) {
                     val assetIn = chainRegistry.asset(quotedSwapEdge.edge.from)
-                    val initialAmount = amountIn.formatPlanks(assetIn)
+                    val initialAmount = amountIn.formatExactForLog(assetIn)
                     append(initialAmount)
 
                     if (trade.direction == SwapDirection.SPECIFIED_OUT) {
                         val roughFeesInAssetIn = trade.roughFeeEstimation.inAssetIn
-                        val roughFeesInAssetInAmount = roughFeesInAssetIn.formatPlanks(assetIn)
+                        val roughFeesInAssetInAmount = roughFeesInAssetIn.formatExactForLog(assetIn)
 
                         append(" (+$roughFeesInAssetInAmount fees) ")
                     }
@@ -864,20 +918,25 @@ internal class RealSwapService(
                 append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: $weight)---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
-                val outAmount = amountOut.formatPlanks(assetOut)
+                val outAmount = amountOut.formatExactForLog(assetOut)
 
                 append(outAmount)
 
                 if (index == trade.path.size - 1) {
                     if (trade.direction == SwapDirection.SPECIFIED_IN) {
                         val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
-                        val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
+                        val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatExactForLog(assetOut)
 
                         append(" (-$roughFeesInAssetOutAmount fees, w: ${weightBreakdown.total})")
                     }
                 }
             }
         }
+    }
+
+    private fun Balance.formatExactForLog(asset: Chain.Asset): String {
+        val amount = asset.amountFromPlanks(this).stripTrailingZeros().toPlainString()
+        return "$amount ${asset.symbol.value}"
     }
 
     private inner class ExchangeRegistry(

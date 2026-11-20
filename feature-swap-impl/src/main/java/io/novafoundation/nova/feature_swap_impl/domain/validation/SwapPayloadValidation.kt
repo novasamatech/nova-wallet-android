@@ -6,12 +6,22 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.createAggregated
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
+
+sealed class SwapDustCheckFee {
+
+    data object QuoteFee : SwapDustCheckFee()
+
+    data class MaxFeeWithMargin(val amount: Balance) : SwapDustCheckFee()
+}
 
 data class SwapValidationPayload(
     val fee: SwapFee,
     val swapQuote: SwapQuote,
     val slippage: Fraction,
+    val metaAccountId: Long? = null,
+    val dustCheckFee: SwapDustCheckFee = SwapDustCheckFee.QuoteFee,
 ) {
 
     val amountIn: ChainAssetWithAmount = swapQuote.amountIn
@@ -27,5 +37,5 @@ fun SwapValidationPayload.estimatedSwapLimit(): SwapLimit {
 }
 
 fun SwapValidationPayload.toSwapState(): SwapState {
-    return SwapState(swapQuote, fee, slippage)
+    return SwapState(swapQuote, fee, slippage, dustCheckFee)
 }

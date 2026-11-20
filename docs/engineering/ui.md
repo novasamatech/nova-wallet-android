@@ -16,7 +16,9 @@ Reuse `ExternalActions.showAddressActions` and `setupExternalActions` for addres
 
 Use the standard `RadioButton` with `wrap_content` dimensions, following existing selection screens. Fixed bounds copied from a design can clip the theme drawable; do not shrink the control's bounds to match the visible circle.
 
-## String resources and localization
+## Resource ownership and localization
+
+Keep resource values in `common/src/main/res/values`, including values used by only one feature. Define colors in `common/src/main/res/values/colors.xml`; do not create feature-local `colors.xml` files. When changing such definitions within a task, move them to `common` and preserve their names and values.
 
 Keep string resources in `strings.xml`, not feature-specific resource files. During feature development, add source strings only to `common/src/main/res/values/strings.xml`. Do not add manual translations to locale-specific resources: translations are handled by the established pre-release pipeline.
 
@@ -54,6 +56,11 @@ than importing another feature's implementation. Inspect the widget and bound st
 For loading/error/empty/value rendering also read [data and state](data-and-state.md).
 Preserve accessibility, touch targets, font scaling, insets and long/localized content. Use resources
 for dimensions/styles where shared; do not shrink RadioButton bounds to imitate a screenshot.
+Constrain a control's ripple to its visible shape with an explicit mask and the existing pressed-state
+color. Do not put a borderless foreground on a larger rectangular touch container around a circular
+button. When the touch target exceeds the visible button, keep the ripple on the shaped child and
+forward the parent's pressed/focused state with `duplicateParentState`. Check pressed and held states,
+not only the idle appearance.
 For requested iOS parity, inspect the explicit iOS source/design first and map behavior to existing
 Android widgets; do not infer parity from a screenshot or claim it without evidence.
 Check the screen after binding: TextAppearance and custom widgets can override XML attributes.

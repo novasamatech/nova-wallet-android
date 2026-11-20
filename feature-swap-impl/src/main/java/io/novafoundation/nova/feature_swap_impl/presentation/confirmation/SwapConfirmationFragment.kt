@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.confirmation
 
+import android.os.Bundle
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
@@ -7,25 +10,32 @@ import io.novafoundation.nova.common.view.bottomSheet.description.observeDescrip
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.setProgressState
-import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
+import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapConfirmationBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 
 class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, FragmentSwapConfirmationBinding>() {
 
+    companion object {
+
+        private const val KEY_PAYLOAD = "swap_operation"
+
+        fun getBundle(payload: SwapOperationPayload) = Bundle().apply { putParcelable(KEY_PAYLOAD, payload) }
+    }
+
     override fun createBinding() = FragmentSwapConfirmationBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.swapConfirmationAssets.setArrowBackgroundTint(R.color.swap_pair_arrow_background)
         binder.swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.swapConfirmationButton.prepareForProgress(this)
 
         binder.swapConfirmationRate.setOnClickListener { viewModel.rateClicked() }
-        binder.swapConfirmationPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
         binder.swapConfirmationSlippage.setOnClickListener { viewModel.slippageClicked() }
         binder.swapConfirmationNetworkFee.setOnClickListener { viewModel.networkFeeClicked() }
         binder.swapConfirmationAccount.setOnClickListener { viewModel.accountClicked() }
@@ -41,11 +51,13 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
             SwapFeatureApi::class.java
         )
             .swapConfirmation()
-            .create(this)
+            .create(this, argument(KEY_PAYLOAD))
             .inject(this)
     }
 
     override fun subscribe(viewModel: SwapConfirmationViewModel) {
+        observeRetries(viewModel)
+
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         observeDescription(viewModel)
@@ -55,7 +67,6 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
         viewModel.swapDetails.observe {
             binder.swapConfirmationAssets.setModel(it.assets)
             binder.swapConfirmationRate.showValue(it.rate)
-            binder.swapConfirmationPriceDifference.showValueOrHide(it.priceDifference)
             binder.swapConfirmationSlippage.showValue(it.slippage)
             binder.swapConfirmationRoute.setSwapRouteModel(it.swapRouteModel)
             binder.swapConfirmationExecutionTime.showValue(it.estimatedExecutionTime)
@@ -65,6 +76,8 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
         viewModel.addressFlow.observe { binder.swapConfirmationAccount.showAddress(it) }
 
         viewModel.slippageAlertMixin.slippageAlertMessage.observe { binder.swapConfirmationAlert.setMessageOrHide(it) }
+
+        viewModel.readyToConfirm.observe { binder.swapConfirmationButton.isEnabled = it }
 
         viewModel.validationInProgress.observe(binder.swapConfirmationButton::setProgressState)
 

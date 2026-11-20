@@ -178,6 +178,11 @@ class ResponseCache(
                         latest = get(url, type, metaAccountId, validate = validate, fetch = fetch)
                         if (!mayPublish()) continue
                         send(latest)
+                    } else if (latest?.stale == true) {
+                        // A flight stores its response before leaving the registry, so one that finished after this
+                        // iteration's read is already on disk. Publish it now instead of waiting for the retry interval.
+                        val stored = peek(url, type, metaAccountId, validate)
+                        if (stored != null && stored.fetchedAt > requireNotNull(latest).fetchedAt) continue
                     }
                 } catch (e: CancellationException) {
                     throw e

@@ -4,16 +4,21 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.data.repository.duration
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.CancellationException
 
 interface ChartsInteractor {
 
     fun chartsFlow(priceId: String): Flow<List<AssetPriceChart>>
+
+    fun chartFlow(priceId: String, currency: Currency, period: PricePeriod): Flow<AssetPriceChart>
 }
 
 class RealChartsInteractor(
@@ -34,12 +39,29 @@ class RealChartsInteractor(
 
     private fun getChartFor(priceId: String, range: PricePeriod): Flow<AssetPriceChart> {
         return flow {
-            emit(AssetPriceChart(range, ExtendedLoadingState.Loading))
             val currency = currencyRepository.getSelectedCurrency()
+            emitAll(chartFlow(priceId, currency, range))
+        }
+    }
 
-            runCatching { coinPriceRepository.getLastHistoryForPeriod(priceId, currency, range) }
-                .onSuccess { emit(AssetPriceChart(range, ExtendedLoadingState.Loaded(it))) }
-                .onFailure { emit(AssetPriceChart(range, ExtendedLoadingState.Error(it))) }
+    override fun chartFlow(priceId: String, currency: Currency, period: PricePeriod): Flow<AssetPriceChart> {
+        val sourcePeriod = when (period) {
+            PricePeriod.WEEK -> PricePeriod.MONTH
+            PricePeriod.YEAR -> PricePeriod.MAX
+            else -> period
+        }
+
+        return flow {
+            emit(AssetPriceChart(period, ExtendedLoadingState.Loading))
+            runCatching { coinPriceRepository.getLastHistoryForPeriod(priceId, currency, sourcePeriod) }
+                .onSuccess {
+                    val chart = AssetPriceChart(sourcePeriod, ExtendedLoadingState.Loaded(it))
+                    emit(if (sourcePeriod == period) chart else chart.subChartForPeriod(period))
+                }
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    emit(AssetPriceChart(period, ExtendedLoadingState.Error(it)))
+                }
         }
     }
 

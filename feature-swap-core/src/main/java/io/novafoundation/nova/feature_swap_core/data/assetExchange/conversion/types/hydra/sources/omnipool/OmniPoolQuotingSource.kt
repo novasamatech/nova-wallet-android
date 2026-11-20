@@ -2,11 +2,12 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteIdAndLocalAsset
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.TradeAmountLimitedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 
 interface OmniPoolQuotingSource : HydraDxQuotingSource<OmniPoolQuotingSource.Edge> {
 
-    interface Edge : QuotableEdge {
+    interface Edge : QuotableEdge, TradeAmountLimitedEdge {
 
         val fromAsset: RemoteIdAndLocalAsset
 

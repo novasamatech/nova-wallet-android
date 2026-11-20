@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapEntryPoint
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -43,7 +42,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.filter.Tra
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.TransactionHistoryBannerModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
-import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModelMapper
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPriceChangeTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPricePriceTextInjector
@@ -51,7 +50,6 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
-import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceHold
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
@@ -100,6 +98,7 @@ class BalanceDetailViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetIconProvider: AssetIconProvider,
     private val chartsInteractor: ChartsInteractor,
+    private val priceChartModelMapper: PriceChartModelMapper,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val amountFormatter: AmountFormatter,
     private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
@@ -259,7 +258,7 @@ class BalanceDetailViewModel(
         }.shareInBackground()
 
     val priceChartModels = priceCharts.map { charts ->
-        charts?.map { mapChartsToUi(it) }
+        charts?.map(priceChartModelMapper::map)
     }.shareInBackground()
 
     init {
@@ -311,7 +310,7 @@ class BalanceDetailViewModel(
         launch {
             val chainAsset = assetFlow.first().token.configuration
             val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload(), SwapEntryPoint.ASSET_DETAILS)
-            router.openSwapSetupAmount(payload)
+            router.openSwapTab(payload)
         }
     }
 
@@ -406,57 +405,6 @@ class BalanceDetailViewModel(
         }
 
         return BalanceLocksModel(locks)
-    }
-
-    private fun mapChartsToUi(assetPriceChart: AssetPriceChart): PriceChartModel {
-        val buttonText = mapButtonText(assetPriceChart.range)
-
-        return when (val chart = assetPriceChart.chart) {
-            is ExtendedLoadingState.Loading -> PriceChartModel.Loading(buttonText)
-
-            is ExtendedLoadingState.Error -> PriceChartModel.Empty(buttonText, resourceManager.getString(R.string.price_chart_load_failed))
-
-            // Price feed may successfully return no points at all - for example, when the feed is stale or the asset has just been listed
-            is ExtendedLoadingState.Loaded -> if (chart.data.isEmpty()) {
-                PriceChartModel.Empty(buttonText, resourceManager.getString(R.string.price_chart_no_data))
-            } else {
-                val periodName = mapPeriodName(assetPriceChart.range)
-                val supportTimeShowing = supportTimeShowing(assetPriceChart.range)
-                val mappedChart = chart.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
-                PriceChartModel.Chart(buttonText, periodName, supportTimeShowing, mappedChart)
-            }
-        }
-    }
-
-    private fun mapButtonText(pricePeriod: PricePeriod): String {
-        val buttonTextRes = when (pricePeriod) {
-            PricePeriod.DAY -> R.string.price_chart_day
-            PricePeriod.WEEK -> R.string.price_chart_week
-            PricePeriod.MONTH -> R.string.price_chart_month
-            PricePeriod.YEAR -> R.string.price_chart_year
-            PricePeriod.MAX -> R.string.price_chart_max
-        }
-
-        return resourceManager.getString(buttonTextRes)
-    }
-
-    private fun mapPeriodName(pricePeriod: PricePeriod): String {
-        val periodNameRes = when (pricePeriod) {
-            PricePeriod.DAY -> R.string.price_charts_period_today
-            PricePeriod.WEEK -> R.string.price_charts_period_week
-            PricePeriod.MONTH -> R.string.price_charts_period_month
-            PricePeriod.YEAR -> R.string.price_charts_period_year
-            PricePeriod.MAX -> R.string.price_charts_period_all
-        }
-
-        return resourceManager.getString(periodNameRes)
-    }
-
-    private fun supportTimeShowing(pricePeriod: PricePeriod): Boolean {
-        return when (pricePeriod) {
-            PricePeriod.DAY, PricePeriod.WEEK, PricePeriod.MONTH -> true
-            PricePeriod.YEAR, PricePeriod.MAX -> false
-        }
     }
 
     private fun learnMoreMigrationClicked(config: ChainMigrationConfig) {

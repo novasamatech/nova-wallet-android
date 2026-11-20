@@ -312,11 +312,13 @@ class SelectSendViewModel(
             is SendPayload.SpecifiedDestination -> {
                 val destination = chainRegistry.chainWithAsset(payload.destination.chainId, payload.destination.chainAssetId)
 
+                // Incoming directions are derived from the destination, so it has to be set before they are awaited
+                destinationChainWithAsset.emit(destination)
+
                 // When destination chain is specified we expect at least one destination to be available
                 val availableCrossChainDestinations = availableCrossChainDestinations.first { it.isNotEmpty() }
                 val origin = availableCrossChainDestinations.first().chainWithAsset
 
-                destinationChainWithAsset.emit(destination)
                 originChainWithAsset.emit(origin)
             }
         }

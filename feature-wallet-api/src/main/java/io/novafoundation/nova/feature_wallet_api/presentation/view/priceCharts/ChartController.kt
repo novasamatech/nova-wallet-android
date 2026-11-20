@@ -38,6 +38,12 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private var filledLine = false
 
+    private var sparkline = false
+
+    init {
+        setupChartUI()
+    }
+
     fun setFilledLine(enabled: Boolean) {
         filledLine = enabled
         chart.axisRight.apply {
@@ -48,8 +54,15 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         updateChart()
     }
 
-    init {
-        setupChartUI()
+    fun setSparkline(enabled: Boolean) {
+        if (sparkline == enabled) return
+        sparkline = enabled
+        chart.extraTopOffset = if (enabled) 0f else 12f
+        chart.extraBottomOffset = if (enabled) 0f else 12f
+        chart.setTouchEnabled(!enabled)
+        chart.setOnTouchListener(if (enabled) null else this)
+        setAxisVisible(!enabled)
+        updateChart()
     }
 
     /**
@@ -239,9 +252,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
             color = context.getColor(colorRes)
             setDrawCircles(false)
             setDrawValues(false)
-            mode = if (filledLine) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER
-            lineWidth = if (filledLine) 2f else chartUIParams.chartLineWidthDp
-            setDrawFilled(filledLine)
+            mode = if (filledLine || sparkline) LineDataSet.Mode.LINEAR else LineDataSet.Mode.CUBIC_BEZIER
+            lineWidth = when {
+                sparkline -> 1.5f
+                filledLine -> 2f
+                else -> chartUIParams.chartLineWidthDp
+            }
+            setDrawFilled(filledLine && !sparkline)
             fillColor = color
             fillAlpha = 32
         }

@@ -62,7 +62,7 @@ class RealCrossChainTransactor(
     ): Fee {
         return estimateFee(
             chain = transfer.originChain,
-            origin = TransactionOrigin.SelectedWallet,
+            origin = transfer.metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
             submissionOptions = ExtrinsicService.SubmissionOptions(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
@@ -79,7 +79,7 @@ class RealCrossChainTransactor(
     ): Result<ExtrinsicSubmission> {
         return submitExtrinsic(
             chain = transfer.originChain,
-            origin = TransactionOrigin.SelectedWallet,
+            origin = transfer.metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
             submissionOptions = ExtrinsicService.SubmissionOptions(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )
@@ -99,6 +99,7 @@ class RealCrossChainTransactor(
     override suspend fun performAndTrackTransfer(
         configuration: CrossChainTransferConfiguration,
         transfer: AssetTransferBase,
+        onOriginExecuted: suspend (ExtrinsicExecutionResult) -> Unit,
     ): Result<Balance> {
         // Start balances updates eagerly to not to miss events in case tx has been included to block right after submission
         val balancesUpdates = observeTransferableBalance(transfer)
@@ -108,6 +109,7 @@ class RealCrossChainTransactor(
         Log.d("CrossChain", "Starting cross-chain transfer")
 
         return performTransferOfExactAmount(configuration, transfer)
+            .onSuccess { onOriginExecuted(it) }
             .requireOk()
             .flatMap {
                 Log.d("CrossChain", "Cross chain transfer for successfully executed on origin, waiting for destination")
@@ -208,7 +210,7 @@ class RealCrossChainTransactor(
     ): Result<ExtrinsicExecutionResult> {
         return submitExtrinsicAndAwaitExecution(
             chain = transfer.originChain,
-            origin = TransactionOrigin.SelectedWallet,
+            origin = transfer.metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
             submissionOptions = ExtrinsicService.SubmissionOptions(
                 feePaymentCurrency = transfer.feePaymentCurrency
             )

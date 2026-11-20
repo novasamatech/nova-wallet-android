@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.common.view.ExpandableView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_block_12"
+    android:clipToOutline="true"
+    android:paddingHorizontal="12dp"
+    app:chevronId="@id/swapChartChevron"
+    app:collapsedByDefault="true"
+    app:expandableId="@id/swapChartContent"
+    app:supportAnimation="false"
+    app:toggleViewId="@id/swapChartHeader">
+
+    <LinearLayout
+        android:id="@+id/swapChartHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:paddingVertical="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/swapChartTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:includeFontPadding="false"
+            android:textColor="@color/text_primary" />
+
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+            android:id="@+id/swapChartSparkline"
+            android:layout_width="48dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:importantForAccessibility="noHideDescendants" />
+
+        <ImageView
+            android:id="@+id/swapChartChevron"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="2dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_chevron_up"
+            app:tint="@color/icon_secondary" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/swapChartContent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/swapChartHeader"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/swapChartDate"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:visibility="gone" />
+
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+            android:id="@+id/swapChartPlot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/swapChartRetry"
+            style="@style/Widget.Nova.Button.AccentSecondaryTransparent.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/common_retry"
+            android:visibility="gone" />
+    </LinearLayout>
+</io.novafoundation.nova.common.view.ExpandableView>

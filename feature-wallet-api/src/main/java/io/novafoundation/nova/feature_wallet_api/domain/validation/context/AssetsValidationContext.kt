@@ -16,7 +16,7 @@ interface AssetsValidationContext {
 
     interface Factory {
 
-        fun create(): AssetsValidationContext
+        fun create(metaAccountId: Long? = null): AssetsValidationContext
     }
 
     suspend fun getAsset(chainAsset: Chain.Asset): Asset

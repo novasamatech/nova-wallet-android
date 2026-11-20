@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="56dp"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:background="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/swapFilterNetworkIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp" />
+
+    <TextView
+        android:id="@+id/swapFilterNetworkName"
+        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="12dp"
+        android:textColor="@color/text_primary" />
+
+    <CheckBox
+        android:id="@+id/swapFilterSelected"
+        style="@style/Widget.Nova.Checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false" />
+</LinearLayout>

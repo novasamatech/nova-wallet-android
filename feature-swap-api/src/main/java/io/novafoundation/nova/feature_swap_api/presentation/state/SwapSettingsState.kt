@@ -12,6 +12,8 @@ interface SwapSettingsState : SelectedOptionSharedState<SwapSettings> {
 
     fun setAssetOut(asset: Chain.Asset)
 
+    fun applyAssetSelection(asset: Chain.Asset, selectingPay: Boolean, clearOpposite: Boolean)
+
     fun setAmount(amount: Balance?, swapDirection: SwapDirection)
 
     fun setSlippage(slippage: Fraction)

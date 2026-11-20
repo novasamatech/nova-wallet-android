@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsViewModel
+import io.novafoundation.nova.feature_swap_impl.presentation.options.SwapSettingsSheetViewModel
+import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidator
 
 @Module(includes = [ViewModelModule::class])
 class SwapOptionsModule {
@@ -55,6 +57,39 @@ class SwapOptionsModule {
             slippageSettingsCommunicator
         )
     }
+
+    @Provides
+    fun provideSheetSlippageFieldValidator(
+        payload: SlippageSettingsPayload?,
+        factory: SlippageFieldValidatorFactory
+    ): SlippageFieldValidator = factory.create(requireNotNull(payload).config())
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(SwapSettingsSheetViewModel::class)
+    fun provideSheetViewModel(
+        swapRouter: SwapRouter,
+        resourceManager: ResourceManager,
+        slippageFieldValidator: SlippageFieldValidator,
+        slippageAlertMixinFactory: SlippageAlertMixinFactory,
+        payload: SlippageSettingsPayload?,
+        slippageSettingsCommunicator: SlippageSettingsCommunicator
+    ): ViewModel {
+        return SwapSettingsSheetViewModel(
+            swapRouter,
+            resourceManager,
+            slippageFieldValidator,
+            slippageAlertMixinFactory,
+            requireNotNull(payload),
+            slippageSettingsCommunicator
+        )
+    }
+
+    @Provides
+    fun provideSheetViewModelCreator(
+        fragment: Fragment,
+        viewModelFactory: ViewModelProvider.Factory
+    ): SwapSettingsSheetViewModel = ViewModelProvider(fragment, viewModelFactory).get(SwapSettingsSheetViewModel::class.java)
 
     @Provides
     fun provideViewModelCreator(

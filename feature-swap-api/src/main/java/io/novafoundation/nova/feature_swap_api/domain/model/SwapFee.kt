@@ -25,6 +25,7 @@ class SwapFee(
      * Additional deductions from max amount of asset in that are not directly caused by fees
      */
     val additionalMaxAmountDeduction: SwapMaxAdditionalAmountDeduction,
+    val route: List<SwapRouteEdgeId>,
 ) : MaxAvailableDeduction {
 
     data class SwapSegment(

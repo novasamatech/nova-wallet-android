@@ -7,11 +7,14 @@ import io.novafoundation.nova.core_db.dao.ResponseCacheDao
 import io.novafoundation.nova.feature_staking_impl.data.cache.ResponseCache
 import io.novafoundation.nova.core_db.model.ResponseCacheKey
 import io.novafoundation.nova.core_db.model.ResponseCacheLocal
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
@@ -20,6 +23,15 @@ import kotlinx.coroutines.flow.map
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.mockito.Mockito.mock
+
+/**
+ * A chain that never answers. Position streams are shared with replay 1, so a test that reads their first value
+ * only sees the saved snapshot when no chain answer can overtake it.
+ */
+class PendingBittensorPositionRemote : BittensorPositionRemoteSource {
+
+    override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions = awaitCancellation()
+}
 
 class InMemoryResponseCacheDao(private val owners: MutableSet<Long>? = null) : ResponseCacheDao {
 

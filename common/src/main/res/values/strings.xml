@@ -82,7 +82,8 @@
     <string name="claim_gift_success_message">You’ve successfully claimed a gift. Tokens will appear in your balance shortly.</string>
 
     <string name="claim_gift_already_claimed_title">The gift cannot be received</string>
-    <string name="claim_gift_already_claimed_message">Oops, the gift has already been  claimed</string>
+    <string name="claim_gift_already_claimed_message">Oops, the gift has already been
+claimed</string>
 
     <string name="claim_gift_default_error_title">Oops, something went wrong</string>
     <string name="claim_gift_default_error_message">There may be a problem with the server. Please, try again later.</string>
@@ -471,7 +472,7 @@
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 
 
-    <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
+    <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size or splitting your trade into multiple transactions.</string>
 
     <string name="popular_dapps_title">Popular</string>
 
@@ -1174,6 +1175,7 @@
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Select a token to pay</string>
     <string name="swap_main_settings_asset_out_not_selecting_button_state">Select a token to receive</string>
     <string name="swap_main_settings_enter_amount_disabled_button_state">Enter amount</string>
+    <string name="swap_not_enough_asset">Not enough %s</string>
     <string name="swap_main_settings_wrong_amount_disabled_button_state">Enter other amount</string>
 
     <string name="swap_field_validation_not_enough_liquidity">Not enough liquidity</string>
@@ -2362,6 +2364,7 @@
     <string name="choose_amount_fee">Transfer fee</string>
     <string name="choose_amount_initial" translatable="false">0</string>
     <string name="choose_amount_network_error">Network not responding</string>
+    <string name="network_fee_error_message">Could not estimate the network fee. Please try again.</string>
     <string name="choose_amount_to">To</string>
     <string name="common_account">Account</string>
     <string name="common_add">Add</string>
@@ -2746,6 +2749,9 @@
     <string name="staking_your_validators">Your validators</string>
     <string name="staking_your_validators_changing_title">Your validators will change in the next era.</string>
     <string name="tabbar_staking_title">Staking</string>
+    <string name="tabbar_browser_title">Browser</string>
+    <string name="tabbar_swaps_title">Swaps</string>
+    <string name="tabbar_more_title">More</string>
     <string name="tabbar_wallet_title">Wallet</string>
     <string name="today">Today</string>
     <string name="transaction_details_copy_hash">Copy hash</string>
@@ -3220,4 +3226,38 @@
     <string name="bittensor_mev_unchanged">Your order wasn\'t executed. Your stake is unchanged, please try again.</string>
     <string name="bittensor_mev_nothing_spent">Nothing was spent.</string>
     <string name="bittensor_mev_fee_may_be_charged">A network fee may have been charged.</string>
+    <string name="swap_flip_tokens">Swap pay and receive tokens</string>
+    <string name="swap_price_impact_label">Price impact</string>
+    <string name="swap_max_slippage">Max slippage</string>
+    <string name="swap_min_received">Min received</string>
+    <string name="swap_balance_label">Balance: %s</string>
+    <string name="swap_quote_failed">Couldn’t load the quote. Please try again.</string>
+    <string name="swap_review_title">Confirm swap</string>
+    <string name="swap_execution_interrupted">The transaction status could not be verified. Check your transaction history before starting another swap.</string>
+    <string name="swap_execution_unknown_title">Status unavailable</string>
+    <string name="swap_view_transaction">View transaction</string>
+    <string name="swap_slippage_custom">Custom</string>
+    <string name="swap_slippage_custom_hint">Custom, %</string>
+    <string name="swap_select_balance_unavailable">—</string>
+    <string name="swap_select_back">Back to tokens</string>
+    <string name="swap_select_pay_title">Select a token to pay</string>
+    <string name="swap_select_receive_title">Select a token to receive</string>
+    <string name="swap_select_search_hint">Search by network or token</string>
+    <string name="swap_select_your_tokens">Your tokens</string>
+    <string name="swap_select_other_tokens">Other tokens</string>
+    <string name="swap_select_not_swappable">Not swappable with %s</string>
+    <string name="swap_select_loading_error">Could not load tokens. Please try again.</string>
+    <string name="swap_select_route_error">Could not check this swap pair. Please try again.</string>
+    <plurals name="swap_select_network_count">
+        <item quantity="one">%d network</item>
+        <item quantity="other">%d networks</item>
+    </plurals>
+    <string name="swap_select_more_networks">%d+</string>
+    <string name="swap_chart_ticker">%1$s · %2$s</string>
+    <string name="swap_chart_nothing_to_follow">Nothing to follow</string>
+    <string name="swap_chart_select_token">Select a token to see its price history</string>
+    <string name="swap_failure_pool_trade_minimum_title">Amount below pool minimum</string>
+    <string name="swap_failure_pool_trade_minimum_message">This swap route requires at least %1$s at one of its liquidity pools. Increase the amount or choose another route.</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_title">Unable to verify pool limits</string>
+    <string name="swap_failure_pool_trade_limits_unavailable_message">Pool trading limits could not be loaded. Please try again.</string>
 </resources>

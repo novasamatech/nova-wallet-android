@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
@@ -62,6 +63,7 @@ class BittensorSubnetAmountModule {
         retryController: BittensorRetryController,
         bittensorAmountFormatter: BittensorAmountFormatter,
         amountChooserFactory: AmountChooserMixin.Factory,
+        enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
@@ -93,6 +95,7 @@ class BittensorSubnetAmountModule {
         retryController = retryController,
         bittensorAmountFormatter = bittensorAmountFormatter,
         amountChooserFactory = amountChooserFactory,
+        enoughAmountValidatorFactory = enoughAmountValidatorFactory,
         validationSystem = validationSystem,
         validationExecutor = validationExecutor,
         feeLoaderMixinFactory = feeLoaderMixinFactory,

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation
 
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.FieldValidator
@@ -24,7 +25,7 @@ class LiquidityFieldValidator(
 
     override fun observe(inputStream: Flow<String>): Flow<FieldValidationResult> {
         return quotingStateFlow.map { quotingState ->
-            if (quotingState is QuotingState.Error) {
+            if (quotingState is QuotingState.Error && quotingState.error is SwapQuoteException.NotEnoughLiquidity) {
                 FieldValidationResult.Error(
                     resourceManager.getString(R.string.swap_field_validation_not_enough_liquidity)
                 )

@@ -23,6 +23,7 @@ class SwapRouteTableCellView @JvmOverloads constructor(
 
     fun setSwapRouteState(routeState: SwapRouteState) {
         setVisible(!routeState.isError)
+        isEnabled = !routeState.isLoading && !routeState.isError
 
         showProgress(routeState.isLoading)
 

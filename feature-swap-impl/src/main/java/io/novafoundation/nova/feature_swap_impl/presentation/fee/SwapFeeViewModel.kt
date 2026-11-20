@@ -12,8 +12,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteModel
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.stateFlow
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
+import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel.FeeOperationModel
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel.SwapComponentFeeModel
@@ -32,10 +32,10 @@ class SwapFeeViewModel(
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
     private val amountFormatter: AmountFormatter,
-    swapStateStoreProvider: SwapStateStoreProvider
-) : BaseViewModel() {
+    private val operationLoader: SwapOperationLoader,
+) : BaseViewModel(), Retriable by operationLoader {
 
-    private val swapStateFlow = swapStateStoreProvider.stateFlow(viewModelScope)
+    private val swapStateFlow = operationLoader.state(viewModelScope).shareInBackground()
 
     val swapFeeSegments = swapStateFlow
         .map { it.fee.toSwapFeeSegments() }

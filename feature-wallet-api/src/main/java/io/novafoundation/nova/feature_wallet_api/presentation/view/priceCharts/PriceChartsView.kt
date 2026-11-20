@@ -18,6 +18,7 @@ import com.github.mikephil.charting.data.Entry
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.utils.setShimmerVisible
 import io.novafoundation.nova.feature_wallet_api.databinding.LayoutPriceChartButtonBinding
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewPriceChartsBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
@@ -64,18 +65,38 @@ class PriceChartsView @JvmOverloads constructor(
 
     private var selectedChartIndex = 0
 
-    enum class Presentation { FULL, PLOT_ONLY }
+    enum class Presentation { FULL, PLOT_ONLY, SPARKLINE }
+
+    enum class LoadingStyle { CHART_SKELETON, BLOCK }
 
     private var presentation = Presentation.FULL
+
+    private var loadingStyle = LoadingStyle.CHART_SKELETON
 
     /** A plot-only presentation for screens that already own their amount header. */
     fun setPresentation(presentation: Presentation) {
         this.presentation = presentation
         controller.setFilledLine(presentation == Presentation.PLOT_ONLY)
+        controller.setSparkline(presentation == Presentation.SPARKLINE)
+        binder.priceChartButtons.isGone = presentation == Presentation.SPARKLINE
         when (presentation) {
             Presentation.FULL -> showFullPresentation()
-            Presentation.PLOT_ONLY -> showPlotOnlyPresentation()
+            Presentation.PLOT_ONLY, Presentation.SPARKLINE -> showPlotOnlyPresentation()
         }
+        refreshSelectedChart()
+    }
+
+    fun setLoadingStyle(style: LoadingStyle) {
+        loadingStyle = style
+        refreshSelectedChart()
+    }
+
+    fun setPeriodSpacing(topMarginDp: Int) {
+        binder.priceChartButtons.updateLayoutParams<LayoutParams> { topMargin = topMarginDp.dpF.toInt() }
+    }
+
+    private fun refreshSelectedChart() {
+        if (charts.isEmpty()) showLoadingState() else selectChart(selectedChartIndex)
     }
 
     private fun showFullPresentation() {
@@ -211,7 +232,7 @@ class PriceChartsView @JvmOverloads constructor(
     private fun showEmptyState(message: String) {
         setChartContentVisible(false)
         binder.priceChartEmptyLabel.text = message
-        binder.priceChartEmptyLabel.isGone = false
+        binder.priceChartEmptyLabel.isGone = presentation == Presentation.SPARKLINE
         setShimmeringVisible(false)
     }
 
@@ -224,16 +245,20 @@ class PriceChartsView @JvmOverloads constructor(
     private fun setChartContentVisible(visible: Boolean) {
         onContentVisibilityChanged?.invoke(visible)
         binder.priceChart.setVisible(visible, falseState = View.INVISIBLE)
-        if (presentation == Presentation.PLOT_ONLY) return
+        if (presentation != Presentation.FULL) return
         binder.priceChartDate.setVisible(visible, falseState = View.INVISIBLE)
         binder.priceChartPriceChange.setVisible(visible, falseState = View.INVISIBLE)
         binder.priceChartCurrentPrice.setVisible(visible, falseState = View.INVISIBLE)
     }
 
     private fun setShimmeringVisible(visible: Boolean) {
-        binder.priceChartPriceChangeShimmering.isGone = !visible || presentation == Presentation.PLOT_ONLY
-        binder.priceChartCurrentPriceShimmering.isGone = !visible || presentation == Presentation.PLOT_ONLY
-        binder.priceChartShimmering.isGone = !visible
+        val blockStyle = loadingStyle == LoadingStyle.BLOCK || presentation == Presentation.SPARKLINE
+        binder.priceChartPriceChangeShimmering.isGone = !visible || presentation != Presentation.FULL
+        binder.priceChartCurrentPriceShimmering.isGone = !visible || presentation != Presentation.FULL
+        binder.priceChartShimmering.isGone = !visible || blockStyle
+        binder.priceChartBlockShimmer.setShimmerVisible(visible && blockStyle)
+        binder.priceChartButtons.alpha = if (visible && blockStyle) 0.4f else 1f
+        getButtons().forEach { it.isEnabled = !visible || !blockStyle }
     }
 
     private fun selectChart(index: Int) {

@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_swap_api.domain.swap
 
+import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
@@ -17,13 +20,31 @@ import kotlinx.coroutines.flow.Flow
 
 interface SwapService {
 
+    suspend fun resolveRoute(
+        route: List<SwapRouteEdgeId>,
+        computationScope: CoroutineScope
+    ): List<SwapGraphEdge>
+
+    suspend fun constructOperations(args: SwapFeeArgs): List<AtomicSwapOperation>
+
     suspend fun warmUpCommonChains(computationScope: CoroutineScope): Result<Unit>
 
     suspend fun sync(coroutineScope: CoroutineScope)
 
     suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
 
-    suspend fun availableSwapDirectionsFor(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
+    suspend fun availableSwapDirectionsFor(
+        asset: Chain.Asset,
+        computationScope: CoroutineScope,
+        metaAccountId: Long? = null
+    ): Flow<Set<FullChainAssetId>>
+
+    suspend fun availableAssetsForSelection(
+        oppositeAsset: FullChainAssetId,
+        selectingPay: Boolean,
+        metaAccountId: Long,
+        computationScope: CoroutineScope
+    ): Flow<Set<FullChainAssetId>>
 
     suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean>
 
@@ -42,5 +63,5 @@ interface SwapService {
 
     fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
 
-    suspend fun isDeepSwapAllowed(): Boolean
+    suspend fun isDeepSwapAllowed(metaAccountId: Long? = null): Boolean
 }

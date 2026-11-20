@@ -97,6 +97,10 @@ the beneficiary's system account is alive and that it can receive the output ass
 changes the actual output so the commission no longer fits, that execution waives the commission instead of
 failing the user's swap.
 
+Fee estimation and initial submission do not require the swap output alone to cover ED. The existing output
+validations check the wallet's balance plus the net minimum received; a small swap into an already funded
+account is valid. Keep the commission in the estimate so these validations use the actual net output.
+
 On the native path `transferKeepAlive` reverts the whole `batchAll` if the sender would drop below the
 existential deposit — which is exactly why the ED validations must use `netFlow.amountOutMin`, not the gross
 floor. The worst case is a small swap into a native asset the wallet does not hold yet.

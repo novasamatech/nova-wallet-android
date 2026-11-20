@@ -235,6 +235,14 @@ private class RealOmniPoolQuotingSource(
             return weightAppendingToPath(path, Weights.Hydra.OMNIPOOL)
         }
 
+        override suspend fun minAllowedAmountIn(): BigInteger {
+            return remoteStorageSource.query(chain.id) {
+                runtime.metadata.omnipool().numberConstant("MinimumTradingLimit", runtime)
+            }
+        }
+
+        override suspend fun minAllowedAmountOut(): BigInteger = minAllowedAmountIn()
+
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val omniPool = omniPoolFlow.first()
 

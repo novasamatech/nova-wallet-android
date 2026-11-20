@@ -10,12 +10,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
 import io.novafoundation.nova.feature_staking_impl.data.cache.ResponseCache
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -460,15 +458,15 @@ class BittensorPositionRepositoryTest {
         }
     }
 
-    /**
-     * Snapshot assertions read the first value of a replay-1 shared stream, so a chain answer must never overtake it.
-     * The request stays pending until the stream is released.
-     */
     private fun snapshotOnlyRepository(cache: ResponseCache = snapshots): RealBittensorPositionRepository {
-        val pendingChain = object : BittensorPositionRemoteSource {
-            override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions = awaitCancellation()
-        }
-        val positionSource = BittensorPositionSource(pendingChain, chainStateRepository, computationalCache, logger, positionUpdates, cache)
+        val positionSource = BittensorPositionSource(
+            PendingBittensorPositionRemote(),
+            chainStateRepository,
+            computationalCache,
+            logger,
+            positionUpdates,
+            cache
+        )
         return RealBittensorPositionRepository(positionSource, BittensorPricesSource(priceSource, cache, computationalCache))
     }
 

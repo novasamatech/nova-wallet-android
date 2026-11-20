@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.WeightedEdge
+import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
@@ -367,6 +368,12 @@ private class RealStableSwapQuotingSource(
 
         override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
             return weightAppendingToPath(path, Weights.Hydra.STABLESWAP)
+        }
+
+        override suspend fun minTradingLimit(): BigInteger {
+            return remoteStorageSource.query(chain.id) {
+                runtime.metadata.stableSwap.module.numberConstant("MinTradingLimit", runtime)
+            }
         }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {

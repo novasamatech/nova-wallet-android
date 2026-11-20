@@ -20,7 +20,10 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -111,13 +114,16 @@ class BittensorPortfolioRepositoryTest {
     @Test
     fun `refresh failure preserves stake for the same wallet`() = runBlocking {
         prepare()
+        var nextBlocks = false
         val states = withTimeout(3_000L) {
-            repository().observePortfolio().filter { it.dataStatus !is BittensorDataStatus.Loading }.onEach {
-                if (it.dataStatus is BittensorDataStatus.Fresh) {
-                    failFirstWallet = true
-                    blockNumbers.value += BigInteger.ONE
-                }
-            }.take(2).toList()
+            producingBlocksWhen({ nextBlocks }) {
+                repository().observePortfolio().filter { it.dataStatus !is BittensorDataStatus.Loading }.onEach {
+                    if (it.dataStatus is BittensorDataStatus.Fresh) {
+                        failFirstWallet = true
+                        nextBlocks = true
+                    }
+                }.take(2).toList()
+            }
         }
         assertTrue(states[1].dataStatus is BittensorDataStatus.Stale)
         assertEquals(BigInteger.TEN, states[1].positions?.rootStake)
@@ -126,11 +132,14 @@ class BittensorPortfolioRepositoryTest {
     @Test
     fun `new block updates positions without a transaction refresh signal`() = runBlocking {
         prepare()
+        var nextBlocks = false
         val states = withTimeout(3_000L) {
-            repository().observePortfolio().filter { it.dataStatus is BittensorDataStatus.Fresh }.onEach {
-                rootStake = BigInteger.valueOf(20)
-                blockNumbers.value += BigInteger.ONE
-            }.take(2).toList()
+            producingBlocksWhen({ nextBlocks }) {
+                repository().observePortfolio().filter { it.dataStatus is BittensorDataStatus.Fresh }.onEach {
+                    rootStake = BigInteger.valueOf(20)
+                    nextBlocks = true
+                }.take(2).toList()
+            }
         }
 
         assertEquals(listOf(BigInteger.TEN, BigInteger.valueOf(20)), states.map { it.positions?.rootStake })
@@ -140,13 +149,16 @@ class BittensorPortfolioRepositoryTest {
     fun `next block recovers after a failed position request`() = runBlocking {
         prepare()
         failFirstWallet = true
+        var nextBlocks = false
         val states = withTimeout(3_000L) {
-            repository().observePortfolio().filter { it.dataStatus !is BittensorDataStatus.Loading }.onEach {
-                if (it.dataStatus is BittensorDataStatus.Stale) {
-                    failFirstWallet = false
-                    blockNumbers.value += BigInteger.ONE
-                }
-            }.take(2).toList()
+            producingBlocksWhen({ nextBlocks }) {
+                repository().observePortfolio().filter { it.dataStatus !is BittensorDataStatus.Loading }.onEach {
+                    if (it.dataStatus is BittensorDataStatus.Stale) {
+                        failFirstWallet = false
+                        nextBlocks = true
+                    }
+                }.take(2).toList()
+            }
         }
 
         assertTrue(states[0].dataStatus is BittensorDataStatus.Stale)
@@ -225,4 +237,27 @@ class BittensorPortfolioRepositoryTest {
     private val positionRepository = RealBittensorPositionRepository(sharedPositionSource, pricesSource)
 
     private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)
+
+    /**
+     * The position source subscribes to blocks asynchronously and drops the block it subscribes at, so a single
+     * new block can be lost. Once [requested], keep producing blocks the way a live chain does until [block] ends.
+     */
+    private suspend fun <T> producingBlocksWhen(requested: () -> Boolean, block: suspend () -> T): T = coroutineScope {
+        val chain = launch {
+            while (true) {
+                if (requested()) blockNumbers.value += BigInteger.ONE
+                delay(BLOCK_INTERVAL_MILLIS)
+            }
+        }
+        try {
+            block()
+        } finally {
+            chain.cancel()
+        }
+    }
+
+    private companion object {
+
+        const val BLOCK_INTERVAL_MILLIS = 20L
+    }
 }

@@ -1,12 +1,30 @@
 # Data, state and runtime
 
+## Absence and state
+
+Use `null` only for genuinely absent values, such as an unset selection or an omitted optional field.
+Represent meaningful alternatives such as loading, failure, stale data, an unavailable calculation, or a
+different validation mode with an explicit sealed class or interface. Reuse an existing sealed type when
+it fits. Keep each case and its associated data together so callers can handle the cases exhaustively.
+
+Keep nullable API fields and database columns where their contracts allow absence. Map them to explicit
+states at the boundary when their meaning affects business logic or presentation.
+
 ## Independent loading
 
 Load interactor data with `flowOf { ... }` or an interactor-provided Flow and share it with `shareInBackground()` when reused. Derive loading and presentation values with the established flow operators instead of copying them into `MutableStateFlow` from `init`. Keep mutable flows for user-editable state and explicit operation/retry controls, not redundant copies of loaded data. Name selections after the selected entity. Keep entity lookup by ID in the interactor rather than filtering its catalogue in the ViewModel.
 
+Use the existing `ExtendedLoadingState<T>` for loading, loaded data and failure; do not introduce local
+`Loading` / `Loaded` / `Failed` state hierarchies with the same meaning. Reuse `withSafeLoading()`,
+`mapLoading`, `onError`, `firstIfLoaded` and other existing helpers where their semantics fit. Preserve the
+error cause and coroutine cancellation. A separate domain state is justified only for additional domain
+transitions that this shared loading model cannot express.
+
 Use `withSafeLoading()` only when its loading state is consumed by the UI, including disabling actions while data is loading. Do not add loading wrappers solely to catch exceptions; use `catch` with appropriate error reporting when no loading state is needed. Retry infrastructure must not impose UI loading states; apply loading-state transformations at the consuming ViewModel, per attempt when retries must reset the UI.
 
-Use `mapNotNull` when a derived flow should emit only available values instead of forwarding null and checking it in every consumer. Preserve nullable emissions when null explicitly clears stale UI data, selection, or operation readiness during loading or failure.
+Use `mapNotNull` when a derived flow should emit only present optional values and dropping absence is
+intentional. Emit explicit states when loading, failure, or invalidation needs to clear stale UI data or
+operation readiness. A nullable selection can emit `null` to indicate that the selection was cleared.
 
 Independent data, such as wallet positions and a market chart, must have independent sources, error states, and retries. Failure of one load must not hide another load's successful data. When converting an exception into an error or stale state, log diagnostic context and the cause without secrets or personal data.
 
@@ -14,7 +32,7 @@ Use the established retry dialog for failed screen reads instead of adding inlin
 
 Derive staking and dashboard updates from reactive balance or on-chain state sources. Do not introduce a feature-specific event bus or call dashboard refresh methods after submitting a transaction. Keep complex input flows in named private methods so that `combine` only assembles their results. Do not wrap `ChainRegistry.getChain` in a dedicated timeout; chain lookup uses the existing registry lifecycle.
 
-External staking balances belong to the existing wallet balance update lifecycle, not only a staking screen subscription. Key valuations by the explicit wallet and asset. Persist an initial partial valuation with its completeness marker, but never replace a stored complete value with incomplete or stale data. Replace partial and complete entries atomically so they cannot be counted twice. Fresh confirmed empty holdings must clear both entries. Keep portfolio totals nullable until fully priced. Reuse shared position streams so dashboard, asset balances and details do not duplicate runtime subscriptions. Include positive external balances in the existing automatic asset-discovery path, respecting disabled discovery and explicit visibility choices.
+External staking balances belong to the existing wallet balance update lifecycle, not only a staking screen subscription. Key valuations by the explicit wallet and asset. Persist an initial partial valuation with its completeness marker, but never replace a stored complete value with incomplete or stale data. Replace partial and complete entries atomically so they cannot be counted twice. Fresh confirmed empty holdings must clear both entries. Represent loading, incomplete, and unavailable portfolio valuations with explicit sealed states. Reuse shared position streams so dashboard, asset balances and details do not duplicate runtime subscriptions. Include positive external balances in the existing automatic asset-discovery path, respecting disabled discovery and explicit visibility choices.
 
 ## API models and mapping
 

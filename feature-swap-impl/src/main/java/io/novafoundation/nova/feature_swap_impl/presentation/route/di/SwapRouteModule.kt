@@ -11,8 +11,10 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
 import io.novafoundation.nova.feature_swap_impl.presentation.route.SwapRouteViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -23,16 +25,20 @@ class SwapRouteModule {
     @IntoMap
     @ViewModelKey(SwapRouteViewModel::class)
     fun provideViewModel(
+        tokenFormatter: TokenFormatter,
+        fiatFormatter: FiatFormatter,
         swapInteractor: SwapInteractor,
-        swapStateStoreProvider: SwapStateStoreProvider,
+        operationLoader: SwapOperationLoader,
         chainRegistry: ChainRegistry,
         assetIconProvider: AssetIconProvider,
         resourceManager: ResourceManager,
         router: SwapRouter,
     ): ViewModel {
         return SwapRouteViewModel(
+            tokenFormatter = tokenFormatter,
+            fiatFormatter = fiatFormatter,
             swapInteractor = swapInteractor,
-            swapStateStoreProvider = swapStateStoreProvider,
+            operationLoader = operationLoader,
             chainRegistry = chainRegistry,
             assetIconProvider = assetIconProvider,
             router = router,

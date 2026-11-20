@@ -264,6 +264,8 @@ internal class HydraDxAssetExchange(
         private val sourceQuotableEdge: HydraDxSourceEdge,
     ) : SwapGraphEdge, HydraDxQuotableEdge by sourceQuotableEdge, NovaFeeChargingSwapEdge {
 
+        override val exchangeId: String = "hydration"
+
         override val poolId: SwapPoolId
             get() = sourceQuotableEdge.poolId
 
@@ -331,7 +333,8 @@ internal class HydraDxAssetExchange(
 
     inner class HydraDxOperation private constructor(
         val segments: List<HydraDxSwapTransactionSegment>,
-        val feePaymentCurrency: FeePaymentCurrency
+        val feePaymentCurrency: FeePaymentCurrency,
+        private val metaAccountId: Long?
     ) : AtomicSwapOperation {
 
         override val estimatedSwapLimit: SwapLimit = aggregatedSwapLimit()
@@ -343,13 +346,13 @@ internal class HydraDxAssetExchange(
         override val chargesServiceCommission: Boolean = true
 
         constructor(sourceEdge: HydraDxSourceEdge, args: AtomicSwapOperationArgs) :
-            this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency)
+            this(listOf(HydraDxSwapTransactionSegment(sourceEdge, args.estimatedSwapLimit)), args.feePaymentCurrency, args.metaAccountId)
 
         fun appendSegment(nextEdge: HydraDxSourceEdge, nextSwapArgs: AtomicSwapOperationArgs): HydraDxOperation {
             val nextSegment = HydraDxSwapTransactionSegment(nextEdge, nextSwapArgs.estimatedSwapLimit)
 
             // Ignore nextSwapArgs.feePaymentCurrency - we are using configuration from the very first segment
-            return HydraDxOperation(segments + nextSegment, feePaymentCurrency)
+            return HydraDxOperation(segments + nextSegment, feePaymentCurrency, metaAccountId)
         }
 
         override suspend fun constructDisplayData(netFlow: SegmentNetFlow): AtomicOperationDisplayData {
@@ -367,7 +370,7 @@ internal class HydraDxAssetExchange(
             }
             val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
-                origin = TransactionOrigin.SelectedWallet,
+                origin = metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
                     batchMode = BatchMode.BATCH_ALL,
                     feePaymentCurrency = feePaymentCurrency
@@ -393,7 +396,8 @@ internal class HydraDxAssetExchange(
                 chainAssetIn = assetIn,
                 chainAssetOut = assetOut,
                 amount = extraOutAmount,
-                swapDirection = SwapDirection.SPECIFIED_OUT
+                swapDirection = SwapDirection.SPECIFIED_OUT,
+                metaAccountId = metaAccountId
             )
 
             return swapHost.quote(quoteArgs)
@@ -437,14 +441,14 @@ internal class HydraDxAssetExchange(
         ): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
-                origin = TransactionOrigin.SelectedWallet,
+                origin = metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
                     batchMode = BatchMode.BATCH_ALL,
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
                 appendSwapCalls(args.actualSwapLimit, commissionAmount)
-            }.requireOk()
+            }.onSuccess { args.onExecuted(it) }.requireOk()
         }
 
         private suspend fun ExtrinsicBuilder.appendSwapCalls(swapLimit: SwapLimit, commissionAmount: Balance?) {

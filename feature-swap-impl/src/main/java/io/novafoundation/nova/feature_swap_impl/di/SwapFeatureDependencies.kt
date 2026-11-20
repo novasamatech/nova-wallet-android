@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
@@ -50,7 +55,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -64,13 +68,23 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateReposito
 
 interface SwapFeatureDependencies {
 
+    val coinPriceRepository: CoinPriceRepository
+
+    val fiatFormatter: FiatFormatter
+
+    val currencyRepository: CurrencyRepository
+
     fun analyticsService(): AnalyticsService
 
     fun usdRateRepository(): UsdRateRepository
 
+    val tokenFormatter: TokenFormatter
+
     val amountFormatter: AmountFormatter
 
     val validationExecutor: ValidationExecutor
+
+    fun globalConfigDataSource(): GlobalConfigDataSource
 
     val preferences: Preferences
 
@@ -180,6 +194,4 @@ interface SwapFeatureDependencies {
     val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory
 
     val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher
-
-    fun maxActionProviderFactory(): MaxActionProviderFactory
 }

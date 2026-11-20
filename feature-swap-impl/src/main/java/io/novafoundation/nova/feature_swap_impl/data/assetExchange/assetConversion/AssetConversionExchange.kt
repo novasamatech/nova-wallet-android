@@ -217,6 +217,8 @@ private class AssetConversionExchange(
         private val chargesNovaCommission: Boolean = false,
     ) : BaseSwapGraphEdge(fromAsset, toAsset) {
 
+        override val exchangeId: String = "asset-conversion"
+
         override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return AssetConversionOperation(args, fromAsset, toAsset, chargesNovaCommission)
         }
@@ -324,7 +326,7 @@ private class AssetConversionExchange(
 
             val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
-                origin = TransactionOrigin.SelectedWallet,
+                origin = transactionArgs.metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
                     batchMode = BatchMode.BATCH_ALL,
                     feePaymentCurrency = transactionArgs.feePaymentCurrency,
@@ -348,7 +350,8 @@ private class AssetConversionExchange(
                 chainAssetIn = fromAsset,
                 chainAssetOut = toAsset,
                 amount = extraOutAmount,
-                swapDirection = SwapDirection.SPECIFIED_OUT
+                swapDirection = SwapDirection.SPECIFIED_OUT,
+                metaAccountId = transactionArgs.metaAccountId
             )
 
             return swapHost.quote(quoteArgs)
@@ -406,7 +409,7 @@ private class AssetConversionExchange(
         ): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
-                origin = TransactionOrigin.SelectedWallet,
+                origin = transactionArgs.metaAccountId?.let(TransactionOrigin::WalletWithId) ?: TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
                     batchMode = BatchMode.BATCH_ALL,
                     feePaymentCurrency = transactionArgs.feePaymentCurrency,
@@ -418,7 +421,7 @@ private class AssetConversionExchange(
                     sendTo = buildingContext.submissionOrigin.executingAccount,
                     commission = commission,
                 )
-            }.requireOk()
+            }.onSuccess { args.onExecuted(it) }.requireOk()
         }
 
         private suspend fun ExtrinsicBuilder.appendSwapCalls(
@@ -437,8 +440,8 @@ private class AssetConversionExchange(
         }
 
         private suspend fun prepareRequiredCommission(swapLimit: SwapLimit): PreparedCommission? {
-            return prepareCommission(swapLimit) { minimumBalance ->
-                commissionResolver.resolveRequired(swapLimit, minimumBalance)
+            return prepareCommission {
+                commissionResolver.resolveRequired(swapLimit)
             }
         }
 
@@ -451,19 +454,17 @@ private class AssetConversionExchange(
         }
 
         private suspend fun prepareCommissionOrWaive(swapLimit: SwapLimit): PreparedCommission? {
-            return prepareCommission(swapLimit) { minimumBalance ->
+            return prepareCommission {
+                val minimumBalance = assetSourceRegistry.sourceFor(toAsset).balance.existentialDeposit(toAsset)
                 commissionResolver.resolveOrWaive(swapLimit, minimumBalance)
             }
         }
 
         private suspend fun prepareCommission(
-            swapLimit: SwapLimit,
-            resolveAmount: (minimumBalance: Balance) -> Balance?,
+            resolveAmount: suspend () -> Balance?,
         ): PreparedCommission? {
             val recipient = commissionRecipient ?: return null
-            val outputBalance = assetSourceRegistry.sourceFor(toAsset).balance
-            val minimumBalance = outputBalance.existentialDeposit(toAsset)
-            val amount = resolveAmount(minimumBalance) ?: return null
+            val amount = resolveAmount() ?: return null
 
             ensureCommissionRecipientReady(recipient)
 

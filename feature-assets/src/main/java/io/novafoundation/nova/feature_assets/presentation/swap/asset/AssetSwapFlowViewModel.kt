@@ -1,128 +1,187 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.asset
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
-import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.launchUnit
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.common.utils.firstIfLoaded
+import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_account_api.domain.account.SelectedMetaAccountChangeObserver
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
-import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
-import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
-import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
-import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
-import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
+import io.novafoundation.nova.feature_assets.domain.swap.SwapNetworkSelectionRepository
+import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionData
+import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
-import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
-import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
-import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
-import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
-import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
-import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
+import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
+import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.Flow
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 class AssetSwapFlowViewModel(
-    interactorFactory: AssetSearchInteractorFactory,
-    router: AssetsRouter,
-    currencyInteractor: CurrencyInteractor,
-    externalBalancesInteractor: ExternalBalancesInteractor,
-    controllableAssetCheck: ControllableAssetCheckMixin,
-    accountUseCase: SelectedAccountUseCase,
-    resourceManager: ResourceManager,
-    private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
-    private val swapFlowExecutor: SwapFlowExecutor,
-    private val swapPayload: SwapFlowPayload,
-    private val assetIconProvider: AssetIconProvider,
-    assetViewModeInteractor: AssetViewModeInteractor,
-    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    private val networkAssetMapper: NetworkAssetFormatter,
-    private val tokenAssetFormatter: TokenAssetFormatter
-) : AssetFlowViewModel(
-    interactorFactory,
-    router,
-    currencyInteractor,
-    controllableAssetCheck,
-    accountUseCase,
-    externalBalancesInteractor,
-    resourceManager,
-    assetIconProvider,
-    assetViewModeInteractor,
-    networkAssetMapper,
-    tokenAssetFormatter
-) {
+    private val interactor: SwapTokenSelectionInteractor,
+    private val formatter: SwapTokenSelectionFormatter,
+    private val networkSelectionRepository: SwapNetworkSelectionRepository,
+    private val router: AssetsRouter,
+    private val resourceManager: ResourceManager,
+    private val accountRepository: AccountRepository,
+    private val selectedMetaAccountChangeObserver: SelectedMetaAccountChangeObserver,
+    private val communicator: SwapTokenSelectionCommunicator,
+    private val request: SwapTokenSelectionCommunicator.Request
+) : BaseViewModel() {
 
-    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+    val query = MutableStateFlow("")
+
+    private val selectedNetworks = MutableStateFlow<Set<ChainId>>(emptySet())
+
+    private val retries = MutableStateFlow(0)
+
+    private val selecting = MutableStateFlow(false)
+
+    private var selectionJob: Job? = null
+
+    private val data = retries.flatMapLatest {
+        interactor.observe(request.metaAccountId, request.oppositeAsset?.fullChainAssetId, request.selectingPay, viewModelScope)
+            .withSafeLoading()
+            .onError { error ->
+                if (error is CancellationException) throw error
+                error.printStackTrace()
+            }
+    }.shareInBackground()
+
+    private val networkSelectionFlow = combine(
+        networkSelectionRepository.savedNetworks(),
+        selectedNetworks
+    ) { savedNetworkIds, selectedNetworkIds ->
+        NetworkSelection(savedNetworkIds, selectedNetworkIds)
+    }
+
+    internal val screen = combine(
+        data,
+        query,
+        networkSelectionFlow,
+        selecting
+    ) { state, query, networkSelection, selecting ->
+        val title = resourceManager.getString(if (request.selectingPay) R.string.swap_select_pay_title else R.string.swap_select_receive_title)
+        when (state) {
+            ExtendedLoadingState.Loading -> SwapTokenSelectionModel(title, loading = true)
+            is ExtendedLoadingState.Error -> SwapTokenSelectionModel(title, failed = true)
+            is ExtendedLoadingState.Loaded -> loadedScreen(title, state.data, query, networkSelection, selecting)
+        }
+    }.shareInBackground()
 
     init {
-        launchInitialSwapSync()
+        selectedMetaAccountChangeObserver.observeOnce(
+            initialMetaAccountId = request.metaAccountId,
+            scope = viewModelScope
+        ) { close() }
     }
 
-    @StringRes
-    fun getTitleRes(): Int {
-        return when (swapPayload) {
-            SwapFlowPayload.InitialSelecting, is SwapFlowPayload.ReselectAssetIn -> R.string.assets_swap_flow_pay_title
-            is SwapFlowPayload.ReselectAssetOut -> R.string.assets_swap_flow_receive_title
+    fun retry() {
+        retries.value += 1
+    }
+
+    fun close() {
+        selectionJob?.cancel()
+        router.back()
+    }
+
+    internal fun chipClicked(chip: SwapNetworkChip) {
+        when (chip) {
+            is SwapNetworkChip.All -> selectedNetworks.value = emptySet()
+            is SwapNetworkChip.Network -> {
+                val id = chip.network.chainId
+                selectedNetworks.value = if (id in selectedNetworks.value) selectedNetworks.value - id else selectedNetworks.value + id
+            }
+            is SwapNetworkChip.More -> Unit // The Fragment presents the network selection sheet.
         }
     }
 
-    override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
-        return interactor.searchSwapAssetsFlow(
-            forAsset = swapPayload.constraintDirectionsAsset?.fullChainAssetId,
-            queryFlow = query,
-            externalBalancesFlow = externalBalancesFlow,
-            coroutineScope = swapFlowScope
+    fun saveNetworks(networks: Set<ChainId>) {
+        networkSelectionRepository.saveNetworks(networks)
+        selectedNetworks.value = networks
+    }
+
+    internal fun rowClicked(row: SwapTokenRow) {
+        if (!selecting.value) select(row.id)
+    }
+
+    private fun loadedScreen(
+        title: String,
+        data: SwapTokenSelectionData,
+        query: String,
+        networkSelection: NetworkSelection,
+        selecting: Boolean
+    ): SwapTokenSelectionModel {
+        val chips = interactor.networkChips(data.chains, networkSelection.savedNetworkIds)
+        val availableNetworks = data.chains.map { it.id }.toSet()
+        val selected = networkSelection.selectedNetworkIds.intersect(availableNetworks)
+        val moreCount = data.chains.size - chips.size
+        val networks = (interactor.networkChips(data.chains, emptySet()) + data.chains.sortedWith(Chain.defaultComparator())).distinctBy { it.id }
+        return SwapTokenSelectionModel(
+            title = title,
+            items = formatter.tokens(interactor.groups(data, query, selected), data.oppositeSymbol, request.selectedAsset?.fullChainAssetId),
+            networks = networks.map { formatter.network(it, it.id in networkSelection.savedNetworkIds) },
+            chips = buildList {
+                add(SwapNetworkChip.All(resourceManager.getString(R.string.common_all), selected.isEmpty()))
+                addAll(chips.map { SwapNetworkChip.Network(formatter.network(it, it.id in selected)) })
+                add(
+                    SwapNetworkChip.More(
+                        if (moreCount > 0) {
+                            resourceManager.getString(R.string.swap_select_more_networks, moreCount)
+                        } else {
+                            resourceManager.getString(R.string.select_network_title)
+                        }
+                    )
+                )
+            },
+            selecting = selecting
         )
     }
 
-    override fun assetClicked(asset: Chain.Asset) {
-        launch {
-            swapFlowExecutor.openNextScreen(swapFlowScope, asset)
+    private fun select(id: FullChainAssetId) {
+        selectionJob = launch {
+            selecting.value = true
+            try {
+                val loaded = data.firstIfLoaded() ?: return@launch
+                val asset = interactor.asset(loaded, id) ?: return@launch
+                val clearOpposite = interactor.shouldClearOpposite(
+                    id,
+                    request.oppositeAsset?.fullChainAssetId,
+                    request.selectingPay,
+                    request.metaAccountId,
+                    viewModelScope
+                )
+                if (accountRepository.getSelectedMetaAccount().id != request.metaAccountId) return@launch
+                communicator.respond(
+                    SwapTokenSelectionCommunicator.Response(
+                        request.requestId,
+                        request.selectingPay,
+                        asset.toAssetPayload(),
+                        request.metaAccountId,
+                        clearOpposite
+                    )
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showError(resourceManager.getString(R.string.swap_select_route_error))
+            } finally {
+                selecting.value = false
+            }
         }
     }
 
-    override fun tokenClicked(tokenGroup: TokenGroupUi) = launchUnit {
-        when (val type = tokenGroup.groupType) {
-            is TokenGroupUi.GroupType.SingleItem -> assetClicked(type.asset)
-
-            TokenGroupUi.GroupType.Group -> router.openSwapNetworks(NetworkSwapFlowPayload(NetworkFlowPayload(tokenGroup.tokenSymbol), swapPayload))
-        }
-    }
-
-    override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return networkAssetMapper.mapGroupedAssetsToUi(
-            assets,
-            assetIconProvider,
-            currency,
-            NetworkAssetGroup::groupTransferableBalanceFiat,
-            AssetBalance::transferable
-        )
-    }
-
-    override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
-        return assets.map { (group, assets) ->
-            tokenAssetFormatter.mapTokenAssetGroupToUi(assetIconProvider, group, assets) { it.groupBalance.transferable }
-        }
-    }
-
-    private fun launchInitialSwapSync() {
-        if (swapPayload is SwapFlowPayload.InitialSelecting) {
-            launch { swapAvailabilityInteractor.warmUpCommonlyUsedChains(swapFlowScope) }
-
-            launch { swapAvailabilityInteractor.sync(swapFlowScope) }
-        }
-    }
+    private class NetworkSelection(val savedNetworkIds: Set<ChainId>, val selectedNetworkIds: Set<ChainId>)
 }

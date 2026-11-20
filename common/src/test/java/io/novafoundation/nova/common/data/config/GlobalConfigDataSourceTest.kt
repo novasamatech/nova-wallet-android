@@ -7,6 +7,7 @@ import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
@@ -24,6 +25,8 @@ class GlobalConfigDataSourceTest {
 
     private val stored = mutableMapOf<String, String>()
 
+    private val changeNowTaoUrl = "https://changenow.io/exchange?from=assethub&to=tao&link_id=59409968ba3831"
+
     private val onlineApi = object : GlobalConfigApi {
         override suspend fun getGlobalConfig() = GlobalConfigRemote("multisigs", "proxy", "staking", "https://infra.test/")
     }
@@ -32,9 +35,94 @@ class GlobalConfigDataSourceTest {
         override suspend fun getGlobalConfig(): GlobalConfigRemote = throw IOException("Offline")
     }
 
+    private val onlineTaoApi = object : GlobalConfigApi {
+        override suspend fun getGlobalConfig() = GlobalConfigRemote(
+            multisigsApiUrl = "multisigs",
+            proxyApiUrl = "proxy",
+            multiStakingApiUrl = "staking",
+            infraUrl = "https://infra.test/",
+            changeNowTaoUrl = changeNowTaoUrl
+        )
+    }
+
     private fun prepareStorage() {
         doAnswer { call -> stored[call.getArgument(0)] = call.getArgument(1); null }.`when`(preferences).putString(anyString(), anyString())
         `when`(preferences.getString(anyString())).thenAnswer { call -> stored[call.getArgument(0)] }
+    }
+
+    @Test
+    fun `swap pair and TAO funding URL survive decoding and offline restore together`() = runBlocking {
+        prepareStorage()
+        val chainId = "a".repeat(64)
+        val json = """
+            {
+                "multisigsApiUrl": "multisigs",
+                "proxyApiUrl": "proxy",
+                "multiStakingApiUrl": "staking",
+                "infraUrl": "https://infra.test/",
+                "changeNowTaoUrl": "$changeNowTaoUrl",
+                "defaultSwapPair": {
+                    "assetIn": {"chainId": "$chainId", "assetId": 0},
+                    "assetOut": {"chainId": "$chainId", "assetId": 2}
+                }
+            }
+        """.trimIndent()
+        val api = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig(): GlobalConfigRemote = gson.fromJson(json, GlobalConfigRemote::class.java)
+        }
+        val online = RealGlobalConfigDataSource(api, preferences, gson, logger)
+        val loaded = online.getGlobalConfig()
+        assertEquals(changeNowTaoUrl, loaded.changeNowTaoUrl)
+        assertEquals(0, loaded.defaultSwapPair!!.assetIn.assetId)
+        assertEquals(2, loaded.defaultSwapPair!!.assetOut.assetId)
+
+        val offline = RealGlobalConfigDataSource(offlineApi, preferences, gson, logger)
+        val restored = offline.getGlobalConfig()
+        assertEquals(changeNowTaoUrl, restored.changeNowTaoUrl)
+        assertEquals(loaded.defaultSwapPair, restored.defaultSwapPair)
+    }
+
+    @Test
+    fun `remote config decodes ChangeNOW TAO URL`() {
+        val json = """
+            {
+                "multisigsApiUrl": "multisigs",
+                "proxyApiUrl": "proxy",
+                "multiStakingApiUrl": "staking",
+                "infraUrl": "https://infra.test/",
+                "changeNowTaoUrl": "$changeNowTaoUrl"
+            }
+        """.trimIndent()
+
+        val remote = gson.fromJson(json, GlobalConfigRemote::class.java)
+
+        assertEquals(changeNowTaoUrl, remote.changeNowTaoUrl)
+    }
+
+    @Test
+    fun `remote config without ChangeNOW TAO URL decodes null`() {
+        val json = """
+            {
+                "multisigsApiUrl": "multisigs",
+                "proxyApiUrl": "proxy",
+                "multiStakingApiUrl": "staking",
+                "infraUrl": "https://infra.test/"
+            }
+        """.trimIndent()
+
+        val remote = gson.fromJson(json, GlobalConfigRemote::class.java)
+
+        assertNull(remote.changeNowTaoUrl)
+    }
+
+    @Test
+    fun `ChangeNOW TAO URL survives a new owner with no network`() = runBlocking {
+        prepareStorage()
+        val online = RealGlobalConfigDataSource(onlineTaoApi, preferences, gson, logger)
+        assertEquals(changeNowTaoUrl, online.getGlobalConfig().changeNowTaoUrl)
+
+        val restarted = RealGlobalConfigDataSource(offlineApi, preferences, gson, logger)
+        assertEquals(changeNowTaoUrl, restarted.getGlobalConfig().changeNowTaoUrl)
     }
 
     @Test
@@ -44,6 +132,7 @@ class GlobalConfigDataSourceTest {
         assertEquals("https://infra.test/", online.getGlobalConfig().infraUrl)
         val restarted = RealGlobalConfigDataSource(offlineApi, preferences, gson, logger)
         assertEquals("https://infra.test/", restarted.getGlobalConfig().infraUrl)
+        assertNull(restarted.getGlobalConfig().changeNowTaoUrl)
     }
 
     @Test
@@ -90,5 +179,34 @@ class GlobalConfigDataSourceTest {
         }
         val source = RealGlobalConfigDataSource(cancelledApi, preferences, gson, logger)
         assertTrue(runCatching { source.getGlobalConfig() }.exceptionOrNull() is CancellationException)
+    }
+
+    @Test
+    fun `default swap pair is optional and validated independently of other global settings`() = runBlocking<Unit> {
+        prepareStorage()
+        val chainId = "a".repeat(64)
+        val pair = SwapPairRemote(SwapPairRemote.Asset(chainId, 0), SwapPairRemote.Asset(chainId, 2))
+        val api = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig() = GlobalConfigRemote("m", "p", "s", "https://infra.test/", pair)
+        }
+        val config = RealGlobalConfigDataSource(api, preferences, gson, logger).getGlobalConfig()
+        assertEquals(0, config.defaultSwapPair!!.assetIn.assetId)
+        assertEquals(2, config.defaultSwapPair!!.assetOut.assetId)
+        val oldApi = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig() = GlobalConfigRemote("m", "p", "s", "https://infra.test/")
+        }
+        org.junit.Assert.assertNull(RealGlobalConfigDataSource(oldApi, preferences, gson, logger).getGlobalConfig().defaultSwapPair)
+    }
+
+    @Test
+    fun `malformed pair does not discard valid infrastructure configuration`() = runBlocking<Unit> {
+        prepareStorage()
+        val badPair = SwapPairRemote(SwapPairRemote.Asset("invalid", null), SwapPairRemote.Asset("invalid", 2))
+        val api = object : GlobalConfigApi {
+            override suspend fun getGlobalConfig() = GlobalConfigRemote("m", "p", "s", "https://infra.test/", badPair)
+        }
+        val config = RealGlobalConfigDataSource(api, preferences, gson, logger).getGlobalConfig()
+        assertEquals("https://infra.test/", config.infraUrl)
+        org.junit.Assert.assertNull(config.defaultSwapPair)
     }
 }

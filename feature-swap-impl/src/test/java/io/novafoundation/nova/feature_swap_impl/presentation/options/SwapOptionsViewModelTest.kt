@@ -6,12 +6,15 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator.Method
+import io.novafoundation.nova.feature_swap_api.presentation.state.DEFAULT_SLIPPAGE
+import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SlippageFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapSettingsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -104,11 +107,13 @@ class SwapOptionsViewModelTest {
     }
 
     @Test
-    fun `input precision and title depend on the payload`() {
+    fun `input precision and title depend on the payload`() = runBlocking<Unit> {
         val withPayload = createViewModel(payload(selected = 0.005))
         assertTrue(withPayload.limitsInputPrecision)
         assertEquals("${R.string.common_settings}", withPayload.title)
 
+        val state = RealSwapSettingsState(SwapSettings(slippage = DEFAULT_SLIPPAGE))
+        Mockito.`when`(stateProvider.getSwapSettingsState(any() ?: this)).thenReturn(state)
         val swap = createViewModel(null)
         assertFalse(swap.limitsInputPrecision)
         assertEquals("${R.string.swap_settings_title}", swap.title)

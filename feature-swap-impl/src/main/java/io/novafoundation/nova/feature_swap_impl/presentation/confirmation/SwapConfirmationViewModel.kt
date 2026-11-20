@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.validation.TransformedFailure
@@ -34,7 +33,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapOperationSubmiss
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
@@ -45,6 +43,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmoun
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
@@ -53,21 +52,21 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAler
 import io.novafoundation.nova.feature_swap_impl.presentation.common.analytics.toSwapFailureReason
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
-import io.novafoundation.nova.feature_swap_impl.presentation.common.state.setState
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
+import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationPayloadMapper
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
+import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.feature_swap_impl.presentation.main.mapSwapValidationFailureToUI
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -85,6 +84,8 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 private data class SwapConfirmationState(
     val swapQuoteArgs: SwapQuoteArgs,
     val swapQuote: SwapQuote,
+    val fee: SwapFee,
+    val reviewedDustCheckFee: SwapDustCheckFee = SwapDustCheckFee.QuoteFee,
 )
 
 enum class MaxAction {
@@ -103,35 +104,37 @@ class SwapConfirmationViewModel(
     private val validationExecutor: ValidationExecutor,
     private val tokenRepository: TokenRepository,
     private val externalActions: ExternalActions.Presentation,
-    private val swapStateStoreProvider: SwapStateStoreProvider,
+    private val operationLoader: SwapOperationLoader,
+    private val operationPayload: SwapOperationPayload,
+    private val operationMapper: SwapOperationPayloadMapper,
     private val feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val arbitraryAssetUseCase: ArbitraryAssetUseCase,
-    private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val maxActionProviderFactory: SwapMaxActionProviderFactory,
     private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val resourceManager: ResourceManager,
-    private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val analyticsService: AnalyticsService,
     private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
+    Retriable by operationLoader,
     ExternalActions by externalActions,
     Validatable by validationExecutor,
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
-    private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
+    private val swapFlowScope = viewModelScope
 
     private val confirmationStateFlow = singleReplaySharedFlow<SwapConfirmationState>()
 
-    private val metaAccountFlow = accountRepository.selectedMetaAccountFlow()
+    private val metaAccountFlow = accountRepository.metaAccountFlow(operationPayload.metaAccountId)
         .shareInBackground()
 
     private val slippageConfigFlow = confirmationStateFlow
         .mapNotNull { swapInteractor.slippageConfig(it.swapQuote.assetIn.chainId) }
         .shareInBackground()
 
-    private val initialSwapState = flowOf { swapStateStoreProvider.getStateOrThrow(swapFlowScope) }
+    private val initialSwapState = operationLoader.state(viewModelScope).shareInBackground()
 
     private val slippageFlow = initialSwapState.map { it.slippage }
         .shareInBackground()
@@ -144,12 +147,12 @@ class SwapConfirmationViewModel(
         .shareInBackground()
 
     private val assetInFlow = initialSwapState.flatMapLatest {
-        arbitraryAssetUseCase.assetFlow(it.quote.assetIn)
+        arbitraryAssetUseCase.assetFlow(operationPayload.metaAccountId, it.quote.assetIn)
     }
         .shareInBackground()
 
     private val assetOutFlow = initialSwapState.flatMapLatest {
-        arbitraryAssetUseCase.assetFlow(it.quote.assetOut)
+        arbitraryAssetUseCase.assetFlow(operationPayload.metaAccountId, it.quote.assetOut)
     }
         .shareInBackground()
 
@@ -162,11 +165,25 @@ class SwapConfirmationViewModel(
         interactor = swapInteractor
     )
 
-    private val maxActionProvider = createMaxActionProvider()
+    private val maxActionProvider = maxActionProviderFactory.create(
+        scope = viewModelScope,
+        assets = assetInFlow,
+        outputAssets = confirmationStateFlow.map { it.swapQuote.assetOut },
+        maxActive = maxActionFlow.map { it == MaxAction.ACTIVE },
+        feeLoaderMixin = feeMixin,
+    )
 
     private val _validationInProgress = MutableStateFlow(false)
 
-    val validationInProgress = _validationInProgress
+    private val updatingQuote = MutableStateFlow(false)
+
+    private var quoteUpdateJob: Job? = null
+
+    val validationInProgress = combine(_validationInProgress, updatingQuote) { validating, updating -> validating || updating }
+
+    val readyToConfirm = combine(operationLoader.loading, confirmationStateFlow, validationInProgress) { loading, _, busy ->
+        !loading && !busy
+    }
 
     val swapDetails = confirmationStateFlow.map {
         swapConfirmationDetailsFormatter.format(it.swapQuote, slippageFlow.first())
@@ -183,7 +200,7 @@ class SwapConfirmationViewModel(
         NovaSwapCommission.FEE_PERCENT_DISPLAY
     )
 
-    val wallet: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow()
+    val wallet: Flow<WalletModel> = walletUiUseCase.walletUiFlow(operationPayload.metaAccountId)
 
     val addressFlow: Flow<AddressModel> = combine(chainIn, metaAccountFlow) { chainId, metaAccount ->
         addressIconGenerator.createAccountAddressModel(chainId, metaAccount)
@@ -212,12 +229,12 @@ class SwapConfirmationViewModel(
         launchSlippageDescription(resourceManager)
     }
 
-    fun networkFeeClicked() = setSwapStateAndThen {
-        swapRouter.openSwapFee()
+    fun networkFeeClicked() = launchUnit {
+        swapRouter.openSwapFee(currentOperationPayload())
     }
 
-    fun routeClicked() = setSwapStateAfter {
-        swapRouter.openSwapRoute()
+    fun routeClicked() = launchUnit {
+        swapRouter.openSwapRoute(currentOperationPayload())
     }
 
     fun accountClicked() {
@@ -230,12 +247,12 @@ class SwapConfirmationViewModel(
     }
 
     fun confirmButtonClicked() {
+        if (_validationInProgress.value || updatingQuote.value || operationLoader.loading.value) return
+        _validationInProgress.value = true
         confirmedAt = System.currentTimeMillis()
 
         launch {
-            _validationInProgress.value = true
-
-            val validationSystem = swapInteractor.validationSystem()
+            val validationSystem = swapInteractor.validationSystem(operationPayload.metaAccountId)
             val payload = getValidationPayload()
 
             validationExecutor.requireValid(
@@ -260,35 +277,8 @@ class SwapConfirmationViewModel(
         super.onCleared()
     }
 
-    private fun setSwapStateAndThen(action: () -> Unit) {
-        launch {
-            updateSwapStateInStore()
-
-            action()
-        }
-    }
-
-    private fun setSwapStateAfter(action: () -> Unit) {
-        launch {
-            val store = swapStateStoreProvider.getStore(swapFlowScope)
-            store.resetState()
-
-            action()
-
-            updateSwapStateInStore()
-        }
-    }
-
-    private suspend fun updateSwapStateInStore() {
-        swapStateStoreProvider.setState(getValidationPayload().toSwapState())
-    }
-
-    private fun createMaxActionProvider(): MaxActionProvider {
-        return maxActionProviderFactory.create(
-            viewModelScope = viewModelScope,
-            assetInFlow = assetInFlow,
-            feeLoaderMixin = feeMixin,
-        )
+    private suspend fun currentOperationPayload(): SwapOperationPayload {
+        return operationMapper.toPayload(getValidationPayload().toSwapState(), operationPayload.metaAccountId, operationPayload.returnToTab)
     }
 
     private fun executeSwap(validPayload: SwapValidationPayload) = launchUnit {
@@ -296,10 +286,10 @@ class SwapConfirmationViewModel(
 
         trackSwapConfirmed()
 
-        if (swapInteractor.isDeepSwapAvailable()) {
-            swapStateStoreProvider.setState(validPayload.toSwapState())
-
-            swapRouter.openSwapExecution()
+        if (swapInteractor.isDeepSwapAvailable(operationPayload.metaAccountId)) {
+            swapRouter.openSwapExecution(
+                operationMapper.toPayload(validPayload.toSwapState(), operationPayload.metaAccountId, operationPayload.returnToTab)
+            )
         } else {
             executeFirstSwapStep(validPayload.fee)
         }
@@ -315,8 +305,7 @@ class SwapConfirmationViewModel(
                 this.showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) {
-                    val asset = assetOutFlow.first()
-                    swapRouter.openBalanceDetails(asset.token.configuration.toAssetPayload())
+                    swapRouter.finishSwap(returnToTab = operationPayload.returnToTab)
                 }
             }.onFailure {
                 _validationInProgress.value = false
@@ -380,12 +369,18 @@ class SwapConfirmationViewModel(
 
     private suspend fun getValidationPayload(): SwapValidationPayload {
         val confirmationState = confirmationStateFlow.first()
-        val swapFee = feeMixin.awaitFee()
+        val dustCheckFee = if (maxActionFlow.value == MaxAction.ACTIVE) {
+            maxActionProvider.dustCheckFeeFor(confirmationState.swapQuote)
+        } else {
+            confirmationState.reviewedDustCheckFee
+        }
 
         return SwapValidationPayload(
             swapQuote = confirmationState.swapQuote,
-            fee = swapFee,
-            slippage = slippageFlow.first()
+            fee = confirmationState.fee,
+            slippage = slippageFlow.first(),
+            metaAccountId = operationPayload.metaAccountId,
+            dustCheckFee = dustCheckFee
         )
     }
 
@@ -404,9 +399,7 @@ class SwapConfirmationViewModel(
     }
 
     private fun setMaxAmountIn() {
-        launch {
-            maxActionFlow.value = MaxAction.ACTIVE
-        }
+        maxActionFlow.value = MaxAction.ACTIVE
     }
 
     private fun setMinAmountOut(amount: Balance) = launchUnit {
@@ -436,23 +429,26 @@ class SwapConfirmationViewModel(
     }
 
     private fun calculateQuote(newSwapQuoteArgs: SwapQuoteArgs) {
-        launch {
-            val confirmationState = confirmationStateFlow.first()
-            val swapQuote = swapInteractor.quote(newSwapQuoteArgs, swapFlowScope)
-                .onFailure { }
-                .getOrNull() ?: return@launch
-
-            feeMixin.loadFee { feePaymentCurrency ->
+        quoteUpdateJob?.cancel()
+        updatingQuote.value = true
+        quoteUpdateJob = launch {
+            runCatching {
+                val swapQuote = swapInteractor.quote(newSwapQuoteArgs, swapFlowScope).getOrThrow()
                 val executeArgs = swapQuote.toExecuteArgs(
                     slippage = slippageFlow.first(),
-                    firstSegmentFees = feePaymentCurrency
+                    firstSegmentFees = feeMixin.feePaymentCurrency(),
+                    metaAccountId = operationPayload.metaAccountId
                 )
-
-                swapInteractor.estimateFee(executeArgs)
+                val fee = swapInteractor.estimateFee(executeArgs)
+                coroutineContext.ensureActive()
+                feeMixin.setFee(fee)
+                confirmationStateFlow.emit(SwapConfirmationState(newSwapQuoteArgs, swapQuote, fee))
+            }.onFailure { error ->
+                if (error is CancellationException) throw error
+                maxActionFlow.value = MaxAction.DISABLED
+                showError(resourceManager.getString(R.string.common_undefined_error_message))
             }
-
-            val newState = confirmationState.copy(swapQuoteArgs = newSwapQuoteArgs, swapQuote = swapQuote)
-            confirmationStateFlow.emit(newState)
+            updatingQuote.value = false
         }
     }
 
@@ -470,25 +466,32 @@ class SwapConfirmationViewModel(
                 tokenOut = tokenRepository.getToken(assetOut),
                 amount = swapQuote.quotedPath.quotedAmount,
                 swapDirection = swapQuote.quotedPath.direction,
+                metaAccountId = operationPayload.metaAccountId,
             )
 
             feeMixin.setFee(swapState.fee)
 
-            val newState = SwapConfirmationState(quoteArgs, swapQuote)
+            val newState = SwapConfirmationState(quoteArgs, swapQuote, swapState.fee, swapState.dustCheckFee)
             confirmationStateFlow.emit(newState)
         }
     }
 
     private fun handleMaxClick() {
-        combineToPair(maxActionFlow, maxActionProvider.maxAvailableBalance)
-            .filter { (maxAction, _) -> maxAction == MaxAction.ACTIVE }
-            .mapNotNull { it.second.actualBalance }
+        val maximumInput = maxActionProvider.maxAvailableBalance.map { it.actualBalance }
+        combineToPair(maxActionFlow, maximumInput)
             .distinctUntilChanged()
-            .onEach {
-                val confirmationState = confirmationStateFlow.first()
+            .filter { (maxAction, _) -> maxAction == MaxAction.ACTIVE }
+            .onEach { (_, amount) ->
+                // The fee mixin can update Max before the corresponding quote has been published.
+                quoteUpdateJob?.join()
+                if (maxActionFlow.value != MaxAction.ACTIVE) return@onEach
+
+                val quoteArgs = confirmationStateFlow.first().swapQuoteArgs
+                // Max sets the pay amount, while a SPECIFIED_OUT quote stores the receive amount.
+                if (quoteArgs.amount == amount && quoteArgs.swapDirection == SwapDirection.SPECIFIED_IN) return@onEach
                 calculateQuote(
-                    confirmationState.swapQuoteArgs.copy(
-                        amount = it,
+                    quoteArgs.copy(
+                        amount = amount,
                         swapDirection = SwapDirection.SPECIFIED_IN
                     )
                 )

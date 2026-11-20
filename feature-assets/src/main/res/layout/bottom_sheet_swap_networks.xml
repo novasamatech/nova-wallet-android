@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="512dp"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center"
+        android:text="@string/select_network_title"
+        android:textColor="@color/text_primary" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/swapNetworksList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/swapNetworksDone"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/common_done" />
+</LinearLayout>

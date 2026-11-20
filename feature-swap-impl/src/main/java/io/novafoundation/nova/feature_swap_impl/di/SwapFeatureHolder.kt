@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
+import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
@@ -20,6 +22,7 @@ class SwapFeatureHolder @Inject constructor(
     featureContainer: FeatureContainer,
     private val router: SwapRouter,
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
+    private val swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -30,12 +33,13 @@ class SwapFeatureHolder @Inject constructor(
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .swapCoreApi(getFeature(SwapCoreApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
+            .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
             .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))
             .build()
 
         return DaggerSwapFeatureComponent.factory()
-            .create(accountFeatureDependencies, router, slippageSettingsCommunicator)
+            .create(accountFeatureDependencies, router, slippageSettingsCommunicator, swapTokenSelectionCommunicator)
     }
 }

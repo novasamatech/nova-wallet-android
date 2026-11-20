@@ -59,7 +59,8 @@ class BittensorPositionSourceTest {
         val invalid = saved.copy(root = listOf(saved.root.single().copy(stakeInPlanks = BigInteger.valueOf(-1))))
         cache.saveSnapshot(key, 1L, invalid)
         `when`(chainState.currentRemoteBlockNumberFlow("chain")).thenReturn(blocks)
-        `when`(remote.positions("chain", coldKey)).thenThrow(IllegalStateException("Offline"))
+        // A chain answer would replace the replayed first state, so the chain stays silent here.
+        val source = BittensorPositionSource(PendingBittensorPositionRemote(), chainState, computationalCache, logger, updates, cache)
 
         val initial = withTimeout(3_000) { source.observePositions("chain", coldKey, 1L).first() }
 
@@ -90,7 +91,8 @@ class BittensorPositionSourceTest {
         withTimeout(3_000) { source.observePositions("chain", coldKey, 1L).first { it.status is BittensorDataStatus.Fresh } }
         val restartedCache = createResponseTestCache(dao)
         val restartedComputations = commonModule.provideComputationalCache()
-        val restarted = BittensorPositionSource(remote, chainState, restartedComputations, logger, updates, restartedCache)
+        // The restarted process must show the saved positions before the chain answers, so the chain stays silent.
+        val restarted = BittensorPositionSource(PendingBittensorPositionRemote(), chainState, restartedComputations, logger, updates, restartedCache)
 
         val initial = withTimeout(3_000) { restarted.observePositions("chain", coldKey, 1L).first() }
 
