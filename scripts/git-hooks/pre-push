@@ -1,8 +1,10 @@
 #!/bin/sh
-# Opt-in pre-push hook: runs the project's ktlint on the Kotlin files touched by the commits being pushed.
+# Pre-push hook: runs the project's ktlint on the Kotlin files touched by the commits being pushed.
 #
-#   Enable once per clone:  git config core.hooksPath scripts/git-hooks
-#   Skip for one push:      git push --no-verify
+#   Enabled by any local Gradle run (scripts/git-hooks.gradle) while core.hooksPath is unset.
+#   Enable by hand:      git config core.hooksPath scripts/git-hooks
+#   Opt out:             git config core.hooksPath .git/hooks
+#   Skip for one push:   git push --no-verify
 #
 # The check reads the working tree, so it only applies when the pushed commit is the checked-out one;
 # other refs (tags, branches that are not checked out) are left to CI.

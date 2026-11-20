@@ -34,11 +34,15 @@ no SDK, NDK, Rust or secrets. The test job runs `./gradlew testDebugUnitTest`.
 They run on pull requests (`pull_request.yml`), on pushes to `develop` (`push_develop.yml`, which also
 builds and distributes) and on pushes to `rc/**` (`push_rc.yml`).
 
-`git config core.hooksPath scripts/git-hooks` enables the opt-in `pre-push` hook for a clone. It runs
-the same ktlint task on the Kotlin files touched by commits the remote does not have yet and aborts
-the push on violations; it does nothing when no Kotlin file changed. It reads the working tree, so it
-only checks a push of the checked-out commit. `core.hooksPath` replaces `.git/hooks` for that clone;
-`git push --no-verify` skips the hook once.
+`scripts/git-hooks/pre-push` runs the same ktlint task on the Kotlin files touched by commits the remote
+does not have yet and aborts the push on violations; it does nothing when no Kotlin file changed. It reads
+the working tree, so it only checks a push of the checked-out commit. `git push --no-verify` skips it once.
+A local Gradle run or IDE sync enables it (`scripts/git-hooks.gradle`) by setting `core.hooksPath` to
+`scripts/git-hooks`, but only outside CI, while no git config scope defines that key and `.git/hooks` holds
+no hooks of its own. An existing value is never changed: `git config core.hooksPath .git/hooks` opts a clone
+out, and `git config core.hooksPath scripts/git-hooks` enables the hook by hand where the automatic step did
+not apply. The setting is shared by all worktrees of a clone; a worktree on a branch without
+`scripts/git-hooks/pre-push` simply has no hook.
 
 ## Evidence by risk
 

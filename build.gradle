@@ -324,4 +324,5 @@ task runTest(type: GradleBuild) {
     tasks = ['clean', 'ktlint', 'testDebugUnitTest']
 }
 
+apply from: "scripts/git-hooks.gradle"
 apply from: "allmodules.gradle"
