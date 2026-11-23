@@ -54,6 +54,34 @@ review remains pending. Do not label another pass by the same agent “independe
 Human review is still needed for financial, signing, security, migrations and changed public contracts.
 No instruction file can guarantee that generated code is correct.
 
+## Commits and Jira tasks
+
+Jira links a commit to a task only when the task key (`NW-1234`) is in the commit message, branch name or
+pull request; work without a key is invisible on the task. This section decides what a commit message
+contains. It does not authorize committing: the root authorization rule still applies.
+
+Before the first commit of a piece of work, find its task from the first source that answers:
+
+1. The user named a task in this conversation (a key, a Jira link, "this is for NW-1234").
+2. The branch name contains a key (`fix/nw-2516-amount-comma`).
+3. Otherwise ask once: "Is there an NW task for these changes?" Accept a key, "no task", or several tasks
+   (then ask which change belongs to which).
+
+Do not take the key from earlier commits on the branch: long feature branches carry many tasks. Do not guess
+a key from a similar-sounding task or invent one. If a Jira tool is available, show the task summary for
+confirmation. Keep the answer for follow-up commits on the same work; ask again when the work moves to a
+different bug or feature.
+
+- Put the key first in the subject: `NW-2516 Keep the comma in amount and slippage inputs`.
+- One commit, one task. Split a change that covers two tasks; list both keys only when it cannot be split.
+- For a confirmed "no task", commit without a key or placeholder. If the change fixes an unfiled bug, say so
+  once so the user can decide whether it needs a ticket.
+- Never add Jira smart-commit commands (`#close`, `#comment`, `#time`, any `#word` after a key): they change
+  the ticket. Do not amend, reword or rebase existing commits to add a key unless asked.
+- No key and no question for merge commits, localization pulls, version or dependency bumps and CI-only changes.
+- A new task branch carries the key after the prefix (`fix/nw-2516-amount-comma`). A pull request names every
+  task it covers: in the title for one task, as a list in the description for several.
+
 ## Handoff
 
 State what changed, what was reused, checks actually run (and their outcome), and anything not verified.
