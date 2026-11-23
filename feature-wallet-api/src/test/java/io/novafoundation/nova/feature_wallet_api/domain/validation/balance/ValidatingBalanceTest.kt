@@ -92,7 +92,7 @@ class ValidatingBalanceTest {
 
     @Test
     fun shouldFreeze() {
-        val initial =  createBalance(free = 20, frozen = 5, reserved = 10)
+        val initial = createBalance(free = 20, frozen = 5, reserved = 10)
         assetBalanceEquals(30, initial.assetBalance.total)
         val actual = initial.tryFreeze(30)
 
@@ -101,7 +101,7 @@ class ValidatingBalanceTest {
 
     @Test
     fun shouldFailFreeze() {
-        val initial =  createBalance(free = 20, frozen = 5, reserved = 10)
+        val initial = createBalance(free = 20, frozen = 5, reserved = 10)
         assetBalanceEquals(30, initial.assetBalance.total)
         val actual = initial.tryFreeze(35)
 
@@ -115,7 +115,7 @@ class ValidatingBalanceTest {
 
         val actual = initial
             .tryWithdraw(5, BalancePreservation.KEEP_ALIVE) // aka withdraw fee. New free is 15
-            .tryWithdraw(20,  BalancePreservation.KEEP_ALIVE) // aka withdraw transfer amount. We are 15 tokens short here. Fixed imbalance results in ed (10) in free
+            .tryWithdraw(20, BalancePreservation.KEEP_ALIVE) // aka withdraw transfer amount. We are 15 tokens short here. Fixed imbalance results in ed (10) in free
             .tryWithdraw(15, BalancePreservation.ALLOW_DEATH) // aka withdraw delivery fee. We are 5 tokens short here
 
         assertDeductFailure(negativeImbalance = 20, free = 0, frozen = 0, reserved = 0, actual)
@@ -197,7 +197,7 @@ class ValidatingBalanceTest {
         assertEquals(reserved.toBigInteger(), actual.newBalanceAfterFixingImbalance.assetBalance.reserved)
     }
 
-    private fun createBalance(free: Int, frozen: Int, reserved: Int) : ValidatingBalance {
+    private fun createBalance(free: Int, frozen: Int, reserved: Int): ValidatingBalance {
         val balance = ChainAssetBalance(
             chainAsset = chainAsset,
             free = free.toBigInteger(),

@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data.model.curve
 
 import io.novafoundation.nova.common.utils.lessEpsilon
-import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.LinearDecreasingCurve
 import io.novafoundation.nova.feature_governance_api.data.thresold.gov2.curve.SteppedDecreasingCurve
-import java.math.BigDecimal
 import org.junit.Test
 
 class SteppedDecreasingCurveTest {

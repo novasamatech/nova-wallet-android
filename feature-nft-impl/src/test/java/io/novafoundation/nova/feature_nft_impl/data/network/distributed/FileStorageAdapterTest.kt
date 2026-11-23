@@ -5,7 +5,6 @@ import org.junit.Test
 
 class FileStorageAdapterTest {
 
-
     @Test
     fun `should adapt ipfs to http`() {
         runTest(

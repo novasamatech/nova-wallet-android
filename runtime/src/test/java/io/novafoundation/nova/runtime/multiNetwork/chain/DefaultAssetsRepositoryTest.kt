@@ -48,7 +48,6 @@ class DefaultAssetsRepositoryTest {
         assertTrue(repository().defaultAssetIds().isEmpty())
     }
 
-
     @Test
     fun `a fetched list is reused, a failed one is retried`() = runBlocking<Unit> {
         `when`(chainFetcher.getDefaultAssets())

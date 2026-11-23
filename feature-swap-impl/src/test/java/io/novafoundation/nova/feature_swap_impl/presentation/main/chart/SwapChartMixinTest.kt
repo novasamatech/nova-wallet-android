@@ -188,15 +188,17 @@ class SwapChartMixinTest {
     fun `currency change cancels in flight history and never relabels old fiat`() = runBlocking<Unit> {
         val started = CompletableDeferred<Unit>()
         val cancelled = CompletableDeferred<Unit>()
-        `when`(charts.chartFlow("tether", usd, PricePeriod.WEEK)).thenReturn(flow {
-            emit(AssetPriceChart(PricePeriod.WEEK, ExtendedLoadingState.Loading))
-            started.complete(Unit)
-            try {
-                awaitCancellation()
-            } finally {
-                cancelled.complete(Unit)
+        `when`(charts.chartFlow("tether", usd, PricePeriod.WEEK)).thenReturn(
+            flow {
+                emit(AssetPriceChart(PricePeriod.WEEK, ExtendedLoadingState.Loading))
+                started.complete(Unit)
+                try {
+                    awaitCancellation()
+                } finally {
+                    cancelled.complete(Unit)
+                }
             }
-        })
+        )
         val mixin = create()
         withTimeout(5_000) { started.await() }
         selectedCurrency.value = eur

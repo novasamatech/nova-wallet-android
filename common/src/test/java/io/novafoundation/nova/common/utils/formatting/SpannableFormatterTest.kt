@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatt
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-
 class SpannableFormatterTest {
 
     @Test

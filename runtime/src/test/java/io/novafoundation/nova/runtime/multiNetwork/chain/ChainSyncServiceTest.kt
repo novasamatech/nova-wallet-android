@@ -29,7 +29,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito.lenient
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
@@ -106,12 +105,10 @@ class ChainSyncServiceTest {
     @Mock
     lateinit var chainFetcher: ChainFetcher
 
-
     lateinit var chainSyncService: ChainSyncService
 
     @Before
     fun setup() = runBlocking {
-
         chainSyncService = ChainSyncService(dao, chainFetcher, gson)
     }
 

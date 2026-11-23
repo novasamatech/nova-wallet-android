@@ -352,7 +352,6 @@ class CloudBackupExtKtTest {
         builder()
 
         privateData {
-
         }
     }
 }

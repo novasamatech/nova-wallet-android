@@ -7,8 +7,8 @@ internal class PartitionTest {
 
     @Test
     fun testEveryCombinationBelowSize100() {
-        (1..100).map {  size ->
-            (0 .. size).map { truePointIndex ->
+        (1..100).map { size ->
+            (0..size).map { truePointIndex ->
                 val list = List(truePointIndex) { false } + List(size - truePointIndex) { true }
                 runTest(list, expectedResult = truePointIndex.takeIf { truePointIndex < size })
             }
@@ -22,6 +22,6 @@ internal class PartitionTest {
         var iterationCount = 0
         val actualResult = list.findPartitionPoint { iterationCount++; it }
 
-        assertEquals("Expected: ${expectedResult}, Got: $actualResult in $list", expectedResult, actualResult)
+        assertEquals("Expected: $expectedResult, Got: $actualResult in $list", expectedResult, actualResult)
     }
 }

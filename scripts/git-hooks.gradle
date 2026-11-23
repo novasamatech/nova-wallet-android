@@ -1,0 +1,91 @@
+// Enables the repository's git hooks (scripts/git-hooks) in local clones by setting core.hooksPath.
+//
+// It only fills in an unset value. An existing core.hooksPath from any git config scope is kept, so
+// `git config core.hooksPath .git/hooks` opts a clone out. CI, sources without .git (archives) and
+// clones that already have hooks in the default hooks directory, which core.hooksPath would switch
+// off, are left alone. Nothing here may fail the build or slow it down.
+
+import java.util.concurrent.TimeUnit
+import org.gradle.api.provider.ValueSource
+import org.gradle.api.provider.ValueSourceParameters
+
+// A ValueSource is how a process may run at configuration time with the configuration cache on.
+// Gradle can call obtain() again on any build; that is safe because a set value is never changed.
+abstract class GitHooksPathSetup implements ValueSource<Boolean, Parameters> {
+
+    interface Parameters extends ValueSourceParameters {
+
+        DirectoryProperty getRepositoryDir()
+
+        Property<String> getHooksPath()
+    }
+
+    private static final String HOOKS_PATH_KEY = 'core.hooksPath'
+
+    // Exit code of `git config --get` for a key that no config scope defines.
+    private static final int CONFIG_KEY_NOT_FOUND = 1
+
+    private static final String SAMPLE_HOOK_SUFFIX = '.sample'
+
+    private static final long GIT_TIMEOUT_SECONDS = 5
+
+    // Returns true when this call has set core.hooksPath.
+    @Override
+    Boolean obtain() {
+        try {
+            if (git('config', '--get', HOOKS_PATH_KEY).exitCode != CONFIG_KEY_NOT_FOUND) return false
+            if (hasHooksInDefaultDirectory()) return false
+
+            return git('config', HOOKS_PATH_KEY, parameters.hooksPath.get()).exitCode == 0
+        } catch (Exception ignored) {
+            // No git binary, read-only config and the like: the hooks are a convenience.
+            return false
+        }
+    }
+
+    private boolean hasHooksInDefaultDirectory() {
+        def hooksDirLookup = git('rev-parse', '--git-path', 'hooks')
+        if (hooksDirLookup.exitCode != 0) return true
+
+        def hooksDir = new File(hooksDirLookup.output.trim())
+        if (!hooksDir.absolute) hooksDir = new File(repositoryDir, hooksDir.path)
+
+        def hookFiles = hooksDir.listFiles() ?: new File[0]
+        return hookFiles.any { it.file && !it.name.endsWith(SAMPLE_HOOK_SUFFIX) }
+    }
+
+    private Map git(String... arguments) {
+        def process = new ProcessBuilder(['git', *arguments])
+            .directory(repositoryDir)
+            .redirectErrorStream(true)
+            .start()
+        process.outputStream.close()
+
+        if (!process.waitFor(GIT_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+            process.destroyForcibly()
+            throw new IllegalStateException("git ${arguments.join(' ')} timed out")
+        }
+
+        return [exitCode: process.exitValue(), output: process.inputStream.text]
+    }
+
+    private File getRepositoryDir() {
+        return parameters.repositoryDir.get().asFile
+    }
+}
+
+def hooksPath = 'scripts/git-hooks'
+def isCi = providers.environmentVariable('CI').isPresent()
+// A directory in a regular clone, a file in a linked worktree.
+def isGitCheckout = rootProject.file('.git').exists()
+
+if (!isCi && isGitCheckout) {
+    def hooksPathWasSet = providers.of(GitHooksPathSetup) {
+        parameters.repositoryDir.set(rootProject.layout.projectDirectory)
+        parameters.hooksPath.set(hooksPath)
+    }.get()
+
+    if (hooksPathWasSet) {
+        logger.lifecycle("Git hooks enabled: core.hooksPath=$hooksPath (opt out: git config core.hooksPath .git/hooks)")
+    }
+}

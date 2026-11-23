@@ -9,7 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 @JvmInline
-private value class IntIdentifiable(val value: Int): Identifiable {
+private value class IntIdentifiable(val value: Int) : Identifiable {
     override val identifier: String
         get() = value.toString()
 }
@@ -74,7 +74,7 @@ class FlowExtKtTest {
                 second = listOf(newStruct),
                 expectedDiff = Diff(
                     removed = emptyList(),
-                    added =  emptyList(),
+                    added = emptyList(),
                     updated = listOf(newStruct),
                     all = listOf(newStruct)
                 )
@@ -90,7 +90,7 @@ class FlowExtKtTest {
         performTest(first, second, expectedDiff, ::IntIdentifiable)
     }
 
-    private suspend fun <T: Identifiable> performTest(
+    private suspend fun <T : Identifiable> performTest(
         first: List<T>,
         second: List<T>,
         expectedDiff: Diff<T>,

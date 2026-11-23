@@ -41,7 +41,6 @@ import org.mockito.junit.MockitoJUnitRunner
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 
-
 private const val TEST_TYPES = "Stub"
 
 @Ignore("Flaky tests due to concurrency issues")

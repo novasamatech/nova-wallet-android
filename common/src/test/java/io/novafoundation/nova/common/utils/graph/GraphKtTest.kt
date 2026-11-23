@@ -45,7 +45,6 @@ internal class GraphKtTest {
             repeat(100) { i ->
                 graph.findDijkstraPathsBetween(i, graphSize - i, limit = 10)
             }
-
         }
 
         print("Execution time: ${time / 100}")

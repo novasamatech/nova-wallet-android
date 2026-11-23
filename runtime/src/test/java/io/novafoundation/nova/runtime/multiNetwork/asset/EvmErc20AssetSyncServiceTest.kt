@@ -57,12 +57,10 @@ class EvmErc20AssetSyncServiceTest {
     @Mock
     lateinit var assetFetcher: AssetFetcher
 
-
     lateinit var evmAssetSyncService: EvmAssetsSyncService
 
     @Before
     fun setup() = runBlocking {
-
         evmAssetSyncService = EvmAssetsSyncService(chaindao, dao, assetFetcher, gson)
     }
 

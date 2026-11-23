@@ -83,7 +83,6 @@ class LocalMetaAccountMockBuilder(
     private var _globallyUniqueId: String = MetaAccountLocal.generateGloballyUniqueId()
     private var _typeExtras: String? = null
 
-
     fun chainAccount(chainId: ChainId, builder: LocalChainAccountMockBuilder.() -> Unit) {
         val chainAccountLocal = LocalChainAccountMockBuilder(metaId, chainId).apply(builder).build()
         chainAccounts.add(chainAccountLocal)

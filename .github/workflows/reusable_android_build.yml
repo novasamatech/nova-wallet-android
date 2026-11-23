@@ -54,6 +54,28 @@ env:
   POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
 
 jobs:
+  lint:
+    name: Lint (ktlint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: ${{ inputs.run-tests }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # No "cache: gradle" here: its key is shared with the build jobs, and this job would save
+      # a cache holding little more than ktlint, which those jobs would then restore.
+      - name: ☕️ Install Java
+        uses: actions/setup-java@v4.0.0
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # The root ktlint task needs the root project only. Configuring on demand leaves the Android
+      # modules alone, so this job works without the SDK, NDK, Rust and secrets.
+      - name: 🧹 Run ktlint
+        run: ./gradlew :ktlint --configure-on-demand
+
   run-tests:
     name: Run unit tests
     runs-on: ubuntu-latest
@@ -77,8 +99,9 @@ jobs:
           dev-google-services-base64: ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}
           prod-google-services-base64: ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}
 
+      # Style is checked by the lint job, so a ktlint failure does not hide test results.
       - name: 🧪 Run tests
-        run: ./gradlew runTest
+        run: ./gradlew testDebugUnitTest
 
   build-app:
     name: Build app
