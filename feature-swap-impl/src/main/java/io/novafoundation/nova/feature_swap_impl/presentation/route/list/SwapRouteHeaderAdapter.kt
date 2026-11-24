@@ -5,17 +5,10 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.feature_swap_impl.databinding.ItemRouteHeaderBinding
 
-class SwapRouteHeaderAdapter(
-    private val handler: Handler
-) : RecyclerView.Adapter<SwapRouteHeaderViewHolder>() {
-
-    interface Handler {
-
-        fun backClicked()
-    }
+class SwapRouteHeaderAdapter : RecyclerView.Adapter<SwapRouteHeaderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SwapRouteHeaderViewHolder {
-        return SwapRouteHeaderViewHolder(ItemRouteHeaderBinding.inflate(parent.inflater(), parent, false), handler)
+        return SwapRouteHeaderViewHolder(ItemRouteHeaderBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun getItemCount(): Int {
@@ -27,10 +20,4 @@ class SwapRouteHeaderAdapter(
 
 class SwapRouteHeaderViewHolder(
     binder: ItemRouteHeaderBinding,
-    handler: SwapRouteHeaderAdapter.Handler
-) : RecyclerView.ViewHolder(binder.root) {
-
-    init {
-        binder.swapRouteBack.setHomeButtonListener { handler.backClicked() }
-    }
-}
+) : RecyclerView.ViewHolder(binder.root)

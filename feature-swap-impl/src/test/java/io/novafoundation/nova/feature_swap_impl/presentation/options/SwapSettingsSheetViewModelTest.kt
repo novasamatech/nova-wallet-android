@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
-import io.novafoundation.nova.feature_swap_impl.data.SwapChartPreferences
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.FieldValidationResult
@@ -30,11 +29,9 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
 import org.mockito.Mockito.timeout
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
-import org.mockito.Mockito.`when`
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SwapSettingsSheetViewModelTest {
@@ -42,8 +39,6 @@ class SwapSettingsSheetViewModelTest {
     private val resources = mock(ResourceManager::class.java) { invocation ->
         if (invocation.method.name == "getString") invocation.arguments.joinToString("|") else Mockito.RETURNS_DEFAULTS.answer(invocation)
     }
-
-    private val chartPreferences = mock(SwapChartPreferences::class.java)
 
     private val router = mock(SwapRouter::class.java)
 
@@ -56,7 +51,6 @@ class SwapSettingsSheetViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        `when`(chartPreferences.isEnabled()).thenReturn(true)
     }
 
     @After
@@ -141,43 +135,15 @@ class SwapSettingsSheetViewModelTest {
     fun `reset restores default without publishing until apply`() = runBlocking {
         val viewModel = createViewModel(selected = 0.02)
         assertEquals(SwapSlippageSelection.Custom("2"), viewModel.selection.value)
-        viewModel.setChartEnabled(false)
 
         viewModel.resetClicked()
 
         assertEquals(1, viewModel.selectedTip.first())
-        assertTrue(viewModel.chartEnabled.value)
-        verify(chartPreferences, never()).setEnabled(true)
         verifyNoInteractions(communicator, router)
         viewModel.applyClicked()
         val response = captureResponse()
         assertEquals(0.005, response.fraction, 1e-12)
         assertEquals(Method.RESET, response.method)
-        verify(chartPreferences).setEnabled(true)
-    }
-
-    @Test
-    fun `chart visibility remains a draft until apply`() = runBlocking<Unit> {
-        val viewModel = createViewModel()
-        viewModel.setChartEnabled(false)
-        verify(chartPreferences, never()).setEnabled(false)
-
-        viewModel.applyClicked()
-        captureResponse()
-
-        verify(chartPreferences).setEnabled(false)
-    }
-
-    @Test
-    fun `invalid settings cannot partially persist chart visibility`() = runBlocking<Unit> {
-        val viewModel = createViewModel()
-        viewModel.setChartEnabled(false)
-        viewModel.selection.value = viewModel.selectionFromInput("60")
-        viewModel.applyClicked()
-
-        withTimeout(5_000) { viewModel.slippageInputValidationResult.first { it is FieldValidationResult.Error } }
-        verify(chartPreferences, never()).setEnabled(false)
-        verifyNoInteractions(communicator, router)
     }
 
     @Test
@@ -249,6 +215,6 @@ class SwapSettingsSheetViewModelTest {
             requestId = "form-request"
         )
         val validator = SlippageFieldValidator(payload.config(), resources)
-        return SwapSettingsSheetViewModel(router, resources, validator, alertFactory, payload, communicator, chartPreferences).also(models::add)
+        return SwapSettingsSheetViewModel(router, resources, validator, alertFactory, payload, communicator).also(models::add)
     }
 }

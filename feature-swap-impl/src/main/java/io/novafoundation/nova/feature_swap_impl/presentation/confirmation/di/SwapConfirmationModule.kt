@@ -21,11 +21,11 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationLoader
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationPayloadMapper
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.confirmation.SwapConfirmationViewModel
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -52,7 +52,7 @@ class SwapConfirmationModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         assetUseCase: ArbitraryAssetUseCase,
-        maxActionProviderFactory: MaxActionProviderFactory,
+        maxActionProviderFactory: SwapMaxActionProviderFactory,
         operationLoader: SwapOperationLoader,
         operationPayload: SwapOperationPayload,
         operationMapper: SwapOperationPayloadMapper,

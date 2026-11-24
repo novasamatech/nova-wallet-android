@@ -17,10 +17,12 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDustCheckFeePayload
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -53,8 +55,10 @@ class SwapOperationPayloadMapperTest {
     @Test
     fun `recreated screen preserves reviewed net amounts fees slippage and wallet without requoting`() = runBlocking {
         prepare()
-        val state = state()
+        val bufferedFee = 101.toBigInteger()
+        val state = state(SwapDustCheckFee.MaxFeeWithMargin(bufferedFee))
         val payload = mapper.toPayload(state, metaAccountId = 42, returnToTab = true)
+        assertEquals(SwapDustCheckFeePayload.MaxFeeWithMargin(bufferedFee), payload.dustCheckFee)
         `when`(service.resolveRoute(listOf(edge.routeId()), this)).thenReturn(listOf(edge))
         `when`(service.constructOperations(any() ?: unusedArgs)).thenAnswer {
             operationArgs = it.getArgument(0)
@@ -64,10 +68,12 @@ class SwapOperationPayloadMapperTest {
         assertEquals(state.quote.planksIn, restored.quote.planksIn)
         assertEquals(state.quote.planksOut, restored.quote.planksOut)
         assertEquals(state.slippage, restored.slippage)
+        assertEquals(state.dustCheckFee, restored.dustCheckFee)
         assertEquals(BigInteger.valueOf(17), restored.fee.segments.single().fee.serviceCommission!!.amount)
         assertEquals(BigInteger.valueOf(1950), restored.fee.segments.single().netFlow.amountOutMin)
         assertEquals(BigInteger.valueOf(1983), restored.fee.segments.single().netFlow.amountOut)
         assertEquals(42L, operationArgs!!.metaAccountId)
+        assertEquals(listOf(edge.routeId()), restored.fee.route)
         assertEquals(BigInteger.valueOf(2000), operationArgs!!.executionPath.single().quotedSwapEdge.quote)
         assertEquals(BigInteger.valueOf(20), restored.quote.quotedPath.roughFeeEstimation.inAssetOut)
         assertEquals(BigInteger.valueOf(10), restored.quote.quotedPath.roughFeeEstimation.inAssetIn)
@@ -92,6 +98,7 @@ class SwapOperationPayloadMapperTest {
         `when`(service.resolveRoute(listOf(edge.routeId()), this)).thenReturn(listOf(edge))
         `when`(service.constructOperations(any() ?: unusedArgs)).thenReturn(listOf(operation))
         val restored = mapper.fromPayload(payload, this)
+        assertEquals(SwapDustCheckFee.QuoteFee, restored.dustCheckFee)
         restored.fee.initialSubmissionFee.submissionOrigin.executingAccount[0] = 8
         restored.fee.initialSubmissionFee.submissionOrigin.signingAccount[0] = 8
         assertArrayEquals(byteArrayOf(1), savedFee.executingAccount)
@@ -120,7 +127,7 @@ class SwapOperationPayloadMapperTest {
         `when`(operation.assetOut).thenReturn(outputId)
     }
 
-    private fun state(): SwapState {
+    private fun state(dustCheckFee: SwapDustCheckFee = SwapDustCheckFee.QuoteFee): SwapState {
         val submission = SubmissionFeeWithLabel(SubstrateFee(BigInteger.valueOf(3), SubmissionOrigin(byteArrayOf(1), byteArrayOf(2)), input))
         val fee = object : AtomicSwapOperationFee {
             override val submissionFee = submission
@@ -153,9 +160,11 @@ class SwapOperationPayloadMapperTest {
                     )
                 ),
                 SubstrateFeeBase(BigInteger.ZERO, input),
-                SwapMaxAdditionalAmountDeduction(BigInteger.valueOf(100))
+                SwapMaxAdditionalAmountDeduction(BigInteger.valueOf(100)),
+                route = listOf(edge.routeId())
             ),
-            0.005.fractions
+            0.005.fractions,
+            dustCheckFee
         )
     }
 

@@ -32,8 +32,8 @@ class PriceChartModelMapper @Inject constructor(private val resourceManager: Res
     private fun mapButtonText(pricePeriod: PricePeriod): String {
         val buttonTextRes = when (pricePeriod) {
             PricePeriod.DAY -> R.string.price_chart_day
-            PricePeriod.WEEK -> R.string.price_chart_week
-            PricePeriod.MONTH -> R.string.price_chart_month
+            PricePeriod.WEEK -> R.string.staking_period_week_short
+            PricePeriod.MONTH -> R.string.staking_period_month_short
             PricePeriod.YEAR -> R.string.price_chart_year
             PricePeriod.MAX -> R.string.price_chart_max
         }

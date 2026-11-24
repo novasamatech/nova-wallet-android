@@ -84,12 +84,13 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromFiatOrZero
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
@@ -147,6 +148,7 @@ internal class RealSwapService(
     private val extrinsicServiceFactory: ExtrinsicService.Factory,
     private val defaultFeePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val swapInputReserve: SwapInputReserve,
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     private val chainStateRepository: ChainStateRepository,
@@ -234,13 +236,12 @@ internal class RealSwapService(
         val segments = buildSwapSegments(fees, atomicOperations)
         val convertedFees = segments.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
-        val firstOperation = atomicOperations.first()
-
         return SwapFee(
             segments = segments,
             intermediateSegmentFeesInAssetIn = convertedFees,
-            additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction(),
-        ).also(::logFee)
+            additionalMaxAmountDeduction = swapInputReserve.requiredFor(executeArgs.assetIn, segments.first()),
+            route = executeArgs.executionPath.map { it.quotedSwapEdge.edge.routeId() },
+        ).also { logFee(it, executeArgs.assetIn) }
     }
 
     override suspend fun resolveRoute(
@@ -851,7 +852,7 @@ internal class RealSwapService(
         }
     }
 
-    private fun logFee(fee: SwapFee) {
+    private fun logFee(fee: SwapFee, assetIn: Chain.Asset) {
         if (!debug) return
 
         val route = fee.segments.joinToString(separator = "\n") { segment ->
@@ -861,11 +862,13 @@ internal class RealSwapService(
                 addAll(segment.fee.postSubmissionFees.paidFromAmount)
             }
 
-            allFees.joinToString { "${it.amount.formatPlanks(it.asset)} (${it.debugLabel})" }
+            allFees.joinToString { "${it.amount.formatExactForLog(it.asset)} (${it.debugLabel})" }
         }
 
         Log.d("Swaps", "---- Fees -----")
         Log.d("Swaps", route)
+        Log.d("Swaps", "Total in input asset: ${fee.totalFeeAmount(assetIn).formatExactForLog(assetIn)}")
+        Log.d("Swaps", "Input reserve: ${fee.additionalMaxAmountDeduction.fromCountedTowardsEd.formatExactForLog(assetIn)}")
         Log.d("Swaps", "---- End Fees -----")
     }
 
@@ -901,12 +904,12 @@ internal class RealSwapService(
 
                 if (index == 0) {
                     val assetIn = chainRegistry.asset(quotedSwapEdge.edge.from)
-                    val initialAmount = amountIn.formatPlanks(assetIn)
+                    val initialAmount = amountIn.formatExactForLog(assetIn)
                     append(initialAmount)
 
                     if (trade.direction == SwapDirection.SPECIFIED_OUT) {
                         val roughFeesInAssetIn = trade.roughFeeEstimation.inAssetIn
-                        val roughFeesInAssetInAmount = roughFeesInAssetIn.formatPlanks(assetIn)
+                        val roughFeesInAssetInAmount = roughFeesInAssetIn.formatExactForLog(assetIn)
 
                         append(" (+$roughFeesInAssetInAmount fees) ")
                     }
@@ -915,20 +918,25 @@ internal class RealSwapService(
                 append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: $weight)---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
-                val outAmount = amountOut.formatPlanks(assetOut)
+                val outAmount = amountOut.formatExactForLog(assetOut)
 
                 append(outAmount)
 
                 if (index == trade.path.size - 1) {
                     if (trade.direction == SwapDirection.SPECIFIED_IN) {
                         val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
-                        val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
+                        val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatExactForLog(assetOut)
 
                         append(" (-$roughFeesInAssetOutAmount fees, w: ${weightBreakdown.total})")
                     }
                 }
             }
         }
+    }
+
+    private fun Balance.formatExactForLog(asset: Chain.Asset): String {
+        val amount = asset.amountFromPlanks(this).stripTrailingZeros().toPlainString()
+        return "$amount ${asset.symbol.value}"
     }
 
     private inner class ExchangeRegistry(

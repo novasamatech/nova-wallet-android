@@ -111,6 +111,7 @@
             android:background="@null"
             android:gravity="end"
             android:hint="0"
+            android:imeOptions="actionDone"
             android:inputType="numberDecimal"
             android:paddingTop="8dp"
             android:paddingEnd="16dp"

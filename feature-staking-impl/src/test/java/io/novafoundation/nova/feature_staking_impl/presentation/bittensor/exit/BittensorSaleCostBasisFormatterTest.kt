@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedCostBasis
@@ -186,12 +187,63 @@ class BittensorSaleCostBasisFormatterTest {
     }
 
     @Test
-    fun `sale earned needs settled totals`() {
+    fun `sale earned uses the same known totals as the average while history settles`() {
+        `when`(chainAsset.precision).thenReturn(Precision(9))
+        val totals = BittensorEstimatedPurchaseTotals(number(200), number(100))
+        val provisional = BittensorSaleCostBasis.Known(totals, settled = false)
+        val settled = BittensorSaleCostBasis.Known(totals, settled = true)
+
+        assertEquals("2 NATIVE", profitFormatter.averagePrice(provisional, token).token)
+        val profit = profitFormatter.profit(provisional, quote, token)
+        assertEquals("+0.00000009 NATIVE", profit.amount.token)
+        assertEquals(R.color.text_positive, profit.colorRes)
+        assertEquals(profitFormatter.profit(settled, quote, token), profit)
+    }
+
+    @Test
+    fun `provisional sale estimate retains losses and zero`() {
+        `when`(chainAsset.precision).thenReturn(Precision(9))
+        val loss = BittensorSaleCostBasis.Known(BittensorEstimatedPurchaseTotals(number(500), number(100)), settled = false)
+        val breakEven = BittensorSaleCostBasis.Known(BittensorEstimatedPurchaseTotals(number(290), number(100)), settled = false)
+
+        assertEquals("−0.00000021 NATIVE", profitFormatter.profit(loss, quote, token).amount.token)
+        assertEquals(R.color.text_negative, profitFormatter.profit(loss, quote, token).colorRes)
+        assertEquals("0 NATIVE", profitFormatter.profit(breakEven, quote, token).amount.token)
+        assertEquals(R.color.text_primary, profitFormatter.profit(breakEven, quote, token).colorRes)
+    }
+
+    @Test
+    fun `reported sell amount shows estimated loss while purchase history is stale`() {
+        `when`(chainAsset.precision).thenReturn(Precision(9))
+        val totals = BittensorEstimatedPurchaseTotals(
+            paidTao = BigInteger("22754000000"),
+            receivedAlpha = BigInteger("200000000000")
+        )
+        val sale = BittensorSaleCostBasis.Known(totals, settled = false)
+        val quote = BittensorExitQuote(
+            netuid = BittensorNetuid.Subnet(1),
+            amount = BigInteger("175261433"),
+            fullExit = false,
+            estimatedTaoOut = BigInteger("19110000"),
+            minimumTaoOut = BigInteger("19000000"),
+            serviceFee = BigInteger.ZERO,
+            limitPrice = BigInteger.ONE
+        )
+
+        val profit = profitFormatter.profit(sale, quote, token)
+
+        assertEquals("−0.000829493 NATIVE", profit.amount.token)
+        assertEquals(R.color.text_negative, profit.colorRes)
+    }
+
+    @Test
+    fun `missing sale totals quote or token keep earned unknown`() {
         val totals = BittensorEstimatedPurchaseTotals(number(200), number(100))
 
-        assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Known(totals, false), quote, token).amount.token)
         assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Unknown, quote, token).amount.token)
+        assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.NoPurchases, quote, token).amount.token)
         assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Known(totals, true), null, token).amount.token)
+        assertEquals("—", profitFormatter.profit(BittensorSaleCostBasis.Known(totals, false), quote, null).amount.token)
     }
 
     private fun number(value: Long): BigInteger = BigInteger.valueOf(value)

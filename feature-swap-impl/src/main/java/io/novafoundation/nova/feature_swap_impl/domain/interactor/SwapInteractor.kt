@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
+import io.novafoundation.nova.feature_swap_impl.domain.SwapInputReserve
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
 import io.novafoundation.nova.feature_swap_impl.domain.validation.availableSlippage
 import io.novafoundation.nova.feature_swap_impl.domain.validation.canPayAllFees
@@ -39,6 +40,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.su
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.FiatAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -52,11 +54,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedA
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
-class SwapInteractor(
+class SwapInteractor internal constructor(
     private val priceImpactThresholds: PriceImpactThresholds,
     private val swapService: SwapService,
     private val tokenRepository: TokenRepository,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
+    private val swapInputReserve: SwapInputReserve,
     private val assetsValidationContextFactory: AssetsValidationContext.Factory,
     private val canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
     private val showReceivedAssetUseCase: ShowReceivedAssetUseCase,
@@ -69,22 +72,15 @@ class SwapInteractor(
         return tokenRepository.getTokens(chainAssets)
     }
 
-    suspend fun calculateSegmentFiatPrices(swapFee: SwapFee): List<FiatAmount> {
-        return withContext(Dispatchers.Default) {
-            val basicFeesBySegment = swapFee.segments.map { it.fee.allBasicFees() }
-            val chainAssets = basicFeesBySegment.flatMap { segmentFees -> segmentFees.map { it.asset } }
+    suspend fun calculateSegmentFiatPrices(swapFee: SwapFee): List<FiatAmount?> {
+        val tokens = getAllFeeTokens(swapFee)
 
-            val tokens = tokenRepository.getTokens(chainAssets)
-            val currency = tokens.values.first().currency
-
-            basicFeesBySegment.map { segmentBasicFees ->
-                val totalSegmentFees = segmentBasicFees.sumOf { basicFee ->
-                    val token = tokens[basicFee.asset.fullId]
-                    token?.planksToFiat(basicFee.amount) ?: BigDecimal.ZERO
-                }
-
-                FiatAmount(currency, totalSegmentFees)
+        return swapFee.segments.map { segment ->
+            val currency = tokens[segment.fee.submissionFee.asset.fullId]?.currency ?: return@map null
+            val total = segment.fee.allBasicFees().sumOf { fee ->
+                tokens[fee.asset.fullId]?.planksToFiatOrNull(fee.amount) ?: return@map null
             }
+            FiatAmount(currency, total)
         }
     }
 
@@ -193,7 +189,7 @@ class SwapInteractor(
 
             sufficientBalanceConsideringNonSufficientAssetsValidation(assetsValidationContext)
 
-            sufficientBalanceConsideringConsumersValidation(assetsValidationContext)
+            sufficientBalanceConsideringConsumersValidation(assetsValidationContext, swapInputReserve)
 
             swapSmallRemainingBalance(assetsValidationContext)
 

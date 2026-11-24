@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin.SwapInputAssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.BaseAmountChooserProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.DefaultFiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
@@ -17,6 +18,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
 class SwapAmountInputMixinFactory(
@@ -31,7 +33,8 @@ class SwapAmountInputMixinFactory(
         @StringRes emptyAssetTitle: Int,
         maxActionProvider: MaxActionProvider? = null,
         fiatFormatter: AmountChooserMixinBase.FiatFormatter = DefaultFiatFormatter(),
-        fieldValidator: FieldValidator
+        fieldValidator: FieldValidator,
+        inputState: MutableStateFlow<InputState<String>> = MutableStateFlow(InputState.empty())
     ): SwapAmountInputMixin.Presentation {
         return RealSwapAmountInputMixin(
             coroutineScope = coroutineScope,
@@ -42,7 +45,8 @@ class SwapAmountInputMixinFactory(
             maxActionProvider = maxActionProvider,
             fiatFormatter = fiatFormatter,
             fieldValidator = fieldValidator,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            inputState = inputState
         )
     }
 }
@@ -56,13 +60,15 @@ private class RealSwapAmountInputMixin(
     maxActionProvider: MaxActionProvider?,
     fiatFormatter: AmountChooserMixinBase.FiatFormatter,
     fieldValidator: FieldValidator,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    inputState: MutableStateFlow<InputState<String>>
 ) : BaseAmountChooserProvider(
     coroutineScope = coroutineScope,
     tokenFlow = tokenFlow,
     maxActionProvider = maxActionProvider,
     fiatFormatter = fiatFormatter,
-    fieldValidator = fieldValidator
+    fieldValidator = fieldValidator,
+    inputState = inputState
 ),
     SwapAmountInputMixin.Presentation {
 

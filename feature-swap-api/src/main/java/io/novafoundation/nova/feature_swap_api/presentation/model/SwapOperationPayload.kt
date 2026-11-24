@@ -13,7 +13,17 @@ data class SwapOperationPayload(
     val slippage: Double,
     val fee: SwapFeePayload,
     val returnToTab: Boolean,
+    val dustCheckFee: SwapDustCheckFeePayload = SwapDustCheckFeePayload.QuoteFee,
 ) : Parcelable
+
+sealed interface SwapDustCheckFeePayload : Parcelable {
+
+    @Parcelize
+    data object QuoteFee : SwapDustCheckFeePayload
+
+    @Parcelize
+    data class MaxFeeWithMargin(val amount: BigInteger) : SwapDustCheckFeePayload
+}
 
 @Parcelize
 data class SwapQuotePayload(

@@ -5,5 +5,6 @@ class GlobalConfig(
     val proxyApiUrl: String,
     val multiStakingApiUrl: String,
     val infraUrl: String?,
-    val defaultSwapPair: SwapPairConfig? = null
+    val defaultSwapPair: SwapPairConfig? = null,
+    val changeNowTaoUrl: String? = null
 )

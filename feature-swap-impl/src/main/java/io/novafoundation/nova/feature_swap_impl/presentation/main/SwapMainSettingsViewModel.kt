@@ -64,9 +64,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
-import io.novafoundation.nova.feature_swap_impl.domain.swap.includesNovaFee
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
@@ -76,8 +74,10 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.mapFromModel
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapDustCheckFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
@@ -85,9 +85,9 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapMaxActionProviderFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapOperationPayloadMapper
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
@@ -104,7 +104,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValida
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
@@ -136,6 +136,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.IOException
@@ -143,6 +144,7 @@ import java.math.BigDecimal
 import kotlin.time.Duration.Companion.seconds
 import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 private val QUOTE_LOADING_TIMEOUT = 30.seconds
 
@@ -197,6 +199,8 @@ class SwapMainSettingsViewModel(
 
     private val feeSnapshot = MutableStateFlow<SwapFeeSnapshot?>(null)
 
+    private val maxFeeResetVersion = MutableStateFlow(0)
+
     private val active = MutableStateFlow(true)
 
     private var initializedMetaAccountId: Long? = null
@@ -204,8 +208,6 @@ class SwapMainSettingsViewModel(
     private var selectionRequestId: String? = null
 
     private var slippageRequestId: String? = null
-
-    private var needsInitialKeyboard = true
 
     val detailsExpanded = MutableStateFlow(true)
 
@@ -225,10 +227,6 @@ class SwapMainSettingsViewModel(
             is QuotingState.Loaded -> quoteState.quote.priceImpact
         }
     }
-
-    val swapRouteState = quotingState
-        .map { quoteState -> quoteState.toSwapRouteState() }
-        .shareInBackground()
 
     val swapExecutionTime = quotingState
         .map { it.toExecutionEstimate() }
@@ -254,7 +252,7 @@ class SwapMainSettingsViewModel(
     }
 
     val priceImpactDetails = priceImpact.map { impact ->
-        impact?.let { priceImpactFormatter.format(it) ?: it.formatPercents() }
+        impact?.let(priceImpactFormatter::format)
     }
 
     val slippageDetails = swapSettings.map { it.slippage.formatPercents() }
@@ -281,11 +279,22 @@ class SwapMainSettingsViewModel(
         )
     )
 
+    val swapRouteState = combine(quotingState, feeSnapshot, feeMixin.fee) { quote, snapshot, fee ->
+        when {
+            quote !is QuotingState.Loaded -> quote.toLoadingState { null }
+            fee is FeeStatus.Error -> ExtendedLoadingState.Loaded(null)
+            fee !is FeeStatus.Loaded || snapshot?.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) != true -> ExtendedLoadingState.Loading
+            else -> ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(snapshot.quote.quote))
+        }
+    }.shareInBackground()
+
     val minimumReceived = combine(quotingState, feeSnapshot) { quote, snapshot ->
         snapshot?.takeIf { quote is QuotingState.Loaded && it.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) }?.let {
             tokenFormatter.formatToken(it.fee.segments.last().netFlow.amountOutMin, it.quote.quote.assetOut)
         }
     }
+
+    private val amountInInputState = MutableStateFlow(InputState.empty())
 
     private val maxAssetInProvider = createMaxActionProvider()
 
@@ -294,7 +303,8 @@ class SwapMainSettingsViewModel(
         tokenFlow = assetInFlow.token().nullOnStart(),
         emptyAssetTitle = R.string.swap_field_asset_from_title,
         maxActionProvider = maxAssetInProvider,
-        fieldValidator = getAmountInFieldValidator()
+        fieldValidator = getAmountInFieldValidator(),
+        inputState = amountInInputState
     )
 
     val amountOutInput = swapAmountInputMixinFactory.create(
@@ -325,23 +335,6 @@ class SwapMainSettingsViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val showNovaFeeDisclaimer: Flow<Boolean> = quotingState.mapNotNull {
-        when (it) {
-            is QuotingState.Loaded -> it.quote.includesNovaFee()
-            is QuotingState.Default,
-            is QuotingState.Error -> false
-
-            is QuotingState.Loading -> null
-        }
-    }
-        .distinctUntilChanged()
-        .shareInBackground()
-
-    val novaFeeDisclaimerText: String = resourceManager.getString(
-        R.string.swap_nova_fee_disclaimer,
-        NovaSwapCommission.FEE_PERCENT_DISPLAY
-    )
-
     private val _validationProgress = MutableStateFlow(false)
 
     val validationProgress = _validationProgress
@@ -360,7 +353,7 @@ class SwapMainSettingsViewModel(
 
     val buttonState = combine(inputButtonState, quotingState, feeSnapshot, feeMixin.fee) { inputState, quote, snapshot, fee ->
         val hasFeeForInputs = quote is QuotingState.Loaded &&
-            snapshot?.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) == true && fee is FeeStatus.Loaded
+            snapshot?.matchesQuote(quote) == true && fee is FeeStatus.Loaded
 
         if (inputState is DescriptiveButtonState.Enabled && !hasFeeForInputs) {
             DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
@@ -409,7 +402,6 @@ class SwapMainSettingsViewModel(
         swapRouter.observeSwapRetries().onEach { retry ->
             val account = selectedAccountUseCase.getSelectedMetaAccount()
             if (retry.metaAccountId != null && retry.metaAccountId != account.id) return@onEach
-            needsInitialKeyboard = true
             entryPayload.value = retry
         }.launchIn(viewModelScope)
 
@@ -436,7 +428,6 @@ class SwapMainSettingsViewModel(
     fun applyTabPayload(payload: SwapSettingsPayload) {
         if (entryPayload.value === payload) return
 
-        needsInitialKeyboard = payload != SwapSettingsPayload.Restore
         analyticsService.track(AnalyticsEvent.SwapScreenOpened(payload.source.toAnalyticsSource()))
         chart.onEntry(collapsed = payload != SwapSettingsPayload.Restore)
         entryPayload.value = payload
@@ -464,6 +455,10 @@ class SwapMainSettingsViewModel(
                 return@onEach
             }
             selectionRequestId = null
+            if (response.clearOpposite) {
+                amountInInput.clearInput()
+                amountOutInput.clearInput()
+            }
             swapSettingsState.applyAssetSelection(asset, response.selectingPay, response.clearOpposite)
             rememberSelection()
         }.launchIn(viewModelScope)
@@ -484,16 +479,6 @@ class SwapMainSettingsViewModel(
     fun setActive(isActive: Boolean) {
         active.value = isActive
         if (!isActive) quotingJob?.cancel()
-    }
-
-    fun consumeInitialKeyboard(): Boolean {
-        if (!active.value || initializedMetaAccountId == null) return false
-        return needsInitialKeyboard.also { needsInitialKeyboard = false }
-    }
-
-    suspend fun initialKeyboardDirection(): SwapDirection {
-        val settings = swapSettings.first()
-        return settings.swapDirection ?: if (settings.assetIn != null) SwapDirection.SPECIFIED_IN else SwapDirection.SPECIFIED_OUT
     }
 
     fun setDetailsExpanded(expanded: Boolean) {
@@ -519,11 +504,16 @@ class SwapMainSettingsViewModel(
             _validationProgress.value = false
             return@launchUnit
         }
+        val dustCheckFee = if (amountInInputState.value.inputKind.isMaxAction()) {
+            maxAssetInProvider.dustCheckFeeFor(payload.swapQuote)
+        } else {
+            SwapDustCheckFee.QuoteFee
+        }
         val validationSystem = swapInteractor.validationSystem(payload.metaAccountId)
 
         validationExecutor.requireValid(
             validationSystem = validationSystem,
-            payload = payload,
+            payload = payload.copy(dustCheckFee = dustCheckFee),
             progressConsumer = _validationProgress.progressConsumer(),
             validationFailureTransformerCustom = ::formatValidationFailure,
         ) { validPayload ->
@@ -600,7 +590,11 @@ class SwapMainSettingsViewModel(
 
     private fun openSwapConfirmation(validPayload: SwapValidationPayload) = launchUnit {
         swapRouter.openSwapConfirmation(
-            operationMapper.toPayload(validPayload.toSwapState(), requireNotNull(validPayload.metaAccountId), returnToTab = display == SwapFormDisplay.TAB)
+            operationMapper.toPayload(
+                state = validPayload.toSwapState(),
+                metaAccountId = requireNotNull(validPayload.metaAccountId),
+                returnToTab = display == SwapFormDisplay.TAB
+            )
         )
     }
 
@@ -609,12 +603,14 @@ class SwapMainSettingsViewModel(
         return operationMapper.toPayload(payload.toSwapState(), requireNotNull(payload.metaAccountId), returnToTab = display == SwapFormDisplay.TAB)
     }
 
-    private fun createMaxActionProvider(): MaxActionProvider {
+    private fun createMaxActionProvider(): SwapMaxActionProvider {
         return maxActionProviderFactory.create(
             scope = viewModelScope,
             assets = assetInFlow.filterNotNull(),
             outputAssets = swapSettings.map { it.assetOut },
-            fees = feeMixin.fee,
+            maxActive = amountInInputState.map { it.inputKind.isMaxAction() }.distinctUntilChanged(),
+            feeLoaderMixin = feeMixin,
+            feeResetVersion = maxFeeResetVersion
         )
     }
 
@@ -625,6 +621,7 @@ class SwapMainSettingsViewModel(
         ) { metaAccount, payload -> metaAccount to payload }
             .mapLatest { (metaAccount, payload) ->
                 initializedMetaAccountId = null
+                feeSnapshot.value = null
                 selectionRequestId = null
                 slippageRequestId = null
                 quotingJob?.cancel()
@@ -632,6 +629,9 @@ class SwapMainSettingsViewModel(
                 amountInInput.clearInput()
                 amountOutInput.clearInput()
                 swapSettingsState.setSwapSettings(SwapSettings(slippage = DEFAULT_SLIPPAGE))
+                feeMixin.setFeeStatus(FeeStatus.NoFee)
+                maxFeeResetVersion.update { it + 1 }
+
                 val selection = if (payload == SwapSettingsPayload.Restore) {
                     selectionInteractor.initialSelection(metaAccount.id)
                 } else {
@@ -715,8 +715,12 @@ class SwapMainSettingsViewModel(
     }
 
     private fun applyFlipToUi(previousSettings: SwapSettings, newSettings: SwapSettings) {
-        val amount = previousSettings.amount ?: return
         val swapDirection = previousSettings.swapDirection ?: return
+        val amount = previousSettings.amount
+        if (amount == null) {
+            swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+            return
+        }
 
         when (swapDirection) {
             SwapDirection.SPECIFIED_IN -> {
@@ -760,6 +764,10 @@ class SwapMainSettingsViewModel(
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_enter_amount_disabled_button_state))
             }
 
+            errorStates.any { it.isErrorWithTag(EnoughAmountFieldValidator.ERROR_TAG) } -> {
+                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_not_enough_asset, assetIn.token.configuration.symbol.value))
+            }
+
             errorStates.any { it is FieldValidationResult.Error } -> {
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
             }
@@ -781,8 +789,14 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupPerSwapSettingQuoting() {
+        var previousSettings: SwapSettings? = null
         combine(swapSettings, active) { settings, isActive -> settings to isActive }
             .onEach { (settings, isActive) ->
+                if (settings != swapSettings.first()) return@onEach
+
+                settings.invalidateCalculatedInput(previousSettings, amountInInput, amountOutInput)
+                previousSettings = settings
+
                 if (isActive) performQuote(settings, shouldShowLoading = true, origin = QuoteRefreshOrigin.USER_INPUT)
             }.launchIn(viewModelScope)
     }
@@ -804,14 +818,16 @@ class SwapMainSettingsViewModel(
             }.launchIn(viewModelScope)
     }
 
-    private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
+    private fun performQuote(settings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
+        if (!active.value) return
+
         quotingJob?.cancel()
         if (shouldShowLoading) {
             feeSnapshot.value = null
             quotingState.value = QuotingState.Loading
         }
         quotingJob = launch {
-            val swapQuoteArgs = swapSettings.toQuoteArgs(
+            val swapQuoteArgs = settings.toQuoteArgs(
                 tokenIn = { assetInFlow.ensureToken(it) },
                 tokenOut = { assetOutFlow.ensureToken(it) },
             ) ?: run {
@@ -820,12 +836,21 @@ class SwapMainSettingsViewModel(
             }
 
             val quote = withTimeoutOrNull(QUOTE_LOADING_TIMEOUT) {
+                if (BuildConfig.DEBUG) {
+                    Log.d("Swaps", "Quote requested: origin=$origin, direction=${swapQuoteArgs.swapDirection}, amountPlanks=${swapQuoteArgs.amount}")
+                }
                 swapInteractor.quote(swapQuoteArgs, swapFlowScope)
             } ?: Result.failure(IOException("Swap quote timed out"))
 
+            val selectedMetaAccountId = selectedAccountUseCase.getSelectedMetaAccount().id
+            val currentSettings = swapSettings.first()
             coroutineContext.ensureActive()
+            // A quote can finish after the form changes or before it resets for the newly selected wallet.
+            if (!active.value || settings != currentSettings) return@launch
+            if (swapQuoteArgs.metaAccountId != selectedMetaAccountId || selectedMetaAccountId != initializedMetaAccountId) return@launch
+
             quotingState.value = quote.fold(
-                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin, swapSettings) },
+                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin, settings) },
                 onFailure = {
                     if (it is CancellationException) {
                         throw it
@@ -835,12 +860,8 @@ class SwapMainSettingsViewModel(
                 }
             )
 
-            handleNewQuote(quote, swapSettings)
+            handleNewQuote(quote, settings)
         }
-    }
-
-    private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
-        return toLoadingState { swapRouteFormatter.formatSwapRoute(it) }
     }
 
     private fun QuotingState.toExecutionEstimate(): ExtendedLoadingState<String?> {
@@ -857,10 +878,7 @@ class SwapMainSettingsViewModel(
                 SwapDirection.SPECIFIED_OUT -> amountInInput.updateInput(quote.assetIn, quote.planksIn)
             }
         }.onFailure {
-            when (swapSettings.swapDirection!!) {
-                SwapDirection.SPECIFIED_OUT -> amountInInput.clearInput()
-                SwapDirection.SPECIFIED_IN -> amountOutInput.clearInput()
-            }
+            swapSettings.swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
         }
     }
 
@@ -868,17 +886,19 @@ class SwapMainSettingsViewModel(
         tokenIn: (Chain.Asset) -> Token,
         tokenOut: (Chain.Asset) -> Token
     ): SwapQuoteArgs? {
-        return if (assetIn != null && assetOut != null && amount != null && swapDirection != null) {
-            SwapQuoteArgs(
-                tokenIn = tokenIn(assetIn!!),
-                tokenOut = tokenOut(assetOut!!),
-                amount = amount!!,
-                swapDirection = swapDirection!!,
-                metaAccountId = initializedMetaAccountId,
-            )
-        } else {
-            null
-        }
+        val assetIn = assetIn ?: return null
+        val assetOut = assetOut ?: return null
+        val direction = swapDirection ?: return null
+        val amount = amount?.takeIf { it.isPositive() } ?: return null
+        val metaAccountId = initializedMetaAccountId
+
+        return SwapQuoteArgs(
+            tokenIn = tokenIn(assetIn),
+            tokenOut = tokenOut(assetOut),
+            amount = amount,
+            swapDirection = direction,
+            metaAccountId = metaAccountId,
+        )
     }
 
     private fun handleInputChanges(
@@ -893,17 +913,18 @@ class SwapMainSettingsViewModel(
                 val asset = chainAsset(settings) ?: return@onEach
                 val planks = state.value?.let(asset::planksFromAmount)
                 if (planks == null && settings.amount == null) return@onEach
+                if (BuildConfig.DEBUG && state.inputKind == InputKind.MAX_ACTION) {
+                    Log.d("Swaps", "Max input: previousPlanks=${settings.amount}, amountPlanks=$planks")
+                }
                 swapSettingsState.setAmount(planks, swapDirection)
             }.launchIn(viewModelScope)
     }
 
-    private fun SwapAmountInputMixin.clearInput() {
-        inputState.value = InputState(value = "", initiatedByUser = false, inputKind = InputKind.REGULAR)
-    }
-
     private fun SwapAmountInputMixin.updateInput(chainAsset: Chain.Asset, planks: Balance) {
         val amount = chainAsset.amountFromPlanks(planks)
-        inputState.value = InputState(amountInputFormatter.format(amount), initiatedByUser = false, InputKind.REGULAR)
+        // In editable amounts a comma always means a decimal separator.
+        val ungroupedAmount = amountInputFormatter.format(amount).replace(",", "")
+        inputState.value = InputState(ungroupedAmount, initiatedByUser = false, InputKind.REGULAR)
     }
 
     private fun Flow<SwapSettings>.assetFlowOf(extractor: (SwapSettings) -> Chain.Asset?): Flow<Asset?> {
@@ -926,7 +947,10 @@ class SwapMainSettingsViewModel(
 
     private fun getAmountInFieldValidator(): FieldValidator {
         return CompoundFieldValidator(
-            enoughAmountValidatorFactory.create(maxAssetInProvider, errorMessageRes = R.string.swap_field_validation_not_enough_amount_to_swap),
+            enoughAmountValidatorFactory.create(
+                maxAssetInProvider.affordableBalanceProvider,
+                errorMessageRes = R.string.swap_field_validation_not_enough_amount_to_swap
+            ),
             liquidityFieldValidatorFactory.create(quotingState)
         )
     }
@@ -936,13 +960,11 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun getValidationPayload(): SwapValidationPayload? {
-        val quotingState = quotingState.value
-        if (quotingState !is QuotingState.Loaded) return null
-
-        val snapshot = feeSnapshot.value ?: return null
         val settings = swapSettings.first()
         val account = selectedAccountUseCase.getSelectedMetaAccount()
-        if (!snapshot.matchesInputs(settings, account.id)) return null
+        val quote = quotingState.value as? QuotingState.Loaded ?: return null
+        val snapshot = feeSnapshot.value ?: return null
+        if (!snapshot.matchesInputs(settings, account.id) || !snapshot.matchesQuote(quote)) return null
         if (feeMixin.fee.value !is FeeStatus.Loaded) return null
 
         return snapshot.toValidationPayload()
@@ -991,4 +1013,29 @@ class SwapMainSettingsViewModel(
 
         super.onCleared()
     }
+}
+
+internal fun SwapSettings.invalidateCalculatedInput(
+    previousSettings: SwapSettings?,
+    amountInInput: SwapAmountInputMixin,
+    amountOutInput: SwapAmountInputMixin,
+) {
+    val amountInputsChanged = assetIn != previousSettings?.assetIn || assetOut != previousSettings?.assetOut ||
+        amount != previousSettings?.amount || swapDirection != previousSettings?.swapDirection
+
+    if (amountInputsChanged) {
+        swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+    }
+}
+
+private fun SwapDirection?.clearCalculatedInput(amountInInput: SwapAmountInputMixin, amountOutInput: SwapAmountInputMixin) {
+    when (this) {
+        SwapDirection.SPECIFIED_IN -> amountOutInput.clearInput()
+        SwapDirection.SPECIFIED_OUT -> amountInInput.clearInput()
+        null -> Unit
+    }
+}
+
+private fun SwapAmountInputMixin.clearInput() {
+    inputState.value = InputState(value = "", initiatedByUser = false, inputKind = InputKind.REGULAR)
 }

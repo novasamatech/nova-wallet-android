@@ -40,6 +40,7 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     init {
+        amountInput.setupSwapDecimalInput()
         binder.swapAmountInputContainer.background = context.getInputBackground()
         binder.swapAmountInputContainer.setAddStatesFromChildren(true)
     }

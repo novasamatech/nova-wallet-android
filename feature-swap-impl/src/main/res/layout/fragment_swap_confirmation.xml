@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:contentBackground="@android:color/transparent"
-        app:titleText="@string/swap_review_title" />
+        app:titleText="@string/operations_swap_title" />
 
     <ScrollView
         android:layout_width="match_parent"

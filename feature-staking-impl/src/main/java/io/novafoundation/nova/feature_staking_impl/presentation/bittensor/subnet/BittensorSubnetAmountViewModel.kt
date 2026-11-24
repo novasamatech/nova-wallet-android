@@ -34,12 +34,14 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.FieldValidationResult
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_staking_impl.R
@@ -82,6 +84,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
@@ -139,6 +142,7 @@ class BittensorSubnetAmountViewModel(
     private val retryController: BittensorRetryController,
     private val bittensorAmountFormatter: BittensorAmountFormatter,
     private val amountChooserFactory: AmountChooserMixin.Factory,
+    enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
     private val validationSystem: BittensorStakePreflightSystem,
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
@@ -337,13 +341,19 @@ class BittensorSubnetAmountViewModel(
             .deductFee(feeLoaderMixin)
     }
 
+    private val amountValidator = enoughAmountValidatorFactory.create(maxActionProvider)
+
     private val amountChooser = amountChooserFactory.create(
         scope = this,
         assetFlow = walletContext.map { it.asset },
-        maxActionProvider = maxActionProvider
+        maxActionProvider = maxActionProvider,
+        fieldValidator = amountValidator
     )
 
     val amount = amountChooser.inputState.map { it.value }
+        .shareInBackground()
+
+    val amountFieldError = amountChooser.fieldError
         .shareInBackground()
 
     val amountModel = amountChooser.assetModel
@@ -683,13 +693,15 @@ class BittensorSubnetAmountViewModel(
         validating,
         needsFunding,
         needsValidatorPick,
-        hasAmount
-    ) { quotedButtonState, validating, needsFunding, needsValidatorPick, hasAmount ->
+        hasAmount,
+        amountFieldError
+    ) { quotedButtonState, validating, needsFunding, needsValidatorPick, hasAmount, fieldError ->
         when {
-            needsFunding -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_continue))
             validating -> DescriptiveButtonState.Loading
-            needsValidatorPick -> DescriptiveButtonState.Enabled(resources.getString(R.string.bittensor_select_validator_title))
             !hasAmount -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_enter_amount))
+            fieldError is FieldValidationResult.Error -> DescriptiveButtonState.Disabled(fieldError.reason)
+            needsFunding -> DescriptiveButtonState.Disabled(resources.getString(R.string.common_continue))
+            needsValidatorPick -> DescriptiveButtonState.Enabled(resources.getString(R.string.bittensor_select_validator_title))
             else -> quotedButtonState
         }
     }
@@ -853,7 +865,7 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun continueClicked() = launchUnit {
-        if (validating.value) return@launchUnit
+        if (validating.value || continueButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
         if (needsValidatorPick.first()) {
             openValidatorPicker()
             return@launchUnit

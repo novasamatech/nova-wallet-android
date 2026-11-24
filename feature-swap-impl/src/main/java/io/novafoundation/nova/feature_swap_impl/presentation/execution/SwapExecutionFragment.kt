@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.Swa
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapOperationPayload
 import io.novafoundation.nova.common.mixin.impl.observeRetries
-import android.text.TextUtils
 import android.view.Gravity
 import android.view.animation.AnimationUtils
 import android.widget.TextSwitcher
@@ -208,8 +207,6 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
         setFactory {
             val textView = TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_SemiBold_Body)
             textView.setGravity(Gravity.CENTER)
-            textView.setSingleLine()
-            textView.ellipsize = TextUtils.TruncateAt.END
             textView
         }
     }

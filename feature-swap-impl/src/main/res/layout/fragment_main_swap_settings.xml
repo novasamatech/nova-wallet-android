@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
     android:orientation="vertical"
     android:background="@drawable/bg_swap_screen">
 
@@ -71,6 +72,7 @@
         android:paddingBottom="16dp">
 
         <LinearLayout
+            android:id="@+id/swapFormContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -83,6 +85,7 @@
                 android:layout_marginBottom="16dp" />
 
             <LinearLayout
+                android:id="@+id/swapMainSettingsPayHeader"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:gravity="center_vertical">
@@ -273,13 +276,14 @@
                             android:id="@+id/swapMainSettingsPriceImpact"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:title="@string/swap_price_impact_label" />
+                            android:visibility="gone"
+                            app:title="@string/swap_price_difference_title" />
 
                         <io.novafoundation.nova.common.view.TableCellView
                             android:id="@+id/swapMainSettingsSlippage"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            app:title="@string/swap_max_slippage"
+                            app:title="@string/swap_slippage_title"
                             app:titleIcon="@drawable/ic_info" />
 
                         <io.novafoundation.nova.common.view.TableCellView
@@ -291,23 +295,23 @@
                     </io.novafoundation.nova.common.view.TableView>
                 </FrameLayout>
             </io.novafoundation.nova.common.view.ExpandableView>
-            <TextView
-                android:id="@+id/swapNovaFeeDisclaimer"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/swapMainSettingsContinue"
+
+    <FrameLayout
+        android:id="@+id/swapContinueContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="16dp"
-        android:enabled="false"
-        tools:text="Enter amount" />
+        android:layout_height="wrap_content">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/swapMainSettingsContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            tools:text="Enter amount" />
+
+    </FrameLayout>
+
 </LinearLayout>
