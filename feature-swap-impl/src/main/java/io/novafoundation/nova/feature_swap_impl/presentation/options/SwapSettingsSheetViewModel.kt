@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import io.novafoundation.nova.common.view.input.DecimalInputConstraints
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -38,6 +39,8 @@ class SwapSettingsSheetViewModel(
     private class ValidatedSelection(val selection: SwapSlippageSelection, val validation: FieldValidationResult)
 
     private val config = payload.config()
+
+    val slippageInputConstraints = DecimalInputConstraints.FractionOnly(config.maxPercentFractionDigits)
 
     val selection = MutableStateFlow(selectionFor(payload.selected.fractions))
 
@@ -101,12 +104,12 @@ class SwapSettingsSheetViewModel(
         return if (config.slippageTips.any { it.sameAs(slippage) }) {
             SwapSlippageSelection.Preset(slippage)
         } else {
-            SwapSlippageSelection.Custom(slippageInputText(slippage))
+            SwapSlippageSelection.Custom(slippageInputText(slippage, config.maxPercentFractionDigits))
         }
     }
 
     private fun SwapSlippageSelection.validationInput(): String = when (this) {
-        is SwapSlippageSelection.Preset -> slippageInputText(slippage)
+        is SwapSlippageSelection.Preset -> slippageInputText(slippage, config.maxPercentFractionDigits)
         is SwapSlippageSelection.Custom -> input
     }
 

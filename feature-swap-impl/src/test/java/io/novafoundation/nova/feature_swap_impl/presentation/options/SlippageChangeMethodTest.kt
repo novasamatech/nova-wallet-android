@@ -38,8 +38,9 @@ class SlippageChangeMethodTest {
 
     @Test
     fun `saved slippage is shown within the four decimal cap`() {
-        assertEquals("0.0125", slippageInputText(0.0125.percents))
-        assertEquals("0.1", slippageInputText(0.001.fractions))
-        assertEquals("0.0123", slippageInputText(0.012345.percents))
+        assertEquals("0.0125", slippageInputText(0.0125.percents, config.maxPercentFractionDigits))
+        assertEquals("0.1", slippageInputText(0.001.fractions, config.maxPercentFractionDigits))
+        assertEquals("0.0123", slippageInputText(0.012345.percents, config.maxPercentFractionDigits))
+        assertEquals("0.012345", slippageInputText(0.012345.percents, maxFractionDigits = 6))
     }
 }

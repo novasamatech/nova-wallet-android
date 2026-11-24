@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.route.di.SwapRouteC
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
+import io.novafoundation.nova.infrastructure.di.InfrastructureApi
 
 @Component(
     dependencies = [
@@ -30,6 +31,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         SwapFeatureModule::class,
+        ExchangerAModule::class,
     ]
 )
 @FeatureScope
@@ -61,6 +63,7 @@ interface SwapFeatureComponent : SwapFeatureApi {
     @Component(
         dependencies = [
             AnalyticsFeatureApi::class,
+            InfrastructureApi::class,
             CommonApi::class,
             RuntimeApi::class,
             WalletFeatureApi::class,

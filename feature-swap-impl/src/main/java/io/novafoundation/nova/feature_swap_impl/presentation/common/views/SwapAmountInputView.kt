@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.common.views
 
+import io.novafoundation.nova.common.view.input.setupDecimalInput
+import io.novafoundation.nova.common.view.input.setDecimalInputConstraints
+import io.novafoundation.nova.common.view.input.DecimalInputConstraints
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.EditText
@@ -40,13 +43,18 @@ class SwapAmountInputView @JvmOverloads constructor(
     }
 
     init {
-        amountInput.setupSwapDecimalInput()
+        amountInput.setupDecimalInput()
         binder.swapAmountInputContainer.background = context.getInputBackground()
         binder.swapAmountInputContainer.setAddStatesFromChildren(true)
     }
 
     fun setSelectTokenClickListener(listener: OnClickListener) {
         binder.swapAmountInputContainer.setOnClickListener(listener)
+    }
+
+    /** Changes future edit limits without rewriting the currently displayed amount. */
+    fun setInputConstraints(constraints: DecimalInputConstraints) {
+        amountInput.setDecimalInputConstraints(constraints)
     }
 
     fun setModel(model: SwapInputAssetModel) {

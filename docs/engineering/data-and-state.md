@@ -6,6 +6,8 @@ Use `null` only for genuinely absent values, such as an unset selection or an om
 Represent meaningful alternatives such as loading, failure, stale data, an unavailable calculation, or a
 different validation mode with an explicit sealed class or interface. Reuse an existing sealed type when
 it fits. Keep each case and its associated data together so callers can handle the cases exhaustively.
+This includes input constraints: represent unlimited and bounded modes explicitly, rather than using
+nullable numeric limits to switch validation on or off. Keep the limit values inside the bounded case.
 
 Keep nullable API fields and database columns where their contracts allow absence. Map them to explicit
 states at the boundary when their meaning affects business logic or presentation.

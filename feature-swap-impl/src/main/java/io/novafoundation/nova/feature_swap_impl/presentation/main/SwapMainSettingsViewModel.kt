@@ -556,6 +556,7 @@ class SwapMainSettingsViewModel(
                 maximum = config.maxAvailableSlippage.inFraction,
                 small = config.smallSlippage.inFraction,
                 big = config.bigSlippage.inFraction,
+                maxPercentFractionDigits = config.maxPercentFractionDigits,
                 requestId = requestId
             )
         )

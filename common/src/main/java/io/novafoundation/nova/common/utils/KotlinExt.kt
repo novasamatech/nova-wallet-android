@@ -220,6 +220,10 @@ val BigDecimal.isNegative: Boolean
 val BigDecimal.isNonNegative: Boolean
     get() = signum() >= 0
 
+/** Number of digits before the decimal point, excluding the sign and counting the zero in 0.x. */
+val BigDecimal.integerDigits: Int
+    get() = if (isZero) 1 else (precision() - scale()).coerceAtLeast(1)
+
 val BigInteger.isNonPositive: Boolean
     get() = signum() <= 0
 

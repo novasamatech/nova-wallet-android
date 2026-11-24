@@ -32,6 +32,7 @@ dependencies {
 
     implementation project(":common")
     implementation project(":analytics")
+    implementation project(":infrastructure")
     implementation project(":runtime")
 
     implementation project(":bindings:hydra-dx-math")
@@ -41,6 +42,7 @@ dependencies {
     implementation substrateSdkDep
 
     implementation kotlinDep
+    implementation retrofitDep
 
     
     implementation androidDep

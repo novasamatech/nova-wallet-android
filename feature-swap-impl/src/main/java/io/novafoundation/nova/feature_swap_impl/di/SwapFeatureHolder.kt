@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
+import io.novafoundation.nova.infrastructure.di.InfrastructureApi
 import javax.inject.Inject
 
 @ApplicationScope
@@ -29,6 +30,7 @@ class SwapFeatureHolder @Inject constructor(
         val accountFeatureDependencies = DaggerSwapFeatureComponent_SwapFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
+            .infrastructureApi(getFeature(InfrastructureApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .swapCoreApi(getFeature(SwapCoreApi::class.java))

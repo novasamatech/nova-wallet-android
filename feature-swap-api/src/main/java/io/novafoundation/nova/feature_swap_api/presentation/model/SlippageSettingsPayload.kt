@@ -14,8 +14,17 @@ data class SlippageSettingsPayload(
     val maximum: Double,
     val small: Double,
     val big: Double,
-    val requestId: String? = null
+    val requestId: String? = null,
+    val maxPercentFractionDigits: Int = SlippageConfig.DEFAULT_PERCENT_FRACTION_DIGITS
 ) : Parcelable {
 
-    fun config() = SlippageConfig(default.fractions, tips.map { it.fractions }, minimum.fractions, maximum.fractions, small.fractions, big.fractions)
+    fun config() = SlippageConfig(
+        defaultSlippage = default.fractions,
+        slippageTips = tips.map { it.fractions },
+        minAvailableSlippage = minimum.fractions,
+        maxAvailableSlippage = maximum.fractions,
+        smallSlippage = small.fractions,
+        bigSlippage = big.fractions,
+        maxPercentFractionDigits = maxPercentFractionDigits
+    )
 }
