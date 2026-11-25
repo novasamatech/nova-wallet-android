@@ -18,13 +18,17 @@ internal fun Flow<QuotingState>.throttleFeeRefreshes(timeSource: TimeSource = Ti
     var lastFeeQuote: ReadyForReview? = null
 
     this@throttleFeeRefreshes
-        .transformLatest { state ->
-            if (state !is ReadyForReview) return@transformLatest
+        .transformLatest { quote ->
+            val state = quote.readyForReviewOrNull() ?: return@transformLatest
 
             delay(300.milliseconds)
             val sameInputs = lastFeeQuote?.settings == state.settings && lastFeeQuote?.quoteArgs?.metaAccountId == state.quoteArgs.metaAccountId
             // A market update may replace a user quote during debounce; changed inputs must still bypass the interval.
-            if (state.origin == QuoteRefreshOrigin.SUBSCRIPTION && sameInputs) {
+            val throttle = when (state.origin) {
+                QuoteRefreshOrigin.USER_INPUT -> false
+                QuoteRefreshOrigin.SUBSCRIPTION -> sameInputs
+            }
+            if (throttle) {
                 val remainingDelay = BACKGROUND_FEE_REFRESH_INTERVAL - lastFeeLoadStartedAt.elapsedNow()
                 if (remainingDelay.isPositive()) delay(remainingDelay)
             }

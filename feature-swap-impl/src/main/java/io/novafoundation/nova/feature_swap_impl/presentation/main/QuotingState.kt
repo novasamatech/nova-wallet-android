@@ -27,6 +27,7 @@ sealed class QuotingState {
 
         abstract val quote: SwapQuotePreview
 
+        // TODO(NW-2502): Remove PreviewOnly once external quotes can proceed to Review.
         class PreviewOnly(override val quote: SwapQuotePreview) : Loaded()
 
         data class ReadyForReview(
@@ -36,6 +37,11 @@ sealed class QuotingState {
             val settings: SwapSettings,
         ) : Loaded()
     }
+}
+
+internal fun QuotingState.readyForReviewOrNull(): ReadyForReview? = when (this) {
+    is ReadyForReview -> this
+    is PreviewOnly, is QuotingState.PayLimit, is QuotingState.Error, QuotingState.Default, QuotingState.Loading -> null
 }
 
 internal fun SwapQuotePreview.toQuotingState(args: SwapQuoteArgs, origin: QuoteRefreshOrigin, settings: SwapSettings): QuotingState {

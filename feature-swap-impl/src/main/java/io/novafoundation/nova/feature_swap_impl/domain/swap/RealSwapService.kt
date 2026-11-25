@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.domain.swap
 
+import io.novafoundation.nova.common.data.memory.LazyAsyncCache
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapRouteEdgeId
 import android.util.Log
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -10,7 +11,6 @@ import io.novafoundation.nova.common.utils.Fraction.Companion.fractions
 import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.flatMap
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Path
@@ -18,7 +18,6 @@ import io.novafoundation.nova.common.utils.graph.allEdges
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
 import io.novafoundation.nova.common.utils.graph.numberOfEdges
-import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.mapAsync
@@ -51,11 +50,14 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.routeId
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
+import io.novafoundation.nova.feature_swap_api.domain.model.OnChainSwapEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.ExternalSwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuotePreview
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
@@ -64,6 +66,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.buildSwapSegments
 import io.novafoundation.nova.feature_swap_api.domain.model.replaceAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.totalFeeEnsuringSubmissionAsset
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapAssetRole
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathFeeEstimator
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
@@ -73,7 +76,6 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.model.WeightBreak
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuote
-import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
@@ -114,10 +116,11 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmittedTransaction
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -129,7 +132,6 @@ import java.math.MathContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-private const val ALL_DIRECTIONS_CACHE = "RealSwapService.ALL_DIRECTIONS"
 private const val EXCHANGES_CACHE = "RealSwapService.EXCHANGES"
 private const val EXTRINSIC_SERVICE_CACHE = "RealSwapService.ExtrinsicService"
 private const val QUOTER_CACHE = "RealSwapService.QUOTER"
@@ -141,6 +143,7 @@ private val ADDITIONAL_ESTIMATE_BUFFER = 3.seconds
 internal class RealSwapService(
     private val assetConversionFactory: AssetConversionExchangeFactory,
     private val hydraDxExchangeFactory: HydraDxExchangeFactory,
+    private val externalExchange: AssetExchange.External,
     private val crossChainTransferFactory: CrossChainTransferAssetExchangeFactory,
     private val computationalCache: ComputationalCache,
     private val chainRegistry: ChainRegistry,
@@ -178,9 +181,17 @@ internal class RealSwapService(
     }
 
     override suspend fun assetsAvailableForSwap(
-        computationScope: CoroutineScope
+        computationScope: CoroutineScope,
+        role: SwapAssetRole
     ): Flow<Set<FullChainAssetId>> {
-        return directionsGraph(computationScope).map { it.vertices() }
+        return directionsGraph(computationScope).map { graph ->
+            graph.assetsForRole(role)
+        }
+    }
+
+    override suspend fun canSwap(pay: FullChainAssetId, receive: FullChainAssetId, metaAccountId: Long, scope: CoroutineScope): Boolean {
+        val graph = exchangeRegistry(scope).graph(includeExternal = true, destination = receive).first()
+        return receive in graph.findAllPossibleDestinations(pay, nodeVisitFilter(scope, metaAccountId))
     }
 
     override suspend fun availableSwapDirectionsFor(
@@ -211,6 +222,28 @@ internal class RealSwapService(
 
     override suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean> {
         return directionsGraph(computationScope).map { it.hasOutcomingDirections(asset.fullId) }
+    }
+
+    // TODO(NW-2502): Merge preview() into quote() once Review supports external routes.
+    override suspend fun preview(args: SwapQuoteArgs, computationSharingScope: CoroutineScope): SwapQuotePreview = withContext(Dispatchers.Default) {
+        val trade = quoteTrade(
+            chainAssetIn = args.tokenIn.configuration,
+            chainAssetOut = args.tokenOut.configuration,
+            amount = args.amount,
+            swapDirection = args.swapDirection,
+            computationSharingScope = computationSharingScope,
+            metaAccountId = args.metaAccountId,
+            includeExternal = true
+        )
+        if (trade.path.any { it.edge !is OnChainSwapEdge }) {
+            ExternalSwapQuote(
+                amountIn = args.tokenIn.configuration.withAmount(trade.amountIn()),
+                amountOut = args.tokenOut.configuration.withAmount(trade.netAmountOut),
+                quotedPath = trade
+            )
+        } else {
+            onChainQuote(args, trade)
+        }
     }
 
     override suspend fun quote(
@@ -249,7 +282,7 @@ internal class RealSwapService(
         computationScope: CoroutineScope
     ): List<SwapGraphEdge> {
         require(route.isNotEmpty())
-        val results = exchangeRegistry(computationScope).allExchanges().mapAsync { exchange ->
+        val results = exchangeRegistry(computationScope).allExchanges().filterNot { it is AssetExchange.External }.mapAsync { exchange ->
             runCatching { exchange.availableDirectSwapConnections() }.onFailure { currentCoroutineContext().ensureActive() }
         }
         val edges = results.mapNotNull { it.getOrNull() }.flatten()
@@ -371,6 +404,7 @@ internal class RealSwapService(
         executionPath.forEachIndexed { index, segmentExecuteArgs ->
             val quotedEdge = segmentExecuteArgs.quotedSwapEdge
 
+            val edge = requireNotNull(quotedEdge.edge as? OnChainSwapEdge) { "Route requires an external order" }
             val operationArgs = AtomicSwapOperationArgs(
                 estimatedSwapLimit = SwapLimit(direction, quotedEdge.quotedAmount, slippage, quotedEdge.quote),
                 feePaymentCurrency = segmentExecuteArgs.quotedSwapEdge.edge.identifySegmentCurrency(
@@ -382,43 +416,16 @@ internal class RealSwapService(
 
             // Initial case - begin first operation
             if (currentSwapTx == null) {
-                currentSwapTx = quotedEdge.edge.beginOperation(operationArgs)
+                currentSwapTx = edge.beginOperation(operationArgs)
                 return@forEachIndexed
             }
 
             // Try to append segment to current swap tx
-            val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperation(currentSwapTx!!, operationArgs)
+            val maybeAppendedCurrentTx = edge.appendToOperation(currentSwapTx!!, operationArgs)
 
             currentSwapTx = if (maybeAppendedCurrentTx == null) {
                 finishedSwapTxs.add(currentSwapTx!!)
-                quotedEdge.edge.beginOperation(operationArgs)
-            } else {
-                maybeAppendedCurrentTx
-            }
-        }
-
-        finishedSwapTxs.add(currentSwapTx!!)
-
-        return finishedSwapTxs
-    }
-
-    private suspend fun Path<QuotedEdge<SwapGraphEdge>>.constructAtomicOperationPrototypes(): List<AtomicSwapOperationPrototype> {
-        var currentSwapTx: AtomicSwapOperationPrototype? = null
-        val finishedSwapTxs = mutableListOf<AtomicSwapOperationPrototype>()
-
-        forEach { quotedEdge ->
-            // Initial case - begin first operation
-            if (currentSwapTx == null) {
-                currentSwapTx = quotedEdge.edge.beginOperationPrototype()
-                return@forEach
-            }
-
-            // Try to append segment to current swap tx
-            val maybeAppendedCurrentTx = quotedEdge.edge.appendToOperationPrototype(currentSwapTx!!)
-
-            currentSwapTx = if (maybeAppendedCurrentTx == null) {
-                finishedSwapTxs.add(currentSwapTx!!)
-                quotedEdge.edge.beginOperationPrototype()
+                edge.beginOperation(operationArgs)
             } else {
                 maybeAppendedCurrentTx
             }
@@ -454,84 +461,21 @@ internal class RealSwapService(
             metaAccountId = args.metaAccountId
         )
 
-        val serviceFeeCharger = quotedTrade.path.constructAtomicOperationPrototypes()
-            .lastOrNull { it.chargesServiceFee }
+        return onChainQuote(args, quotedTrade)
+    }
 
-        val adjusted = quotedTrade.applyServiceFee(args, serviceFeeCharger, computationSharingScope)
-
-        val prototypes = adjusted.trade.path.constructAtomicOperationPrototypes()
-
-        val priceImpact = args.calculatePriceImpact(adjusted.amountIn, adjusted.grossAmountOut)
-
-        val atomicOperationsEstimates = prototypes.map { it.maximumExecutionTime() }
-
+    private suspend fun onChainQuote(args: SwapQuoteArgs, trade: QuotedTrade): SwapQuote {
+        val prototypes = trade.path.map { it.edge }.operationPrototypes()
+        val amountIn = trade.amountIn()
         return SwapQuote(
-            amountIn = args.tokenIn.configuration.withAmount(adjusted.amountIn),
-            amountOut = args.tokenOut.configuration.withAmount(adjusted.amountOut),
-            priceImpact = priceImpact,
-            quotedPath = adjusted.trade,
-            executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER),
+            amountIn = args.tokenIn.configuration.withAmount(amountIn),
+            amountOut = args.tokenOut.configuration.withAmount(trade.netAmountOut),
+            priceImpact = args.calculatePriceImpact(amountIn, trade.grossAmountOut()),
+            quotedPath = trade,
+            executionEstimate = SwapExecutionEstimate(prototypes.map { it.value.maximumExecutionTime() }, ADDITIONAL_ESTIMATE_BUFFER),
             direction = args.swapDirection,
         )
     }
-
-    /**
-     * Adjusts a raw quote for the Nova service fee charged by [serviceFeeCharger] (null = no fee).
-     * Keeps the user's received amount equal to the displayed amountOut in both directions.
-     */
-    private suspend fun QuotedTrade.applyServiceFee(
-        args: SwapQuoteArgs,
-        serviceFeeCharger: AtomicSwapOperationPrototype?,
-        computationSharingScope: CoroutineScope,
-    ): ServiceFeeAdjustedTrade {
-        val rawAmountIn = amountIn()
-        val rawAmountOut = amountOut()
-
-        if (serviceFeeCharger == null) {
-            return ServiceFeeAdjustedTrade(this, rawAmountIn, rawAmountOut, grossAmountOut = rawAmountOut)
-        }
-
-        return when (args.swapDirection) {
-            // Entered amountOut is final: buy `entered + fee` from the pool so the on-chain commission
-            // leaves exactly `entered`. Re-quote to get the accurate (grown) amountIn.
-            SwapDirection.SPECIFIED_OUT -> {
-                val net = args.amount
-                val grossFinal = net + serviceFeeCharger.serviceCommissionToAddOnTop(net)
-                val grossTrade = quoteTrade(
-                    chainAssetIn = args.tokenIn.configuration,
-                    chainAssetOut = args.tokenOut.configuration,
-                    amount = grossFinal,
-                    swapDirection = SwapDirection.SPECIFIED_OUT,
-                    computationSharingScope = computationSharingScope,
-                    metaAccountId = args.metaAccountId
-                )
-                ServiceFeeAdjustedTrade(
-                    trade = grossTrade,
-                    amountIn = grossTrade.amountIn(),
-                    amountOut = net,
-                    grossAmountOut = grossFinal,
-                )
-            }
-
-            // Entered amountIn is final: the commission is deducted from the pool output.
-            SwapDirection.SPECIFIED_IN -> {
-                val net = rawAmountOut - serviceFeeCharger.serviceCommissionIncludedIn(rawAmountOut)
-                ServiceFeeAdjustedTrade(
-                    trade = this,
-                    amountIn = rawAmountIn,
-                    amountOut = net,
-                    grossAmountOut = rawAmountOut,
-                )
-            }
-        }
-    }
-
-    private class ServiceFeeAdjustedTrade(
-        val trade: QuotedTrade,
-        val amountIn: Balance,
-        val amountOut: Balance,
-        val grossAmountOut: Balance,
-    )
 
     override suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig {
         return SlippageConfig.default()
@@ -570,11 +514,16 @@ internal class RealSwapService(
         }
     }
 
-    private fun QuotedTrade.amountOut(): Balance {
-        return when (direction) {
-            SwapDirection.SPECIFIED_IN -> lastSegmentQuote
-            SwapDirection.SPECIFIED_OUT -> lastSegmentQuotedAmount
+    /** Apply the quoted exchange rates without the commission transfer when calculating price impact. */
+    private fun QuotedTrade.grossAmountOut(): Balance {
+        var gross = amountIn()
+        val sell = direction == SwapDirection.SPECIFIED_IN
+        for (step in path) {
+            val input = if (sell) step.quotedAmount else step.quote
+            val output = if (sell) step.quote else step.quotedAmount
+            gross = if (gross == input || input == Balance.ZERO) output else gross * output / input
         }
+        return gross
     }
 
     private fun QuotedTrade.finalQuote(): Balance {
@@ -592,23 +541,8 @@ internal class RealSwapService(
         return priceImpact.fractions
     }
 
-    private suspend fun directionsGraph(computationScope: CoroutineScope): Flow<SwapGraph> {
-        return computationalCache.useSharedFlow(ALL_DIRECTIONS_CACHE, computationScope) {
-            val exchangeRegistry = exchangeRegistry(computationScope)
-
-            val directionsByExchange = exchangeRegistry.allExchanges().map { exchange ->
-                flowOf { exchange.availableDirectSwapConnections() }
-                    .catch {
-                        emit(emptyList())
-
-                        Log.e("RealSwapService", "Failed to fetch directions for exchange ${exchange::class.simpleName}", it)
-                    }
-            }
-
-            combineSwapDirections(directionsByExchange)
-                .onEach { printGraphStats(it) }
-        }
-    }
+    private suspend fun directionsGraph(computationScope: CoroutineScope): Flow<SwapGraph> =
+        exchangeRegistry(computationScope).graph(includeExternal = true, destination = null)
 
     private fun printGraphStats(graph: SwapGraph) {
         if (!BuildConfig.DEBUG) return
@@ -654,8 +588,10 @@ internal class RealSwapService(
 
     private suspend fun createExchangeRegistry(coroutineScope: CoroutineScope): ExchangeRegistry {
         return ExchangeRegistry(
+            scope = coroutineScope,
             singleChainExchanges = createIndividualChainExchanges(coroutineScope),
             multiChainExchanges = listOf(
+                externalExchange,
                 crossChainTransferFactory.create(createInnerSwapHost(coroutineScope))
             )
         )
@@ -713,9 +649,11 @@ internal class RealSwapService(
         swapDirection: SwapDirection,
         computationSharingScope: CoroutineScope,
         logQuotes: Boolean = true,
-        metaAccountId: Long? = null
+        metaAccountId: Long? = null,
+        includeExternal: Boolean = false,
+        includeServiceCommission: Boolean = true
     ): QuotedTrade {
-        val quoter = getPathQuoter(computationSharingScope, metaAccountId)
+        val quoter = getPathQuoter(computationSharingScope, metaAccountId, chainAssetOut.fullId, includeExternal, includeServiceCommission)
 
         val bestPathQuote = quoter.findBestPath(chainAssetIn, chainAssetOut, amount, swapDirection)
         if (debug && logQuotes) {
@@ -725,23 +663,39 @@ internal class RealSwapService(
         return bestPathQuote.bestPath
     }
 
-    private suspend fun getPathQuoter(computationScope: CoroutineScope, metaAccountId: Long?): PathQuoter<SwapGraphEdge> {
+    private suspend fun getPathQuoter(
+        computationScope: CoroutineScope,
+        metaAccountId: Long?,
+        destination: FullChainAssetId,
+        includeExternal: Boolean,
+        includeServiceCommission: Boolean
+    ): PathQuoter<SwapGraphEdge> {
         val account = metaAccountId?.let { accountRepository.getMetaAccount(it) } ?: accountRepository.getSelectedMetaAccount()
-        return computationalCache.useCache("$QUOTER_CACHE:${account.id}", computationScope) {
-            val graphFlow = directionsGraph(computationScope)
+        val registry = exchangeRegistry(computationScope)
+        val externalTarget = destination.takeIf { includeExternal && registry.supportsExternalDestination(it) }
+        return computationalCache.useCache("$QUOTER_CACHE:${account.id}:$externalTarget:$includeServiceCommission", computationScope) {
+            val graphFlow = if (externalTarget == null) {
+                computationalCache.useSharedFlow("SwapService.OnChainDirections", this) { registry.graph(includeExternal = false, destination = null) }
+            } else {
+                registry.graph(includeExternal = true, destination = externalTarget)
+            }
             val filter = nodeVisitFilter(computationScope, account.id)
 
-            quoterFactory.create(graphFlow, this, SwapPathFeeEstimator(), filter)
+            quoterFactory.create(graphFlow, this, SwapPathFeeEstimator(includeServiceCommission), filter)
         }
     }
 
-    private inner class SwapPathFeeEstimator : PathFeeEstimator<SwapGraphEdge> {
+    private inner class SwapPathFeeEstimator(private val includeServiceCommission: Boolean) : PathFeeEstimator<SwapGraphEdge> {
+
+        override suspend fun outputCommission(path: Path<SwapGraphEdge>): IndexedValue<AtomicSwapOperationPrototype>? =
+            if (includeServiceCommission) path.outputCommission() else null
 
         override suspend fun roughlyEstimateFee(path: Path<QuotedEdge<SwapGraphEdge>>): PathRoughFeeEstimation {
             // USDT is used to determine usd to selected currency rate without making a separate request to price api
             val usdtOnAssetHub = chainRegistry.getUSDTOnAssetHub() ?: return PathRoughFeeEstimation.zero()
 
-            val operationPrototypes = path.constructAtomicOperationPrototypes()
+            val operationPrototypes = path.map { it.edge }.operationPrototypes().map { it.value }
+            if (operationPrototypes.isEmpty()) return PathRoughFeeEstimation.zero()
 
             val nativeAssetsSegments = operationPrototypes.allNativeAssets()
             val assetIn = chainRegistry.asset(path.first().edge.from)
@@ -843,7 +797,8 @@ internal class RealSwapService(
                 swapDirection = quoteArgs.swapDirection,
                 computationSharingScope = scope,
                 logQuotes = false,
-                metaAccountId = quoteArgs.metaAccountId
+                metaAccountId = quoteArgs.metaAccountId,
+                includeServiceCommission = false
             ).finalQuote()
         }
 
@@ -940,9 +895,24 @@ internal class RealSwapService(
     }
 
     private inner class ExchangeRegistry(
+        scope: CoroutineScope,
         private val singleChainExchanges: Map<ChainId, AssetExchange>,
         private val multiChainExchanges: List<AssetExchange>,
     ) {
+
+        private val connections = allExchanges().associateWith { exchange ->
+            LazyAsyncCache<Unit, List<SwapGraphEdge>>(scope) { exchange.availableDirectSwapConnections() }
+        }
+
+        fun supportsExternalDestination(asset: FullChainAssetId): Boolean =
+            connections.keys.filterIsInstance<AssetExchange.External>().any { it.supportsDestination(asset) }
+
+        fun graph(includeExternal: Boolean, destination: FullChainAssetId?): Flow<SwapGraph> {
+            val directions = connections.mapNotNull { (exchange, cache) ->
+                exchange.directionsFor(includeExternal, destination) { cache.getOrCompute(Unit) }
+            }
+            return combineSwapDirections(directions).onEach { printGraphStats(it) }
+        }
 
         private val feePaymentRegistry = SwapFeePaymentRegistry()
 
@@ -1076,6 +1046,33 @@ internal class RealSwapService(
             return blockNumberCache.getOrCompute(chainId)
         }
     }
+
+    companion object {
+
+        internal fun AssetExchange.directionsFor(
+            includeExternal: Boolean,
+            destination: FullChainAssetId?,
+            load: suspend () -> List<SwapGraphEdge>
+        ): Flow<List<SwapGraphEdge>>? {
+            val external = this as? AssetExchange.External
+            if (external != null && (!includeExternal || destination != null && !external.supportsDestination(destination))) return null
+
+            return flow {
+                // The picker can already show on-chain assets. A quote for a specific destination waits for its providers.
+                if (external != null && destination == null) emit(emptyList())
+                val connections = try {
+                    load()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (failure: Exception) {
+                    if (external != null && destination != null) throw failure
+                    Log.w("Swaps", "Failed to load directions from ${this@directionsFor::class.simpleName}", failure)
+                    emptyList()
+                }
+                emit(connections)
+            }
+        }
+    }
 }
 
 private typealias QuotedTrade = QuotedPath<SwapGraphEdge>
@@ -1083,7 +1080,7 @@ private typealias QuotedTrade = QuotedPath<SwapGraphEdge>
 abstract class BaseSwapGraphEdge(
     val fromAsset: Chain.Asset,
     val toAsset: Chain.Asset
-) : SwapGraphEdge {
+) : OnChainSwapEdge {
 
     final override val from: FullChainAssetId = fromAsset.fullId
 

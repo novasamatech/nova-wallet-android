@@ -914,7 +914,9 @@ class SwapMainSettingsViewModel(
             when (state) {
                 is ReadyForReview -> updateQuotedInput(settings, state.quote.amountIn, state.quote.amountOut)
                 is PreviewOnly -> updateQuotedInput(settings, state.quote.amountIn, state.quote.amountOut, exact = true)
-                QuotingState.Default, QuotingState.Loading, is QuotingState.Error, is QuotingState.PayLimit -> settings.swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+                QuotingState.Default, QuotingState.Loading, is QuotingState.Error, is QuotingState.PayLimit -> {
+                    settings.swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+                }
             }
         }
     }

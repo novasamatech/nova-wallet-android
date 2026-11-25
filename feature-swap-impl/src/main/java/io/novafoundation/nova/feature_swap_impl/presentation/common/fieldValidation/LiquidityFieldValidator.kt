@@ -25,12 +25,14 @@ class LiquidityFieldValidator(
 
     override fun observe(inputStream: Flow<String>): Flow<FieldValidationResult> {
         return quotingStateFlow.map { quotingState ->
-            if (quotingState is QuotingState.Error && quotingState.error is SwapQuoteException.NotEnoughLiquidity) {
-                FieldValidationResult.Error(
-                    resourceManager.getString(R.string.swap_field_validation_not_enough_liquidity)
-                )
-            } else {
-                FieldValidationResult.Ok
+            when (quotingState) {
+                is QuotingState.Error -> when (quotingState.error) {
+                    SwapQuoteException.NotEnoughLiquidity -> FieldValidationResult.Error(
+                        resourceManager.getString(R.string.swap_field_validation_not_enough_liquidity)
+                    )
+                    else -> FieldValidationResult.Ok
+                }
+                QuotingState.Default, QuotingState.Loading, is QuotingState.Loaded, is QuotingState.PayLimit -> FieldValidationResult.Ok
             }
         }
     }
