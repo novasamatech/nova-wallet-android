@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.di.modules
 
 import android.content.Context
+import android.os.SystemClock
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.WebSocketFactory
 import dagger.Module
@@ -28,6 +29,7 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
 import io.novasama.substrate_sdk_android.wsrpc.request.RequestExecutor
 import okhttp3.Cache
+import okhttp3.Dispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import io.novafoundation.nova.common.data.network.DebugHttpLoggingInterceptor
@@ -39,8 +41,17 @@ private const val HTTP_CACHE = "http_cache"
 private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MiB
 private const val TIMEOUT_SECONDS = 20L
 
-// An unreachable mirror must delay the GitHub fallback less than an ordinary request timeout
-private const val NOVA_UTILS_MIRROR_ATTEMPT_TIMEOUT_SECONDS = 10L
+private const val NOVA_UTILS_MIRROR_CACHE = "nova_utils_mirror_cache"
+
+// The whole mirror attempt - every address of the host, the headers and the body. A healthy mirror answers
+// well within it, and callers with their own deadline (30 s for the Bittensor config) still reach GitHub
+private const val NOVA_UTILS_MIRROR_ATTEMPT_DEADLINE_SECONDS = 5L
+
+// How long the mirror is skipped after it could not be reached, so a dead mirror costs one deadline per window
+private const val NOVA_UTILS_MIRROR_FAILURE_COOL_DOWN_SECONDS = 60L
+
+// Mirror answers are held in memory; nova-utils files are a few hundred KiB. Larger ones are read from GitHub
+private const val NOVA_UTILS_MIRROR_MAX_BODY_SIZE = 4L * 1024L * 1024L // 4 MiB
 
 private const val SOCKET_CONNECTION_TIMEOUT = 5_000
 
@@ -83,12 +94,39 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
-    fun provideNovaUtilsMirrorInterceptor(): NovaUtilsMirrorInterceptor {
+    fun provideNovaUtilsMirrorInterceptor(
+        context: Context,
+        logger: Logger
+    ): NovaUtilsMirrorInterceptor {
         return NovaUtilsMirrorInterceptor(
             mirrorBaseUrl = BuildConfig.NOVA_UTILS_MIRROR_URL.toHttpUrl(),
-            mirrorAttemptTimeoutMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_ATTEMPT_TIMEOUT_SECONDS).toInt(),
-            standardTimeoutMillis = TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS).toInt()
+            mirrorCallFactory = createNovaUtilsMirrorClient(context),
+            attemptDeadlineMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_ATTEMPT_DEADLINE_SECONDS),
+            failureCoolDownMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_FAILURE_COOL_DOWN_SECONDS),
+            maxBodySize = NOVA_UTILS_MIRROR_MAX_BODY_SIZE,
+            elapsedRealtimeMillis = SystemClock::elapsedRealtime,
+            logger = logger
         )
+    }
+
+    /**
+     * The client of the mirror attempts made by [NovaUtilsMirrorInterceptor] for the shared client and for the
+     * image loader's client. It has its own HTTP cache: an answer the interceptor returns never passes
+     * the cache of the client that owns the original request.
+     */
+    private fun createNovaUtilsMirrorClient(context: Context): OkHttpClient {
+        // The clients that own the original requests already limit their concurrency; queueing an attempt here
+        // as well would spend its deadline
+        val dispatcher = Dispatcher()
+        dispatcher.maxRequestsPerHost = dispatcher.maxRequests
+
+        return OkHttpClient.Builder()
+            .dispatcher(dispatcher)
+            .cache(Cache(File(context.cacheDir, NOVA_UTILS_MIRROR_CACHE), CACHE_SIZE))
+            // The mirror serves files directly; a redirect is not its answer and is never followed
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .build()
     }
 
     @Provides
