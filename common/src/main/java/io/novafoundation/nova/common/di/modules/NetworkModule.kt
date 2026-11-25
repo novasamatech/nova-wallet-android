@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.network.AndroidLogger
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.NovaUtilsMirrorInterceptor
 import io.novafoundation.nova.common.data.network.TimeHeaderInterceptor
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -27,6 +28,7 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
 import io.novasama.substrate_sdk_android.wsrpc.request.RequestExecutor
 import okhttp3.Cache
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import io.novafoundation.nova.common.data.network.DebugHttpLoggingInterceptor
 import io.novafoundation.nova.common.data.storage.DebugSettings
@@ -36,6 +38,9 @@ import java.util.concurrent.TimeUnit
 private const val HTTP_CACHE = "http_cache"
 private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MiB
 private const val TIMEOUT_SECONDS = 20L
+
+// An unreachable mirror must delay the GitHub fallback less than an ordinary request timeout
+private const val NOVA_UTILS_MIRROR_ATTEMPT_TIMEOUT_SECONDS = 10L
 
 private const val SOCKET_CONNECTION_TIMEOUT = 5_000
 
@@ -78,8 +83,19 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
+    fun provideNovaUtilsMirrorInterceptor(): NovaUtilsMirrorInterceptor {
+        return NovaUtilsMirrorInterceptor(
+            mirrorBaseUrl = BuildConfig.NOVA_UTILS_MIRROR_URL.toHttpUrl(),
+            mirrorAttemptTimeoutMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_ATTEMPT_TIMEOUT_SECONDS).toInt(),
+            standardTimeoutMillis = TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS).toInt()
+        )
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideOkHttpClient(
         context: Context,
+        novaUtilsMirrorInterceptor: NovaUtilsMirrorInterceptor,
         loggingInterceptor: DebugHttpLoggingInterceptor
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
@@ -89,6 +105,7 @@ class NetworkModule {
             .cache(Cache(File(context.cacheDir, HTTP_CACHE), CACHE_SIZE))
             .retryOnConnectionFailure(true)
             .addInterceptor(TimeHeaderInterceptor())
+            .addInterceptor(novaUtilsMirrorInterceptor)
 
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(loggingInterceptor)
