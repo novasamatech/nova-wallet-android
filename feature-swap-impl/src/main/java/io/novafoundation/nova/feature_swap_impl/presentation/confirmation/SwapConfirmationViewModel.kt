@@ -39,7 +39,6 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.domain.swap.includesNovaFee
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
-import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
@@ -464,7 +463,7 @@ class SwapConfirmationViewModel(
             val quoteArgs = SwapQuoteArgs(
                 tokenIn = tokenRepository.getToken(assetIn),
                 tokenOut = tokenRepository.getToken(assetOut),
-                amount = swapQuote.quotedPath.quotedAmount,
+                amount = if (swapQuote.direction == SwapDirection.SPECIFIED_IN) swapQuote.planksIn else swapQuote.planksOut,
                 swapDirection = swapQuote.quotedPath.direction,
                 metaAccountId = operationPayload.metaAccountId,
             )
