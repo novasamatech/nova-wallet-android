@@ -297,6 +297,35 @@ sealed class AnalyticsEvent(
         )
     )
 
+    class DappStakingPromptShown(
+        placement: DappStakingPromptPlacement,
+        kind: DappStakingPromptKind,
+        dappHost: String? = null
+    ) : AnalyticsEvent(
+        name = "dapp_staking_prompt_shown",
+        properties = buildMap {
+            put("placement", placement.value)
+            put("kind", kind.value)
+            if (dappHost != null) put("dapp_host", dappHost)
+        }
+    )
+
+    class DappStakingPromptAction(
+        placement: DappStakingPromptPlacement,
+        kind: DappStakingPromptKind,
+        // Qualified: inside AnalyticsEvent the simple name is this event class, not the enum
+        action: io.novafoundation.nova.analytics.DappStakingPromptAction,
+        dappHost: String? = null
+    ) : AnalyticsEvent(
+        name = "dapp_staking_prompt_action",
+        properties = buildMap {
+            put("placement", placement.value)
+            put("kind", kind.value)
+            put("action", action.value)
+            if (dappHost != null) put("dapp_host", dappHost)
+        }
+    )
+
     class AssetFundingDappOpened(provider: String, asset: String, chainId: String) : AnalyticsEvent(
         name = "asset_funding_dapp_opened",
         properties = mapOf(
@@ -513,4 +542,20 @@ enum class WalletCreationStep(val value: String) {
 enum class SignSource(val value: String) {
     DAPP_BROWSER("dapp_browser"),
     WALLET_CONNECT("walletconnect")
+}
+
+/** Where DApp search prompts the user about built-in staking: `placement` of `dapp_staking_prompt_*`. */
+enum class DappStakingPromptPlacement(val value: String) {
+    SEARCH_BANNER("search_banner"),
+    NOTICE("notice")
+}
+
+enum class DappStakingPromptKind(val value: String) {
+    BITTENSOR("bittensor"),
+    STAKING("staking")
+}
+
+enum class DappStakingPromptAction(val value: String) {
+    GO_TO_STAKING("go_to_staking"),
+    CONTINUE_TO_SITE("continue_to_site")
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink
 
+import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.HasStake
@@ -50,6 +51,24 @@ class StakingDeepLinkTargetTest {
     @Test
     fun `native asset defaults to zero and chain prefix is normalized`() {
         assertEquals(target, parseStakingDeepLinkTarget("0xchain", null))
+    }
+
+    @Test
+    fun `parsed link reports the deep link flow source`() {
+        assertEquals(StakingFlowSource.DEEP_LINK, parseStakingDeepLinkTarget("0xchain", null)?.source)
+        assertEquals(StakingFlowSource.DEEP_LINK, target.source)
+    }
+
+    @Test
+    fun `flow source does not change which dashboard item is the target`() {
+        val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCED)
+        val dashboard = StakingDashboard(emptyList(), listOf(option))
+        val dAppTarget = target.copy(source = StakingFlowSource.DAPP_SEARCH_BANNER)
+
+        val destination = resolveStakingDeepLink(dAppTarget, dashboard, waitingForSync = true)
+
+        assertSame(option, destination?.option)
+        assertSame(dAppTarget, destination?.target)
     }
 
     @Test

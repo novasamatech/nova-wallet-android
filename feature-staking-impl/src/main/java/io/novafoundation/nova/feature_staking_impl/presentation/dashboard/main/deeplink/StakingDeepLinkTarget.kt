@@ -1,13 +1,21 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink
 
 import android.os.Parcelable
+import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDashboard
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
 import kotlinx.parcelize.Parcelize
 
+/**
+ * [source] is reported as the source of the staking flow when the target opens start staking.
+ */
 @Parcelize
-data class StakingDeepLinkTarget(val chainId: String, val assetId: Int) : Parcelable
+data class StakingDeepLinkTarget(
+    val chainId: String,
+    val assetId: Int,
+    val source: StakingFlowSource = StakingFlowSource.DEEP_LINK
+) : Parcelable
 
 internal fun parseStakingDeepLinkTarget(chainId: String?, assetId: String?): StakingDeepLinkTarget? {
     if (chainId == null) return null
