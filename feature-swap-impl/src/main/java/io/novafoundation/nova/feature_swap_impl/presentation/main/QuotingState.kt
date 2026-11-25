@@ -1,7 +1,12 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.PreviewOnly
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.ReadyForReview
+import io.novafoundation.nova.feature_swap_impl.domain.swap.QuoteProviderException
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.ExternalSwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuotePreview
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.routeId
@@ -16,12 +21,28 @@ sealed class QuotingState {
 
     data class Error(val error: Throwable) : QuotingState()
 
-    data class Loaded(
-        val quote: SwapQuote,
-        val quoteArgs: SwapQuoteArgs,
-        val origin: QuoteRefreshOrigin,
-        val settings: SwapSettings,
-    ) : QuotingState()
+    class PayLimit(val limit: QuoteProviderException.DepositLimit) : QuotingState()
+
+    sealed class Loaded : QuotingState() {
+
+        abstract val quote: SwapQuotePreview
+
+        class PreviewOnly(override val quote: SwapQuotePreview) : Loaded()
+
+        data class ReadyForReview(
+            override val quote: SwapQuote,
+            val quoteArgs: SwapQuoteArgs,
+            val origin: QuoteRefreshOrigin,
+            val settings: SwapSettings,
+        ) : Loaded()
+    }
+}
+
+internal fun SwapQuotePreview.toQuotingState(args: SwapQuoteArgs, origin: QuoteRefreshOrigin, settings: SwapSettings): QuotingState {
+    return when (this) {
+        is SwapQuote -> ReadyForReview(this, args, origin, settings)
+        is ExternalSwapQuote -> PreviewOnly(this)
+    }
 }
 
 enum class QuoteRefreshOrigin {
@@ -29,13 +50,13 @@ enum class QuoteRefreshOrigin {
     SUBSCRIPTION,
 }
 
-internal class SwapFeeSnapshot(val quote: QuotingState.Loaded, val fee: SwapFee) {
+internal class SwapFeeSnapshot(val quote: ReadyForReview, val fee: SwapFee) {
 
     fun matchesInputs(settings: SwapSettings, metaAccountId: Long?): Boolean {
         return quote.settings == settings && quote.quoteArgs.metaAccountId == metaAccountId
     }
 
-    fun matchesQuote(other: QuotingState.Loaded): Boolean {
+    fun matchesQuote(other: ReadyForReview): Boolean {
         return matchesInputs(other.settings, other.quoteArgs.metaAccountId) &&
             fee.route == other.quote.quotedPath.path.map { it.edge.routeId() }
     }
@@ -47,9 +68,9 @@ internal class SwapFeeSnapshot(val quote: QuotingState.Loaded, val fee: SwapFee)
 
 inline fun <T> QuotingState.toLoadingState(onLoaded: (SwapQuote) -> T?): ExtendedLoadingState<T?> {
     return when (this) {
-        QuotingState.Default -> ExtendedLoadingState.Loaded(null)
+        QuotingState.Default, is PreviewOnly, is QuotingState.PayLimit -> ExtendedLoadingState.Loaded(null)
         is QuotingState.Error -> ExtendedLoadingState.Error(error)
-        is QuotingState.Loaded -> ExtendedLoadingState.Loaded(onLoaded(quote))
+        is ReadyForReview -> ExtendedLoadingState.Loaded(onLoaded(quote))
         QuotingState.Loading -> ExtendedLoadingState.Loading
     }
 }

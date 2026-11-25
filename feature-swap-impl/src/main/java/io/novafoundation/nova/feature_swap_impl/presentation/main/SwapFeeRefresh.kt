@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.ReadyForReview
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -12,13 +13,13 @@ import kotlin.time.TimeSource
 private val BACKGROUND_FEE_REFRESH_INTERVAL = 10.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun Flow<QuotingState>.throttleFeeRefreshes(timeSource: TimeSource = TimeSource.Monotonic): Flow<QuotingState.Loaded> = flow {
+internal fun Flow<QuotingState>.throttleFeeRefreshes(timeSource: TimeSource = TimeSource.Monotonic): Flow<ReadyForReview> = flow {
     var lastFeeLoadStartedAt = timeSource.markNow() - BACKGROUND_FEE_REFRESH_INTERVAL
-    var lastFeeQuote: QuotingState.Loaded? = null
+    var lastFeeQuote: ReadyForReview? = null
 
     this@throttleFeeRefreshes
         .transformLatest { state ->
-            if (state !is QuotingState.Loaded) return@transformLatest
+            if (state !is ReadyForReview) return@transformLatest
 
             delay(300.milliseconds)
             val sameInputs = lastFeeQuote?.settings == state.settings && lastFeeQuote?.quoteArgs?.metaAccountId == state.quoteArgs.metaAccountId
