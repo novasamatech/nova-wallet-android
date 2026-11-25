@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_swap_impl.data.exchanger
 import io.novafoundation.nova.common.utils.integerDigits
 import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.common.utils.isPositive
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAQuoteArgs
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAAmountPrecisionExceeded
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAAmountConstraints
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAPayLimits
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAQuoteResult
@@ -20,9 +21,9 @@ import kotlin.time.Duration.Companion.minutes
 
 private val RESPONSE_AMOUNT_PATTERN = Regex("(?:0|[1-9][0-9]{0,14})(?:\\.[0-9]{1,36})?")
 
-internal fun mapExchangerAQuoteRequest(args: SwapQuoteArgs, constraints: ExchangerAAmountConstraints): ExchangerAQuoteRequest {
-    val assetIn = args.tokenIn.configuration
-    val assetOut = args.tokenOut.configuration
+internal fun mapExchangerAQuoteRequest(args: ExchangerAQuoteArgs, constraints: ExchangerAAmountConstraints): ExchangerAQuoteRequest {
+    val assetIn = args.assetIn
+    val assetOut = args.assetOut
     require(assetIn.fullId != assetOut.fullId) { "Exchanger A requires different assets" }
 
     val specifiedAsset = when (args.swapDirection) {
@@ -32,10 +33,9 @@ internal fun mapExchangerAQuoteRequest(args: SwapQuoteArgs, constraints: Exchang
     val amount = specifiedAsset.amountFromPlanks(args.amount).stripTrailingZeros()
     require(amount.isPositive) { "Exchanger A quote amount must be positive" }
     val limits = constraints.forAsset(specifiedAsset)
-    require(amount.scale() <= limits.maxFractionDigits) {
-        "Exchanger A quote amount exceeds the supported precision"
+    if (amount.scale() > limits.maxFractionDigits || amount.integerDigits > limits.maxIntegerDigits) {
+        throw ExchangerAAmountPrecisionExceeded(limits)
     }
-    require(amount.integerDigits <= limits.maxIntegerDigits) { "Exchanger A quote amount exceeds the supported range" }
     val amountString = amount.toPlainString()
 
     val from = ExchangerAAssetReference(assetIn.chainId, assetIn.id)
@@ -46,8 +46,8 @@ internal fun mapExchangerAQuoteRequest(args: SwapQuoteArgs, constraints: Exchang
     }
 }
 
-internal fun mapExchangerAQuote(remote: ExchangerAQuoteRemote, args: SwapQuoteArgs): ExchangerAQuoteResult {
-    val limits = mapLimits(remote.limits, args.tokenIn.configuration)
+internal fun mapExchangerAQuote(remote: ExchangerAQuoteRemote, args: ExchangerAQuoteArgs): ExchangerAQuoteResult {
+    val limits = mapLimits(remote.limits, args.assetIn)
     return when (remote.kind) {
         "quote" -> mapQuote(remote, args, limits)
         "out_of_range" -> ExchangerAQuoteResult.OutOfRange(args, limits, mapLimitReason(remote.reason))
@@ -57,11 +57,11 @@ internal fun mapExchangerAQuote(remote: ExchangerAQuoteRemote, args: SwapQuoteAr
 
 private fun mapQuote(
     remote: ExchangerAQuoteRemote,
-    args: SwapQuoteArgs,
+    args: ExchangerAQuoteArgs,
     limits: ExchangerAPayLimits
 ): ExchangerAQuoteResult.Quote {
-    val assetIn = args.tokenIn.configuration
-    val assetOut = args.tokenOut.configuration
+    val assetIn = args.assetIn
+    val assetOut = args.assetOut
     val amountIn = mapAmount(remote.payAmount, assetIn, "payAmount", allowZero = false)
     val amountOut = mapAmount(remote.receiveAmount, assetOut, "receiveAmount", allowZero = false)
     if (args.swapDirection == SwapDirection.SPECIFIED_IN && amountIn != args.amount) invalidQuote("payAmount")

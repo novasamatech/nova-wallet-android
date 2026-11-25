@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.graph.numberOfEdges
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.measureExecution
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathFeeEstimator
+import io.novafoundation.nova.feature_swap_core_api.data.paths.OutputCommission
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.BestPathQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
@@ -121,43 +122,41 @@ private class RealPathQuoter<E : QuotableEdge>(
         amount: BigInteger,
         swapDirection: SwapDirection
     ): QuotedPath<E> {
-        val quote = when (swapDirection) {
-            SwapDirection.SPECIFIED_IN -> quotePathSell(path, amount)
-            SwapDirection.SPECIFIED_OUT -> quotePathBuy(path, amount)
-        }
-
-        val pathRoughFeeEstimation = pathFeeEstimation.roughlyEstimateFeeOrZero(quote)
-
-        return QuotedPath(swapDirection, quote, pathRoughFeeEstimation)
-    }
-
-    private suspend fun PathFeeEstimator<E>?.roughlyEstimateFeeOrZero(quote: Path<QuotedEdge<E>>): PathRoughFeeEstimation {
-        return this?.roughlyEstimateFee(quote) ?: PathRoughFeeEstimation.zero()
-    }
-
-    private suspend fun quotePathBuy(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>> {
-        return run {
-            val initial = mutableListOf<QuotedEdge<E>>() to amount
-
-            path.foldRight(initial) { segment, (quotedPath, currentAmount) ->
-                val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_OUT)
-                quotedPath.add(0, QuotedEdge(currentAmount, segmentQuote, segment))
-
-                quotedPath to segmentQuote
-            }.first
+        val commission = pathFeeEstimation?.outputCommission(path)
+        return when (swapDirection) {
+            SwapDirection.SPECIFIED_IN -> quoteSell(path, amount, commission)
+            SwapDirection.SPECIFIED_OUT -> quoteBuy(path, amount, commission)
         }
     }
 
-    private suspend fun quotePathSell(path: Path<E>, amount: BigInteger): Path<QuotedEdge<E>> {
-        return run {
-            val initial = mutableListOf<QuotedEdge<E>>() to amount
-
-            path.fold(initial) { (quotedPath, currentAmount), segment ->
-                val segmentQuote = segment.quote(currentAmount, SwapDirection.SPECIFIED_IN)
-                quotedPath.add(QuotedEdge(currentAmount, segmentQuote, segment))
-
-                quotedPath to segmentQuote
-            }.first
+    private suspend fun quoteSell(path: Path<E>, amount: BigInteger, commission: IndexedValue<OutputCommission>?): QuotedPath<E> {
+        var available = amount
+        val quoted = path.mapIndexed { index, edge ->
+            val amounts = edge.quoteAmounts(available, SwapDirection.SPECIFIED_IN, isIntermediate = index > 0)
+            val grossOutput = amounts.counterpart
+            available = if (commission?.index == index) grossOutput - commission.value.serviceCommissionIncludedIn(grossOutput) else grossOutput
+            QuotedEdge(amounts.specified, grossOutput, edge)
         }
+        return quoted.withFees(SwapDirection.SPECIFIED_IN, netAmountOut = available)
+    }
+
+    private suspend fun quoteBuy(path: Path<E>, amount: BigInteger, commission: IndexedValue<OutputCommission>?): QuotedPath<E> {
+        val quoted = ArrayList<QuotedEdge<E>>(path.size)
+        var required = amount
+        var netAmountOut = amount
+        for (index in path.indices.reversed()) {
+            val fee = if (commission?.index == index) commission.value.serviceCommissionToAddOnTop(required) else BigInteger.ZERO
+            val edge = path[index]
+            val amounts = edge.quoteAmounts(required + fee, SwapDirection.SPECIFIED_OUT, isIntermediate = index < path.lastIndex)
+            quoted.add(QuotedEdge(amounts.specified, amounts.counterpart, edge))
+            if (index == path.lastIndex) netAmountOut = amounts.specified - fee
+            required = amounts.counterpart
+        }
+        return quoted.asReversed().withFees(SwapDirection.SPECIFIED_OUT, netAmountOut)
+    }
+
+    private suspend fun Path<QuotedEdge<E>>.withFees(direction: SwapDirection, netAmountOut: BigInteger): QuotedPath<E> {
+        val roughFee = pathFeeEstimation?.roughlyEstimateFee(this) ?: PathRoughFeeEstimation.zero()
+        return QuotedPath(direction, this, roughFee, netAmountOut)
     }
 }

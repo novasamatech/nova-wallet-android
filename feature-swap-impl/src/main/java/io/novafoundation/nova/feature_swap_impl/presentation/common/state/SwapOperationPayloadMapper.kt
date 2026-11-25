@@ -95,6 +95,7 @@ class SwapOperationPayloadMapper @Inject constructor(
             quotedPath = QuotedPath(
                 direction = direction,
                 path = route.zip(snapshot.route) { edge, saved -> QuotedEdge(saved.quotedAmount, saved.quote, edge) },
+                netAmountOut = snapshot.amountOut,
                 roughFeeEstimation = PathRoughFeeEstimation(snapshot.roughFeeOut, snapshot.roughFeeIn)
             ),
             executionEstimate = SwapExecutionEstimate(

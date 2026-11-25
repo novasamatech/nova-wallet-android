@@ -9,9 +9,10 @@ class QuotedPath<E>(
     val direction: SwapDirection,
     val path: Path<QuotedEdge<E>>,
     val roughFeeEstimation: PathRoughFeeEstimation,
+    val netAmountOut: BigInteger,
 ) : Comparable<QuotedPath<E>> {
 
-    private val amountOutAfterFees: BigInteger = lastSegmentQuote - roughFeeEstimation.inAssetOut
+    private val amountOutAfterFees: BigInteger = netAmountOut - roughFeeEstimation.inAssetOut
     private val amountInAfterFees: BigInteger = firstSegmentQuote + roughFeeEstimation.inAssetIn
 
     override fun compareTo(other: QuotedPath<E>): Int {

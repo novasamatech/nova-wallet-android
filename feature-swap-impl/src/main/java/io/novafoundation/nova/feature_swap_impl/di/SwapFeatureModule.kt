@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateF
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.exchangerA.ExchangerAAssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
@@ -80,6 +81,7 @@ class SwapFeatureModule {
     internal fun provideSwapService(
         assetConversionFactory: AssetConversionExchangeFactory,
         hydraDxExchangeFactory: HydraDxExchangeFactory,
+        exchangerA: ExchangerAAssetExchange,
         crossChainTransferAssetExchangeFactory: CrossChainTransferAssetExchangeFactory,
         computationalCache: ComputationalCache,
         chainRegistry: ChainRegistry,
@@ -96,6 +98,7 @@ class SwapFeatureModule {
         return RealSwapService(
             assetConversionFactory = assetConversionFactory,
             hydraDxExchangeFactory = hydraDxExchangeFactory,
+            exchangerA = exchangerA,
             crossChainTransferFactory = crossChainTransferAssetExchangeFactory,
             computationalCache = computationalCache,
             chainRegistry = chainRegistry,

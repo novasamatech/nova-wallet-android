@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
-import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerATaoCatalogue
+import io.novafoundation.nova.feature_swap_impl.domain.exchanger.catalogue.ExchangerATaoCatalogue
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator

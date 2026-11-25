@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuotePreview
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -17,6 +18,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+
+enum class SwapAssetRole { PAY, RECEIVE, EITHER }
 
 interface SwapService {
 
@@ -31,7 +34,9 @@ interface SwapService {
 
     suspend fun sync(coroutineScope: CoroutineScope)
 
-    suspend fun assetsAvailableForSwap(computationScope: CoroutineScope): Flow<Set<FullChainAssetId>>
+    suspend fun assetsAvailableForSwap(computationScope: CoroutineScope, role: SwapAssetRole = SwapAssetRole.EITHER): Flow<Set<FullChainAssetId>>
+
+    suspend fun canSwap(pay: FullChainAssetId, receive: FullChainAssetId, metaAccountId: Long, scope: CoroutineScope): Boolean
 
     suspend fun availableSwapDirectionsFor(
         asset: Chain.Asset,
@@ -47,6 +52,9 @@ interface SwapService {
     ): Flow<Set<FullChainAssetId>>
 
     suspend fun hasAvailableSwapDirections(asset: Chain.Asset, computationScope: CoroutineScope): Flow<Boolean>
+
+    // TODO(NW-2502): Once Review supports ExternalSwapQuote, use quote() for both the form and Review and remove preview().
+    suspend fun preview(args: SwapQuoteArgs, computationSharingScope: CoroutineScope): SwapQuotePreview
 
     suspend fun quote(
         args: SwapQuoteArgs,

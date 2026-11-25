@@ -15,4 +15,10 @@ interface QuotableEdge : WeightedEdge<FullChainAssetId> {
         amount: BigInteger,
         direction: SwapDirection
     ): BigInteger
+
+    /** A floating-rate provider can return an estimate for both sides of a Receive request. */
+    suspend fun quoteAmounts(amount: BigInteger, direction: SwapDirection, isIntermediate: Boolean = false): QuotedAmounts =
+        QuotedAmounts(amount, quote(amount, direction))
 }
+
+data class QuotedAmounts(val specified: BigInteger, val counterpart: BigInteger)

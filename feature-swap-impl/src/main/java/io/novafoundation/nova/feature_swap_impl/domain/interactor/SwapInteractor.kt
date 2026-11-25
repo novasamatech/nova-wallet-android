@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuotePreview
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
@@ -113,6 +114,9 @@ class SwapInteractor internal constructor(
     ): UpdateSystem {
         return swapUpdateSystemFactory.create(chainFlow, state, coroutineScope)
     }
+
+    // TODO(NW-2502): Remove preview() when the form and Review both use quote() for ExternalSwapQuote.
+    suspend fun preview(args: SwapQuoteArgs, scope: CoroutineScope): SwapQuotePreview = swapService.preview(args, scope)
 
     suspend fun quote(quoteArgs: SwapQuoteArgs, computationalScope: CoroutineScope): Result<SwapQuote> {
         return swapService.quote(quoteArgs, computationalScope)

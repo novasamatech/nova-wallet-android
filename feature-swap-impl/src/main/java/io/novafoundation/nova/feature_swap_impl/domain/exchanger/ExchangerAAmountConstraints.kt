@@ -12,3 +12,6 @@ class ExchangerAAmountConstraints {
         maxFractionDigits = minOf(limits.maxFractionDigits, asset.precision.value)
     )
 }
+
+class ExchangerAAmountPrecisionExceeded(val constraints: DecimalInputConstraints.Bounded) :
+    IllegalArgumentException("Amount exceeds Exchanger A digit limits")
