@@ -344,7 +344,7 @@ class NovaUtilsMirrorInterceptorTest {
 
         const val MIRROR_CONNECT_TIMEOUT_MILLIS = 3_000
 
-        const val MIRROR_READ_TIMEOUT_MILLIS = 5_000
+        const val MIRROR_READ_TIMEOUT_MILLIS = 3_000
 
         const val STANDARD_TIMEOUT_MILLIS = 20_000
 

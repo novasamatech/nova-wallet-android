@@ -42,8 +42,9 @@ private const val TIMEOUT_SECONDS = 20L
 
 // Caps of the socket timeouts of a mirror attempt, shorter than an ordinary request's so that a dead mirror
 // delays the GitHub fallback less. They apply to each address of the mirror host in turn, not to the attempt as a whole
+// (the read timeout also bounds each TLS handshake), so with six addresses they must stay well under callers' own deadlines
 private const val NOVA_UTILS_MIRROR_CONNECT_TIMEOUT_SECONDS = 3L
-private const val NOVA_UTILS_MIRROR_READ_TIMEOUT_SECONDS = 5L
+private const val NOVA_UTILS_MIRROR_READ_TIMEOUT_SECONDS = 3L
 
 // How long the mirror is skipped after a network failure, so that a dead mirror is not waited for on every request
 private const val NOVA_UTILS_MIRROR_FAILURE_COOL_DOWN_SECONDS = 60L
