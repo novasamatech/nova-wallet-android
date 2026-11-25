@@ -10,16 +10,22 @@ import io.novafoundation.nova.common.view.bottomSheet.action.TextAction
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.common.view.bottomSheet.action.setupView
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingSiteKind
 
+/**
+ * The Bittensor notice names the built-in Bittensor staking and offers "Continue to site" at once;
+ * the notice for other staking sites reveals it after "Advanced".
+ */
 class DAppStakingNoticeBottomSheet(
     context: Context,
+    private val kind: DAppStakingSiteKind,
     private val onGoToStaking: () -> Unit,
     private val onContinueToSite: () -> Unit,
 ) : BaseBottomSheet<BottomSheetActionBinding>(context) {
 
     override val binder: BottomSheetActionBinding = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
 
-    private var continueRevealed = false
+    private var continueRevealed = kind == DAppStakingSiteKind.BITTENSOR
 
     init {
         bindContent()
@@ -30,7 +36,7 @@ class DAppStakingNoticeBottomSheet(
             payload = ActionBottomSheetPayload(
                 imageRes = R.drawable.ic_info_24,
                 title = context.getString(R.string.dapp_staking_notice_title),
-                subtitle = context.getString(R.string.dapp_staking_notice_message),
+                subtitle = context.getString(messageRes()),
                 actionButtonPreferences = ButtonPreferences.primary(context.getString(R.string.common_go_to_staking)) {
                     dismiss()
                     onGoToStaking()
@@ -49,6 +55,13 @@ class DAppStakingNoticeBottomSheet(
         } else {
             continueRevealed = true
             bindContent()
+        }
+    }
+
+    private fun messageRes(): Int {
+        return when (kind) {
+            DAppStakingSiteKind.BITTENSOR -> R.string.dapp_staking_notice_bittensor_message
+            DAppStakingSiteKind.THIRD_PARTY_STAKING, DAppStakingSiteKind.NONE -> R.string.dapp_staking_notice_message
         }
     }
 

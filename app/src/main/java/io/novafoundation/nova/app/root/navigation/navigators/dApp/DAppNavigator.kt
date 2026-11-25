@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.dApp
 
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.FragmentNavigator
+import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -14,6 +15,17 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBr
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
+
+/**
+ * The dashboard resolves the target as it does for a staking deep link: positions for a wallet with a stake,
+ * start staking otherwise, and it stays on the dashboard when Bittensor is not there.
+ */
+internal fun bittensorStakingTarget(source: StakingFlowSource): StakingDeepLinkTarget {
+    return StakingDeepLinkTarget(chainId = ChainGeneses.BITTENSOR, assetId = UTILITY_ASSET_ID, source = source)
+}
 
 class DAppNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
@@ -79,10 +91,18 @@ class DAppNavigator(
     }
 
     override fun openStaking() {
+        openStakingDashboard(target = null)
+    }
+
+    override fun openBittensorStaking(source: StakingFlowSource) {
+        openStakingDashboard(bittensorStakingTarget(source))
+    }
+
+    private fun openStakingDashboard(target: StakingDeepLinkTarget?) {
         navigationBuilder().action(R.id.action_open_split_screen)
             .navigateInRoot()
 
-        stakingDashboardRouter.openStakingDashboard()
+        stakingDashboardRouter.openStakingDashboard(target)
     }
 
     private fun NavigationBuilder.setDappAnimations(): NavigationBuilder {
