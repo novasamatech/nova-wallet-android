@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.data.exchanger
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.catalogue.RealExchangerATaoCatalogue
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -86,10 +85,9 @@ class ExchangerACatalogueTest {
     @Test
     fun `pair check uses current send and receive flags and rejects the reverse direction`() = runBlocking {
         respond(remote(usdt), remote(tao))
-        assertTrue(catalogue.supportsPair(usdt.fullId, tao.fullId))
-        assertFalse(catalogue.supportsPair(tao.fullId, usdt.fullId))
+        assertEquals(listOf(usdt to tao), catalogue.availablePairs().map { it.assetIn to it.assetOut })
         respond(remote(usdt, send = false), remote(tao))
-        assertFalse(catalogue.supportsPair(usdt.fullId, tao.fullId))
+        assertTrue(catalogue.availablePairs().isEmpty())
     }
 
     @Test

@@ -3,12 +3,10 @@ package io.novafoundation.nova.feature_swap_impl.data.exchanger
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.asPrecision
-import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAQuoteArgs
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAAmountConstraints
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAQuoteResult
-import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.test_shared.any
@@ -30,8 +28,6 @@ import kotlin.time.Duration.Companion.minutes
 class ExchangerAQuoteRepositoryTest {
 
     private val gson = Gson()
-
-    private val currency = mock(Currency::class.java)
 
     private val assetIn = asset("asset-hub", 1, 6)
 
@@ -58,7 +54,6 @@ class ExchangerAQuoteRepositoryTest {
         val result = repository.quote(args) as ExchangerAQuoteResult.Quote
 
         assertSame(args, result.args)
-        assertEquals(42L, result.args.metaAccountId)
         assertSame(assetIn, result.amountIn.chainAsset)
         assertSame(assetOut, result.amountOut.chainAsset)
         assertEquals(BigInteger("100000000"), result.amountIn.amount)
@@ -132,7 +127,7 @@ class ExchangerAQuoteRepositoryTest {
 
     @Test
     fun `same asset request is rejected before HTTP`() = runBlocking {
-        val args = args().let { it.copy(tokenOut = it.tokenIn) }
+        val args = args().let { it.copy(assetOut = it.assetIn) }
 
         assertTrue(runCatching { repository.quote(args) }.exceptionOrNull() is IllegalArgumentException)
         verifyNoInteractions(source)
@@ -243,14 +238,13 @@ class ExchangerAQuoteRepositoryTest {
 
     private fun remote(json: String = QUOTE): ExchangerAQuoteRemote = gson.fromJson(json, ExchangerAQuoteRemote::class.java)
 
-    private fun args(amount: String = "100", direction: SwapDirection = SwapDirection.SPECIFIED_IN): SwapQuoteArgs {
+    private fun args(amount: String = "100", direction: SwapDirection = SwapDirection.SPECIFIED_IN): ExchangerAQuoteArgs {
         val specifiedAsset = if (direction == SwapDirection.SPECIFIED_IN) assetIn else assetOut
-        return SwapQuoteArgs(
-            tokenIn = Token(currency, null, assetIn),
-            tokenOut = Token(currency, null, assetOut),
+        return ExchangerAQuoteArgs(
+            assetIn = assetIn,
+            assetOut = assetOut,
             amount = specifiedAsset.planksFromAmount(amount.toBigDecimal()),
-            swapDirection = direction,
-            metaAccountId = 42L
+            swapDirection = direction
         )
     }
 

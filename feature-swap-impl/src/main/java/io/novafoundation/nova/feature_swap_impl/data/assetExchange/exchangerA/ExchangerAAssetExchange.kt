@@ -20,13 +20,10 @@ import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAQuote
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.feature_swap_impl.domain.swap.QuoteProviderException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
-
-class ExchangerAUnavailable(cause: Exception) : Exception(cause)
-
-class ExchangerAPayLimit(val result: ExchangerAQuoteResult.OutOfRange) : Exception()
 
 class ExchangerAAssetExchange @Inject constructor(
     private val catalogue: ExchangerATaoCatalogue,
@@ -50,9 +47,9 @@ class ExchangerAAssetExchange @Inject constructor(
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (precision: ExchangerAAmountPrecisionExceeded) {
-        throw precision
+        throw QuoteProviderException.AmountPrecisionExceeded(precision.constraints)
     } catch (error: Exception) {
-        throw ExchangerAUnavailable(error)
+        throw QuoteProviderException.Unavailable(error)
     }
 
     private inner class ExchangerAEdge(private val pair: ExchangerASwapPair) : SwapGraphEdge {
@@ -86,7 +83,10 @@ class ExchangerAAssetExchange @Inject constructor(
             val requestAmount = if (isIntermediate) intermediateAmount(amount, direction) else amount
             val result = request { quotes.quote(ExchangerAQuoteArgs(pair.assetIn, pair.assetOut, requestAmount, direction)) }
             return when (result) {
-                is ExchangerAQuoteResult.OutOfRange -> throw ExchangerAPayLimit(result)
+                is ExchangerAQuoteResult.OutOfRange -> throw when (result.reason) {
+                    ExchangerAQuoteResult.OutOfRange.Reason.BELOW_MINIMUM -> QuoteProviderException.DepositLimit.BelowMinimum(pair.assetIn, result.limits.min)
+                    ExchangerAQuoteResult.OutOfRange.Reason.ABOVE_MAXIMUM -> QuoteProviderException.DepositLimit.AboveMaximum(pair.assetIn, result.limits.max)
+                }
                 is ExchangerAQuoteResult.Quote -> when (direction) {
                     SwapDirection.SPECIFIED_IN -> QuotedAmounts(result.amountIn.amount, result.amountOut.amount)
                     SwapDirection.SPECIFIED_OUT -> QuotedAmounts(result.amountOut.amount, result.amountIn.amount)
