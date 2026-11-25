@@ -11,6 +11,8 @@ import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ResponseBody.Companion.asResponseBody
+import okio.Buffer
 
 private const val GITHUB_RAW_SCHEME = "https"
 private const val GITHUB_RAW_HOST = "raw.githubusercontent.com"
@@ -28,6 +30,9 @@ private val MIRROR_ANSWER_CODES = setOf(HTTP_OK, HTTP_NOT_MODIFIED)
 
 // OkHttp's value of a timeout that never expires.
 private const val NO_TIMEOUT = 0
+
+// Value of "skip until" while no cool-down is in force and every request may try the mirror.
+private const val MIRROR_NOT_SKIPPED = Long.MIN_VALUE
 
 private const val LOG_TAG = "[NovaUtilsMirror]"
 
@@ -63,24 +68,31 @@ private fun List<String>.startsWith(prefix: List<String>): Boolean {
  * Reads nova-utils `master` files from the nova-infra config mirror and falls back to GitHub per request.
  *
  * Callers keep requesting the raw GitHub URL. A GET or HEAD for a nova-utils `master` file is first sent
- * to the mirror, on the same client and with capped socket timeouts. The mirror's own 200 or 304 is returned.
- * Any other status, a redirected answer or a network failure makes the original GitHub request proceed as
- * before, with its own timeouts. A mirror 404 is not final: the file may be newer than the mirror's copy.
- * Every other request passes through untouched.
+ * to the mirror, on the same client and with capped socket timeouts. The mirror's own 200 or 304 is returned
+ * once its body has been read. Any other status, a redirected answer, a network failure or a body that fails
+ * while it is read makes the original GitHub request proceed as before, with its own timeouts. A mirror 404
+ * is not final: the file may be newer than the mirror's copy. Every other request passes through untouched.
  *
- * After a network failure the mirror is skipped for [failureCoolDownMillis]. A status does not start this
- * cool-down: it is quick and concerns one file. One instance serves every client it is registered on (the
- * shared client and the image loader's client), so they share the cool-down; a client without it keeps
- * reading GitHub. It must stay an application interceptor: it proceeds twice and adjusts timeouts.
+ * A failed attempt that kept the request waiting for at least [mirrorConnectTimeoutMillis] starts a cool-down
+ * during which the mirror is skipped. It lasts [failureCoolDownMillis] and doubles, up to
+ * [maxFailureCoolDownMillis], each time the mirror fails that way again. When it ends, one request probes
+ * the mirror while the others keep reading GitHub; the mirror's answer over the network ends it for all.
+ * A quick failure (no connectivity, a refused connection) and a status only fall back. Cache-only requests
+ * cost no network and are never skipped: files cached from the mirror are stored under its URL.
+ *
+ * One instance serves every client it is registered on (the shared client and the image loader's client),
+ * so they share the cool-down; a client without it keeps reading GitHub. It must stay an application
+ * interceptor: it proceeds twice and adjusts timeouts. [TimeHeaderInterceptor] must come before it,
+ * otherwise it re-applies the header timeouts inside the mirror attempt and the cap is lost.
  *
  * Known limits, accepted for the sake of a simple interceptor:
  * - The timeouts bound each socket operation, not the mirror attempt as a whole. OkHttp tries every address
- *   of the mirror host in turn, so the first request to an unreachable mirror waits one connect timeout per
- *   address before it falls back - or one read timeout per address when they accept the connection and then
- *   stall the TLS handshake. The cool-down keeps later requests from repeating that wait. A caller that gives
- *   up earlier cancels the call, which neither falls back nor starts the cool-down.
- * - Only the status line decides. A mirror 200 whose body then fails while it is being read is an error for
- *   that request, and [mirrorReadTimeoutMillis] stays in force for that body.
+ *   of the mirror host in turn, so a request to an unreachable mirror waits up to one connect timeout plus
+ *   one read timeout (the TLS handshake) per address before it falls back. Every request already in flight
+ *   when the mirror stops answering pays that wait once. A caller that gives up earlier cancels the call,
+ *   which does not fall back; its retry does, because the cool-down has started.
+ * - The cool-down lives in memory. After a cold start the mirror is tried by the first requests again.
+ * - The mirror body is held in memory before it is returned; nova-utils files and icons are small.
  *
  * [mirrorBaseUrl] is a build constant and not `infraUrl` of the global config (see `InfrastructureUrls`),
  * because that config is itself a nova-utils file read through the mirror. Both must name the same host.
@@ -95,29 +107,42 @@ class NovaUtilsMirrorInterceptor(
     private val mirrorConnectTimeoutMillis: Int,
     private val mirrorReadTimeoutMillis: Int,
     private val failureCoolDownMillis: Long,
+    private val maxFailureCoolDownMillis: Long,
     private val elapsedRealtimeMillis: () -> Long,
     private val logger: Logger
 ) : Interceptor {
 
-    private val skipMirrorUntilMillis = AtomicLong(Long.MIN_VALUE)
+    private val skipMirrorUntilMillis = AtomicLong(MIRROR_NOT_SKIPPED)
+
+    private val nextCoolDownMillis = AtomicLong(failureCoolDownMillis)
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val mirrorRequest = mirrorRequestFor(request)
-        if (mirrorRequest == null || isCoolingDown()) return chain.proceed(request)
+        val mirrorRequest = mirrorRequestFor(request) ?: return chain.proceed(request)
+        val admission = admitMirrorAttempt(request) ?: return chain.proceed(request)
 
+        val startedMillis = elapsedRealtimeMillis()
         val mirrorResponse = try {
-            proceedWithMirror(chain, mirrorRequest)
+            val response = proceedWithMirror(chain, mirrorRequest)
+            if (rejectionReasonOf(response) == null) response.withBodyInMemory() else response
         } catch (mirrorFailure: IOException) {
+            // Only a failure that kept the request waiting is worth avoiding next time.
+            val keptWaiting = elapsedRealtimeMillis() - startedMillis >= mirrorConnectTimeoutMillis
+            if (keptWaiting) startCoolDown(admission, mirrorFailure)
+
             // A cancelled call fails here as well; it must not start another request.
             if (chain.call().isCanceled()) throw mirrorFailure
 
             logFallback(request, reason = mirrorFailure.javaClass.simpleName)
-            startCoolDown(mirrorFailure)
             return proceedAfterMirrorFailure(chain, request, mirrorFailure)
         }
 
-        val rejectionReason = rejectionReasonOf(mirrorResponse) ?: return mirrorResponse
+        val rejectionReason = rejectionReasonOf(mirrorResponse)
+        if (rejectionReason == null) {
+            // An answer from the cache says nothing about the mirror being reachable.
+            if (mirrorResponse.networkResponse != null) endCoolDown()
+            return mirrorResponse
+        }
 
         // OkHttp refuses to proceed again while the previous response is still open.
         mirrorResponse.close()
@@ -132,6 +157,22 @@ class NovaUtilsMirrorInterceptor(
         return request.newBuilder().url(mirrorUrl).build()
     }
 
+    /**
+     * The "skip until" value under which [request] may try the mirror, or null while the mirror is skipped.
+     */
+    private fun admitMirrorAttempt(request: Request): Long? {
+        val skipUntilMillis = skipMirrorUntilMillis.get()
+        if (skipUntilMillis == MIRROR_NOT_SKIPPED || request.cacheControl.onlyIfCached) return skipUntilMillis
+
+        val now = elapsedRealtimeMillis()
+        if (now < skipUntilMillis) return null
+
+        // The cool-down has ended. The request that moves it forward probes the mirror; the others keep reading
+        // GitHub until the probe has reported back, which takes less than a cool-down.
+        val probeUntilMillis = now + failureCoolDownMillis
+        return probeUntilMillis.takeIf { skipMirrorUntilMillis.compareAndSet(skipUntilMillis, it) }
+    }
+
     private fun proceedWithMirror(chain: Interceptor.Chain, mirrorRequest: Request): Response {
         val connectTimeoutMillis = cappedTimeout(chain.connectTimeoutMillis(), mirrorConnectTimeoutMillis)
         val readTimeoutMillis = cappedTimeout(chain.readTimeoutMillis(), mirrorReadTimeoutMillis)
@@ -144,6 +185,17 @@ class NovaUtilsMirrorInterceptor(
 
     private fun cappedTimeout(requestTimeoutMillis: Int, capMillis: Int): Int {
         return if (requestTimeoutMillis == NO_TIMEOUT) capMillis else min(requestTimeoutMillis, capMillis)
+    }
+
+    /**
+     * Reads the body now, while a failure can still be answered by GitHub. It is empty for HEAD and 304.
+     */
+    private fun Response.withBodyInMemory(): Response {
+        val body = body ?: return this
+        val content = Buffer()
+        body.use { content.writeAll(it.source()) }
+
+        return newBuilder().body(content.asResponseBody(body.contentType(), content.size)).build()
     }
 
     /**
@@ -167,17 +219,22 @@ class NovaUtilsMirrorInterceptor(
         }
     }
 
-    private fun isCoolingDown(): Boolean = elapsedRealtimeMillis() < skipMirrorUntilMillis.get()
+    /**
+     * @param admission the value [admitMirrorAttempt] gave the failed attempt. Requests that were in flight
+     * together fail one after another; only the first of them starts the cool-down and makes the next one longer.
+     */
+    private fun startCoolDown(admission: Long, mirrorFailure: IOException) {
+        val coolDownMillis = nextCoolDownMillis.get()
+        val skipUntilMillis = elapsedRealtimeMillis() + coolDownMillis
+        if (!skipMirrorUntilMillis.compareAndSet(admission, skipUntilMillis)) return
 
-    private fun startCoolDown(mirrorFailure: IOException) {
-        val now = elapsedRealtimeMillis()
-        val previousSkipUntil = skipMirrorUntilMillis.getAndSet(now + failureCoolDownMillis)
+        nextCoolDownMillis.set(min(coolDownMillis * 2, maxFailureCoolDownMillis))
+        logger.log("$LOG_TAG Mirror skipped for $coolDownMillis ms after ${mirrorFailure.javaClass.simpleName}")
+    }
 
-        // Requests already in flight when the mirror went down fail one after another; announce it once.
-        val wasCoolingDown = now < previousSkipUntil
-        if (!wasCoolingDown) {
-            logger.log("$LOG_TAG Mirror skipped for $failureCoolDownMillis ms after ${mirrorFailure.javaClass.simpleName}")
-        }
+    private fun endCoolDown() {
+        skipMirrorUntilMillis.set(MIRROR_NOT_SKIPPED)
+        nextCoolDownMillis.set(failureCoolDownMillis)
     }
 
     private fun logFallback(request: Request, reason: String) {

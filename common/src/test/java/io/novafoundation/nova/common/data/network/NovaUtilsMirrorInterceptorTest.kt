@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.data.network
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import okhttp3.CacheControl
 import okhttp3.Headers
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
@@ -15,6 +16,8 @@ import okhttp3.ResponseBody
 import okio.Buffer
 import okio.BufferedSource
 import okio.ForwardingSource
+import okio.Source
+import okio.Timeout
 import okio.buffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -26,18 +29,33 @@ class NovaUtilsMirrorInterceptorTest {
 
     private sealed interface Answer {
 
-        class Status(val code: Int, val body: String = "", val afterRedirect: Boolean = false) : Answer
+        class Status(
+            val code: Int,
+            val body: String = "",
+            val afterRedirect: Boolean = false,
+            val fromCache: Boolean = false,
+            val bodyFailure: IOException? = null
+        ) : Answer
 
         class Failure(val error: IOException) : Answer
 
         object CallCancelled : Answer
     }
 
-    private class TrackedBody(text: String) : ResponseBody() {
+    private class FailingSource(private val failure: IOException) : Source {
+
+        override fun read(sink: Buffer, byteCount: Long): Long = throw failure
+
+        override fun timeout() = Timeout.NONE
+
+        override fun close() = Unit
+    }
+
+    private class TrackedBody(content: Source) : ResponseBody() {
 
         var closed = false
 
-        private val source = object : ForwardingSource(Buffer().writeUtf8(text)) {
+        private val source = object : ForwardingSource(content) {
             override fun close() {
                 closed = true
                 super.close()
@@ -79,12 +97,13 @@ class NovaUtilsMirrorInterceptorTest {
                     throw IOException("Canceled")
                 }
                 is Answer.Status -> {
-                    val body = TrackedBody(answer.body)
+                    val body = TrackedBody(answer.bodyFailure?.let(::FailingSource) ?: Buffer().writeUtf8(answer.body))
                     attempt.body = body
                     val response = Response.Builder().request(request).protocol(Protocol.HTTP_1_1).message("test")
                     val redirect = if (answer.afterRedirect) response.code(302).build() else null
+                    val networkResponse = if (answer.fromCache) null else response.code(answer.code).build()
 
-                    response.code(answer.code).body(body).priorResponse(redirect).build()
+                    response.code(answer.code).body(body).priorResponse(redirect).networkResponse(networkResponse).build()
                 }
             }
         }
@@ -114,6 +133,7 @@ class NovaUtilsMirrorInterceptorTest {
         mirrorConnectTimeoutMillis = MIRROR_CONNECT_TIMEOUT_MILLIS,
         mirrorReadTimeoutMillis = MIRROR_READ_TIMEOUT_MILLIS,
         failureCoolDownMillis = COOL_DOWN_MILLIS,
+        maxFailureCoolDownMillis = MAX_COOL_DOWN_MILLIS,
         elapsedRealtimeMillis = { elapsedRealtimeMillis },
         logger = logger
     )
@@ -133,6 +153,21 @@ class NovaUtilsMirrorInterceptorTest {
     private fun read(url: String = CHAINS_URL): String = execute(get(url)).use { it.body!!.string() }
 
     private fun mirrored(gitHubUrl: String): String? = novaUtilsMirrorUrl(gitHubUrl.toHttpUrl(), mirrorBaseUrl)?.toString()
+
+    private fun mirrorAttempts() = backend.attempts.count { it.request.url.host == MIRROR_HOST }
+
+    private fun coolDownLogs() = logger.messages.filter { "skipped" in it }
+
+    /** The mirror keeps a request waiting for [SLOW_ATTEMPT_MILLIS] before it gives [answer]. */
+    private fun mirrorIsSlow(answer: Answer = Answer.Failure(IOException("connect timed out"))) {
+        backend.mirror = answer
+        backend.onMirrorAttempt = { elapsedRealtimeMillis += SLOW_ATTEMPT_MILLIS }
+    }
+
+    private fun mirrorRecovers() {
+        backend.mirror = Answer.Status(200, "mirror")
+        backend.onMirrorAttempt = {}
+    }
 
     @Test
     fun `nova-utils master files map to the mirror base plus the unchanged file path`() {
@@ -182,10 +217,13 @@ class NovaUtilsMirrorInterceptorTest {
     fun `mirror 200 and 304 are used and GitHub is not called`() {
         val request = Request.Builder().url(CHAINS_URL).header("If-None-Match", "\"etag\"").tag(String::class.java, "tag").build()
 
-        val ok = execute(request).use { it.body!!.string() }
+        val okResponse = execute(request)
+        val bodyReadBeforeAnswer = backend.attempts.single().body!!.closed
+        val ok = okResponse.use { it.body!!.string() }
         backend.mirror = Answer.Status(304)
         val notModified = execute(request.newBuilder().head().build()).use { it.code }
 
+        assertTrue(bodyReadBeforeAnswer)
         assertEquals("mirror", ok)
         assertEquals(304, notModified)
         assertEquals(listOf(CHAINS_MIRROR_URL, CHAINS_MIRROR_URL), backend.urls)
@@ -226,10 +264,10 @@ class NovaUtilsMirrorInterceptorTest {
     }
 
     @Test
-    fun `mirror network failure falls back to GitHub and skips the mirror until the cool-down ends`() {
-        backend.mirror = Answer.Failure(IOException("connection refused"))
+    fun `slow mirror failure falls back to GitHub and skips the mirror until the cool-down ends`() {
+        mirrorIsSlow()
         val afterFailure = read()
-        backend.mirror = Answer.Status(200, "mirror")
+        mirrorRecovers()
 
         elapsedRealtimeMillis += COOL_DOWN_MILLIS - 1
         val duringCoolDown = listOf(read(), read("$GITHUB_MASTER/icons/tokens/white/v1/DOT.svg"))
@@ -237,28 +275,106 @@ class NovaUtilsMirrorInterceptorTest {
         val afterCoolDown = read()
 
         assertEquals(listOf("github", "github", "github", "mirror"), listOf(afterFailure) + duringCoolDown + afterCoolDown)
-        assertEquals(2, backend.attempts.count { it.request.url.host == MIRROR_HOST })
+        assertEquals(2, mirrorAttempts())
         assertEquals(
             listOf(
-                "[NovaUtilsMirror] GitHub fallback for $CHAINS_GITHUB_PATH: IOException",
-                "[NovaUtilsMirror] Mirror skipped for $COOL_DOWN_MILLIS ms after IOException"
+                "[NovaUtilsMirror] Mirror skipped for $COOL_DOWN_MILLIS ms after IOException",
+                "[NovaUtilsMirror] GitHub fallback for $CHAINS_GITHUB_PATH: IOException"
             ),
             logger.messages
         )
     }
 
     @Test
-    fun `failure of a request that was in flight when the cool-down started does not announce it again`() {
-        backend.mirror = Answer.Failure(IOException("connection refused"))
-        // Another request fails and starts the cool-down while the first mirror attempt is still in flight
+    fun `quick mirror failure falls back to GitHub without a cool-down`() {
+        backend.mirror = Answer.Failure(IOException("no address associated with hostname"))
+        backend.onMirrorAttempt = { elapsedRealtimeMillis += SLOW_ATTEMPT_MILLIS - 1 }
+
+        val bodies = listOf(read(), read())
+
+        assertEquals(listOf("github", "github"), bodies)
+        assertEquals(2, mirrorAttempts())
+        assertTrue(coolDownLogs().isEmpty())
+    }
+
+    @Test
+    fun `mirror body that fails while it is read falls back to GitHub`() {
+        mirrorIsSlow(Answer.Status(200, bodyFailure = IOException("timeout")))
+
+        val bodies = listOf(read(), read())
+
+        assertEquals(listOf("github", "github"), bodies)
+        assertTrue(backend.attempts.first().body!!.closed)
+        assertEquals("a slow body failure starts the cool-down", 1, mirrorAttempts())
+    }
+
+    @Test
+    fun `cache-only request asks the mirror during a cool-down and does not end it`() {
+        mirrorIsSlow()
+        read()
+        backend.mirror = Answer.Status(200, "cached", fromCache = true)
+        val cacheOnly = Request.Builder().url(CHAINS_URL).cacheControl(CacheControl.FORCE_CACHE).build()
+
+        val fromCache = execute(cacheOnly).use { it.body!!.string() }
+        val afterwards = read()
+
+        assertEquals("cached", fromCache)
+        assertEquals("github", afterwards)
+    }
+
+    @Test
+    fun `cool-down doubles while the mirror keeps failing and starts over after its answer`() {
+        val coolDowns = listOf(COOL_DOWN_MILLIS, COOL_DOWN_MILLIS * 2, MAX_COOL_DOWN_MILLIS, MAX_COOL_DOWN_MILLIS)
+
+        mirrorIsSlow()
+        coolDowns.forEach { coolDown ->
+            read()
+            elapsedRealtimeMillis += coolDown
+        }
+        mirrorRecovers()
+        val recovered = listOf(read(), read())
+        mirrorIsSlow()
+        read()
+
+        assertEquals(listOf("mirror", "mirror"), recovered)
+        assertEquals(
+            (coolDowns + COOL_DOWN_MILLIS).map { "[NovaUtilsMirror] Mirror skipped for $it ms after IOException" },
+            coolDownLogs()
+        )
+    }
+
+    @Test
+    fun `one request probes the mirror after the cool-down while the others read GitHub`() {
+        mirrorIsSlow()
+        read()
+        elapsedRealtimeMillis += COOL_DOWN_MILLIS
+        mirrorRecovers()
+        var duringProbe = ""
         backend.onMirrorAttempt = {
             backend.onMirrorAttempt = {}
+            duringProbe = read("$GITHUB_MASTER/a.json")
+        }
+
+        val probe = read()
+        val afterProbe = read()
+
+        assertEquals(listOf("mirror", "github", "mirror"), listOf(probe, duringProbe, afterProbe))
+    }
+
+    @Test
+    fun `failure of a request that was in flight when the cool-down started does not start it again`() {
+        mirrorIsSlow()
+        val failsSlowly = backend.onMirrorAttempt
+        // Another request fails and starts the cool-down while the first mirror attempt is still in flight
+        backend.onMirrorAttempt = {
+            backend.onMirrorAttempt = failsSlowly
             read("$GITHUB_MASTER/a.json")
+            failsSlowly()
         }
 
         read()
 
-        assertEquals(1, logger.messages.count { "skipped" in it })
+        assertEquals(listOf("[NovaUtilsMirror] Mirror skipped for $COOL_DOWN_MILLIS ms after IOException"), coolDownLogs())
     }
 
     @Test
@@ -275,17 +391,20 @@ class NovaUtilsMirrorInterceptorTest {
     }
 
     @Test
-    fun `cancelled call is rethrown without a fallback or a cool-down`() {
+    fun `cancelled call is rethrown without a fallback and starts the cool-down only after a slow attempt`() {
         backend.mirror = Answer.CallCancelled
+        val quicklyCancelled = runCatching { read() }.exceptionOrNull()
+        mirrorRecovers()
+        val afterQuickCancel = read()
 
-        val thrown = runCatching { read() }.exceptionOrNull()
-        backend.mirror = Answer.Status(200, "mirror")
-        val next = read()
+        mirrorIsSlow(Answer.CallCancelled)
+        val slowlyCancelled = runCatching { read() }.exceptionOrNull()
+        mirrorRecovers()
+        val afterSlowCancel = read()
 
-        assertTrue(thrown is IOException)
-        assertEquals(listOf(CHAINS_MIRROR_URL, CHAINS_MIRROR_URL), backend.urls)
-        assertEquals("mirror", next)
-        assertTrue(logger.messages.isEmpty())
+        assertTrue(quicklyCancelled is IOException && slowlyCancelled is IOException)
+        assertEquals(listOf("mirror", "github"), listOf(afterQuickCancel, afterSlowCancel))
+        assertEquals(listOf(CHAINS_MIRROR_URL, CHAINS_MIRROR_URL, CHAINS_MIRROR_URL, CHAINS_URL), backend.urls)
     }
 
     @Test
@@ -342,7 +461,12 @@ class NovaUtilsMirrorInterceptorTest {
 
         const val COOL_DOWN_MILLIS = 60_000L
 
+        const val MAX_COOL_DOWN_MILLIS = COOL_DOWN_MILLIS * 4
+
         const val MIRROR_CONNECT_TIMEOUT_MILLIS = 3_000
+
+        // An attempt that lasted as long as the connect cap kept the request waiting
+        const val SLOW_ATTEMPT_MILLIS = MIRROR_CONNECT_TIMEOUT_MILLIS.toLong()
 
         const val MIRROR_READ_TIMEOUT_MILLIS = 3_000
 

@@ -41,13 +41,14 @@ private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MiB
 private const val TIMEOUT_SECONDS = 20L
 
 // Caps of the socket timeouts of a mirror attempt, shorter than an ordinary request's so that a dead mirror
-// delays the GitHub fallback less. They apply to each address of the mirror host in turn, not to the attempt as a whole
-// (the read timeout also bounds each TLS handshake), so with six addresses they must stay well under callers' own deadlines
+// delays the GitHub fallback less. They apply to each address of the mirror host in turn and the read timeout also
+// bounds each TLS handshake, so they must stay well under callers' own deadlines: see "Known limits" of NovaUtilsMirrorInterceptor
 private const val NOVA_UTILS_MIRROR_CONNECT_TIMEOUT_SECONDS = 3L
 private const val NOVA_UTILS_MIRROR_READ_TIMEOUT_SECONDS = 3L
 
-// How long the mirror is skipped after a network failure, so that a dead mirror is not waited for on every request
+// How long the mirror is skipped after it kept a request waiting and failed. Doubles while it keeps failing, up to the maximum
 private const val NOVA_UTILS_MIRROR_FAILURE_COOL_DOWN_SECONDS = 60L
+private const val NOVA_UTILS_MIRROR_MAX_FAILURE_COOL_DOWN_MINUTES = 30L
 
 private const val SOCKET_CONNECTION_TIMEOUT = 5_000
 
@@ -96,6 +97,7 @@ class NetworkModule {
             mirrorConnectTimeoutMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_CONNECT_TIMEOUT_SECONDS).toInt(),
             mirrorReadTimeoutMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_READ_TIMEOUT_SECONDS).toInt(),
             failureCoolDownMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_FAILURE_COOL_DOWN_SECONDS),
+            maxFailureCoolDownMillis = TimeUnit.MINUTES.toMillis(NOVA_UTILS_MIRROR_MAX_FAILURE_COOL_DOWN_MINUTES),
             elapsedRealtimeMillis = SystemClock::elapsedRealtime,
             logger = logger
         )
@@ -114,6 +116,8 @@ class NetworkModule {
             .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .cache(Cache(File(context.cacheDir, HTTP_CACHE), CACHE_SIZE))
             .retryOnConnectionFailure(true)
+            // Order matters: TimeHeaderInterceptor first, otherwise it re-applies the header timeouts inside the mirror
+            // attempt and the cap is lost
             .addInterceptor(TimeHeaderInterceptor())
             .addInterceptor(novaUtilsMirrorInterceptor)
 
