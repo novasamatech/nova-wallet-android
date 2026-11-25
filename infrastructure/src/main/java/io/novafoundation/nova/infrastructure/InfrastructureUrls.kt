@@ -11,9 +11,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
  * Read from the global remote config (`infraUrl`) rather than baked into the build, so the backend can
  * move without an app release, and dev and release builds follow their own config file.
  *
- * The one exception is the nova-utils config mirror (`NovaUtilsMirrorInterceptor`, `NOVA_UTILS_MIRROR_URL` in
- * `common/build.gradle`): the global config is read through it, so its address is a build constant that has to
- * name the same host as `infraUrl`. A build whose mirror host no longer serves reads those files from GitHub.
+ * The one exception is the address of the nova-utils config mirror, see `NovaUtilsMirrorInterceptor`.
  */
 fun interface InfrastructureUrls {
 
