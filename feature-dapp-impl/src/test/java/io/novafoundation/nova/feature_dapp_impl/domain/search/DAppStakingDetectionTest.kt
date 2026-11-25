@@ -51,6 +51,81 @@ class DAppStakingDetectionTest {
     }
 
     @Test
+    fun `should detect TAO related hosts`() {
+        val bittensorHosts = listOf(
+            "taostats.io",
+            "dash.taostats.io",
+            "tao.app",
+            "www.tao.app",
+            "tensorwallet.ca",
+            "mentatminds.com",
+            "mentatlend.com",
+            "taoswap.org",
+            "taomarketcap.com",
+            "backprop.finance",
+            "tao.com",
+            "tao.bot",
+            "potatao.io",
+            "taoyield.com",
+            "bittensor.com",
+            "bridge.bittensor.com",
+            "delegate.tensorplex.ai",
+            "TAOSTATS.IO"
+        )
+
+        bittensorHosts.forEach { host ->
+            assertTrue(host, DAppStakingDetection.isBittensorHost(host))
+        }
+    }
+
+    @Test
+    fun `should not detect unrelated hosts as TAO related`() {
+        val otherHosts = listOf(
+            "taobao.com",
+            "www.taobao.com",
+            "tensor.trade",
+            "tensorflow.org",
+            "web.subwallet.app",
+            "staking.polkadot.cloud",
+            "app.hydration.net",
+            null,
+            ""
+        )
+
+        otherHosts.forEach { host ->
+            assertFalse(host, DAppStakingDetection.isBittensorHost(host))
+        }
+    }
+
+    @Test
+    fun `should detect TAO related queries by words`() {
+        val bittensorQueries = listOf("tao", "TAO staking", "bittensor", "taostats", "dtao", "taostats.io")
+
+        bittensorQueries.forEach { query ->
+            assertTrue(query, DAppStakingDetection.isBittensorQuery(query))
+        }
+    }
+
+    @Test
+    fun `should not detect unrelated queries as TAO related`() {
+        val otherQueries = listOf("taobao", "tensor", "polkadot staking", "mistake", "", null)
+
+        otherQueries.forEach { query ->
+            assertFalse(query, DAppStakingDetection.isBittensorQuery(query))
+        }
+    }
+
+    @Test
+    fun `should prefer TAO over staking for a query matching both`() {
+        assertEquals(DAppStakingQueryKind.BITTENSOR, DAppStakingDetection.queryKind("TAO staking"))
+        assertEquals(DAppStakingQueryKind.BITTENSOR, DAppStakingDetection.queryKind("tao"))
+        assertEquals(DAppStakingQueryKind.STAKING, DAppStakingDetection.queryKind("polkadot staking"))
+        assertEquals(DAppStakingQueryKind.NONE, DAppStakingDetection.queryKind("hydration"))
+        assertEquals(DAppStakingQueryKind.NONE, DAppStakingDetection.queryKind(""))
+        assertEquals(DAppStakingQueryKind.NONE, DAppStakingDetection.queryKind(null))
+    }
+
+    @Test
     fun `should normalize host by dropping www and case`() {
         assertEquals("example.com", DAppStakingDetection.normalizeHost("WWW.Example.com"))
         assertEquals("example.com", DAppStakingDetection.normalizeHost("example.com"))

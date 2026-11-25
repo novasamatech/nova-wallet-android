@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingDetection
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingSiteKind
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
@@ -145,7 +146,7 @@ class DAppSearchViewModel(
 
     fun searchResultClicked(searchResult: DappSearchResult) {
         launch {
-            if (interactor.isThirdPartyStakingSite(searchResult)) {
+            if (interactor.stakingSiteKind(searchResult) != DAppStakingSiteKind.NONE) {
                 pendingStakingSiteResult = searchResult
                 _showStakingNoticeEvent.sendEvent()
                 return@launch

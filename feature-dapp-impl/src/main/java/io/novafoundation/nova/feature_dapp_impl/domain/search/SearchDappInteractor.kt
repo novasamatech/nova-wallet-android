@@ -55,16 +55,28 @@ class SearchDappInteractor(
         }
     }
 
-    suspend fun isThirdPartyStakingSite(result: DappSearchResult): Boolean = withContext(Dispatchers.Default) {
+    /**
+     * The TAO expression is checked first, so a TAO-related site is never reported as a third-party staking one.
+     * A free-text search is not a site.
+     */
+    suspend fun stakingSiteKind(result: DappSearchResult): DAppStakingSiteKind = withContext(Dispatchers.Default) {
         val url = when (result) {
             is DappSearchResult.Dapp -> result.dapp.url
             is DappSearchResult.Url -> result.url
-            is DappSearchResult.Search -> return@withContext false
+            is DappSearchResult.Search -> return@withContext DAppStakingSiteKind.NONE
         }
 
+        when {
+            DAppStakingDetection.isBittensorHost(Urls.hostOf(url)) -> DAppStakingSiteKind.BITTENSOR
+            isThirdPartyStakingSite(url) -> DAppStakingSiteKind.THIRD_PARTY_STAKING
+            else -> DAppStakingSiteKind.NONE
+        }
+    }
+
+    private suspend fun isThirdPartyStakingSite(url: String): Boolean {
         val host = Urls.domainOf(url)
 
-        DAppStakingDetection.isStakingHost(host) || hasCuratedStakingDApp(host)
+        return DAppStakingDetection.isStakingHost(host) || hasCuratedStakingDApp(host)
     }
 
     private suspend fun hasCuratedStakingDApp(host: String): Boolean {
