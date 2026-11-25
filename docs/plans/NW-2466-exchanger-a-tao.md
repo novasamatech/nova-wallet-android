@@ -1,5 +1,17 @@
 # NW-2466 — Exchanger A integration
 
+## NW-2500 — текущий план интеграции
+
+- [x] Подключить пары из каталога Exchanger A через `AssetExchange` к общему графу. Разрешить шаги до провайдера и завершать маршрут на нём.
+- [x] Вернуть Token select на `SwapService`. Учитывать направление Pay/Receive при выборе первого актива.
+- [x] Убрать отдельный роутер формы. Общий поиск и котировка должны поддерживать Asset Hub → TAO и Hydration → Asset Hub → TAO для обеих сторон ввода.
+- [x] Проверить маршруты, лимиты, недоступность провайдера и обычные свапы тестами и сборкой.
+
+Это часть NW-2500. Отдельно остаются проверка доступа по региону, транспорт создания и статуса ордера и проверка на устройстве.
+
+Проверено локально 25 ноября: debug APK и ktlint, 241 модульный тест прошёл, существующий тест производительности графа пропущен. Проверки котировки использовали тестовые ответы провайдера.
+Для ревью по порядку: `ExchangerAAssetExchange.kt` → `RealSwapService.kt` → `SwapTokenSelectionInteractor.kt`.
+
 Agreed scope on 2026-11-24. Android implementation starts from `origin/master`
 at `9c3a83db1`, in branch `feature/NW-2466-changenow-tao`.
 Keep implementation changes in small, separately reviewable increments.
@@ -30,7 +42,7 @@ by this release split.
 
 - Other supported directions, including selling TAO and Ethereum pairs.
 - General Exchanger A token selection, routing and availability explanations.
-- Input from Hydration and other supported on-chain sources through Asset Hub.
+- Execute multi-step funding from Hydration and other supported sources through Asset Hub. The graph already exposes these paths for selection and preview.
 - [NW-2523](https://novasama-technologies.atlassian.net/browse/NW-2523)
   multi-step routes. Implement Exchanger A as the final step first, then routes
   with subsequent on-chain steps. Persist progress, re-quote using the actual
@@ -123,7 +135,7 @@ and OpenAPI when implementing transport.
 - [x] Map the backend catalogue to wallet assets and select release-1 TAO pairs.
 - [x] Let reusable amount fields accept provider-specific integer/fraction limits.
 - [x] Merge PAH → TAO candidates into the shared Pay and Receive token picker.
-- [ ] Quote the selected PAH → TAO pair in the native Swaps form.
+- [x] Quote the selected PAH → TAO pair in the native Swaps form.
 - [ ] Durable order storage and migration.
 - [ ] TAO form and Review.
 - [ ] Order creation, deposit and tracking.
@@ -245,3 +257,16 @@ remain pending.
 
 Verification on 2026-11-25 passed for the debug app build, root ktlint, all
 28 feature-assets unit tests and the 42 targeted Exchanger A unit tests.
+
+### Superseded prototype — separate quote routing (NW-2500)
+
+The previous prototype requested an on-chain quote first. The shared graph integration above replaces this approach. Only an explicit
+NoRoute result triggers an Exchanger A catalogue check and, for an eligible
+ordered pair, a provider quote. Pay and Receive requests preserve the wallet,
+edited side and entered amount. The form fills the opposite amount field and reports provider limits. Provider service errors offer
+manual retry. On-chain errors and insufficient liquidity keep their original
+meaning. Provider quotes cannot enter on-chain fee estimation or confirmation.
+
+Provider-specific input filters, Max with the deposit fee, access-check,
+Review and order execution remain pending. Device and live-service verification
+are separate from the debug build and JVM checks.

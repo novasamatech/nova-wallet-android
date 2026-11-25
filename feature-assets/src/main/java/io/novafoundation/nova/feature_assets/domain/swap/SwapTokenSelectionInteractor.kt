@@ -1,36 +1,51 @@
 package io.novafoundation.nova.feature_assets.domain.swap
 
+import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.totalWithOffChain
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapAssetRole
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.withContext
 import io.novasama.substrate_sdk_android.hash.isPositive
 
 class SwapTokenSelectionInteractor(
     private val walletRepository: WalletRepository,
+    private val chainRegistry: ChainRegistry,
     private val assetSearchUseCase: AssetSearchUseCase,
-    private val catalogue: SwapTokenSelectionCatalogue,
+    private val swapService: SwapService,
     private val filterFactory: SwapTokenSelectionFilterFactory
 ) {
 
     fun observe(metaAccountId: Long, opposite: FullChainAssetId?, selectingPay: Boolean, scope: CoroutineScope): Flow<SwapTokenSelectionData> {
-        return catalogue.observe(opposite, selectingPay, metaAccountId, scope).flatMapLatest { tokens ->
-            observeWalletAssets(metaAccountId, tokens).map { mapSelectionData(it, tokens.compatible, opposite) }
+        val selectionAssetsFlow = observeAvailableCatalogue(scope, selectingPay)
+            .flatMapLatest { catalogue -> observeWalletAssets(metaAccountId, catalogue) }
+        val compatibleAssetIdsFlow = observeCompatibleAssetIds(opposite, selectingPay, metaAccountId, scope)
+
+        return combine(
+            selectionAssetsFlow,
+            compatibleAssetIdsFlow
+        ) { selectionAssets, compatibleAssetIds ->
+            mapSelectionData(selectionAssets, compatibleAssetIds, opposite)
         }
     }
 
@@ -66,16 +81,38 @@ class SwapTokenSelectionInteractor(
         selectingPay: Boolean,
         metaAccountId: Long,
         scope: CoroutineScope
-    ): Boolean {
-        if (opposite == null) return false
+    ): Boolean = withContext(Dispatchers.Default) {
+        if (opposite == null) return@withContext false
 
-        val pay = if (selectingPay) selected else opposite
-        val receive = if (selectingPay) opposite else selected
-        return !catalogue.canSwap(pay, receive, metaAccountId, scope)
+        val payAssetId = if (selectingPay) selected else opposite
+        val receiveAssetId = if (selectingPay) opposite else selected
+        !swapService.canSwap(payAssetId, receiveAssetId, metaAccountId, scope)
     }
 
-    private fun observeWalletAssets(metaAccountId: Long, catalogue: SwapSelectionTokens): Flow<SwapSelectionAssets> {
-        val catalogueAssetsFlow = walletRepository.supportedAssetsFlow(metaAccountId, catalogue.assets)
+    private fun observeAvailableCatalogue(scope: CoroutineScope, selectingPay: Boolean): Flow<SwapSelectionCatalogue> {
+        val role = if (selectingPay) SwapAssetRole.PAY else SwapAssetRole.RECEIVE
+        val supportedAssetIdsFlow = flowOfAll { swapService.assetsAvailableForSwap(scope, role) }
+
+        return combine(
+            chainRegistry.enabledChainsFlow(),
+            supportedAssetIdsFlow
+        ) { enabledChains, supportedAssetIds ->
+            mapCatalogue(enabledChains, supportedAssetIds)
+        }
+    }
+
+    private fun mapCatalogue(enabledChains: List<Chain>, supportedAssetIds: Set<FullChainAssetId>): SwapSelectionCatalogue {
+        val chainFilter = filterFactory.createChainFilter(enabledChains)
+        val availableChains = enabledChains.applyFilter(chainFilter)
+        val assetConfigurations = availableChains
+            .flatMap { it.assets }
+            .filter { it.fullId in supportedAssetIds }
+
+        return SwapSelectionCatalogue(availableChains, assetConfigurations)
+    }
+
+    private fun observeWalletAssets(metaAccountId: Long, catalogue: SwapSelectionCatalogue): Flow<SwapSelectionAssets> {
+        val catalogueAssetsFlow = walletRepository.supportedAssetsFlow(metaAccountId, catalogue.assetConfigurations)
         val syncedAssetsFlow = walletRepository.syncedAssetsFlow(metaAccountId)
 
         return combine(
@@ -91,6 +128,21 @@ class SwapTokenSelectionInteractor(
 
         return catalogueAssets.map { catalogueAsset ->
             syncedAssetsById[catalogueAsset.token.configuration.fullId] ?: catalogueAsset
+        }
+    }
+
+    private fun observeCompatibleAssetIds(
+        oppositeAssetId: FullChainAssetId?,
+        selectingPay: Boolean,
+        metaAccountId: Long,
+        scope: CoroutineScope
+    ): Flow<Set<FullChainAssetId>> {
+        return flowOfAll {
+            if (oppositeAssetId == null) {
+                flowOf(emptySet())
+            } else {
+                swapService.availableAssetsForSelection(oppositeAssetId, selectingPay, metaAccountId, scope)
+            }
         }
     }
 
@@ -155,6 +207,8 @@ class SwapTokenSelectionInteractor(
         }
     }
 }
+
+private class SwapSelectionCatalogue(val chains: List<Chain>, val assetConfigurations: List<Chain.Asset>)
 
 private class SwapSelectionAssets(val chains: List<Chain>, val assets: List<Asset>)
 

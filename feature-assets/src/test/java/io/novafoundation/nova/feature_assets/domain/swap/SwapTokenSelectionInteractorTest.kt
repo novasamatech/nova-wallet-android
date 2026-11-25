@@ -6,9 +6,8 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerASwapPair
-import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerATaoCatalogue
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapAssetRole
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -33,7 +31,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import io.novafoundation.nova.common.utils.Precision
-import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -48,13 +45,11 @@ class SwapTokenSelectionInteractorTest {
     private val accountRepository = mock(AccountRepository::class.java)
     private val chainRegistry = mock(ChainRegistry::class.java)
     private val swapService = mock(SwapService::class.java)
-    private val exchangerATaoCatalogue = mock(ExchangerATaoCatalogue::class.java)
     private val visibility = mock(AssetVisibilityUseCase::class.java)
     private val search = AssetSearchUseCase(walletRepository, accountRepository, chainRegistry, swapService, visibility)
     private val filterFactory = SwapTokenSelectionFilterFactory()
 
-    private val catalogue = SwapTokenSelectionCatalogue(chainRegistry, swapService, exchangerATaoCatalogue, filterFactory)
-    private val interactor = SwapTokenSelectionInteractor(walletRepository, search, catalogue, filterFactory)
+    private val interactor = SwapTokenSelectionInteractor(walletRepository, chainRegistry, search, swapService, filterFactory)
     private val currency = Currency("USD", "Dollar", "$", Currency.Category.FIAT, true, 0, "usd", true)
     private val pah = chain("pah", "Polkadot Asset Hub")
     private val hydration = chain("hydra", "Hydration")
@@ -65,12 +60,6 @@ class SwapTokenSelectionInteractorTest {
     private val ksm = asset(kusama, "KSM", 0, 100)
     private val all = listOf(dot, dotHydra, usdt, ksm)
     private val compatible = setOf(dot.token.configuration.fullId, dotHydra.token.configuration.fullId, usdt.token.configuration.fullId)
-
-    @Before
-    fun setUpCatalogue() = runBlocking<Unit> {
-        `when`(exchangerATaoCatalogue.availablePairs()).thenReturn(emptyList())
-        `when`(exchangerATaoCatalogue.supportsPair(dot.token.configuration.fullId, usdt.token.configuration.fullId)).thenReturn(false)
-    }
 
     @Test
     fun `incompatible holdings are always in the last section`() {
@@ -115,30 +104,11 @@ class SwapTokenSelectionInteractorTest {
     fun `selection rechecks ordered pair for the requested wallet`() = runBlocking<Unit> {
         `when`(pah.assetsById).thenReturn(mapOf(0 to dot.token.configuration, 1 to usdt.token.configuration))
         `when`(chainRegistry.chainsById).thenReturn(MutableStateFlow(mapOf("pah" to pah)))
-        val destinations = setOf(usdt.token.configuration.fullId)
-        `when`(swapService.availableSwapDirectionsFor(dot.token.configuration, this, 42)).thenReturn(flowOf(destinations))
+        `when`(swapService.canSwap(dot.token.configuration.fullId, usdt.token.configuration.fullId, 42, this)).thenReturn(true)
         assertFalse(interactor.shouldClearOpposite(dot.token.configuration.fullId, usdt.token.configuration.fullId, true, 42, this))
         assertFalse(interactor.shouldClearOpposite(usdt.token.configuration.fullId, dot.token.configuration.fullId, false, 42, this))
-        `when`(swapService.availableSwapDirectionsFor(dot.token.configuration, this, 42)).thenReturn(flowOf(emptySet()))
+        `when`(swapService.canSwap(dot.token.configuration.fullId, usdt.token.configuration.fullId, 42, this)).thenReturn(false)
         assertTrue(interactor.shouldClearOpposite(dot.token.configuration.fullId, usdt.token.configuration.fullId, true, 42, this))
-    }
-
-    @Test
-    fun `selecting either side keeps the opposite when only the provider supports the ordered pair`() = runBlocking<Unit> {
-        val bittensor = chain(ChainGeneses.BITTENSOR, "Bittensor")
-        val tao = asset(bittensor, "TAO", 0, 0).token.configuration
-        val pay = usdt.token.configuration
-        val assetsById = mapOf(pay.id to pay)
-        val chainsById = mapOf(pah.id to pah, bittensor.id to bittensor)
-        `when`(pah.assetsById).thenReturn(assetsById)
-        `when`(chainRegistry.chainsById).thenReturn(MutableStateFlow(chainsById))
-        `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, bittensor)))
-        `when`(swapService.availableSwapDirectionsFor(pay, this, 42)).thenReturn(flowOf(emptySet()))
-        `when`(exchangerATaoCatalogue.supportsPair(pay.fullId, tao.fullId)).thenReturn(true, true, false)
-
-        assertFalse(interactor.shouldClearOpposite(pay.fullId, tao.fullId, true, 42, this))
-        assertFalse(interactor.shouldClearOpposite(tao.fullId, pay.fullId, false, 42, this))
-        assertTrue(interactor.shouldClearOpposite(pay.fullId, tao.fullId, true, 42, this))
     }
 
     @Test
@@ -152,8 +122,7 @@ class SwapTokenSelectionInteractorTest {
         val config = dot.token.configuration
         `when`(pah.assetsById).thenReturn(mapOf(0 to config))
         `when`(chainRegistry.chainsById).thenReturn(MutableStateFlow(mapOf("pah" to pah)))
-        val failure = flow<Set<FullChainAssetId>> { throw IOException("offline") }
-        `when`(swapService.availableSwapDirectionsFor(config, this, 42)).thenReturn(failure)
+        `when`(swapService.canSwap(config.fullId, usdt.token.configuration.fullId, 42, this)).thenAnswer { throw IOException("offline") }
         interactor.shouldClearOpposite(config.fullId, usdt.token.configuration.fullId, true, 42, this)
     }
 
@@ -165,7 +134,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(flowOf(listOf(dot, usdt)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot)))
         val graph = configurations.map { it.fullId }.toSet()
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         val result = interactor.observe(42, null, true, this).first()
         assertEquals(listOf(dot, usdt), result.assets)
         verifyNoInteractions(accountRepository)
@@ -197,7 +166,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(pah.assets).thenReturn(listOf(dot.token.configuration, usdt.token.configuration))
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, hydration, relay)))
         val graph = setOf(dot.token.configuration.fullId, dotHydra.token.configuration.fullId, relayDot.token.configuration.fullId)
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         `when`(walletRepository.supportedAssetsFlow(42, listOf(dot.token.configuration))).thenReturn(flowOf(listOf(dot)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot, dotHydra, relayDot)))
         val result = interactor.observe(42, null, true, this).first()
@@ -212,7 +181,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, hydration)))
         val configurations = listOf(dot.token.configuration, usdt.token.configuration, dotHydra.token.configuration)
         val graph = configurations.map { it.fullId }.toSet()
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         val destinations = setOf(dotHydra.token.configuration.fullId)
         `when`(swapService.availableAssetsForSelection(dot.token.configuration.fullId, true, 42, this)).thenReturn(flowOf(destinations))
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(flowOf(listOf(dot, usdt, dotHydra)))
@@ -231,7 +200,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(hydration.connectionState).thenReturn(Chain.ConnectionState.FULL_SYNC)
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, hydration)))
         val graph = setOf(dot.token.configuration.fullId, dotHydra.token.configuration.fullId)
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         `when`(walletRepository.supportedAssetsFlow(42, listOf(dot.token.configuration))).thenReturn(flowOf(listOf(dot)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot, dotHydra)))
         val result = interactor.observe(42, null, true, this).first()
@@ -251,7 +220,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah)))
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(flowOf(listOf(dot, usdt)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(balancesFlow)
-        `when`(swapService.assetsAvailableForSwap(backgroundScope)).thenReturn(flowOf(swapAssetIds))
+        `when`(swapService.assetsAvailableForSwap(backgroundScope, SwapAssetRole.PAY)).thenReturn(flowOf(swapAssetIds))
 
         val emissions = mutableListOf<SwapTokenSelectionData>()
         val observation = backgroundScope.launch {
@@ -283,7 +252,7 @@ class SwapTokenSelectionInteractorTest {
         val originalAssetsFlow = originalAssets.onCompletion { originalObservationClosed = true }
         `when`(pah.assets).thenReturn(configurations)
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah)))
-        `when`(swapService.assetsAvailableForSwap(backgroundScope)).thenReturn(swapAssetIds)
+        `when`(swapService.assetsAvailableForSwap(backgroundScope, SwapAssetRole.PAY)).thenReturn(swapAssetIds)
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(originalAssetsFlow)
         `when`(walletRepository.supportedAssetsFlow(42, remainingConfigurations)).thenReturn(flowOf(listOf(usdt)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot)))
@@ -306,65 +275,6 @@ class SwapTokenSelectionInteractorTest {
         runCurrent()
         assertEquals(emissionCount, emissions.size)
         assertEquals(listOf(usdt), emissions.last().assets)
-    }
-
-    @Test
-    fun `both picker sides merge directed provider pairs with on-chain candidates`() = runTest {
-        val bittensor = chain(ChainGeneses.BITTENSOR, "Bittensor")
-        val tao = asset(bittensor, "TAO", 0, 0).token.configuration
-        val pay = usdt.token.configuration
-        val dotConfig = dot.token.configuration
-        val chains = MutableStateFlow(listOf(pah, bittensor))
-        val pairs = listOf(ExchangerASwapPair(pay, tao), ExchangerASwapPair(pay, tao))
-        `when`(exchangerATaoCatalogue.availablePairs()).thenReturn(pairs)
-        `when`(chainRegistry.currentChains).thenReturn(chains)
-        `when`(pah.assets).thenReturn(listOf(dotConfig, pay))
-        `when`(bittensor.assets).thenReturn(listOf(tao))
-        val dotId = dotConfig.fullId
-        val graph = setOf(dotId, pay.fullId)
-        `when`(swapService.assetsAvailableForSwap(backgroundScope)).thenReturn(flowOf(graph))
-        `when`(swapService.availableAssetsForSelection(tao.fullId, true, 42, backgroundScope)).thenReturn(flowOf(setOf(dotId)))
-        `when`(swapService.availableAssetsForSelection(pay.fullId, false, 42, backgroundScope)).thenReturn(flowOf(emptySet()))
-        `when`(swapService.availableAssetsForSelection(tao.fullId, false, 42, backgroundScope)).thenReturn(flowOf(emptySet()))
-
-        val selections = mutableListOf<SwapSelectionTokens>()
-        backgroundScope.launch { catalogue.observe(tao.fullId, true, 42, backgroundScope).collect { selections.add(it) } }
-        runCurrent()
-        assertEquals(listOf(dotConfig, pay), selections.last().assets)
-        assertEquals(setOf(dotConfig.fullId, pay.fullId), selections.last().compatible)
-        val receive = catalogue.observe(pay.fullId, false, 42, backgroundScope).first { tao in it.assets }
-        assertEquals(setOf(tao.fullId), receive.compatible)
-        val reverse = catalogue.observe(tao.fullId, false, 42, backgroundScope).first { tao in it.assets }
-        assertTrue(reverse.compatible.isEmpty())
-
-        chains.value = listOf(pah)
-        runCurrent()
-        assertEquals(setOf(dotConfig.fullId), selections.last().compatible)
-    }
-
-    @Test
-    fun `on-chain rows remain selectable during provider loading and failure`() = runTest {
-        val pending = CompletableDeferred<Unit>()
-        val provider = object : ExchangerATaoCatalogue {
-            override suspend fun supportsPair(pay: FullChainAssetId, receive: FullChainAssetId) = false
-            override suspend fun availablePairs(): List<ExchangerASwapPair> {
-                pending.await()
-                throw IOException("offline")
-            }
-        }
-        val routes = SwapTokenSelectionCatalogue(chainRegistry, swapService, provider, filterFactory)
-        val dotConfig = dot.token.configuration
-        `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah)))
-        val dotId = dotConfig.fullId
-        `when`(pah.assets).thenReturn(listOf(dotConfig))
-        `when`(swapService.assetsAvailableForSwap(backgroundScope)).thenReturn(flowOf(setOf(dotId)))
-        val selections = mutableListOf<SwapSelectionTokens>()
-        backgroundScope.launch { routes.observe(null, true, 42, backgroundScope).collect { selections.add(it) } }
-        runCurrent()
-        assertEquals(listOf(dotConfig), selections.last().assets)
-        pending.complete(Unit)
-        runCurrent()
-        assertEquals(listOf(dotConfig), selections.last().assets)
     }
 
     private fun data(compatible: Set<FullChainAssetId> = this.compatible, hasOpposite: Boolean = true) =
