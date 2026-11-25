@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.asset.di
 
+import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerATaoCatalogue
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +17,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.account.SelectedMetaAccountChangeObserver
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
+import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionCatalogue
 import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionInteractor
 import io.novafoundation.nova.feature_assets.domain.swap.SwapTokenSelectionFilterFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -34,13 +36,20 @@ class AssetSwapFlowModule {
     fun provideFilterFactory(): SwapTokenSelectionFilterFactory = SwapTokenSelectionFilterFactory()
 
     @Provides
+    fun provideCatalogue(
+        chainRegistry: ChainRegistry,
+        swapService: SwapService,
+        exchangerATaoCatalogue: ExchangerATaoCatalogue,
+        filterFactory: SwapTokenSelectionFilterFactory
+    ) = SwapTokenSelectionCatalogue(chainRegistry, swapService, exchangerATaoCatalogue, filterFactory)
+
+    @Provides
     fun provideInteractor(
         walletRepository: WalletRepository,
-        chainRegistry: ChainRegistry,
         assetSearchUseCase: AssetSearchUseCase,
-        swapService: SwapService,
+        catalogue: SwapTokenSelectionCatalogue,
         filterFactory: SwapTokenSelectionFilterFactory
-    ) = SwapTokenSelectionInteractor(walletRepository, chainRegistry, assetSearchUseCase, swapService, filterFactory)
+    ) = SwapTokenSelectionInteractor(walletRepository, assetSearchUseCase, catalogue, filterFactory)
 
     @Provides
     fun provideNetworkSelectionRepository(preferences: Preferences): SwapNetworkSelectionRepository = PreferencesSwapNetworkSelectionRepository(preferences)

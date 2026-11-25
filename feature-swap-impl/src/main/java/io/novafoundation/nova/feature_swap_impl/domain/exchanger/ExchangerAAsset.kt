@@ -7,9 +7,3 @@ class ExchangerAAsset(
     val canSend: Boolean,
     val canReceive: Boolean
 )
-
-/** Candidate pair from the catalogue. A quote confirms current pair availability. */
-class ExchangerASwapPair(
-    val assetIn: Chain.Asset,
-    val assetOut: Chain.Asset
-)

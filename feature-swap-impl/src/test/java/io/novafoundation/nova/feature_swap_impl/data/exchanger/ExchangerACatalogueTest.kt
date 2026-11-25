@@ -2,7 +2,8 @@ package io.novafoundation.nova.feature_swap_impl.data.exchanger
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.TokenSymbol
-import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerATaoInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.exchanger.catalogue.RealExchangerATaoCatalogue
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -30,7 +31,7 @@ class ExchangerACatalogueTest {
 
     private val repository = ExchangerAAssetsRepository(source, registry)
 
-    private val interactor = ExchangerATaoInteractor(repository)
+    private val catalogue = RealExchangerATaoCatalogue(repository)
 
     private val dot = asset(Chain.Geneses.POLKADOT_ASSET_HUB, 0)
 
@@ -76,17 +77,26 @@ class ExchangerACatalogueTest {
         chains.value = listOf(chain(dot.chainId, listOf(dot, usdt, usdc, newAsset, receiveOnlyAsset)), bittensor, ethereum)
         respond(remote(eth), remote(tao), remote(usdc), remote(dot), remote(usdt), remote(newAsset), remote(receiveOnlyAsset, send = false))
 
-        val pairs = interactor.availablePairs()
+        val pairs = catalogue.availablePairs()
 
         assertEquals(listOf(usdc, dot, usdt, newAsset), pairs.map { it.assetIn })
         assertTrue(pairs.all { it.assetOut === tao })
     }
 
     @Test
+    fun `pair check uses current send and receive flags and rejects the reverse direction`() = runBlocking {
+        respond(remote(usdt), remote(tao))
+        assertTrue(catalogue.supportsPair(usdt.fullId, tao.fullId))
+        assertFalse(catalogue.supportsPair(tao.fullId, usdt.fullId))
+        respond(remote(usdt, send = false), remote(tao))
+        assertFalse(catalogue.supportsPair(usdt.fullId, tao.fullId))
+    }
+
+    @Test
     fun `receive-only input is excluded and send-only input remains usable`() = runBlocking {
         respond(remote(dot, send = false), remote(usdt, receive = false), remote(tao, send = false))
 
-        val pairs = interactor.availablePairs()
+        val pairs = catalogue.availablePairs()
 
         assertEquals(listOf(usdt), pairs.map { it.assetIn })
     }
@@ -94,10 +104,10 @@ class ExchangerACatalogueTest {
     @Test
     fun `absent or receive-disabled TAO leaves no candidate pairs`() = runBlocking {
         respond(remote(dot))
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
 
         respond(remote(dot), remote(tao, receive = false))
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
     }
 
     @Test
@@ -105,7 +115,7 @@ class ExchangerACatalogueTest {
         respond()
 
         assertTrue(repository.assets().isEmpty())
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
     }
 
     @Test
@@ -118,17 +128,17 @@ class ExchangerACatalogueTest {
         )
 
         assertEquals(listOf(dot, tao), repository.assets().map { it.chainAsset })
-        assertEquals(listOf(dot), interactor.availablePairs().map { it.assetIn })
+        assertEquals(listOf(dot), catalogue.availablePairs().map { it.assetIn })
     }
 
     @Test
     fun `disabled paying or receiving network cannot produce a pair`() = runBlocking {
         respond(remote(dot), remote(tao))
         chains.value = listOf(chain(dot.chainId, listOf(dot), enabled = false), bittensor)
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
 
         chains.value = listOf(assetHub, chain(tao.chainId, listOf(tao), enabled = false))
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
     }
 
     @Test
@@ -139,20 +149,20 @@ class ExchangerACatalogueTest {
         chains.value = chains.value + chain(anotherDot.chainId, listOf(anotherDot))
         respond(remote(anotherDot), remote(dot), remote(tao))
 
-        assertEquals(listOf(dot), interactor.availablePairs().map { it.assetIn })
+        assertEquals(listOf(dot), catalogue.availablePairs().map { it.assetIn })
     }
 
     @Test
     fun `subsequent loads use current backend availability and chain configuration`() = runBlocking {
         respond(remote(dot), remote(tao))
-        assertEquals(1, interactor.availablePairs().size)
+        assertEquals(1, catalogue.availablePairs().size)
 
         respond(remote(dot, send = false), remote(tao))
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
 
         respond(remote(dot), remote(tao))
         chains.value = listOf(bittensor)
-        assertTrue(interactor.availablePairs().isEmpty())
+        assertTrue(catalogue.availablePairs().isEmpty())
     }
 
     @Test
@@ -177,7 +187,7 @@ class ExchangerACatalogueTest {
         for (expected in listOf(IOException("Unavailable"), CancellationException("Cancelled"))) {
             doAnswer { throw expected }.`when`(source).assets()
 
-            assertSame(expected, runCatching { interactor.availablePairs() }.exceptionOrNull())
+            assertSame(expected, runCatching { catalogue.availablePairs() }.exceptionOrNull())
         }
     }
 

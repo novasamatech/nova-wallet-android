@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.di
 
+import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerATaoCatalogue
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import android.content.ContentResolver
 import coil.ImageLoader
@@ -210,6 +211,8 @@ interface AssetsFeatureDependencies {
     val coinPriceRepository: CoinPriceRepository
 
     val swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator
+
+    val exchangerATaoCatalogue: ExchangerATaoCatalogue
 
     val swapService: SwapService
 

@@ -8,7 +8,8 @@ Leave each increment uncommitted until the user reviews and approves it.
 ## Release 1 — Buy TAO
 
 Buy native TAO on Bittensor with any backend-enabled asset on Polkadot Asset Hub,
-through Get TAO / Swap for TAO. Do not hardcode a paying-token allowlist.
+in the existing native Swaps form and shared token picker. Get TAO / Swap for
+TAO can preselect the receive asset. The backend determines eligible pay assets.
 Both Pay and Receive amounts are editable.
 Receive remains an estimate at a floating exchange rate.
 
@@ -121,7 +122,8 @@ and OpenAPI when implementing transport.
 - [x] Domain quote mapping and financial validation for Pay and Receive.
 - [x] Map the backend catalogue to wallet assets and select release-1 TAO pairs.
 - [x] Let reusable amount fields accept provider-specific integer/fraction limits.
-- [ ] Connect the catalogue to token selection and the TAO form.
+- [x] Merge PAH → TAO candidates into the shared Pay and Receive token picker.
+- [ ] Quote the selected PAH → TAO pair in the native Swaps form.
 - [ ] Durable order storage and migration.
 - [ ] TAO form and Review.
 - [ ] Order creation, deposit and tracking.
@@ -178,7 +180,7 @@ silently become asset ID zero or false. No cache is added to the repository.
 The source unwraps the assets response and filters null entries, returning a
 non-null list of remote assets. A missing assets list remains an error.
 
-ExchangerATaoInteractor selects candidate Asset Hub → native TAO pairs by chain
+ExchangerATaoCatalogue selects candidate Asset Hub → native TAO pairs by chain
 identity and backend direction flags, without a paying-token allowlist.
 New Asset Hub tokens become candidates when both the backend and the wallet
 chain configuration include them. The general catalogue
@@ -223,7 +225,23 @@ No device or live-service verification was performed. Changes remain uncommitted
 NW-2500 remains In Progress. Its full scope includes create/status transport,
 general Token select/router integration, service-failure behavior and region
 restrictions. Assets/quote transport and the release-1 catalogue are implemented.
-General token selection/routing and the full Unavailable group remain release 2;
+Support for additional pairs in the general router and the full Unavailable group remain release 2;
 therefore the full Jira task cannot be closed with the release-1 subset alone.
 NW-2524 (access-check) and NW-2525 (Cloudflare) are still To Do in Jira. Input
 constraints in the fourth increment belong to NW-2501, not completion of NW-2500.
+
+### Fifth implementation increment — shared token selection (NW-2500)
+
+Swaps passes the selected asset, opposite asset, edited side and wallet to the
+existing token picker. SwapTokenSelectionCatalogue combines on-chain availability
+with directed Exchanger A pairs. The picker applies wallet balances, sections,
+network filters and search to the resulting list. When the optional service is
+slow or unavailable, on-chain rows remain available. Selecting either side
+rechecks the ordered pair before deciding whether to clear the opposite asset.
+
+Exchanger A currently contributes only Asset Hub → native TAO pairs. Quoting
+the selected pair on the native form, country access checks and live verification
+remain pending.
+
+Verification on 2026-11-25 passed for the debug app build, root ktlint, all
+28 feature-assets unit tests and the 42 targeted Exchanger A unit tests.

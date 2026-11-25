@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerATaoCatalogue
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -9,7 +10,7 @@ import io.novafoundation.nova.feature_swap_impl.data.exchanger.ExchangerAAssetsR
 import io.novafoundation.nova.feature_swap_impl.data.exchanger.ExchangerAQuoteRepository
 import io.novafoundation.nova.feature_swap_impl.data.exchanger.ExchangerAQuoteSource
 import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerAAmountConstraints
-import io.novafoundation.nova.feature_swap_impl.domain.exchanger.ExchangerATaoInteractor
+import io.novafoundation.nova.feature_swap_impl.domain.exchanger.catalogue.RealExchangerATaoCatalogue
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.di.Attested
@@ -25,8 +26,8 @@ class ExchangerAModule {
 
     @Provides
     @FeatureScope
-    fun provideExchangerATaoInteractor(assetsRepository: ExchangerAAssetsRepository): ExchangerATaoInteractor {
-        return ExchangerATaoInteractor(assetsRepository)
+    fun provideExchangerATaoCatalogue(assetsRepository: ExchangerAAssetsRepository): ExchangerATaoCatalogue {
+        return RealExchangerATaoCatalogue(assetsRepository)
     }
 
     @Provides

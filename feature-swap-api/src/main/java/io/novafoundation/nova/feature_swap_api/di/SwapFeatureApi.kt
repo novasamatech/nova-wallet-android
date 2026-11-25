@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.di
 
+import io.novafoundation.nova.feature_swap_api.domain.exchanger.catalogue.ExchangerATaoCatalogue
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapTokenSelectionCommunicator
 import io.novafoundation.nova.feature_swap_api.data.history.SwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
@@ -11,6 +12,8 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 interface SwapFeatureApi {
 
     val swapTokenSelectionCommunicator: SwapTokenSelectionCommunicator
+
+    val exchangerATaoCatalogue: ExchangerATaoCatalogue
 
     val swapService: SwapService
 
