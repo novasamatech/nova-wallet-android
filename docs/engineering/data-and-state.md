@@ -70,6 +70,22 @@ Validate response pagination against the requested page and the endpoint contrac
 
 Distinguish optional presentation fallbacks from transaction inputs. Missing logos may use a placeholder, but a failed commission-config request must not silently supply a default fee. A documented default for an absent or invalid field in a successfully decoded config is a separate case.
 
+### nova-utils config mirror
+
+nova-utils `master` files are read from the nova-infra mirror first, GitHub is the per-request fallback.
+`*_URL` build fields and URLs inside configs stay raw GitHub URLs. `NovaUtilsMirror.addTo` adds the mirror to
+an `OkHttpClient` (`NetworkModule`, the image loader in `CommonModule`). A new `OkHttpClient` or `ImageLoader`
+that reads nova-utils must go through it too, as the last step on the finished client, after
+`TimeHeaderInterceptor`; without it a client silently reads GitHub only.
+
+The policy is shared with iOS and stated in `NovaUtilsMirror` KDoc: a GET of a `master` path without dot
+segments is mapped; one deadline for the whole attempt (10 s, at most half of the caller's timeout); accepted
+is a 200 with an `X-Config-Commit` header and a non-empty body, valid JSON for `.json`; a status of 500 and
+above, a 429, or a network error after which GitHub answers pauses the mirror (60 s, doubling to 30 min, in
+memory); anything else only falls back. Accepted decision: the mirror is trusted as GitHub is, with no integrity
+or freshness check; the header's presence is checked, its value is not read. OkHttp limits are in
+`NovaUtilsMirrorInterceptor` KDoc.
+
 ## Runtime decoding
 
 Use the SDK's `AccountId` alias for raw Substrate account identifiers in signatures and explicitly typed properties, not `ByteArray`. Preserve meaningful domain names such as `coldKey` when they clarify the account's role; changing the type does not require renaming the identifier. Keep protocol-specific wire field names unchanged. Keep `AccountIdKey` for content-based equality and collection keys, and reserve `ByteArray` for actual binary payloads rather than account IDs.

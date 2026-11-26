@@ -1,11 +1,13 @@
 package io.novafoundation.nova.common.data.config
 
 import com.google.gson.Gson
+import io.novafoundation.nova.common.BuildConfig
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -13,6 +15,8 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 class GlobalConfigDataSourceTest {
@@ -24,6 +28,8 @@ class GlobalConfigDataSourceTest {
     private val gson = Gson()
 
     private val stored = mutableMapOf<String, String>()
+
+    private val mirrorHost = BuildConfig.NOVA_UTILS_MIRROR_URL.toHttpUrl().host
 
     private val changeNowTaoUrl = "https://changenow.io/exchange?from=assethub&to=tao&link_id=59409968ba3831"
 
@@ -133,6 +139,31 @@ class GlobalConfigDataSourceTest {
         val restarted = RealGlobalConfigDataSource(offlineApi, preferences, gson, logger)
         assertEquals("https://infra.test/", restarted.getGlobalConfig().infraUrl)
         assertNull(restarted.getGlobalConfig().changeNowTaoUrl)
+    }
+
+    @Test
+    fun `infraUrl on another host than the nova-utils mirror is logged`() = runBlocking<Unit> {
+        prepareStorage()
+        val source = RealGlobalConfigDataSource(onlineApi, preferences, gson, logger)
+
+        source.getGlobalConfig()
+
+        verify(logger).log("[GlobalConfig] infraUrl host infra.test differs from the nova-utils mirror host $mirrorHost")
+    }
+
+    @Test
+    fun `infraUrl on the host of the nova-utils mirror or a missing one is not logged`() = runBlocking<Unit> {
+        prepareStorage()
+        val infraUrls = listOf("https://$mirrorHost/", "https://$mirrorHost:443/v1/other", null)
+
+        infraUrls.forEach { infraUrl ->
+            val api = object : GlobalConfigApi {
+                override suspend fun getGlobalConfig() = GlobalConfigRemote("multisigs", "proxy", "staking", infraUrl)
+            }
+            RealGlobalConfigDataSource(api, preferences, gson, logger).getGlobalConfig()
+        }
+
+        verify(logger, never()).log(anyString())
     }
 
     @Test

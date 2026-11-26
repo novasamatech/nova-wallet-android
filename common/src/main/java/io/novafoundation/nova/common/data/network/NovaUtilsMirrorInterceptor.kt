@@ -1,16 +1,23 @@
 package io.novafoundation.nova.common.data.network
 
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import io.novafoundation.nova.common.data.network.NovaUtilsMirrorCoolDown.Admission
+import io.novafoundation.nova.common.data.network.NovaUtilsMirrorCoolDown.Outcome
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.io.IOException
-import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
+import java.io.InputStreamReader
+import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_OK
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.max
 import kotlin.math.min
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.asResponseBody
 import okio.Buffer
 
@@ -23,23 +30,35 @@ private val NOVA_UTILS_MASTER_PATH_PREFIXES = listOf(
     listOf("novasamatech", "nova-utils", "refs", "heads", "master")
 )
 
-private val MIRRORED_METHODS = setOf("GET", "HEAD")
+private val DOT_SEGMENTS = setOf(".", "..")
 
-// The only statuses that are answers from the mirror's copy; everything else is read from GitHub.
-private val MIRROR_ANSWER_CODES = setOf(HTTP_OK, HTTP_NOT_MODIFIED)
+// What a percent-encoded separator decodes to; OkHttp reads a backslash in a path as a slash.
+private val DECODED_PATH_SEPARATORS = charArrayOf('/', '\\')
+
+// A mirror answer needs a body, so HEAD is left to GitHub.
+private const val MIRRORED_METHOD = "GET"
+
+private const val JSON_FILE_SUFFIX = ".json"
+
+// The mirror service puts it on every 200. Only its presence is checked; the commit is not read or compared.
+private const val MIRROR_COMMIT_HEADER = "X-Config-Commit"
+
+private const val HTTP_TOO_MANY_REQUESTS = 429
 
 // OkHttp's value of a timeout that never expires.
-private const val NO_TIMEOUT = 0
+private const val NO_TIMEOUT = 0L
 
-// Value of "skip until" while no cool-down is in force and every request may try the mirror.
-private const val MIRROR_NOT_SKIPPED = Long.MIN_VALUE
+// A mirror attempt may take at most this part of the caller's own timeout.
+private const val CALLER_TIMEOUT_DIVISOR = 2
+
+private const val MIN_ATTEMPT_DEADLINE_MILLIS = 1L
 
 private const val LOG_TAG = "[NovaUtilsMirror]"
 
 /**
  * Maps the raw GitHub URL of a nova-utils `master` file to the same file on the config mirror:
  * [mirrorBaseUrl] followed by the file's repository path, unchanged. Query and fragment are not part of
- * the file's address and are dropped. Returns null for every other URL.
+ * the file's address and are dropped. Returns null for every other URL, and for a path with a dot segment.
  */
 internal fun novaUtilsMirrorUrl(gitHubUrl: HttpUrl, mirrorBaseUrl: HttpUrl): HttpUrl? {
     val isRawGitHub = gitHubUrl.scheme == GITHUB_RAW_SCHEME &&
@@ -55,6 +74,11 @@ internal fun novaUtilsMirrorUrl(gitHubUrl: HttpUrl, mirrorBaseUrl: HttpUrl): Htt
     val isFilePath = filePathSegments.isNotEmpty() && filePathSegments.none(String::isEmpty)
     if (!isFilePath) return null
 
+    // The mirror decodes the path once and does not normalize it. OkHttp resolves `..` and `%2e%2e` segments
+    // itself while it parses a URL, but not those that appear only after decoding, such as `..%2F`.
+    val decodedFilePathSegments = gitHubUrl.pathSegments.drop(masterPrefix.size)
+    if (decodedFilePathSegments.any(String::hasDotSegment)) return null
+
     return mirrorBaseUrl.newBuilder()
         .apply { filePathSegments.forEach(::addEncodedPathSegment) }
         .build()
@@ -64,177 +88,206 @@ private fun List<String>.startsWith(prefix: List<String>): Boolean {
     return size >= prefix.size && subList(0, prefix.size) == prefix
 }
 
+private fun String.hasDotSegment(): Boolean {
+    return split(*DECODED_PATH_SEPARATORS).any { it in DOT_SEGMENTS }
+}
+
 /**
- * Reads nova-utils `master` files from the nova-infra config mirror and falls back to GitHub per request.
+ * The part of [NovaUtilsMirror] that sits on one client: maps the URL, runs the mirror attempt under its
+ * deadline and falls back to GitHub. When to skip the mirror is decided by [coolDown], which the clients share.
  *
- * Callers keep requesting the raw GitHub URL. A GET or HEAD for a nova-utils `master` file is first sent
- * to the mirror, on the same client and with capped socket timeouts. The mirror's own 200 or 304 is returned
- * once its body has been read. Any other status, a redirected answer, a network failure or a body that fails
- * while it is read makes the original GitHub request proceed as before, with its own timeouts. A mirror 404
- * is not final: the file may be newer than the mirror's copy. Every other request passes through untouched.
+ * The mirror attempt is a call of its own on [mirrorClient], because only a call has a timeout that spans
+ * every address of the host, the TLS handshakes, the headers and the body; the timeouts of a chain bound each
+ * socket operation separately. Its body is read completely, at most [maxBodyBytes], before anything is returned,
+ * so that a failure at any point can still be answered by GitHub. The GitHub request proceeds on the chain,
+ * untouched and with the caller's timeouts.
  *
- * A failed attempt that kept the request waiting for at least [mirrorConnectTimeoutMillis] starts a cool-down
- * during which the mirror is skipped. It lasts [failureCoolDownMillis] and doubles, up to
- * [maxFailureCoolDownMillis], each time the mirror fails that way again. When it ends, one request probes
- * the mirror while the others keep reading GitHub; the mirror's answer over the network ends it for all.
- * A quick failure (no connectivity, a refused connection) and a status only fall back. Cache-only requests
- * cost no network and are never skipped: files cached from the mirror are stored under its URL.
+ * It must be an application interceptor: it answers without proceeding or proceeds after another call.
  *
- * One instance serves every client it is registered on (the shared client and the image loader's client),
- * so they share the cool-down; a client without it keeps reading GitHub. It must stay an application
- * interceptor: it proceeds twice and adjusts timeouts. [TimeHeaderInterceptor] must come before it,
- * otherwise it re-applies the header timeouts inside the mirror attempt and the cap is lost.
+ * Limits of OkHttp, accepted:
+ * - A caller that cancels its call is noticed when the mirror attempt returns, at most one deadline later: the
+ *   cancellation of a call cannot be observed from an interceptor. Nothing is returned to that caller.
+ * - The deadline cannot interrupt a DNS lookup that hangs; the attempt ends when the lookup does.
  *
- * Known limits, accepted for the sake of a simple interceptor:
- * - The timeouts bound each socket operation, not the mirror attempt as a whole. OkHttp tries every address
- *   of the mirror host in turn, so a request to an unreachable mirror waits up to one connect timeout plus
- *   one read timeout (the TLS handshake) per address before it falls back. Every request already in flight
- *   when the mirror stops answering pays that wait once. A caller that gives up earlier cancels the call,
- *   which does not fall back; its retry does, because the cool-down has started.
- * - The cool-down lives in memory. After a cold start the mirror is tried by the first requests again.
- * - The mirror body is held in memory before it is returned; nova-utils files and icons are small.
- *
- * [mirrorBaseUrl] is a build constant and not `infraUrl` of the global config (see `InfrastructureUrls`),
- * because that config is itself a nova-utils file read through the mirror. Both must name the same host.
- *
- * @param mirrorConnectTimeoutMillis cap of the connect timeout of a mirror attempt.
- * @param mirrorReadTimeoutMillis cap of the read timeout of a mirror attempt. A longer timeout of the request,
- * such as one raised through [TimeHeaderInterceptor], applies to the GitHub attempt only.
- * @param elapsedRealtimeMillis monotonic clock of the cool-down.
+ * @param mirrorClient the client this interceptor is registered on, without the interceptor and with
+ * redirects off. It carries that client's cache, so files cached from the mirror are stored under its URL.
+ * @param maxAttemptMillis the deadline of a mirror attempt, see [attemptDeadlineMillis].
  */
-class NovaUtilsMirrorInterceptor(
+internal class NovaUtilsMirrorInterceptor(
     private val mirrorBaseUrl: HttpUrl,
-    private val mirrorConnectTimeoutMillis: Int,
-    private val mirrorReadTimeoutMillis: Int,
-    private val failureCoolDownMillis: Long,
-    private val maxFailureCoolDownMillis: Long,
-    private val elapsedRealtimeMillis: () -> Long,
+    private val mirrorClient: OkHttpClient,
+    private val maxAttemptMillis: Long,
+    private val maxBodyBytes: Long,
+    private val coolDown: NovaUtilsMirrorCoolDown,
     private val logger: Logger
 ) : Interceptor {
 
-    private val skipMirrorUntilMillis = AtomicLong(MIRROR_NOT_SKIPPED)
+    private sealed interface MirrorAttempt {
 
-    private val nextCoolDownMillis = AtomicLong(failureCoolDownMillis)
+        class Accepted(val response: Response, val outcome: Outcome) : MirrorAttempt
+
+        /** The mirror gave an answer that is not its copy of the file. */
+        class Rejected(val reason: String, val outcome: Outcome) : MirrorAttempt
+
+        /** No complete answer: a network or TLS error, the deadline, a body that broke off. */
+        class Failed(val failure: IOException) : MirrorAttempt
+    }
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        val mirrorRequest = mirrorRequestFor(request) ?: return chain.proceed(request)
-        val admission = admitMirrorAttempt(request) ?: return chain.proceed(request)
+        val mirrorRequest = mirrorRequestFor(request)
+        // A call cancelled while it was queued must not cost a mirror request; proceeding fails it as usual.
+        if (mirrorRequest == null || chain.call().isCanceled()) return chain.proceed(request)
 
-        val startedMillis = elapsedRealtimeMillis()
-        val mirrorResponse = try {
-            val response = proceedWithMirror(chain, mirrorRequest)
-            if (rejectionReasonOf(response) == null) response.withBodyInMemory() else response
-        } catch (mirrorFailure: IOException) {
-            // Only a failure that kept the request waiting is worth avoiding next time.
-            val keptWaiting = elapsedRealtimeMillis() - startedMillis >= mirrorConnectTimeoutMillis
-            if (keptWaiting) startCoolDown(admission, mirrorFailure)
+        val admission = coolDown.admit(cacheOnly = request.cacheControl.onlyIfCached)
+        if (admission == Admission.Skipped) return chain.proceed(request)
 
-            // A cancelled call fails here as well; it must not start another request.
-            if (chain.call().isCanceled()) throw mirrorFailure
-
-            logFallback(request, reason = mirrorFailure.javaClass.simpleName)
-            return proceedAfterMirrorFailure(chain, request, mirrorFailure)
+        val attempt = runCatching { attemptMirror(chain, mirrorRequest) }.getOrElse { unexpected ->
+            // Not a verdict about the mirror; a probe must still give its slot back.
+            coolDown.report(admission, Outcome.NO_VERDICT)
+            throw unexpected
         }
 
-        val rejectionReason = rejectionReasonOf(mirrorResponse)
-        if (rejectionReason == null) {
-            // An answer from the cache says nothing about the mirror being reachable.
-            if (mirrorResponse.networkResponse != null) endCoolDown()
-            return mirrorResponse
+        return when (attempt) {
+            is MirrorAttempt.Accepted -> {
+                coolDown.report(admission, attempt.outcome)
+                attempt.response
+            }
+            is MirrorAttempt.Rejected -> {
+                logFallback(request, attempt.reason)
+                report(admission, attempt.outcome, attempt.reason)
+                chain.proceed(request)
+            }
+            is MirrorAttempt.Failed -> fallBackAfterFailure(chain, request, admission, attempt.failure)
         }
-
-        // OkHttp refuses to proceed again while the previous response is still open.
-        mirrorResponse.close()
-        logFallback(request, rejectionReason)
-        return chain.proceed(request)
     }
 
     private fun mirrorRequestFor(request: Request): Request? {
-        if (request.method !in MIRRORED_METHODS) return null
+        if (request.method != MIRRORED_METHOD) return null
         val mirrorUrl = novaUtilsMirrorUrl(request.url, mirrorBaseUrl) ?: return null
 
         return request.newBuilder().url(mirrorUrl).build()
     }
 
-    /**
-     * The "skip until" value under which [request] may try the mirror, or null while the mirror is skipped.
-     */
-    private fun admitMirrorAttempt(request: Request): Long? {
-        val skipUntilMillis = skipMirrorUntilMillis.get()
-        if (skipUntilMillis == MIRROR_NOT_SKIPPED || request.cacheControl.onlyIfCached) return skipUntilMillis
+    private fun attemptMirror(chain: Interceptor.Chain, mirrorRequest: Request): MirrorAttempt {
+        val mirrorCall = mirrorClient.newCall(mirrorRequest)
+        mirrorCall.timeout().timeout(attemptDeadlineMillis(chain), TimeUnit.MILLISECONDS)
 
-        val now = elapsedRealtimeMillis()
-        if (now < skipUntilMillis) return null
-
-        // The cool-down has ended. The request that moves it forward probes the mirror; the others keep reading
-        // GitHub until the probe has reported back, which takes less than a cool-down.
-        val probeUntilMillis = now + failureCoolDownMillis
-        return probeUntilMillis.takeIf { skipMirrorUntilMillis.compareAndSet(skipUntilMillis, it) }
-    }
-
-    private fun proceedWithMirror(chain: Interceptor.Chain, mirrorRequest: Request): Response {
-        val connectTimeoutMillis = cappedTimeout(chain.connectTimeoutMillis(), mirrorConnectTimeoutMillis)
-        val readTimeoutMillis = cappedTimeout(chain.readTimeoutMillis(), mirrorReadTimeoutMillis)
-
-        return chain
-            .withConnectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS)
-            .withReadTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS)
-            .proceed(mirrorRequest)
-    }
-
-    private fun cappedTimeout(requestTimeoutMillis: Int, capMillis: Int): Int {
-        return if (requestTimeoutMillis == NO_TIMEOUT) capMillis else min(requestTimeoutMillis, capMillis)
-    }
-
-    /**
-     * Reads the body now, while a failure can still be answered by GitHub. It is empty for HEAD and 304.
-     */
-    private fun Response.withBodyInMemory(): Response {
-        val body = body ?: return this
-        val content = Buffer()
-        body.use { content.writeAll(it.source()) }
-
-        return newBuilder().body(content.asResponseBody(body.contentType(), content.size)).build()
-    }
-
-    /**
-     * Why [mirrorResponse] is not the mirror's copy of the file, or null when it is.
-     */
-    private fun rejectionReasonOf(mirrorResponse: Response): String? {
-        return when {
-            // A 200 that ends a redirect chain is some other page.
-            mirrorResponse.priorResponse != null -> "redirect"
-            mirrorResponse.code !in MIRROR_ANSWER_CODES -> "status ${mirrorResponse.code}"
-            else -> null
+        return try {
+            // The deadline keeps running until the body has been read.
+            mirrorCall.execute().use(::acceptOrReject)
+        } catch (failure: IOException) {
+            MirrorAttempt.Failed(failure)
         }
     }
 
-    private fun proceedAfterMirrorFailure(chain: Interceptor.Chain, request: Request, mirrorFailure: IOException): Response {
-        try {
-            return chain.proceed(request)
-        } catch (gitHubFailure: IOException) {
+    /**
+     * [maxAttemptMillis], and never more than half of the caller's own timeout: the smallest of the timeouts
+     * the caller has set for the call and its socket operations. A coroutine deadline around the call is not
+     * visible here.
+     */
+    private fun attemptDeadlineMillis(chain: Interceptor.Chain): Long {
+        val callerTimeoutsMillis = listOf(
+            TimeUnit.NANOSECONDS.toMillis(chain.call().timeout().timeoutNanos()),
+            chain.connectTimeoutMillis().toLong(),
+            chain.readTimeoutMillis().toLong()
+        )
+        val callerTimeoutMillis = callerTimeoutsMillis.filter { it != NO_TIMEOUT }.minOrNull() ?: return maxAttemptMillis
+        val deadlineMillis = min(maxAttemptMillis, callerTimeoutMillis / CALLER_TIMEOUT_DIVISOR)
+
+        // Zero would mean no deadline at all.
+        return max(deadlineMillis, MIN_ATTEMPT_DEADLINE_MILLIS)
+    }
+
+    /**
+     * The mirror's copy of the file is a 200 that carries [MIRROR_COMMIT_HEADER] and a body, which for a `.json`
+     * file is JSON. The header tells the mirror service from a page that something on the way answers with a 200,
+     * which for an icon could not be told by its body. A 304 that revalidates a cached copy never gets here as
+     * such: OkHttp's cache returns that copy as a 200, with the headers it was stored with.
+     */
+    private fun acceptOrReject(mirrorResponse: Response): MirrorAttempt {
+        val outcome = outcomeOf(mirrorResponse)
+        if (mirrorResponse.code != HTTP_OK) return MirrorAttempt.Rejected("status ${mirrorResponse.code}", outcome)
+
+        val isFromMirrorService = !mirrorResponse.header(MIRROR_COMMIT_HEADER).isNullOrBlank()
+        if (!isFromMirrorService) return MirrorAttempt.Rejected("no $MIRROR_COMMIT_HEADER header", outcome)
+
+        val body = mirrorResponse.body ?: return MirrorAttempt.Rejected("no body", outcome)
+        val content = body.readAtMost(maxBodyBytes)
+        val isJsonFile = mirrorResponse.request.url.encodedPath.endsWith(JSON_FILE_SUFFIX, ignoreCase = true)
+        val rejectionReason = when {
+            content == null -> "body over $maxBodyBytes bytes"
+            content.size == 0L -> "empty body"
+            isJsonFile && !content.isJson() -> "body is not JSON"
+            else -> return MirrorAttempt.Accepted(mirrorResponse.withBody(content, body), outcome)
+        }
+
+        return MirrorAttempt.Rejected(rejectionReason, outcome)
+    }
+
+    /**
+     * What [mirrorResponse] says about the mirror as a whole, whether or not it is usable for this file.
+     */
+    private fun outcomeOf(mirrorResponse: Response): Outcome {
+        // An answer of the local cache: a cached file, or the refusal of a cache-only request.
+        val networkStatus = mirrorResponse.networkResponse?.code ?: return Outcome.NO_VERDICT
+        val isMirrorWideFailure = networkStatus >= HTTP_INTERNAL_ERROR || networkStatus == HTTP_TOO_MANY_REQUESTS
+
+        return if (isMirrorWideFailure) Outcome.FAILED else Outcome.ANSWERED
+    }
+
+    /**
+     * The whole body, or null when it is longer than [maxBytes].
+     */
+    private fun ResponseBody.readAtMost(maxBytes: Long): Buffer? {
+        val source = source()
+        val isOverLimit = source.request(maxBytes + 1)
+        if (isOverLimit) return null
+
+        return Buffer().apply { writeAll(source) }
+    }
+
+    private fun Buffer.isJson(): Boolean {
+        return runCatching {
+            JsonReader(InputStreamReader(peek().inputStream(), Charsets.UTF_8)).use { reader ->
+                reader.skipValue()
+                reader.peek() == JsonToken.END_DOCUMENT
+            }
+        }.getOrDefault(false)
+    }
+
+    private fun Response.withBody(content: Buffer, originalBody: ResponseBody): Response {
+        return newBuilder().body(content.asResponseBody(originalBody.contentType(), content.size)).build()
+    }
+
+    /**
+     * A failed attempt pauses the mirror only when GitHub then answers over the network: the errors of a device
+     * without connectivity look the same as the errors of an unreachable mirror.
+     */
+    private fun fallBackAfterFailure(chain: Interceptor.Chain, request: Request, admission: Admission, mirrorFailure: IOException): Response {
+        // The caller has gone: nothing to fall back for, and no reason to pause the mirror.
+        if (chain.call().isCanceled()) {
+            coolDown.report(admission, Outcome.NO_VERDICT)
+            throw mirrorFailure
+        }
+
+        val reason = mirrorFailure.javaClass.simpleName
+        logFallback(request, reason)
+        val gitHubAttempt = runCatching { chain.proceed(request) }
+        val gitHubAnswered = gitHubAttempt.getOrNull()?.networkResponse != null
+        val outcome = if (gitHubAnswered) Outcome.FAILED else Outcome.NO_VERDICT
+        report(admission, outcome, reason)
+
+        return gitHubAttempt.getOrElse { gitHubFailure ->
             gitHubFailure.addSuppressed(mirrorFailure)
             throw gitHubFailure
         }
     }
 
-    /**
-     * @param admission the value [admitMirrorAttempt] gave the failed attempt. Requests that were in flight
-     * together fail one after another; only the first of them starts the cool-down and makes the next one longer.
-     */
-    private fun startCoolDown(admission: Long, mirrorFailure: IOException) {
-        val coolDownMillis = nextCoolDownMillis.get()
-        val skipUntilMillis = elapsedRealtimeMillis() + coolDownMillis
-        if (!skipMirrorUntilMillis.compareAndSet(admission, skipUntilMillis)) return
+    private fun report(admission: Admission, outcome: Outcome, reason: String) {
+        val pauseMillis = coolDown.report(admission, outcome) ?: return
 
-        nextCoolDownMillis.set(min(coolDownMillis * 2, maxFailureCoolDownMillis))
-        logger.log("$LOG_TAG Mirror skipped for $coolDownMillis ms after ${mirrorFailure.javaClass.simpleName}")
-    }
-
-    private fun endCoolDown() {
-        skipMirrorUntilMillis.set(MIRROR_NOT_SKIPPED)
-        nextCoolDownMillis.set(failureCoolDownMillis)
+        logger.log("$LOG_TAG Mirror skipped for $pauseMillis ms after $reason")
     }
 
     private fun logFallback(request: Request, reason: String) {

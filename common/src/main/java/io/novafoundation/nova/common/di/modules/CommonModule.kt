@@ -29,7 +29,7 @@ import io.novafoundation.nova.common.data.config.RealGlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
-import io.novafoundation.nova.common.data.network.NovaUtilsMirrorInterceptor
+import io.novafoundation.nova.common.data.network.NovaUtilsMirror
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.providers.deviceid.AndroidDeviceIdProvider
 import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
@@ -154,14 +154,15 @@ class CommonModule {
     @ApplicationScope
     fun imageLoader(
         context: Context,
-        novaUtilsMirrorInterceptor: NovaUtilsMirrorInterceptor
+        novaUtilsMirror: NovaUtilsMirror
     ) = ImageLoader.Builder(context)
         // Coil's default client plus the mirror: configs carry absolute GitHub URLs of nova-utils images
         .okHttpClient {
-            OkHttpClient.Builder()
+            val coilDefaultClient = OkHttpClient.Builder()
                 .cache(CoilUtils.createDefaultCache(context))
-                .addInterceptor(novaUtilsMirrorInterceptor)
                 .build()
+
+            novaUtilsMirror.addTo(coilDefaultClient)
         }
         .componentRegistry {
             add(SvgDecoder(context))
