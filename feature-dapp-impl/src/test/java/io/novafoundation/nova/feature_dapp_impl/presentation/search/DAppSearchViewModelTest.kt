@@ -1,29 +1,29 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
-import android.net.Uri
 import androidx.arch.core.executor.ArchTaskExecutor
 import androidx.arch.core.executor.TaskExecutor
-import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsFlushReason
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.common.data.network.AppLinksProvider
-import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
-import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingSiteKind
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingKind
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResultDetails
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
-import java.net.URI
-import java.util.concurrent.ConcurrentHashMap
-import kotlinx.coroutines.CompletableDeferred
+import io.novafoundation.nova.test_shared.any
+import io.novafoundation.nova.test_shared.argThat
+import io.novafoundation.nova.test_shared.eq
+import io.novafoundation.nova.test_shared.whenever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
@@ -41,21 +41,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.MockedStatic
-import org.mockito.Mockito.RETURNS_DEFAULTS
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.mockStatic
-import org.mockito.Mockito.mockingDetails
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
+import org.mockito.Mockito.verifyNoMoreInteractions
 
-/**
- * The view model runs on an unconfined main dispatcher and the interactor is a mock that answers at once,
- * so every step happens on the test thread; the static [Uri] mock is only visible there.
- *
- * The interactor mock is configured only at creation: the search results flow calls it from a background thread,
- * and stubbing a mock while another thread calls it is not safe.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DAppSearchViewModelTest {
 
@@ -63,39 +53,30 @@ class DAppSearchViewModelTest {
 
     private val resourceManager = mock(ResourceManager::class.java)
 
-    private val siteKinds = ConcurrentHashMap<DappSearchResult, DAppStakingSiteKind>()
+    private val resultDetails = mutableMapOf<DappSearchResult, DappSearchResultDetails>()
 
-    private val interactor = mock(SearchDappInteractor::class.java) { invocation ->
-        when (invocation.method.name) {
-            "categories" -> emptyFlow<List<DappCategory>>()
-            "searchDapps" -> emptyMap<DappSearchGroup, List<DappSearchResult>>()
-            "stakingSiteKind" -> siteKinds.getValue(invocation.getArgument(0))
-            else -> RETURNS_DEFAULTS.answer(invocation)
-        }
-    }
+    private val interactor = mock(SearchDappInteractor::class.java)
 
     private val dappInteractor = mock(DappInteractor::class.java)
 
     private val dAppSearchResponder = mock(DAppSearchResponder::class.java)
 
-    private val awaitableFactory = HeldAwaitableFactory()
+    private val awaitableFactory = CommonModule().actionAwaitableMixinFactory()
 
     private val appLinksProvider = mock(AppLinksProvider::class.java)
 
     private val analyticsService = RecordingAnalyticsService()
 
-    private lateinit var uriMock: MockedStatic<Uri>
-
     private lateinit var viewModel: DAppSearchViewModel
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking<Unit> {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         ArchTaskExecutor.getInstance().setDelegate(ImmediateTaskExecutor())
-        uriMock = mockStatic(Uri::class.java)
-        uriMock.`when`<Uri> { Uri.parse(anyString()) }.thenAnswer { invocation -> uriOf(invocation.getArgument(0)) }
-
-        `when`(appLinksProvider.email).thenReturn("support@novawallet.io")
+        whenever(interactor.categories()).thenReturn(emptyFlow<List<DappCategory>>())
+        whenever(interactor.searchDapps(any(), any())).thenReturn(emptyMap<DappSearchGroup, List<DappSearchResult>>())
+        whenever(interactor.resolveSearchResult(any())).thenAnswer { invocation -> resultDetails.getValue(invocation.getArgument(0)) }
+        whenever(appLinksProvider.email).thenReturn("support@novawallet.io")
 
         viewModel = createViewModel(SearchPayload.Request.OPEN_NEW_URL)
     }
@@ -103,7 +84,6 @@ class DAppSearchViewModelTest {
     @After
     fun tearDown() = runBlocking {
         viewModel.coroutineContext.job.cancelAndJoin()
-        uriMock.close()
         ArchTaskExecutor.getInstance().setDelegate(null)
         Dispatchers.resetMain()
     }
@@ -154,7 +134,7 @@ class DAppSearchViewModelTest {
 
         viewModel.stakingBannerClicked()
 
-        assertRouterCalls("openBittensorStaking" to listOf(StakingFlowSource.DAPP_SEARCH_BANNER))
+        verify(router).openBittensorStaking(StakingFlowSource.DAPP_SEARCH_BANNER)
         assertEvents(bannerShown("bittensor"), bannerAction("bittensor"))
     }
 
@@ -164,34 +144,33 @@ class DAppSearchViewModelTest {
 
         viewModel.stakingBannerClicked()
 
-        assertRouterCalls("openStaking" to emptyList())
+        verify(router).openStaking()
         assertEvents(bannerShown("staking"), bannerAction("staking"))
     }
 
     @Test
     fun `TAO related address shows the Bittensor notice and does not open the site`() {
         val site = DappSearchResult.Url("https://taoyield.com", isTrustedByNova = false)
-        givenSiteKind(site, DAppStakingSiteKind.BITTENSOR)
+        givenSiteKind(site, DAppStakingKind.BITTENSOR)
 
         viewModel.searchResultClicked(site)
 
-        val notice = shownNotice()
-        assertEquals(DAppStakingSiteKind.BITTENSOR, notice?.kind)
-        assertEquals("taoyield.com", notice?.host)
-        assertRouterCalls()
-        assertTrue(awaitableFactory.unknownDAppWarning.requests.isEmpty())
+        val notice = stakingNotice()
+        assertEquals(DAppStakingKind.BITTENSOR, notice?.payload)
+        verifyNoInteractions(router)
+        assertNull(unknownDAppWarning())
         assertEvents(noticeShown("bittensor", "taoyield.com"))
     }
 
     @Test
     fun `continuing from the Bittensor notice opens an unknown site without the unknown DApp warning`() {
         val site = DappSearchResult.Url("https://taoyield.com", isTrustedByNova = false)
-        givenSiteKind(site, DAppStakingSiteKind.BITTENSOR)
+        givenSiteKind(site, DAppStakingKind.BITTENSOR)
         viewModel.searchResultClicked(site)
 
-        viewModel.continueToStakingSiteClicked()
+        selectNoticeAction(StakingNoticeAction.CONTINUE_TO_SITE)
 
-        assertTrue(awaitableFactory.unknownDAppWarning.requests.isEmpty())
+        assertNull(unknownDAppWarning())
         assertOpenedInBrowser("https://taoyield.com")
         assertEvents(
             noticeShown("bittensor", "taoyield.com"),
@@ -203,12 +182,12 @@ class DAppSearchViewModelTest {
     @Test
     fun `go to staking from the Bittensor notice opens Bittensor staking and not the site`() {
         val site = DappSearchResult.Dapp(dApp("https://www.tao.app/staking"))
-        givenSiteKind(site, DAppStakingSiteKind.BITTENSOR)
+        givenSiteKind(site, DAppStakingKind.BITTENSOR)
         viewModel.searchResultClicked(site)
 
-        viewModel.noticeGoToStakingClicked()
+        selectNoticeAction(StakingNoticeAction.GO_TO_STAKING)
 
-        assertRouterCalls("openBittensorStaking" to listOf(StakingFlowSource.DAPP_NOTICE))
+        verify(router).openBittensorStaking(StakingFlowSource.DAPP_NOTICE)
         assertEvents(
             noticeShown("bittensor", "www.tao.app"),
             noticeAction("bittensor", "go_to_staking", "www.tao.app")
@@ -218,15 +197,14 @@ class DAppSearchViewModelTest {
     @Test
     fun `third party staking site keeps the generic notice and the staking tab`() {
         val site = DappSearchResult.Url("https://staking.polkadot.cloud", isTrustedByNova = true)
-        givenSiteKind(site, DAppStakingSiteKind.THIRD_PARTY_STAKING)
+        givenSiteKind(site, DAppStakingKind.STAKING)
 
         viewModel.searchResultClicked(site)
-        val notice = shownNotice()
-        viewModel.noticeGoToStakingClicked()
+        val notice = stakingNotice()
+        selectNoticeAction(StakingNoticeAction.GO_TO_STAKING)
 
-        assertEquals(DAppStakingSiteKind.THIRD_PARTY_STAKING, notice?.kind)
-        assertEquals("staking.polkadot.cloud", notice?.host)
-        assertRouterCalls("openStaking" to emptyList())
+        assertEquals(DAppStakingKind.STAKING, notice?.payload)
+        verify(router).openStaking()
         assertEvents(
             noticeShown("staking", "staking.polkadot.cloud"),
             noticeAction("staking", "go_to_staking", "staking.polkadot.cloud")
@@ -236,15 +214,15 @@ class DAppSearchViewModelTest {
     @Test
     fun `continuing from the generic notice to an unknown site still awaits the unknown DApp warning`() {
         val site = DappSearchResult.Url("https://staking.example.org", isTrustedByNova = false)
-        givenSiteKind(site, DAppStakingSiteKind.THIRD_PARTY_STAKING)
+        givenSiteKind(site, DAppStakingKind.STAKING)
         viewModel.searchResultClicked(site)
 
-        viewModel.continueToStakingSiteClicked()
+        selectNoticeAction(StakingNoticeAction.CONTINUE_TO_SITE)
 
-        assertEquals(1, awaitableFactory.unknownDAppWarning.requests.size)
-        assertRouterCalls()
+        assertEquals("support@novawallet.io", unknownDAppWarning()?.payload?.supportEmail)
+        verifyNoInteractions(router)
 
-        awaitableFactory.unknownDAppWarning.confirm()
+        requireNotNull(unknownDAppWarning()).onSuccess(Unit)
 
         assertOpenedInBrowser("https://staking.example.org")
         assertEvents(
@@ -257,15 +235,15 @@ class DAppSearchViewModelTest {
     @Test
     fun `unknown site without a notice still awaits the unknown DApp warning`() {
         val site = DappSearchResult.Url("https://example.org", isTrustedByNova = false)
-        givenSiteKind(site, DAppStakingSiteKind.NONE)
+        givenSiteKind(site, null)
 
         viewModel.searchResultClicked(site)
 
-        assertNull(shownNotice())
-        assertEquals(1, awaitableFactory.unknownDAppWarning.requests.size)
-        assertRouterCalls()
+        assertNull(stakingNotice())
+        assertEquals("support@novawallet.io", unknownDAppWarning()?.payload?.supportEmail)
+        verifyNoInteractions(router)
 
-        awaitableFactory.unknownDAppWarning.confirm()
+        requireNotNull(unknownDAppWarning()).onSuccess(Unit)
 
         assertOpenedInBrowser("https://example.org")
         assertEvents(dAppOpened("example.org", source = "manual_url", isKnownDApp = false))
@@ -274,28 +252,70 @@ class DAppSearchViewModelTest {
     @Test
     fun `free text TAO query shows no notice and keeps the unknown DApp warning`() {
         val search = DappSearchResult.Search("tao", "https://duckduckgo.com/?q=tao")
-        givenSiteKind(search, DAppStakingSiteKind.NONE)
+        givenSiteKind(search, null)
         typeQueries("tao")
 
         viewModel.searchResultClicked(search)
 
-        assertNull(shownNotice())
-        assertEquals(1, awaitableFactory.unknownDAppWarning.requests.size)
-        assertRouterCalls()
+        assertNull(stakingNotice())
+        assertEquals("support@novawallet.io", unknownDAppWarning()?.payload?.supportEmail)
+        verifyNoInteractions(router)
         assertEvents(bannerShown("bittensor"))
     }
 
     @Test
-    fun `notice buttons do nothing once the pending site is consumed`() {
+    fun `another tap cannot replace an open notice or its destination`() {
+        val firstSite = DappSearchResult.Url("https://taostats.io", isTrustedByNova = true)
+        val secondSite = DappSearchResult.Url("https://staking.polkadot.cloud", isTrustedByNova = true)
+        givenSiteKind(firstSite, DAppStakingKind.BITTENSOR)
+        givenSiteKind(secondSite, DAppStakingKind.STAKING)
+
+        viewModel.searchResultClicked(firstSite)
+        viewModel.searchResultClicked(secondSite)
+        selectNoticeAction(StakingNoticeAction.CONTINUE_TO_SITE)
+
+        assertOpenedInBrowser(firstSite.targetUrl)
+        assertEvents(
+            noticeShown("bittensor", "taostats.io"),
+            noticeAction("bittensor", "continue_to_site", "taostats.io"),
+            dAppOpened("taostats.io", source = "manual_url", isKnownDApp = true)
+        )
+    }
+
+    @Test
+    fun `dismissing a notice lets the user choose another result`() {
+        val firstSite = DappSearchResult.Url("https://taostats.io", isTrustedByNova = true)
+        val secondSite = DappSearchResult.Url("https://staking.polkadot.cloud", isTrustedByNova = true)
+        givenSiteKind(firstSite, DAppStakingKind.BITTENSOR)
+        givenSiteKind(secondSite, DAppStakingKind.STAKING)
+
+        viewModel.searchResultClicked(firstSite)
+        requireNotNull(stakingNotice()).onCancel()
+
+        viewModel.searchResultClicked(secondSite)
+        selectNoticeAction(StakingNoticeAction.GO_TO_STAKING)
+
+        verify(router).openStaking()
+        verifyNoMoreInteractions(router)
+        assertEvents(
+            noticeShown("bittensor", "taostats.io"),
+            noticeShown("staking", "staking.polkadot.cloud"),
+            noticeAction("staking", "go_to_staking", "staking.polkadot.cloud")
+        )
+    }
+
+    @Test
+    fun `an action from a cancelled notice cannot open its site`() {
         val site = DappSearchResult.Url("https://taostats.io", isTrustedByNova = true)
-        givenSiteKind(site, DAppStakingSiteKind.BITTENSOR)
+        givenSiteKind(site, DAppStakingKind.BITTENSOR)
+
         viewModel.searchResultClicked(site)
-        viewModel.noticeGoToStakingClicked()
+        val previousNotice = requireNotNull(stakingNotice())
+        viewModel.cancelSearchResultOpening()
+        previousNotice.onSuccess(StakingNoticeAction.CONTINUE_TO_SITE)
 
-        viewModel.continueToStakingSiteClicked()
-        viewModel.noticeGoToStakingClicked()
-
-        assertRouterCalls("openBittensorStaking" to listOf(StakingFlowSource.DAPP_NOTICE))
+        verifyNoInteractions(router)
+        assertEvents(noticeShown("bittensor", "taostats.io"))
     }
 
     @Test
@@ -303,14 +323,15 @@ class DAppSearchViewModelTest {
         viewModel.coroutineContext.job.cancelAndJoin()
         viewModel = createViewModel(SearchPayload.Request.GO_TO_URL)
         val site = DappSearchResult.Url("https://taostats.io", isTrustedByNova = false)
-        givenSiteKind(site, DAppStakingSiteKind.BITTENSOR)
+        givenSiteKind(site, DAppStakingKind.BITTENSOR)
         viewModel.searchResultClicked(site)
 
-        viewModel.continueToStakingSiteClicked()
+        selectNoticeAction(StakingNoticeAction.CONTINUE_TO_SITE)
 
-        val response = mockingDetails(dAppSearchResponder).invocations.single().arguments.single()
-        assertEquals("https://taostats.io", (response as DAppSearchCommunicator.Response.NewUrl).url)
-        assertRouterCalls("finishDappSearch" to emptyList())
+        verify(dAppSearchResponder).respond(
+            argThat { response -> response is DAppSearchCommunicator.Response.NewUrl && response.url == site.targetUrl }
+        )
+        verify(router).finishDappSearch()
     }
 
     private fun createViewModel(request: SearchPayload.Request) = DAppSearchViewModel(
@@ -329,23 +350,25 @@ class DAppSearchViewModelTest {
         queries.forEach { viewModel.query.value = it }
     }
 
-    private fun givenSiteKind(result: DappSearchResult, kind: DAppStakingSiteKind) {
-        siteKinds[result] = kind
+    private fun givenSiteKind(result: DappSearchResult, kind: DAppStakingKind?) {
+        val host = Urls.hostOf(result.targetUrl)
+        resultDetails[result] = DappSearchResultDetails(host, kind)
     }
 
-    private fun shownNotice(): StakingNoticeModel? = viewModel.showStakingNoticeEvent.value?.peekContent()
+    private fun stakingNotice() = viewModel.stakingNotice.awaitableActionLiveData.value?.peekContent()
 
-    private fun assertRouterCalls(vararg expected: Pair<String, List<Any?>>) {
-        val actual = mockingDetails(router).invocations.map { it.method.name to it.arguments.toList() }
+    private fun unknownDAppWarning() = viewModel.dAppNotInCatalogWarning.awaitableActionLiveData.value?.peekContent()
 
-        assertEquals(expected.toList(), actual)
+    private fun selectNoticeAction(action: StakingNoticeAction) {
+        requireNotNull(stakingNotice()).onSuccess(action)
     }
 
     private fun assertOpenedInBrowser(url: String) {
-        val invocation = mockingDetails(router).invocations.single()
-
-        assertEquals("openDAppBrowser", invocation.method.name)
-        assertEquals(url, (invocation.arguments.first() as DAppBrowserPayload.Address).address)
+        verify(router).openDAppBrowser(
+            payload = argThat { payload -> payload is DAppBrowserPayload.Address && payload.address == url },
+            extras = eq(null)
+        )
+        verifyNoMoreInteractions(router)
     }
 
     private fun assertEvents(vararg expected: Pair<String, Map<String, Any>>) {
@@ -384,13 +407,6 @@ class DAppSearchViewModelTest {
         "is_known_dapp" to isKnownDApp
     )
 
-    private fun uriOf(url: String): Uri {
-        val uri = mock(Uri::class.java)
-        `when`(uri.host).thenReturn(URI(url).host)
-
-        return uri
-    }
-
     private fun dApp(url: String) = DApp(
         name = url,
         description = "",
@@ -411,38 +427,6 @@ class DAppSearchViewModelTest {
         }
 
         override suspend fun flush(reason: AnalyticsFlushReason) = Unit
-    }
-
-    /**
-     * The search view model creates a single awaitable: the unknown DApp warning.
-     */
-    private class HeldAwaitableFactory : ActionAwaitableMixin.Factory {
-
-        val unknownDAppWarning = HeldConfirmation<DappUnknownWarningModel>()
-
-        @Suppress("UNCHECKED_CAST")
-        override fun <P, R> create(): ActionAwaitableMixin.Presentation<P, R> {
-            return unknownDAppWarning as ActionAwaitableMixin.Presentation<P, R>
-        }
-    }
-
-    private class HeldConfirmation<P> : ActionAwaitableMixin.Presentation<P, Unit> {
-
-        override val awaitableActionLiveData = MutableLiveData<Event<ActionAwaitableMixin.Action<P, Unit>>>()
-
-        val requests = mutableListOf<P>()
-
-        private val confirmation = CompletableDeferred<Unit>()
-
-        override suspend fun awaitAction(payload: P) {
-            requests += payload
-
-            confirmation.await()
-        }
-
-        fun confirm() {
-            confirmation.complete(Unit)
-        }
     }
 
     private class ImmediateTaskExecutor : TaskExecutor() {

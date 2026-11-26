@@ -1,13 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.domain.search
 
-enum class DAppStakingSiteKind {
-    NONE,
-    THIRD_PARTY_STAKING,
-    BITTENSOR
-}
-
-enum class DAppStakingQueryKind {
-    NONE,
+enum class DAppStakingKind {
     STAKING,
     BITTENSOR
 }
@@ -30,13 +23,13 @@ object DAppStakingDetection {
     )
 
     /**
-     * A query that is both TAO-related and a staking one is [DAppStakingQueryKind.BITTENSOR].
+     * A query that is both TAO-related and a staking one is [DAppStakingKind.BITTENSOR].
      */
-    fun queryKind(query: String?): DAppStakingQueryKind {
+    fun queryKind(query: String?): DAppStakingKind? {
         return when {
-            isBittensorQuery(query) -> DAppStakingQueryKind.BITTENSOR
-            isStakingQuery(query) -> DAppStakingQueryKind.STAKING
-            else -> DAppStakingQueryKind.NONE
+            isBittensorQuery(query) -> DAppStakingKind.BITTENSOR
+            isStakingQuery(query) -> DAppStakingKind.STAKING
+            else -> null
         }
     }
 

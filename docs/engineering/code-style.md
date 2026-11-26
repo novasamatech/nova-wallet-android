@@ -7,6 +7,10 @@ Context receivers are already used; do not migrate language features as incident
 
 Use existing numeric sign extensions (`isPositive`, `isNegative`, `isZero`, `isNonNegative`, and `isNonPositive`) instead of inline `signum()` comparisons or local duplicates. Respect their existing property/function syntax for each numeric type. Apply the established project conventions proactively when reviewing nearby code, not only to explicitly reported lines.
 
+Use the shared `Urls.hostOf()` helper for the host of an already validated URL. Resolve it in the owner
+of URL handling and pass the host to presentation when needed. `Urls.domainOf()` returns the URL authority,
+which can include a port. Keep any fallback for invalid URLs explicit at the input boundary.
+
 Give variables, classes, and functions clear, descriptive names that convey their purpose. Balance name length with the context it provides: avoid ambiguous abbreviations, but do not repeat information already clear from the surrounding scope.
 
 Make protocol units explicit in names (for example, raw u16 commission versus a decimal commission rate). Use named protocol constants or standard numeric bounds instead of unexplained literals, and keep unit conversions in focused helpers. Preserve wire-field names at the API/storage boundary; use descriptive domain terminology beyond it.

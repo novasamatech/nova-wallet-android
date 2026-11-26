@@ -28,7 +28,7 @@ class DappStakingPromptEventTest {
 
     @Test
     fun `search banner action carries the action without a host`() {
-        val event = AnalyticsEvent.DappStakingPromptAction(
+        val event = AnalyticsEvent.DappStakingPromptActionTaken(
             DappStakingPromptPlacement.SEARCH_BANNER,
             DappStakingPromptKind.STAKING,
             DappStakingPromptAction.GO_TO_STAKING
@@ -41,7 +41,7 @@ class DappStakingPromptEventTest {
 
     @Test
     fun `notice action carries the action and the host`() {
-        val event = AnalyticsEvent.DappStakingPromptAction(
+        val event = AnalyticsEvent.DappStakingPromptActionTaken(
             DappStakingPromptPlacement.NOTICE,
             DappStakingPromptKind.BITTENSOR,
             DappStakingPromptAction.CONTINUE_TO_SITE,

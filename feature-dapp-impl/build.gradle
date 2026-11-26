@@ -97,4 +97,5 @@ dependencies {
     testImplementation jUnitDep
     testImplementation mockitoDep
     testImplementation coroutinesTestDep
+    testImplementation project(':test-shared')
 }

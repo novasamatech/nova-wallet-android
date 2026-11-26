@@ -117,12 +117,12 @@ class DAppStakingDetectionTest {
 
     @Test
     fun `should prefer TAO over staking for a query matching both`() {
-        assertEquals(DAppStakingQueryKind.BITTENSOR, DAppStakingDetection.queryKind("TAO staking"))
-        assertEquals(DAppStakingQueryKind.BITTENSOR, DAppStakingDetection.queryKind("tao"))
-        assertEquals(DAppStakingQueryKind.STAKING, DAppStakingDetection.queryKind("polkadot staking"))
-        assertEquals(DAppStakingQueryKind.NONE, DAppStakingDetection.queryKind("hydration"))
-        assertEquals(DAppStakingQueryKind.NONE, DAppStakingDetection.queryKind(""))
-        assertEquals(DAppStakingQueryKind.NONE, DAppStakingDetection.queryKind(null))
+        assertEquals(DAppStakingKind.BITTENSOR, DAppStakingDetection.queryKind("TAO staking"))
+        assertEquals(DAppStakingKind.BITTENSOR, DAppStakingDetection.queryKind("tao"))
+        assertEquals(DAppStakingKind.STAKING, DAppStakingDetection.queryKind("polkadot staking"))
+        assertEquals(null, DAppStakingDetection.queryKind("hydration"))
+        assertEquals(null, DAppStakingDetection.queryKind(""))
+        assertEquals(null, DAppStakingDetection.queryKind(null))
     }
 
     @Test

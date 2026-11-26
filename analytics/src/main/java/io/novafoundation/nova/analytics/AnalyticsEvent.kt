@@ -310,11 +310,10 @@ sealed class AnalyticsEvent(
         }
     )
 
-    class DappStakingPromptAction(
+    class DappStakingPromptActionTaken(
         placement: DappStakingPromptPlacement,
         kind: DappStakingPromptKind,
-        // Qualified: inside AnalyticsEvent the simple name is this event class, not the enum
-        action: io.novafoundation.nova.analytics.DappStakingPromptAction,
+        action: DappStakingPromptAction,
         dappHost: String? = null
     ) : AnalyticsEvent(
         name = "dapp_staking_prompt_action",
