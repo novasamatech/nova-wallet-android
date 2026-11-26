@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.view.bottomSheet.action.TextAction
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.common.view.bottomSheet.action.setupView
 import io.novafoundation.nova.feature_dapp_impl.R
-import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingSiteKind
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingKind
 
 /**
  * The Bittensor notice names the built-in Bittensor staking and offers "Continue to site" at once;
@@ -18,14 +18,15 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingSiteKin
  */
 class DAppStakingNoticeBottomSheet(
     context: Context,
-    private val kind: DAppStakingSiteKind,
-    private val onGoToStaking: () -> Unit,
-    private val onContinueToSite: () -> Unit,
+    private val kind: DAppStakingKind
 ) : BaseBottomSheet<BottomSheetActionBinding>(context) {
 
     override val binder: BottomSheetActionBinding = BottomSheetActionBinding.inflate(LayoutInflater.from(context))
 
-    private var continueRevealed = kind == DAppStakingSiteKind.BITTENSOR
+    private var continueRevealed = kind == DAppStakingKind.BITTENSOR
+
+    var selectedAction: StakingNoticeAction? = null
+        private set
 
     init {
         bindContent()
@@ -38,8 +39,7 @@ class DAppStakingNoticeBottomSheet(
                 title = context.getString(R.string.dapp_staking_notice_title),
                 subtitle = context.getString(messageRes()),
                 actionButtonPreferences = ButtonPreferences.primary(context.getString(R.string.common_go_to_staking)) {
-                    dismiss()
-                    onGoToStaking()
+                    selectAction(StakingNoticeAction.GO_TO_STAKING)
                 },
                 secondaryTextAction = TextAction(secondaryText(), ::onSecondaryClicked)
             ),
@@ -50,18 +50,22 @@ class DAppStakingNoticeBottomSheet(
 
     private fun onSecondaryClicked() {
         if (continueRevealed) {
-            dismiss()
-            onContinueToSite()
+            selectAction(StakingNoticeAction.CONTINUE_TO_SITE)
         } else {
             continueRevealed = true
             bindContent()
         }
     }
 
+    private fun selectAction(action: StakingNoticeAction) {
+        selectedAction = action
+        dismiss()
+    }
+
     private fun messageRes(): Int {
         return when (kind) {
-            DAppStakingSiteKind.BITTENSOR -> R.string.dapp_staking_notice_bittensor_message
-            DAppStakingSiteKind.THIRD_PARTY_STAKING, DAppStakingSiteKind.NONE -> R.string.dapp_staking_notice_message
+            DAppStakingKind.BITTENSOR -> R.string.dapp_staking_notice_bittensor_message
+            DAppStakingKind.STAKING -> R.string.dapp_staking_notice_message
         }
     }
 

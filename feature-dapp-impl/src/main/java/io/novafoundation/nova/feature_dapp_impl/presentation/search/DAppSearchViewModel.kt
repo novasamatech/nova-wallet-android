@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import android.net.Uri
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.DappStakingPromptAction
@@ -17,13 +16,11 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingDetection
-import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingQueryKind
-import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingSiteKind
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingKind
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
@@ -34,6 +31,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteract
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -56,10 +54,9 @@ class DAppSearchViewModel(
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
 
-    private val _showStakingNoticeEvent = MutableLiveData<Event<StakingNoticeModel>>()
-    val showStakingNoticeEvent: LiveData<Event<StakingNoticeModel>> = _showStakingNoticeEvent
+    val stakingNotice = actionAwaitableMixinFactory.create<DAppStakingKind, StakingNoticeAction>()
 
-    private var pendingStakingNotice: PendingStakingNotice? = null
+    private var openSearchResultJob: Job? = null
 
     val query = MutableStateFlow(payload.initialUrl.orEmpty())
 
@@ -69,7 +66,7 @@ class DAppSearchViewModel(
         .onEach(::trackStakingBannerShown)
         .share()
 
-    val stakingBannerVisible = stakingBannerKind.map { it != DAppStakingQueryKind.NONE }
+    val stakingBannerVisible = stakingBannerKind.map { it != null }
         .distinctUntilChanged()
 
     private val _selectQueryTextEvent = MutableLiveData<Event<Unit>>()
@@ -108,6 +105,8 @@ class DAppSearchViewModel(
     }
 
     fun cancelClicked() {
+        cancelSearchResultOpening()
+
         if (shouldReportResult()) {
             dAppSearchResponder.respond(DAppSearchCommunicator.Response.Cancel)
         }
@@ -149,12 +148,14 @@ class DAppSearchViewModel(
     }
 
     fun stakingBannerClicked() {
-        val kind = DAppStakingDetection.queryKind(query.value).toPromptKind() ?: return
+        if (openSearchResultJob?.isActive == true) return
+
+        val kind = DAppStakingDetection.queryKind(query.value) ?: return
 
         analyticsService.track(
-            AnalyticsEvent.DappStakingPromptAction(
+            AnalyticsEvent.DappStakingPromptActionTaken(
                 placement = DappStakingPromptPlacement.SEARCH_BANNER,
-                kind = kind,
+                kind = kind.toAnalyticsKind(),
                 action = DappStakingPromptAction.GO_TO_STAKING
             )
         )
@@ -162,75 +163,62 @@ class DAppSearchViewModel(
         openStaking(kind, StakingFlowSource.DAPP_SEARCH_BANNER)
     }
 
-    fun noticeGoToStakingClicked() {
-        val notice = consumePendingStakingNotice() ?: return
-
-        trackStakingNoticeAction(notice, DappStakingPromptAction.GO_TO_STAKING)
-
-        openStaking(notice.kind, StakingFlowSource.DAPP_NOTICE)
-    }
-
-    fun continueToStakingSiteClicked() {
-        val notice = consumePendingStakingNotice() ?: return
-
-        trackStakingNoticeAction(notice, DappStakingPromptAction.CONTINUE_TO_SITE)
-
-        // The Bittensor notice replaces the unknown DApp warning for a TAO-related site
-        val isBittensorSite = notice.kind == DappStakingPromptKind.BITTENSOR
-        openSearchResult(notice.searchResult, skipUnknownDAppWarning = isBittensorSite)
-    }
-
     fun searchResultClicked(searchResult: DappSearchResult) {
-        launch {
-            val siteKind = interactor.stakingSiteKind(searchResult)
-            val noticeKind = siteKind.toPromptKind()
+        if (openSearchResultJob?.isActive == true) return
 
-            if (noticeKind == null) {
-                openSearchResult(searchResult, skipUnknownDAppWarning = false)
+        openSearchResultJob = launch {
+            val details = interactor.resolveSearchResult(searchResult)
+            val stakingKind = details.stakingKind
+
+            if (stakingKind == null) {
+                openSearchResult(searchResult, details.host, skipUnknownDAppWarning = false)
             } else {
-                showStakingNotice(searchResult, siteKind, noticeKind)
+                handleStakingNotice(searchResult, stakingKind, details.host)
             }
         }
     }
 
-    private fun showStakingNotice(searchResult: DappSearchResult, siteKind: DAppStakingSiteKind, noticeKind: DappStakingPromptKind) {
-        val host = hostOf(searchResult.targetUrl())
+    fun cancelSearchResultOpening() {
+        openSearchResultJob?.cancel()
+    }
 
-        pendingStakingNotice = PendingStakingNotice(searchResult, noticeKind, host)
-        _showStakingNoticeEvent.value = StakingNoticeModel(siteKind, host).event()
-
+    private suspend fun handleStakingNotice(searchResult: DappSearchResult, kind: DAppStakingKind, host: String) {
         analyticsService.track(
             AnalyticsEvent.DappStakingPromptShown(
                 placement = DappStakingPromptPlacement.NOTICE,
-                kind = noticeKind,
+                kind = kind.toAnalyticsKind(),
                 dappHost = host
             )
         )
-    }
 
-    private fun consumePendingStakingNotice(): PendingStakingNotice? {
-        val notice = pendingStakingNotice
-        pendingStakingNotice = null
+        val action = stakingNotice.awaitAction(kind)
+        trackStakingNoticeAction(kind, action, host)
 
-        return notice
-    }
-
-    private fun openStaking(kind: DappStakingPromptKind, source: StakingFlowSource) {
-        when (kind) {
-            DappStakingPromptKind.BITTENSOR -> router.openBittensorStaking(source)
-            DappStakingPromptKind.STAKING -> router.openStaking()
+        when (action) {
+            StakingNoticeAction.GO_TO_STAKING -> openStaking(kind, StakingFlowSource.DAPP_NOTICE)
+            StakingNoticeAction.CONTINUE_TO_SITE -> openSearchResult(
+                searchResult = searchResult,
+                host = host,
+                skipUnknownDAppWarning = kind == DAppStakingKind.BITTENSOR
+            )
         }
     }
 
-    private fun openSearchResult(searchResult: DappSearchResult, skipUnknownDAppWarning: Boolean) = launch {
-        val newUrl = searchResult.targetUrl()
+    private fun openStaking(kind: DAppStakingKind, source: StakingFlowSource) {
+        when (kind) {
+            DAppStakingKind.BITTENSOR -> router.openBittensorStaking(source)
+            DAppStakingKind.STAKING -> router.openStaking()
+        }
+    }
 
+    private suspend fun openSearchResult(searchResult: DappSearchResult, host: String, skipUnknownDAppWarning: Boolean) {
         val needsUnknownDAppWarning = !searchResult.isTrustedByNova && !skipUnknownDAppWarning
         if (needsUnknownDAppWarning) {
             dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
         }
 
-        trackDappOpened(searchResult, newUrl)
+        trackDappOpened(searchResult, host)
+        val newUrl = searchResult.targetUrl
 
         when (payload.request) {
             SearchPayload.Request.GO_TO_URL -> {
@@ -242,55 +230,41 @@ class DAppSearchViewModel(
         }
     }
 
-    private fun DappSearchResult.targetUrl(): String {
-        return when (this) {
-            is DappSearchResult.Dapp -> dapp.url
-            is DappSearchResult.Search -> searchUrl
-            is DappSearchResult.Url -> url
-        }
-    }
-
-    private fun hostOf(url: String): String = Uri.parse(url).host.orEmpty()
-
-    private fun trackStakingBannerShown(queryKind: DAppStakingQueryKind) {
-        val kind = queryKind.toPromptKind() ?: return
+    private fun trackStakingBannerShown(kind: DAppStakingKind?) {
+        if (kind == null) return
 
         analyticsService.track(
             AnalyticsEvent.DappStakingPromptShown(
                 placement = DappStakingPromptPlacement.SEARCH_BANNER,
-                kind = kind
+                kind = kind.toAnalyticsKind()
             )
         )
     }
 
-    private fun trackStakingNoticeAction(notice: PendingStakingNotice, action: DappStakingPromptAction) {
+    private fun trackStakingNoticeAction(kind: DAppStakingKind, action: StakingNoticeAction, host: String) {
+        val analyticsAction = when (action) {
+            StakingNoticeAction.GO_TO_STAKING -> DappStakingPromptAction.GO_TO_STAKING
+            StakingNoticeAction.CONTINUE_TO_SITE -> DappStakingPromptAction.CONTINUE_TO_SITE
+        }
+
         analyticsService.track(
-            AnalyticsEvent.DappStakingPromptAction(
+            AnalyticsEvent.DappStakingPromptActionTaken(
                 placement = DappStakingPromptPlacement.NOTICE,
-                kind = notice.kind,
-                action = action,
-                dappHost = notice.host
+                kind = kind.toAnalyticsKind(),
+                action = analyticsAction,
+                dappHost = host
             )
         )
     }
 
-    private fun DAppStakingQueryKind.toPromptKind(): DappStakingPromptKind? {
+    private fun DAppStakingKind.toAnalyticsKind(): DappStakingPromptKind {
         return when (this) {
-            DAppStakingQueryKind.NONE -> null
-            DAppStakingQueryKind.STAKING -> DappStakingPromptKind.STAKING
-            DAppStakingQueryKind.BITTENSOR -> DappStakingPromptKind.BITTENSOR
+            DAppStakingKind.STAKING -> DappStakingPromptKind.STAKING
+            DAppStakingKind.BITTENSOR -> DappStakingPromptKind.BITTENSOR
         }
     }
 
-    private fun DAppStakingSiteKind.toPromptKind(): DappStakingPromptKind? {
-        return when (this) {
-            DAppStakingSiteKind.NONE -> null
-            DAppStakingSiteKind.THIRD_PARTY_STAKING -> DappStakingPromptKind.STAKING
-            DAppStakingSiteKind.BITTENSOR -> DappStakingPromptKind.BITTENSOR
-        }
-    }
-
-    private fun trackDappOpened(searchResult: DappSearchResult, url: String) {
+    private fun trackDappOpened(searchResult: DappSearchResult, host: String) {
         val source = when (searchResult) {
             is DappSearchResult.Dapp -> "search"
             is DappSearchResult.Search -> "search"
@@ -299,7 +273,7 @@ class DAppSearchViewModel(
 
         analyticsService.track(
             AnalyticsEvent.DappOpened(
-                dappHost = hostOf(url),
+                dappHost = host,
                 source = source,
                 isKnownDapp = searchResult.isTrustedByNova
             )
@@ -319,10 +293,4 @@ class DAppSearchViewModel(
             selectedCategoryId.value = id
         }
     }
-
-    private class PendingStakingNotice(
-        val searchResult: DappSearchResult,
-        val kind: DappStakingPromptKind,
-        val host: String
-    )
 }

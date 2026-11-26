@@ -42,47 +42,57 @@ class SearchDappInteractorTest {
 
     @Test
     fun `TAO related address shows the Bittensor notice`() {
-        assertSiteKind(DAppStakingSiteKind.BITTENSOR, DappSearchResult.Url("https://taostats.io", isTrustedByNova = true))
-        assertSiteKind(DAppStakingSiteKind.BITTENSOR, DappSearchResult.Url("https://taoyield.com/pools?id=1", isTrustedByNova = false))
+        assertSiteKind(DAppStakingKind.BITTENSOR, DappSearchResult.Url("https://taostats.io", isTrustedByNova = true))
+        assertSiteKind(DAppStakingKind.BITTENSOR, DappSearchResult.Url("https://taoyield.com/pools?id=1", isTrustedByNova = false))
     }
 
     @Test
     fun `TAO related host wins over the staking keyword`() {
-        assertSiteKind(DAppStakingSiteKind.BITTENSOR, DappSearchResult.Url("https://staking.taostats.io", isTrustedByNova = false))
+        assertSiteKind(DAppStakingKind.BITTENSOR, DappSearchResult.Url("https://staking.taostats.io", isTrustedByNova = false))
     }
 
     @Test
     fun `TAO related host wins over the catalogue staking category`() {
-        assertSiteKind(DAppStakingSiteKind.BITTENSOR, DappSearchResult.Dapp(dApp("https://tao.app")))
-        assertSiteKind(DAppStakingSiteKind.BITTENSOR, DappSearchResult.Url("https://www.tao.app", isTrustedByNova = true))
+        assertSiteKind(DAppStakingKind.BITTENSOR, DappSearchResult.Dapp(dApp("https://tao.app")))
+        assertSiteKind(DAppStakingKind.BITTENSOR, DappSearchResult.Url("https://www.tao.app", isTrustedByNova = true))
     }
 
     @Test
     fun `free text query never shows a notice`() {
-        assertSiteKind(DAppStakingSiteKind.NONE, DappSearchResult.Search("tao", "https://duckduckgo.com/?q=tao"))
-        assertSiteKind(DAppStakingSiteKind.NONE, DappSearchResult.Search("staking", "https://duckduckgo.com/?q=staking"))
+        assertSiteKind(null, DappSearchResult.Search("tao", "https://duckduckgo.com/?q=tao"))
+        assertSiteKind(null, DappSearchResult.Search("staking", "https://duckduckgo.com/?q=staking"))
     }
 
     @Test
     fun `staking keyword host keeps the third party staking notice`() {
-        assertSiteKind(DAppStakingSiteKind.THIRD_PARTY_STAKING, DappSearchResult.Url("https://staking.polkadot.cloud", isTrustedByNova = false))
+        assertSiteKind(DAppStakingKind.STAKING, DappSearchResult.Url("https://staking.polkadot.cloud", isTrustedByNova = false))
     }
 
     @Test
     fun `catalogue staking dApp keeps the third party staking notice`() {
-        assertSiteKind(DAppStakingSiteKind.THIRD_PARTY_STAKING, DappSearchResult.Dapp(dApp("https://app.bifrost.io")))
-        assertSiteKind(DAppStakingSiteKind.THIRD_PARTY_STAKING, DappSearchResult.Url("https://APP.bifrost.io/vstaking", isTrustedByNova = true))
+        assertSiteKind(DAppStakingKind.STAKING, DappSearchResult.Dapp(dApp("https://app.bifrost.io")))
+        assertSiteKind(DAppStakingKind.STAKING, DappSearchResult.Url("https://APP.bifrost.io/vstaking", isTrustedByNova = true))
     }
 
     @Test
     fun `other sites show no notice`() {
-        assertSiteKind(DAppStakingSiteKind.NONE, DappSearchResult.Dapp(dApp("https://app.hydration.net")))
-        assertSiteKind(DAppStakingSiteKind.NONE, DappSearchResult.Url("https://taobao.com", isTrustedByNova = false))
-        assertSiteKind(DAppStakingSiteKind.NONE, DappSearchResult.Url("https://tensor.trade", isTrustedByNova = false))
+        assertSiteKind(null, DappSearchResult.Dapp(dApp("https://app.hydration.net")))
+        assertSiteKind(null, DappSearchResult.Url("https://taobao.com", isTrustedByNova = false))
+        assertSiteKind(null, DappSearchResult.Url("https://tensor.trade", isTrustedByNova = false))
     }
 
-    private fun assertSiteKind(expected: DAppStakingSiteKind, result: DappSearchResult) = runBlocking {
-        assertEquals(expected, interactor.stakingSiteKind(result))
+    @Test
+    fun `resolved host excludes the port and path`() = runBlocking {
+        val result = DappSearchResult.Url("https://taostats.io:8443/dashboard", isTrustedByNova = true)
+
+        val details = interactor.resolveSearchResult(result)
+
+        assertEquals("taostats.io", details.host)
+        assertEquals(DAppStakingKind.BITTENSOR, details.stakingKind)
+    }
+
+    private fun assertSiteKind(expected: DAppStakingKind?, result: DappSearchResult) = runBlocking {
+        assertEquals(expected, interactor.resolveSearchResult(result).stakingKind)
     }
 
     private fun dAppMetadata(url: String, category: DappCategory) = DappMetadata(
