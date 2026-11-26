@@ -55,16 +55,23 @@ class SearchDappInteractor(
         }
     }
 
-    suspend fun isThirdPartyStakingSite(result: DappSearchResult): Boolean = withContext(Dispatchers.Default) {
-        val url = when (result) {
-            is DappSearchResult.Dapp -> result.dapp.url
-            is DappSearchResult.Url -> result.url
-            is DappSearchResult.Search -> return@withContext false
+    suspend fun resolveSearchResult(result: DappSearchResult): DappSearchResultDetails = withContext(Dispatchers.Default) {
+        val url = result.targetUrl
+        val host = Urls.hostOf(url)
+        val stakingKind = when {
+            result is DappSearchResult.Search -> null
+            DAppStakingDetection.isBittensorHost(host) -> DAppStakingKind.BITTENSOR
+            isThirdPartyStakingSite(url) -> DAppStakingKind.STAKING
+            else -> null
         }
 
+        DappSearchResultDetails(host, stakingKind)
+    }
+
+    private suspend fun isThirdPartyStakingSite(url: String): Boolean {
         val host = Urls.domainOf(url)
 
-        DAppStakingDetection.isStakingHost(host) || hasCuratedStakingDApp(host)
+        return DAppStakingDetection.isStakingHost(host) || hasCuratedStakingDApp(host)
     }
 
     private suspend fun hasCuratedStakingDApp(host: String): Boolean {
@@ -90,3 +97,8 @@ class SearchDappInteractor(
         return dAppByUrlMapping.values
     }
 }
+
+class DappSearchResultDetails(
+    val host: String,
+    val stakingKind: DAppStakingKind?
+)

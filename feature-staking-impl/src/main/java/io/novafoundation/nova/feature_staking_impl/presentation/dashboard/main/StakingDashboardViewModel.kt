@@ -193,7 +193,7 @@ class StakingDashboardViewModel(
             val option = destination.option
             when (val state = option.stakingState) {
                 is HasStake -> openChainStaking(option.chain, option.token.configuration, state.stakingType)
-                is NoStake -> openStartStaking(option.chain, option.token.configuration, state, StakingFlowSource.DEEP_LINK)
+                is NoStake -> openStartStaking(option.chain, option.token.configuration, state, destination.target.source)
             }
         }
     }

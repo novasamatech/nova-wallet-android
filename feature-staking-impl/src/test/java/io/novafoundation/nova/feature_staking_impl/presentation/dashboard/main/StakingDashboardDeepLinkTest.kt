@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
+import io.novafoundation.nova.analytics.StakingFlowSource
 import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -150,6 +151,45 @@ class StakingDashboardDeepLinkTest {
 
         assertLanding("deep_link")
         verifyNoInteractions(router)
+    }
+
+    @Test
+    fun `no stake target opened from the DApp notice reports its own flow source`() {
+        val dAppNoticeTarget = target.copy(source = StakingFlowSource.DAPP_NOTICE)
+        val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCED)
+        val destination = StakingDeepLinkDestination(dAppNoticeTarget, option)
+        viewModel.setDeepLinkTarget(dAppNoticeTarget)
+
+        viewModel.openDeepLinkDestination(destination)
+        viewModel.openDeepLinkDestination(destination)
+
+        assertLanding("dapp_notice")
+        verifyNoInteractions(router)
+    }
+
+    @Test
+    fun `no stake target opened from the DApp search banner resolves on the dashboard item with its flow source`() = runBlocking {
+        viewModel.setDeepLinkTarget(target.copy(source = StakingFlowSource.DAPP_SEARCH_BANNER))
+
+        val destination = withTimeout(5_000) { viewModel.deepLinkDestination.filterNotNull().first() }
+        viewModel.openDeepLinkDestination(destination)
+
+        assertLanding("dapp_search_banner")
+        verifyNoInteractions(router)
+    }
+
+    @Test
+    fun `existing Bittensor stake opened from the DApp notice opens portfolio without flow analytics`() {
+        val dAppNoticeTarget = target.copy(source = StakingFlowSource.DAPP_NOTICE)
+        val state = HasStake(false, Chain.Asset.StakingType.BITTENSOR_ROOT, null, ExtendedLoadingState.Loading)
+        val option = AggregatedStakingDashboardOption(chain, token, state, SyncingStage.SYNCED)
+        viewModel.setDeepLinkTarget(dAppNoticeTarget)
+
+        viewModel.openDeepLinkDestination(StakingDeepLinkDestination(dAppNoticeTarget, option))
+
+        verify(router).openBittensorPortfolio(BittensorPortfolioPayload(StakingPortfolioSource.DASHBOARD))
+        verifyNoInteractions(startRouter)
+        assertTrue(analytics.events.isEmpty())
     }
 
     @Test

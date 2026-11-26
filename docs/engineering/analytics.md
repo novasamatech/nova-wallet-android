@@ -15,4 +15,8 @@ class SignRequestShown(source: SignSource, method: String, chain: String) : Anal
 
 Do not replace event classes with factory functions such as `fun typeSelected(...) = event(...)` or generic vararg event builders. Feature namespaces may group event classes, but each event must still directly extend `AnalyticsEvent`. Send events through the existing `AnalyticsService`; do not introduce a parallel analytics pipeline. When refactoring declarations, preserve wire event names, property keys and types, omission rules, and emission timing.
 
+Keep event-specific types and values at the tracking boundary. Make decisions about routing, feature behavior
+and warnings with the types that own that behavior. Map their values to analytics enums and event properties
+when building an event. A navigation payload may carry an analytics-only source for later attribution.
+
 Analytics consent controls analytics collection, queued events and uploads, not the lifetime or availability of authentication shared with other features. Opt-out must cancel analytics work and clear its queue without disabling unrelated authenticated requests.

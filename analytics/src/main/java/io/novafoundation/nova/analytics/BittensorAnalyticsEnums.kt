@@ -176,7 +176,9 @@ enum class StakingFlowSource(val value: String) {
     DASHBOARD("dashboard"),
     DEEP_LINK("deep_link"),
     PORTFOLIO_ADD_POSITION("portfolio_add_position"),
-    RESULT_DISCOVER("result_discover")
+    RESULT_DISCOVER("result_discover"),
+    DAPP_SEARCH_BANNER("dapp_search_banner"),
+    DAPP_NOTICE("dapp_notice")
 }
 
 enum class StakingResultAction(val value: String) {

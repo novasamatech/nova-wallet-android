@@ -36,14 +36,16 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
         )
     }
 
-    override fun createBinding() = FragmentSearchDappBinding.inflate(layoutInflater)
-
     @Inject
     lateinit var imageLoader: ImageLoader
 
     private val categoriesAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoriesAdapter(imageLoader, this) }
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
+
+    private var stakingNoticeBottomSheet: DAppStakingNoticeBottomSheet? = null
+
+    override fun createBinding() = FragmentSearchDappBinding.inflate(layoutInflater)
 
     override fun applyInsets(rootView: View) {
         binder.searchDappSearch.applyStatusBarInsets()
@@ -75,17 +77,11 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
     override fun subscribe(viewModel: DAppSearchViewModel) {
         setupDAppNotInCatalogWarning()
 
-        viewModel.showStakingNoticeEvent.observeEvent {
-            DAppStakingNoticeBottomSheet(
-                context = requireContext(),
-                onGoToStaking = viewModel::goToStakingClicked,
-                onContinueToSite = viewModel::continueToStakingSiteClicked
-            ).show()
-        }
+        setupStakingNotice()
 
         binder.searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
-        binder.searchDappStakingBannerAction.setOnClickListener { viewModel.goToStakingClicked() }
+        binder.searchDappStakingBannerAction.setOnClickListener { viewModel.stakingBannerClicked() }
 
         viewModel.stakingBannerVisible.observe { binder.searchDappStakingBanner.isVisible = it }
 
@@ -100,6 +96,14 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
             binder.searchDappCategories.isVisible = it.isLoaded()
             it.onLoaded { categoriesAdapter.submitList(it) }
         }
+    }
+
+    override fun onDestroyView() {
+        viewModel.cancelSearchResultOpening()
+        stakingNoticeBottomSheet?.dismiss()
+        stakingNoticeBottomSheet = null
+
+        super.onDestroyView()
     }
 
     override fun itemClicked(searchResult: DappSearchResult) {
@@ -117,6 +121,30 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
 
         adapter.submitList(data) {
             binder.searchDappList.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+        }
+    }
+
+    private fun setupStakingNotice() {
+        viewModel.stakingNotice.awaitableActionLiveData.observeEvent { action ->
+            val bottomSheet = DAppStakingNoticeBottomSheet(
+                context = requireContext(),
+                kind = action.payload
+            )
+            bottomSheet.setOnDismissListener {
+                if (stakingNoticeBottomSheet === bottomSheet) {
+                    stakingNoticeBottomSheet = null
+                }
+
+                val selection = bottomSheet.selectedAction
+                if (selection == null) {
+                    action.onCancel()
+                } else {
+                    action.onSuccess(selection)
+                }
+            }
+
+            stakingNoticeBottomSheet = bottomSheet
+            bottomSheet.show()
         }
     }
 

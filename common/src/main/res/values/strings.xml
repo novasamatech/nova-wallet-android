@@ -2278,6 +2278,7 @@ claimed</string>
     <string name="dapp_staking_banner_message">Looking to stake? Nova Wallet has built-in staking.</string>
     <string name="dapp_staking_notice_title">Notice</string>
     <string name="dapp_staking_notice_message">Third-party staking sites often become deprecated. We recommend using Nova Wallet\'s built-in staking features.</string>
+    <string name="dapp_staking_notice_bittensor_message">Third-party staking sites often become deprecated. Nova Wallet has built-in staking for Bittensor.</string>
     <string name="dapp_staking_notice_continue">Continue to site</string>
     <string name="common_go_to_staking">Go to Staking</string>
     <string name="common_all">All</string>
