@@ -165,7 +165,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     override fun onHiddenChanged(hidden: Boolean) {
         if (hidden) {
             detachBackCallback()
-        } else {
+        } else if (isResumed) {
+            // Only a resumed fragment may own the callback (onResume attaches it otherwise): popping this fragment
+            // together with the one added over it un-hides it after it is already paused and detached
             attachBackCallback()
         }
     }
