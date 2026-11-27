@@ -395,7 +395,6 @@ class SwapPoolTradeLimitsValidationTest {
         groups: List<List<QuotedEdge<SwapGraphEdge>>>,
         netOutputs: List<Int>? = null
     ): SwapValidationPayload {
-        val path = QuotedPath(direction, groups.flatten(), PathRoughFeeEstimation.zero())
         val segments = groups.mapIndexed { index, hops ->
             val grossInput = if (direction == SwapDirection.SPECIFIED_IN) hops.first().quotedAmount else hops.first().quote
             val grossOutput = if (direction == SwapDirection.SPECIFIED_IN) hops.last().quote else hops.last().quotedAmount
@@ -417,6 +416,7 @@ class SwapPoolTradeLimitsValidationTest {
             )
             SwapFee.SwapSegment(operationFee, operation, netFlow)
         }
+        val path = QuotedPath(direction, groups.flatten(), PathRoughFeeEstimation.zero(), netAmountOut = segments.last().netFlow.amountOut)
         val fee = mock(SwapFee::class.java)
         val quote = mock(SwapQuote::class.java)
         val payload = mock(SwapValidationPayload::class.java)

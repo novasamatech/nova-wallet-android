@@ -9,10 +9,13 @@ class SlippageConfig(
     val minAvailableSlippage: Fraction,
     val maxAvailableSlippage: Fraction,
     val smallSlippage: Fraction,
-    val bigSlippage: Fraction
+    val bigSlippage: Fraction,
+    val maxPercentFractionDigits: Int = DEFAULT_PERCENT_FRACTION_DIGITS
 ) {
 
     companion object {
+
+        const val DEFAULT_PERCENT_FRACTION_DIGITS = 4
 
         fun default(): SlippageConfig {
             return SlippageConfig(

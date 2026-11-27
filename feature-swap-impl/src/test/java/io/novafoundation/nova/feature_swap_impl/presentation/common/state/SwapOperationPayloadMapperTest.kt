@@ -67,6 +67,7 @@ class SwapOperationPayloadMapperTest {
         val restored = SwapOperationPayloadMapper(registry, service).fromPayload(payload, this)
         assertEquals(state.quote.planksIn, restored.quote.planksIn)
         assertEquals(state.quote.planksOut, restored.quote.planksOut)
+        assertEquals(state.quote.planksOut, restored.quote.quotedPath.netAmountOut)
         assertEquals(state.slippage, restored.slippage)
         assertEquals(state.dustCheckFee, restored.dustCheckFee)
         assertEquals(BigInteger.valueOf(17), restored.fee.segments.single().fee.serviceCommission!!.amount)
@@ -144,7 +145,8 @@ class SwapOperationPayloadMapperTest {
             QuotedPath(
                 SwapDirection.SPECIFIED_IN,
                 listOf(QuotedEdge(BigInteger.valueOf(1000), BigInteger.valueOf(2000), edge)),
-                PathRoughFeeEstimation(BigInteger.valueOf(20), BigInteger.valueOf(10))
+                PathRoughFeeEstimation(BigInteger.valueOf(20), BigInteger.valueOf(10)),
+                netAmountOut = BigInteger.valueOf(1983)
             ),
             SwapExecutionEstimate(listOf(12.seconds), 3.seconds),
             SwapDirection.SPECIFIED_IN

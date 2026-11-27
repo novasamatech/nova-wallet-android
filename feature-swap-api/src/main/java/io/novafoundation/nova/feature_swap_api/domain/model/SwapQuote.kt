@@ -9,14 +9,27 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
+sealed interface SwapQuotePreview {
+
+    val amountIn: ChainAssetWithAmount
+
+    val amountOut: ChainAssetWithAmount
+}
+
+class ExternalSwapQuote(
+    override val amountIn: ChainAssetWithAmount,
+    override val amountOut: ChainAssetWithAmount,
+    val quotedPath: QuotedPath<SwapGraphEdge>
+) : SwapQuotePreview
+
 data class SwapQuote(
-    val amountIn: ChainAssetWithAmount,
-    val amountOut: ChainAssetWithAmount,
+    override val amountIn: ChainAssetWithAmount,
+    override val amountOut: ChainAssetWithAmount,
     val priceImpact: Fraction,
     val quotedPath: QuotedPath<SwapGraphEdge>,
     val executionEstimate: SwapExecutionEstimate,
     val direction: SwapDirection,
-) {
+) : SwapQuotePreview {
 
     val assetIn: Chain.Asset
         get() = amountIn.chainAsset

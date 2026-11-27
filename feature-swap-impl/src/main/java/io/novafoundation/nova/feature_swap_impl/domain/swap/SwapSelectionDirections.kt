@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.domain.swap
 
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
+import io.novafoundation.nova.common.utils.graph.allEdges
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapAssetRole
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
@@ -21,3 +23,10 @@ internal suspend fun <N, E : Edge<N>> Graph<N, E>.assetsForSelection(
         candidate != opposite && opposite in findAllPossibleDestinations(candidate, filter)
     }
 }
+
+internal fun <N, E : Edge<N>> Graph<N, E>.assetsForRole(role: SwapAssetRole): Set<N> =
+    when (role) {
+        SwapAssetRole.PAY -> adjacencyList.filterValues { it.isNotEmpty() }.keys
+        SwapAssetRole.RECEIVE -> allEdges().mapTo(mutableSetOf()) { it.to }
+        SwapAssetRole.EITHER -> vertices()
+    }

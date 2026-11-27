@@ -9,10 +9,17 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting.Q
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface AssetExchange {
+
+    /** Optional remote catalogue. The picker can show other exchanges while this one loads. */
+    interface External : AssetExchange {
+
+        fun supportsDestination(asset: FullChainAssetId): Boolean
+    }
 
     interface SingleChainFactory {
 

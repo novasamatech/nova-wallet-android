@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import io.novafoundation.nova.common.view.input.DecimalInputConstraints
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -28,7 +29,6 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -108,14 +108,14 @@ class SwapOptionsViewModelTest {
 
     @Test
     fun `input precision and title depend on the payload`() = runBlocking<Unit> {
-        val withPayload = createViewModel(payload(selected = 0.005))
-        assertTrue(withPayload.limitsInputPrecision)
+        val withPayload = createViewModel(payload(selected = 0.005).copy(maxPercentFractionDigits = 7))
+        assertEquals(DecimalInputConstraints.FractionOnly(7), withPayload.slippageInputConstraints)
         assertEquals("${R.string.common_settings}", withPayload.title)
 
         val state = RealSwapSettingsState(SwapSettings(slippage = DEFAULT_SLIPPAGE))
         Mockito.`when`(stateProvider.getSwapSettingsState(any() ?: this)).thenReturn(state)
         val swap = createViewModel(null)
-        assertFalse(swap.limitsInputPrecision)
+        assertEquals(DecimalInputConstraints.Unlimited, swap.slippageInputConstraints)
         assertEquals("${R.string.swap_settings_title}", swap.title)
     }
 

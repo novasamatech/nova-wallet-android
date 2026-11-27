@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_swap_api.domain.model
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_swap_core_api.data.paths.OutputCommission
 import kotlin.time.Duration
 
-interface AtomicSwapOperationPrototype {
+interface AtomicSwapOperationPrototype : OutputCommission {
 
     val fromChain: ChainId
 
@@ -29,13 +30,13 @@ interface AtomicSwapOperationPrototype {
      * Extra output the operation levies on top of a net amount (SPECIFIED_OUT gross-up).
      * `gross = net + serviceFeeToAddOnTop(net)`. Default: no fee.
      */
-    fun serviceCommissionToAddOnTop(net: Balance): Balance = Balance.ZERO
+    override fun serviceCommissionToAddOnTop(net: Balance): Balance = Balance.ZERO
 
     /**
      * Service fee portion embedded within a gross amount (SPECIFIED_IN reduction).
      * `net = gross - serviceFeeIncludedIn(gross)`. Default: no fee.
      */
-    fun serviceCommissionIncludedIn(gross: Balance): Balance = Balance.ZERO
+    override fun serviceCommissionIncludedIn(gross: Balance): Balance = Balance.ZERO
 }
 
 interface UsdConverter {

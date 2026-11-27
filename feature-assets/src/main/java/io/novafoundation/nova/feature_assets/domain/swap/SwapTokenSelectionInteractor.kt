@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.totalWithOffChain
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapAssetRole
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.fullId
@@ -14,7 +15,6 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -23,7 +23,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
@@ -38,7 +37,7 @@ class SwapTokenSelectionInteractor(
 ) {
 
     fun observe(metaAccountId: Long, opposite: FullChainAssetId?, selectingPay: Boolean, scope: CoroutineScope): Flow<SwapTokenSelectionData> {
-        val selectionAssetsFlow = observeAvailableCatalogue(scope)
+        val selectionAssetsFlow = observeAvailableCatalogue(scope, selectingPay)
             .flatMapLatest { catalogue -> observeWalletAssets(metaAccountId, catalogue) }
         val compatibleAssetIdsFlow = observeCompatibleAssetIds(opposite, selectingPay, metaAccountId, scope)
 
@@ -87,14 +86,12 @@ class SwapTokenSelectionInteractor(
 
         val payAssetId = if (selectingPay) selected else opposite
         val receiveAssetId = if (selectingPay) opposite else selected
-        val payAsset = chainRegistry.asset(payAssetId)
-        val availableReceiveAssetIds = swapService.availableSwapDirectionsFor(payAsset, scope, metaAccountId).first()
-
-        receiveAssetId !in availableReceiveAssetIds
+        !swapService.canSwap(payAssetId, receiveAssetId, metaAccountId, scope)
     }
 
-    private fun observeAvailableCatalogue(scope: CoroutineScope): Flow<SwapSelectionCatalogue> {
-        val supportedAssetIdsFlow = flowOfAll { swapService.assetsAvailableForSwap(scope) }
+    private fun observeAvailableCatalogue(scope: CoroutineScope, selectingPay: Boolean): Flow<SwapSelectionCatalogue> {
+        val role = if (selectingPay) SwapAssetRole.PAY else SwapAssetRole.RECEIVE
+        val supportedAssetIdsFlow = flowOfAll { swapService.assetsAvailableForSwap(scope, role) }
 
         return combine(
             chainRegistry.enabledChainsFlow(),

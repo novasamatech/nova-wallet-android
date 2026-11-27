@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.SlippageSettin
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentSwapOptionsBinding
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
-import io.novafoundation.nova.feature_swap_impl.presentation.common.views.setupSwapDecimalInput
+import io.novafoundation.nova.common.view.input.setupDecimalInput
 
 class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptionsBinding>() {
 
@@ -35,8 +35,7 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptio
         binder.swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
         binder.swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
         binder.swapOptionsSlippageTitle.setOnClickListener { viewModel.slippageInfoClicked() }
-        val maxFractionDigits = if (viewModel.limitsInputPrecision) SLIPPAGE_MAX_FRACTION_DIGITS else null
-        binder.swapOptionsSlippageInput.content.setupSwapDecimalInput(maxFractionDigits)
+        binder.swapOptionsSlippageInput.content.setupDecimalInput(viewModel.slippageInputConstraints)
     }
 
     override fun inject() {

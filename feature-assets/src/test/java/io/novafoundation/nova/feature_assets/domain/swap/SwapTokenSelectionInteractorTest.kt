@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
+import io.novafoundation.nova.feature_swap_api.domain.swap.SwapAssetRole
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -103,11 +104,10 @@ class SwapTokenSelectionInteractorTest {
     fun `selection rechecks ordered pair for the requested wallet`() = runBlocking<Unit> {
         `when`(pah.assetsById).thenReturn(mapOf(0 to dot.token.configuration, 1 to usdt.token.configuration))
         `when`(chainRegistry.chainsById).thenReturn(MutableStateFlow(mapOf("pah" to pah)))
-        val destinations = setOf(usdt.token.configuration.fullId)
-        `when`(swapService.availableSwapDirectionsFor(dot.token.configuration, this, 42)).thenReturn(flowOf(destinations))
+        `when`(swapService.canSwap(dot.token.configuration.fullId, usdt.token.configuration.fullId, 42, this)).thenReturn(true)
         assertFalse(interactor.shouldClearOpposite(dot.token.configuration.fullId, usdt.token.configuration.fullId, true, 42, this))
         assertFalse(interactor.shouldClearOpposite(usdt.token.configuration.fullId, dot.token.configuration.fullId, false, 42, this))
-        `when`(swapService.availableSwapDirectionsFor(dot.token.configuration, this, 42)).thenReturn(flowOf(emptySet()))
+        `when`(swapService.canSwap(dot.token.configuration.fullId, usdt.token.configuration.fullId, 42, this)).thenReturn(false)
         assertTrue(interactor.shouldClearOpposite(dot.token.configuration.fullId, usdt.token.configuration.fullId, true, 42, this))
     }
 
@@ -122,8 +122,7 @@ class SwapTokenSelectionInteractorTest {
         val config = dot.token.configuration
         `when`(pah.assetsById).thenReturn(mapOf(0 to config))
         `when`(chainRegistry.chainsById).thenReturn(MutableStateFlow(mapOf("pah" to pah)))
-        val failure = flow<Set<FullChainAssetId>> { throw IOException("offline") }
-        `when`(swapService.availableSwapDirectionsFor(config, this, 42)).thenReturn(failure)
+        `when`(swapService.canSwap(config.fullId, usdt.token.configuration.fullId, 42, this)).thenAnswer { throw IOException("offline") }
         interactor.shouldClearOpposite(config.fullId, usdt.token.configuration.fullId, true, 42, this)
     }
 
@@ -135,7 +134,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(flowOf(listOf(dot, usdt)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot)))
         val graph = configurations.map { it.fullId }.toSet()
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         val result = interactor.observe(42, null, true, this).first()
         assertEquals(listOf(dot, usdt), result.assets)
         verifyNoInteractions(accountRepository)
@@ -167,7 +166,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(pah.assets).thenReturn(listOf(dot.token.configuration, usdt.token.configuration))
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, hydration, relay)))
         val graph = setOf(dot.token.configuration.fullId, dotHydra.token.configuration.fullId, relayDot.token.configuration.fullId)
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         `when`(walletRepository.supportedAssetsFlow(42, listOf(dot.token.configuration))).thenReturn(flowOf(listOf(dot)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot, dotHydra, relayDot)))
         val result = interactor.observe(42, null, true, this).first()
@@ -182,7 +181,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, hydration)))
         val configurations = listOf(dot.token.configuration, usdt.token.configuration, dotHydra.token.configuration)
         val graph = configurations.map { it.fullId }.toSet()
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         val destinations = setOf(dotHydra.token.configuration.fullId)
         `when`(swapService.availableAssetsForSelection(dot.token.configuration.fullId, true, 42, this)).thenReturn(flowOf(destinations))
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(flowOf(listOf(dot, usdt, dotHydra)))
@@ -201,7 +200,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(hydration.connectionState).thenReturn(Chain.ConnectionState.FULL_SYNC)
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah, hydration)))
         val graph = setOf(dot.token.configuration.fullId, dotHydra.token.configuration.fullId)
-        `when`(swapService.assetsAvailableForSwap(this)).thenReturn(flowOf(graph))
+        `when`(swapService.assetsAvailableForSwap(this, SwapAssetRole.PAY)).thenReturn(flowOf(graph))
         `when`(walletRepository.supportedAssetsFlow(42, listOf(dot.token.configuration))).thenReturn(flowOf(listOf(dot)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot, dotHydra)))
         val result = interactor.observe(42, null, true, this).first()
@@ -221,7 +220,7 @@ class SwapTokenSelectionInteractorTest {
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah)))
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(flowOf(listOf(dot, usdt)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(balancesFlow)
-        `when`(swapService.assetsAvailableForSwap(backgroundScope)).thenReturn(flowOf(swapAssetIds))
+        `when`(swapService.assetsAvailableForSwap(backgroundScope, SwapAssetRole.PAY)).thenReturn(flowOf(swapAssetIds))
 
         val emissions = mutableListOf<SwapTokenSelectionData>()
         val observation = backgroundScope.launch {
@@ -253,7 +252,7 @@ class SwapTokenSelectionInteractorTest {
         val originalAssetsFlow = originalAssets.onCompletion { originalObservationClosed = true }
         `when`(pah.assets).thenReturn(configurations)
         `when`(chainRegistry.currentChains).thenReturn(MutableStateFlow(listOf(pah)))
-        `when`(swapService.assetsAvailableForSwap(backgroundScope)).thenReturn(swapAssetIds)
+        `when`(swapService.assetsAvailableForSwap(backgroundScope, SwapAssetRole.PAY)).thenReturn(swapAssetIds)
         `when`(walletRepository.supportedAssetsFlow(42, configurations)).thenReturn(originalAssetsFlow)
         `when`(walletRepository.supportedAssetsFlow(42, remainingConfigurations)).thenReturn(flowOf(listOf(usdt)))
         `when`(walletRepository.syncedAssetsFlow(42)).thenReturn(flowOf(listOf(dot)))

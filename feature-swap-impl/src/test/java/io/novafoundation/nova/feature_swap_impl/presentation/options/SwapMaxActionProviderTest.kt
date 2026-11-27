@@ -183,7 +183,8 @@ class SwapMaxActionProviderTest {
         val path = QuotedPath(
             direction = SwapDirection.SPECIFIED_IN,
             path = listOf(QuotedEdge(amountIn, BigInteger.ONE, edge)),
-            roughFeeEstimation = PathRoughFeeEstimation.zero()
+            roughFeeEstimation = PathRoughFeeEstimation.zero(),
+            netAmountOut = BigInteger.ONE
         )
 
         return mock(SwapQuote::class.java).also {

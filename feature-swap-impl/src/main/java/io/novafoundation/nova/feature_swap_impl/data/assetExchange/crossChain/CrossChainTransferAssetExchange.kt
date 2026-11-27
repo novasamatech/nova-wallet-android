@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee.SwapSegment.SegmentNetFlow
+import io.novafoundation.nova.feature_swap_api.domain.model.OnChainSwapEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
@@ -115,7 +116,7 @@ class CrossChainTransferAssetExchange(
 
     inner class CrossChainTransferEdge(
         val delegate: Edge<FullChainAssetId>
-    ) : SwapGraphEdge, Edge<FullChainAssetId> by delegate {
+    ) : OnChainSwapEdge, Edge<FullChainAssetId> by delegate {
 
         override val exchangeId: String = "cross-chain"
 

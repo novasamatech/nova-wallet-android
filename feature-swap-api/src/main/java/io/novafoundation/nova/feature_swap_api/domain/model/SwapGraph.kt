@@ -10,31 +10,6 @@ interface SwapGraphEdge : QuotableEdge {
     val exchangeId: String
 
     /**
-     * Begin a fully-constructed, ready to submit operation
-     */
-    suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation
-
-    /**
-     * Append current swap edge execution to the existing transaction
-     * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
-     * [beginOperation]
-     */
-    suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
-
-    /**
-     * Begin a operation prototype that should reflect similar structure to [beginOperation] and [appendToOperation] but is limited to available functionality
-     * Used during quoting to construct the operations array when not all parameters are still known
-     */
-    suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype
-
-    /**
-     * Append current swap edge execution to the existing transaction prototype
-     * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
-     * [beginOperationPrototype]
-     */
-    suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype?
-
-    /**
      * Debug label to describe this edge for logging
      */
     suspend fun debugLabel(): String
@@ -47,7 +22,7 @@ interface SwapGraphEdge : QuotableEdge {
 
     /**
      * Whether this Edge fee check should be skipped when adding to after a specified [predecessor]
-     * The main purpose is to mirror the behavior of [appendToOperation] - multiple segments appended together
+     * The main purpose is to mirror the behavior of [OnChainSwapEdge.appendToOperation] - multiple segments appended together
      * most likely will only use fee configuration from the first segment in the batch
      * Note that returning true here means that [canPayNonNativeFeesInIntermediatePosition] wont be called and checked
      */
@@ -73,6 +48,34 @@ interface SwapGraphEdge : QuotableEdge {
      * since we don't want dust leftovers across intermediate segments
      */
     suspend fun canTransferOutWholeAccountBalance(): Boolean
+}
+
+interface OnChainSwapEdge : SwapGraphEdge {
+
+    /**
+     * Begin a fully-constructed, ready to submit operation
+     */
+    suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation
+
+    /**
+     * Append current swap edge execution to the existing transaction
+     * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
+     * [beginOperation]
+     */
+    suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation?
+
+    /**
+     * Begin a operation prototype that should reflect similar structure to [beginOperation] and [appendToOperation] but is limited to available functionality
+     * Used during quoting to construct the operations array when not all parameters are still known
+     */
+    suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype
+
+    /**
+     * Append current swap edge execution to the existing transaction prototype
+     * Return null if it is not possible, indicating that the new transaction should be initiated to handle this edge via
+     * [beginOperationPrototype]
+     */
+    suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype?
 }
 
 /**

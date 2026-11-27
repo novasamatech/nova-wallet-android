@@ -8,6 +8,9 @@ interface Edge<N> {
     val from: N
 
     val to: N
+
+    /** This edge can reach its destination but cannot be followed by another edge. */
+    val isTerminal: Boolean get() = false
 }
 
 interface WeightedEdge<N> : Edge<N> {
@@ -55,9 +58,7 @@ suspend fun <N, E : Edge<N>> Graph<N, E>.findAllPossibleDestinations(
     val actualNodeListFilter = nodeVisitFilter ?: EdgeVisitFilter { _, _ -> true }
 
     val reachableNodes = reachabilityDfs(origin, adjacencyList, actualNodeListFilter, predecessor = null)
-    reachableNodes.removeAt(reachableNodes.indexOf(origin))
-
-    return reachableNodes.toSet()
+    return reachableNodes - origin
 }
 
 fun <N, E : Edge<N>> Graph<N, E>.hasOutcomingDirections(origin: N): Boolean {
@@ -112,6 +113,7 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
         if (newCount <= limit) {
             val edges = adjacencyList[lastNode].orEmpty()
             edges.forEach { edge ->
+                if (edge.isTerminal && edge.to != to) return@forEach
                 if (edge.to in minimumQueueElement || !actualNodeListFilter.shouldVisit(edge, predecessor)) return@forEach
 
                 val newElement = QueueElement(
@@ -133,8 +135,8 @@ private suspend fun <N, E : Edge<N>> reachabilityDfs(
     nodeVisitFilter: EdgeVisitFilter<E>,
     predecessor: E?,
     visited: MutableSet<N> = mutableSetOf(),
-    connectedComponentState: MutableList<N> = mutableListOf()
-): MutableList<N> {
+    connectedComponentState: MutableSet<N> = mutableSetOf()
+): MutableSet<N> {
     visited.add(node)
     connectedComponentState.add(node)
 
@@ -142,7 +144,11 @@ private suspend fun <N, E : Edge<N>> reachabilityDfs(
 
     for (edge in edges) {
         if (edge.to !in visited && nodeVisitFilter.shouldVisit(edge, predecessor)) {
-            reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, predecessor = edge, visited, connectedComponentState)
+            if (edge.isTerminal) {
+                connectedComponentState.add(edge.to)
+            } else {
+                reachabilityDfs(edge.to, adjacencyList, nodeVisitFilter, predecessor = edge, visited, connectedComponentState)
+            }
         }
     }
 

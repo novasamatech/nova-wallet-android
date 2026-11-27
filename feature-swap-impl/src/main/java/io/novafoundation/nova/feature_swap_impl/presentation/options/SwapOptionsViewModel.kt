@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import io.novafoundation.nova.common.view.input.DecimalInputConstraints
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -50,8 +51,8 @@ class SwapOptionsViewModel(
 
     val title = resourceManager.getString(if (payload == null || payload.requestId != null) R.string.swap_settings_title else R.string.common_settings)
 
-    /** Settings opened with a payload (Bittensor) cap a custom value at four decimals of a percent, as iOS does. */
-    val limitsInputPrecision = payload != null
+    val slippageInputConstraints = payload?.let { DecimalInputConstraints.FractionOnly(it.maxPercentFractionDigits) }
+        ?: DecimalInputConstraints.Unlimited
 
     private val swapSettingState = async(start = CoroutineStart.LAZY) {
         swapSettingsStateProvider.getSwapSettingsState(viewModelScope)
@@ -147,7 +148,7 @@ class SwapOptionsViewModel(
 
     // Payload settings save a locale-independent value the precision filter accepts; the swap flow keeps its format.
     private fun formatInput(slippage: Fraction): String {
-        return if (payload != null) slippageInputText(slippage) else slippage.formatPercents(includeSymbol = false)
+        return if (payload != null) slippageInputText(slippage, payload.maxPercentFractionDigits) else slippage.formatPercents(includeSymbol = false)
     }
 
     private suspend fun String.formatToPercent(): Fraction? {

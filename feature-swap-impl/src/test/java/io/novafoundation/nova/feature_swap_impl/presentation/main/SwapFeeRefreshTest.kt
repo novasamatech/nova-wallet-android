@@ -1,11 +1,14 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.PreviewOnly
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.ReadyForReview
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionEstimate
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.domain.model.ExternalSwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.presentation.state.DEFAULT_SLIPPAGE
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
@@ -58,6 +61,18 @@ class SwapFeeRefreshTest {
     private val completedFees = mutableListOf<SwapFeeSnapshot>()
 
     @Test
+    fun `provider quote replaces pending on-chain fee estimation`() = runTest {
+        startFeeLoading()
+        quoteState.value = loadedQuote()
+        runCurrent()
+        advanceTimeBy(100)
+        quoteState.value = PreviewOnly(mock(ExternalSwapQuote::class.java))
+        advanceTimeBy(2_000)
+        runCurrent()
+        assertTrue(startedAt.isEmpty())
+    }
+
+    @Test
     fun `two second market updates allow three second fee to complete and refresh fees every ten seconds`() = runTest {
         startFeeLoading()
         repeat(12) { block ->
@@ -70,7 +85,7 @@ class SwapFeeRefreshTest {
         assertEquals(listOf(300L, 10_300L, 20_300L), startedAt)
         assertEquals(3, completedFees.size)
         assertEquals(BigInteger.valueOf(1_010), completedFees.last().quote.quote.planksOut)
-        assertEquals(BigInteger.valueOf(1_011), (quoteState.value as QuotingState.Loaded).quote.planksOut)
+        assertEquals(BigInteger.valueOf(1_011), (quoteState.value as ReadyForReview).quote.planksOut)
         assertTrue(completedFees.last().matchesInputs(settings, metaAccountId = 1))
     }
 
@@ -240,11 +255,11 @@ class SwapFeeRefreshTest {
         output: Long = 1_000,
         origin: QuoteRefreshOrigin = QuoteRefreshOrigin.SUBSCRIPTION,
         quoteSettings: SwapSettings = settings,
-    ): QuotingState.Loaded {
+    ): ReadyForReview {
         val amountIn = requireNotNull(quoteSettings.amount)
         val amountOut = BigInteger.valueOf(output)
         val direction = requireNotNull(quoteSettings.swapDirection)
-        val path = QuotedPath(direction, listOf(QuotedEdge(amountIn, amountOut, edge)), PathRoughFeeEstimation.zero())
+        val path = QuotedPath(direction, listOf(QuotedEdge(amountIn, amountOut, edge)), PathRoughFeeEstimation.zero(), netAmountOut = amountOut)
         val quote = SwapQuote(
             amountIn = ChainAssetWithAmount(assetIn, amountIn),
             amountOut = ChainAssetWithAmount(assetOut, amountOut),
@@ -254,6 +269,6 @@ class SwapFeeRefreshTest {
             direction = direction,
         )
         val args = SwapQuoteArgs(token, token, amountIn, direction, metaAccountId = 1)
-        return QuotingState.Loaded(quote, args, origin, quoteSettings)
+        return ReadyForReview(quote, args, origin, quoteSettings)
     }
 }

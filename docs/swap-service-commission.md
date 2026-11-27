@@ -30,33 +30,26 @@ not a pool fee.
 They are consistent: `commissionIncludedIn(net + commissionToAddOnTop(net)) == commissionToAddOnTop(net)`.
 Using `commissionIncludedIn` on a grossed-up amount is what keeps quote-time and execution-time figures equal.
 
-## Quote time — `RealSwapService.applyServiceFee`
+## Quote time
 
-The charging operation is found from the **prototypes**, not the raw path:
+For each candidate path, consecutive compatible on-chain edges form operation prototypes. An external
+edge ends the current group. The last prototype with `chargesServiceFee` supplies the commission
+calculation and the index of its output edge.
 
-```
-quotedTrade.path.constructAtomicOperationPrototypes().lastOrNull { it.chargesServiceFee }
-```
+- For `SPECIFIED_IN`, the path quoter deducts the commission at that output. The next edge quotes the
+  resulting amount in its own input asset. Paths are compared using the user's net receive amount.
+- For `SPECIFIED_OUT`, the path quoter walks backwards and adds the commission to the amount that
+  the charging operation must deliver. Earlier edges then quote the funding required for that amount.
 
-`lastOrNull` matters: on a route like `xcm → hydra → hydra → xcm` the commission belongs to the **last
-Hydration operation**, which is not the last route segment. `RealSwapService` stays source-agnostic —
-`chargesServiceFee` / `serviceCommissionToAddOnTop` / `serviceCommissionIncludedIn` are declared on
-`AtomicSwapOperationPrototype` (default: no fee) and overridden by the Hydration and AssetConversion operations.
-
-- `SPECIFIED_OUT` re-quotes the whole path for `entered + commissionToAddOnTop(entered)` so `amountIn` is
-  accurate, then reports `amountOut = entered`.
-- `SPECIFIED_IN` keeps the trade and reports `amountOut = gross − commissionIncludedIn(gross)`.
-
-**Price impact is computed from `grossAmountOut`, not the net amount** (`ServiceFeeAdjustedTrade` carries
-both). Price impact measures pool slippage; charging our commission into it would double-count the fee and
-show a scary number on small swaps.
+The individual edge quotes retain the amounts used for execution. The path also carries the net
+receive estimate. Price impact uses the quoted exchange rates before commission. Market quotes used
+to convert execution fees omit the service commission.
 
 ## Execution time — the net flow chain
 
-Operations are built from the **gross** quoted path: every `estimatedSwapLimit` holds pre-commission amounts,
-because the pool really does trade the gross amount and the commission is a separate transfer afterwards.
-Therefore a segment cannot know, on its own, how much actually reaches it — the previous segment's output is
-reduced by the commission, and that cut propagates down the chain.
+Each operation's limit contains its quoted input and gross output. The commission is a separate
+transfer from the charging operation's output. Subsequent operations are quoted for the resulting
+net input.
 
 `buildSwapSegments(fees, operations)` in `feature-swap-api/.../domain/model/SwapFee.kt` resolves this **once**
 and stores the result on each `SwapFee.SwapSegment.netFlow`:
@@ -128,7 +121,7 @@ floor. The worst case is a small swap into a native asset the wallet does not ho
 | `feature-swap-api/.../domain/model/AtomicSwapOperationPrototype.kt` | `chargesServiceFee` + quote-time math hooks |
 | `feature-swap-api/.../domain/model/AtomicSwapOperation.kt` | `chargesServiceCommission`, `constructDisplayData(netFlow)` |
 | `feature-swap-api/.../domain/model/SwapFee.kt` | `SegmentNetFlow`, `buildSwapSegments` |
-| `feature-swap-impl/.../domain/swap/RealSwapService.kt` | `applyServiceFee`, price impact, segment assembly |
+| `feature-swap-impl/.../domain/swap/RealSwapService.kt` | Commission selection, price impact and segment assembly |
 | `feature-swap-impl/.../domain/swap/SwapQuoteNovaFee.kt` | Fee-charging edge detection, rate disclaimer mode |
 | `feature-swap-impl/.../assetExchange/hydraDx/HydraDxAssetExchange.kt` | Hydration `batchAll` + commission transfer |
 | `feature-swap-impl/.../assetExchange/assetConversion/AssetConversionExchange.kt` | Asset Hub `batchAll` + commission transfer |

@@ -11,6 +11,8 @@ import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
@@ -67,6 +69,11 @@ import javax.inject.Named
 import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface SwapFeatureDependencies {
+
+    @get:Attested
+    val attestedNetworkApiCreator: NetworkApiCreator
+
+    val infrastructureUrls: InfrastructureUrls
 
     val coinPriceRepository: CoinPriceRepository
 

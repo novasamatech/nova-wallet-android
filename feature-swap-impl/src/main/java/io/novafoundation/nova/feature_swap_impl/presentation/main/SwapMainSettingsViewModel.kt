@@ -1,9 +1,17 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.main
 
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.PreviewOnly
+import io.novafoundation.nova.feature_swap_impl.presentation.main.QuotingState.Loaded.ReadyForReview
+import io.novafoundation.nova.feature_swap_impl.domain.swap.QuoteProviderException
+import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.common.utils.withTokenSymbol
+import io.novafoundation.nova.feature_wallet_api.domain.model.decimalAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_impl.presentation.main.chart.SwapChartMixinFactory
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsState
 import io.novafoundation.nova.feature_swap_api.presentation.state.DEFAULT_SLIPPAGE
@@ -52,6 +60,7 @@ import io.novafoundation.nova.common.utils.nullOnStart
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.validation.CompoundFieldValidator
 import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.common.validation.getReasonOrNull
 import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationFlowActions
@@ -157,7 +166,7 @@ class SwapMainSettingsViewModel(
     chartMixinFactory: SwapChartMixinFactory,
     private val tokenSelectionCommunicator: SwapTokenSelectionCommunicator,
     private val slippageCommunicator: SlippageSettingsCommunicator,
-    private val display: SwapFormDisplay,
+    display: SwapFormDisplay,
     private val resourceManager: ResourceManager,
     private val chainRegistry: ChainRegistry,
     private val assetUseCase: ArbitraryAssetUseCase,
@@ -187,13 +196,18 @@ class SwapMainSettingsViewModel(
 
     private val swapFlowScope = viewModelScope
 
+    private val isTab = when (display) {
+        SwapFormDisplay.TAB -> true
+        SwapFormDisplay.STANDALONE -> false
+    }
+
     private val entryPayload = MutableStateFlow(payload)
 
     private val swapSettings = swapSettingsState.selectedOption
 
     val chart = chartMixinFactory.create(
         settings = swapSettings,
-        initiallyCollapsed = display == SwapFormDisplay.STANDALONE || payload != SwapSettingsPayload.Restore,
+        initiallyCollapsed = !isTab || payload.collapseChartOnEntry(),
         scope = viewModelScope
     )
 
@@ -221,10 +235,10 @@ class SwapMainSettingsViewModel(
     private val assetOutFlow = swapSettings.assetFlowOf(SwapSettings::assetOut)
     private val assetInFlow = swapSettings.assetFlowOf(SwapSettings::assetIn)
 
-    private val priceImpact = quotingState.map { quoteState ->
-        when (quoteState) {
-            is QuotingState.Error, QuotingState.Loading, QuotingState.Default -> null
-            is QuotingState.Loaded -> quoteState.quote.priceImpact
+    private val priceImpact = quotingState.map { state ->
+        when (state) {
+            is ReadyForReview -> state.quote.priceImpact
+            is PreviewOnly, is QuotingState.PayLimit, is QuotingState.Error, QuotingState.Default, QuotingState.Loading -> null
         }
     }
 
@@ -232,16 +246,32 @@ class SwapMainSettingsViewModel(
         .map { it.toExecutionEstimate() }
         .shareInBackground()
 
-    val quoteFailed = quotingState.map {
-        it is QuotingState.Error && it.error !is SwapQuoteException
+    val quoteFailed = quotingState.map { state ->
+        when (state) {
+            is QuotingState.Error -> when (state.error) {
+                is SwapQuoteException, is QuoteProviderException.AmountPrecisionExceeded -> false
+                else -> true
+            }
+            QuotingState.Default, QuotingState.Loading, is QuotingState.Loaded, is QuotingState.PayLimit -> false
+        }
     }
 
-    val quoteProblem = quotingState.map {
-        when {
-            it !is QuotingState.Error -> null
-            it.error is SwapQuoteException.NoRoute -> resourceManager.getString(R.string.swap_error_pair_not_supported)
-            it.error is SwapQuoteException.NotEnoughLiquidity -> null // Displayed beside the amount field.
-            else -> resourceManager.getString(R.string.swap_quote_failed)
+    private fun formatFullAmount(value: ChainAssetWithAmount): String {
+        return value.decimalAmount.toStripTrailingZerosString().withTokenSymbol(value.chainAsset.symbol)
+    }
+
+    val quoteProblem = quotingState.map { state ->
+        when (state) {
+            is QuotingState.PayLimit -> formatPayLimit(state.limit)
+            is QuotingState.Error -> when (val error = state.error) {
+                is QuoteProviderException.AmountPrecisionExceeded -> with(error.constraints) {
+                    resourceManager.getString(R.string.swap_quote_amount_precision, maxIntegerDigits, maxFractionDigits)
+                }
+                SwapQuoteException.NoRoute -> resourceManager.getString(R.string.swap_error_pair_not_supported)
+                SwapQuoteException.NotEnoughLiquidity -> null // Displayed beside the amount field.
+                else -> resourceManager.getString(R.string.swap_quote_failed)
+            }
+            QuotingState.Default, QuotingState.Loading, is QuotingState.Loaded -> null
         }
     }
 
@@ -280,16 +310,21 @@ class SwapMainSettingsViewModel(
     )
 
     val swapRouteState = combine(quotingState, feeSnapshot, feeMixin.fee) { quote, snapshot, fee ->
-        when {
-            quote !is QuotingState.Loaded -> quote.toLoadingState { null }
-            fee is FeeStatus.Error -> ExtendedLoadingState.Loaded(null)
-            fee !is FeeStatus.Loaded || snapshot?.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) != true -> ExtendedLoadingState.Loading
-            else -> ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(snapshot.quote.quote))
+        val review = quote.readyForReviewOrNull() ?: return@combine quote.toLoadingState { null }
+        when (fee) {
+            FeeStatus.Error -> ExtendedLoadingState.Loaded(null)
+            FeeStatus.NoFee, is FeeStatus.Loading -> ExtendedLoadingState.Loading
+            is FeeStatus.Loaded -> if (snapshot?.matchesInputs(review.settings, review.quoteArgs.metaAccountId) == true) {
+                ExtendedLoadingState.Loaded(swapRouteFormatter.formatSwapRoute(snapshot.quote.quote))
+            } else {
+                ExtendedLoadingState.Loading
+            }
         }
     }.shareInBackground()
 
     val minimumReceived = combine(quotingState, feeSnapshot) { quote, snapshot ->
-        snapshot?.takeIf { quote is QuotingState.Loaded && it.matchesInputs(quote.settings, quote.quoteArgs.metaAccountId) }?.let {
+        val review = quote.readyForReviewOrNull() ?: return@combine null
+        snapshot?.takeIf { it.matchesInputs(review.settings, review.quoteArgs.metaAccountId) }?.let {
             tokenFormatter.formatToken(it.fee.segments.last().netFlow.amountOutMin, it.quote.quote.assetOut)
         }
     }
@@ -317,19 +352,19 @@ class SwapMainSettingsViewModel(
 
     val rateDetails: Flow<ExtendedLoadingState<String>> = quotingState.map {
         when (it) {
-            is QuotingState.Loaded -> ExtendedLoadingState.Loaded(formatRate(it.quote))
-            else -> ExtendedLoadingState.Loading
+            is ReadyForReview -> ExtendedLoadingState.Loaded(formatRate(it.quote))
+            is PreviewOnly, is QuotingState.PayLimit, is QuotingState.Error, QuotingState.Default, QuotingState.Loading -> ExtendedLoadingState.Loading
         }
     }
         .shareInBackground()
 
     val showDetails: Flow<Boolean> = quotingState.mapNotNull {
         when (it) {
-            is QuotingState.Loaded -> true
-            is QuotingState.Default,
-            is QuotingState.Error -> false
+            is ReadyForReview -> true
+            is PreviewOnly, is QuotingState.PayLimit,
+            is QuotingState.Default, is QuotingState.Error -> false
 
-            else -> null // Don't do anything if it's loading state
+            QuotingState.Loading -> null // Keep the current visibility while refreshing.
         }
     }
         .distinctUntilChanged()
@@ -352,13 +387,16 @@ class SwapMainSettingsViewModel(
         .shareInBackground()
 
     val buttonState = combine(inputButtonState, quotingState, feeSnapshot, feeMixin.fee) { inputState, quote, snapshot, fee ->
-        val hasFeeForInputs = quote is QuotingState.Loaded &&
-            snapshot?.matchesQuote(quote) == true && fee is FeeStatus.Loaded
-
-        if (inputState is DescriptiveButtonState.Enabled && !hasFeeForInputs) {
-            DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
-        } else {
-            inputState
+        when (inputState) {
+            is DescriptiveButtonState.Enabled -> {
+                val review = quote.readyForReviewOrNull()
+                if (review != null && snapshot?.matchesQuote(review) == true && fee.isLoaded()) {
+                    inputState
+                } else {
+                    DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
+                }
+            }
+            is DescriptiveButtonState.Disabled, DescriptiveButtonState.Loading, DescriptiveButtonState.Gone, DescriptiveButtonState.Invisible -> inputState
         }
     }
 
@@ -429,7 +467,7 @@ class SwapMainSettingsViewModel(
         if (entryPayload.value === payload) return
 
         analyticsService.track(AnalyticsEvent.SwapScreenOpened(payload.source.toAnalyticsSource()))
-        chart.onEntry(collapsed = payload != SwapSettingsPayload.Restore)
+        chart.onEntry(collapsed = payload.collapseChartOnEntry())
         entryPayload.value = payload
     }
 
@@ -470,7 +508,7 @@ class SwapMainSettingsViewModel(
     }
 
     private suspend fun rememberSelection() {
-        if (display != SwapFormDisplay.TAB) return
+        if (!isTab) return
         val metaAccountId = initializedMetaAccountId ?: return
         val settings = swapSettings.first()
         selectionInteractor.remember(metaAccountId, settings.assetIn, settings.assetOut)
@@ -527,7 +565,7 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        val mode = (quotingState.value as? QuotingState.Loaded)?.quote?.swapRateDescriptionMode()
+        val mode = quotingState.value.readyForReviewOrNull()?.quote?.swapRateDescriptionMode()
             ?: SwapRateDescriptionMode.Default
         launchSwapRateDescription(resourceManager, mode)
     }
@@ -556,6 +594,7 @@ class SwapMainSettingsViewModel(
                 maximum = config.maxAvailableSlippage.inFraction,
                 small = config.smallSlippage.inFraction,
                 big = config.bigSlippage.inFraction,
+                maxPercentFractionDigits = config.maxPercentFractionDigits,
                 requestId = requestId
             )
         )
@@ -566,7 +605,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun trackSwapInitiated(source: SwapSource) = launch {
-        val quote = (quotingState.value as? QuotingState.Loaded)?.quote ?: return@launch
+        val quote = quotingState.value.readyForReviewOrNull()?.quote ?: return@launch
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
         val usdAmount = usdRateRepository.planksToUsd(quote.assetIn, quote.planksIn)
@@ -593,14 +632,14 @@ class SwapMainSettingsViewModel(
             operationMapper.toPayload(
                 state = validPayload.toSwapState(),
                 metaAccountId = requireNotNull(validPayload.metaAccountId),
-                returnToTab = display == SwapFormDisplay.TAB
+                returnToTab = isTab
             )
         )
     }
 
     private suspend fun currentOperationPayload(): SwapOperationPayload? {
         val payload = getValidationPayload() ?: return null
-        return operationMapper.toPayload(payload.toSwapState(), requireNotNull(payload.metaAccountId), returnToTab = display == SwapFormDisplay.TAB)
+        return operationMapper.toPayload(payload.toSwapState(), requireNotNull(payload.metaAccountId), returnToTab = isTab)
     }
 
     private fun createMaxActionProvider(): SwapMaxActionProvider {
@@ -632,18 +671,16 @@ class SwapMainSettingsViewModel(
                 feeMixin.setFeeStatus(FeeStatus.NoFee)
                 maxFeeResetVersion.update { it + 1 }
 
-                val selection = if (payload == SwapSettingsPayload.Restore) {
-                    selectionInteractor.initialSelection(metaAccount.id)
-                } else {
-                    val assetIn = selectionInteractor.resolve(payload.assetIn?.fullChainAssetId)
-                    val assetOutPayload = when (payload) {
-                        is SwapSettingsPayload.Prefilled -> payload.assetOut
-                        is SwapSettingsPayload.RepeatOperation -> payload.assetOut
-                        else -> null
-                    }
-                    SwapSelectionInteractor.Selection(assetIn, selectionInteractor.resolve(assetOutPayload?.fullChainAssetId))
+                val selection = when (payload) {
+                    SwapSettingsPayload.Restore -> selectionInteractor.initialSelection(metaAccount.id)
+                    is SwapSettingsPayload.DefaultFlow -> resolveSelection(payload.assetIn, null)
+                    is SwapSettingsPayload.Prefilled -> resolveSelection(payload.assetIn, payload.assetOut)
+                    is SwapSettingsPayload.RepeatOperation -> resolveSelection(payload.assetIn, payload.assetOut)
                 }
-                val retry = (payload as? SwapSettingsPayload.RepeatOperation)?.takeIf { it.metaAccountId == null || it.metaAccountId == metaAccount.id }
+                val retry = when (payload) {
+                    is SwapSettingsPayload.RepeatOperation -> payload.takeIf { it.metaAccountId == null || it.metaAccountId == metaAccount.id }
+                    SwapSettingsPayload.Restore, is SwapSettingsPayload.DefaultFlow, is SwapSettingsPayload.Prefilled -> null
+                }
                 initializedMetaAccountId = metaAccount.id
                 swapSettingsState.setSwapSettings(
                     SwapSettings(
@@ -658,6 +695,13 @@ class SwapMainSettingsViewModel(
                     initInputSilently(retry.direction.mapFromModel(), selection.assetIn, selection.assetOut, retry.amount)
                 }
             }.launchIn(viewModelScope)
+    }
+
+    private suspend fun resolveSelection(assetIn: AssetPayload?, assetOut: AssetPayload?): SwapSelectionInteractor.Selection {
+        return SwapSelectionInteractor.Selection(
+            selectionInteractor.resolve(assetIn?.fullChainAssetId),
+            selectionInteractor.resolve(assetOut?.fullChainAssetId)
+        )
     }
 
     private fun initInputSilently(direction: SwapDirection, assetIn: Chain.Asset, assetOut: Chain.Asset, amount: Balance) {
@@ -683,8 +727,8 @@ class SwapMainSettingsViewModel(
             .onEach {
                 when (it) {
                     is QuotingState.Loading -> setFeeLoading()
-                    is QuotingState.Error, QuotingState.Default -> setFeeStatus(FeeStatus.NoFee)
-                    else -> {}
+                    is PreviewOnly, is QuotingState.PayLimit, is QuotingState.Error, QuotingState.Default -> setFeeStatus(FeeStatus.NoFee)
+                    is ReadyForReview -> Unit
                 }
             }
             .throttleFeeRefreshes()
@@ -693,7 +737,7 @@ class SwapMainSettingsViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun FeeLoaderMixinV2.Presentation<SwapFee, FeeDisplay>.loadSwapFee(quoteState: QuotingState.Loaded) {
+    private fun FeeLoaderMixinV2.Presentation<SwapFee, FeeDisplay>.loadSwapFee(quoteState: ReadyForReview) {
         loadFee { feePaymentCurrency ->
             val swapArgs = quoteState.quote.toExecuteArgs(
                 slippage = quoteState.settings.slippage,
@@ -768,17 +812,18 @@ class SwapMainSettingsViewModel(
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_not_enough_asset, assetIn.token.configuration.symbol.value))
             }
 
-            errorStates.any { it is FieldValidationResult.Error } -> {
+            errorStates.any { it.getReasonOrNull() != null } -> {
                 DescriptiveButtonState.Disabled(resourceManager.getString(R.string.swap_main_settings_wrong_amount_disabled_button_state))
             }
 
-            quotingState is QuotingState.Loading -> DescriptiveButtonState.Loading
-
-            quotingState is QuotingState.Error || inputs.any { it.value.isEmpty() } -> {
-                DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
+            else -> when (quotingState) {
+                QuotingState.Loading -> DescriptiveButtonState.Loading
+                is QuotingState.Error -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
+                QuotingState.Default, is QuotingState.Loaded, is QuotingState.PayLimit -> {
+                    val label = resourceManager.getString(R.string.common_continue)
+                    if (inputs.any { it.value.isEmpty() }) DescriptiveButtonState.Disabled(label) else DescriptiveButtonState.Enabled(label)
+                }
             }
-
-            else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }
 
@@ -812,7 +857,15 @@ class SwapMainSettingsViewModel(
             }
             .onEach {
                 val state = quotingState.value
-                if ((state is QuotingState.Loaded || state is QuotingState.Error) && quotingJob?.isActive != true) {
+                val refreshOnChain = when (state) {
+                    is ReadyForReview -> true
+                    is QuotingState.Error -> when (state.error) {
+                        is QuoteProviderException -> false
+                        else -> true
+                    }
+                    QuotingState.Default, QuotingState.Loading, is PreviewOnly, is QuotingState.PayLimit -> false
+                }
+                if (refreshOnChain && quotingJob?.isActive != true) {
                     performQuote(swapSettings.first(), shouldShowLoading = false, origin = QuoteRefreshOrigin.SUBSCRIPTION)
                 }
             }.launchIn(viewModelScope)
@@ -835,12 +888,20 @@ class SwapMainSettingsViewModel(
                 return@launch
             }
 
-            val quote = withTimeoutOrNull(QUOTE_LOADING_TIMEOUT) {
-                if (BuildConfig.DEBUG) {
-                    Log.d("Swaps", "Quote requested: origin=$origin, direction=${swapQuoteArgs.swapDirection}, amountPlanks=${swapQuoteArgs.amount}")
-                }
-                swapInteractor.quote(swapQuoteArgs, swapFlowScope)
-            } ?: Result.failure(IOException("Swap quote timed out"))
+            val state = try {
+                withTimeoutOrNull(QUOTE_LOADING_TIMEOUT) {
+                    if (BuildConfig.DEBUG) {
+                        Log.d("Swaps", "Quote requested: origin=$origin, direction=${swapQuoteArgs.swapDirection}, amountPlanks=${swapQuoteArgs.amount}")
+                    }
+                    swapInteractor.preview(swapQuoteArgs, swapFlowScope).toQuotingState(swapQuoteArgs, origin, settings)
+                } ?: QuotingState.Error(IOException("Swap quote timed out"))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (limit: QuoteProviderException.DepositLimit) {
+                QuotingState.PayLimit(limit)
+            } catch (error: Exception) {
+                QuotingState.Error(error)
+            }
 
             val selectedMetaAccountId = selectedAccountUseCase.getSelectedMetaAccount().id
             val currentSettings = swapSettings.first()
@@ -849,18 +910,14 @@ class SwapMainSettingsViewModel(
             if (!active.value || settings != currentSettings) return@launch
             if (swapQuoteArgs.metaAccountId != selectedMetaAccountId || selectedMetaAccountId != initializedMetaAccountId) return@launch
 
-            quotingState.value = quote.fold(
-                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin, settings) },
-                onFailure = {
-                    if (it is CancellationException) {
-                        throw it
-                    } else {
-                        QuotingState.Error(it)
-                    }
+            quotingState.value = state
+            when (state) {
+                is ReadyForReview -> updateQuotedInput(settings, state.quote.amountIn, state.quote.amountOut)
+                is PreviewOnly -> updateQuotedInput(settings, state.quote.amountIn, state.quote.amountOut, exact = true)
+                QuotingState.Default, QuotingState.Loading, is QuotingState.Error, is QuotingState.PayLimit -> {
+                    settings.swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
                 }
-            )
-
-            handleNewQuote(quote, settings)
+            }
         }
     }
 
@@ -871,14 +928,25 @@ class SwapMainSettingsViewModel(
         }
     }
 
-    private fun handleNewQuote(quoteResult: Result<SwapQuote>, swapSettings: SwapSettings) {
-        quoteResult.onSuccess { quote ->
-            when (swapSettings.swapDirection!!) {
-                SwapDirection.SPECIFIED_IN -> amountOutInput.updateInput(quote.assetOut, quote.planksOut)
-                SwapDirection.SPECIFIED_OUT -> amountInInput.updateInput(quote.assetIn, quote.planksIn)
+    private suspend fun formatPayLimit(limit: QuoteProviderException.DepositLimit): String {
+        val asset = limit.asset
+        val network = chainRegistry.getChain(asset.chainId).name
+        return when (limit) {
+            is QuoteProviderException.DepositLimit.BelowMinimum ->
+                resourceManager.getString(R.string.swap_minimum_deposit_amount, network, formatFullAmount(ChainAssetWithAmount(asset, limit.minimum)))
+
+            is QuoteProviderException.DepositLimit.AboveMaximum -> {
+                val max = limit.maximum ?: return resourceManager.getString(R.string.swap_deposit_above_limit, network)
+                resourceManager.getString(R.string.swap_maximum_deposit_amount, network, formatFullAmount(ChainAssetWithAmount(asset, max)))
             }
-        }.onFailure {
-            swapSettings.swapDirection.clearCalculatedInput(amountInInput, amountOutInput)
+        }
+    }
+
+    private fun updateQuotedInput(settings: SwapSettings, amountIn: ChainAssetWithAmount, amountOut: ChainAssetWithAmount, exact: Boolean = false) {
+        when (settings.swapDirection) {
+            SwapDirection.SPECIFIED_IN -> amountOutInput.updateInput(amountOut.chainAsset, amountOut.amount, exact)
+            SwapDirection.SPECIFIED_OUT -> amountInInput.updateInput(amountIn.chainAsset, amountIn.amount, exact)
+            null -> Unit
         }
     }
 
@@ -920,10 +988,10 @@ class SwapMainSettingsViewModel(
             }.launchIn(viewModelScope)
     }
 
-    private fun SwapAmountInputMixin.updateInput(chainAsset: Chain.Asset, planks: Balance) {
+    private fun SwapAmountInputMixin.updateInput(chainAsset: Chain.Asset, planks: Balance, exact: Boolean = false) {
         val amount = chainAsset.amountFromPlanks(planks)
         // In editable amounts a comma always means a decimal separator.
-        val ungroupedAmount = amountInputFormatter.format(amount).replace(",", "")
+        val ungroupedAmount = if (exact) amount.toStripTrailingZerosString() else amountInputFormatter.format(amount).replace(",", "")
         inputState.value = InputState(ungroupedAmount, initiatedByUser = false, InputKind.REGULAR)
     }
 
@@ -962,10 +1030,10 @@ class SwapMainSettingsViewModel(
     private suspend fun getValidationPayload(): SwapValidationPayload? {
         val settings = swapSettings.first()
         val account = selectedAccountUseCase.getSelectedMetaAccount()
-        val quote = quotingState.value as? QuotingState.Loaded ?: return null
+        val quote = quotingState.value.readyForReviewOrNull() ?: return null
         val snapshot = feeSnapshot.value ?: return null
         if (!snapshot.matchesInputs(settings, account.id) || !snapshot.matchesQuote(quote)) return null
-        if (feeMixin.fee.value !is FeeStatus.Loaded) return null
+        if (!feeMixin.fee.value.isLoaded()) return null
 
         return snapshot.toValidationPayload()
     }
@@ -1013,6 +1081,16 @@ class SwapMainSettingsViewModel(
 
         super.onCleared()
     }
+}
+
+private fun SwapSettingsPayload.collapseChartOnEntry(): Boolean = when (this) {
+    SwapSettingsPayload.Restore -> false
+    is SwapSettingsPayload.DefaultFlow, is SwapSettingsPayload.Prefilled, is SwapSettingsPayload.RepeatOperation -> true
+}
+
+private fun FeeStatus<*, *>.isLoaded(): Boolean = when (this) {
+    is FeeStatus.Loaded -> true
+    FeeStatus.Error, FeeStatus.NoFee, is FeeStatus.Loading -> false
 }
 
 internal fun SwapSettings.invalidateCalculatedInput(

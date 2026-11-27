@@ -48,7 +48,7 @@ class SwapRouteFormatterTest {
             `when`(edge.to).thenReturn(FullChainAssetId(to, 1))
             QuotedEdge(BigInteger.ONE, BigInteger.ONE, edge)
         }
-        val path = QuotedPath(SwapDirection.SPECIFIED_IN, edges, PathRoughFeeEstimation(BigInteger.ZERO, BigInteger.ZERO))
+        val path = QuotedPath(SwapDirection.SPECIFIED_IN, edges, PathRoughFeeEstimation.zero(), netAmountOut = BigInteger.ONE)
         val quote = mock(SwapQuote::class.java)
         `when`(quote.quotedPath).thenReturn(path)
 
