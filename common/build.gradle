@@ -54,6 +54,10 @@ android {
 
         buildConfigField "String", "ANNOUNCEMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/announcements/v1/announcements_dev.json\""
 
+        // Read before the raw GitHub URLs of nova-utils master files, see the NovaUtilsMirror KDoc. Keep the host equal to infraUrl of the
+        // nova-utils global config; RealGlobalConfigDataSource logs a mismatch
+        buildConfigField "String", "NOVA_UTILS_MIRROR_URL", "\"https://nova-infra-dev.novasama-tech.org/v1/config/\""
+
         buildConfigField "String", "WATCH_ONLY_SCAM_WIKI", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/watch-only-wallets/scam-warning\""
     }
 
@@ -72,6 +76,8 @@ android {
             buildConfigField "String", "LEGAL_DOCUMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/legal/v1/documents.json\""
 
             buildConfigField "String", "ANNOUNCEMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/announcements/v1/announcements.json\""
+
+            buildConfigField "String", "NOVA_UTILS_MIRROR_URL", "\"https://nova-infra.novasama-tech.org/v1/config/\""
         }
 
         releaseGithub {

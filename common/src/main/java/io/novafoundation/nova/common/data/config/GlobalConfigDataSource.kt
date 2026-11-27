@@ -9,6 +9,7 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 interface GlobalConfigDataSource {
 
@@ -32,6 +33,7 @@ class RealGlobalConfigDataSource(
             val response = api.getGlobalConfig()
             val config = response.toDomain()
             preferences.putString(cacheKey(), gson.toJson(response))
+            logMirrorHostMismatch(config)
             config
         }.getOrElse { error ->
             if (error is CancellationException) throw error
@@ -45,6 +47,16 @@ class RealGlobalConfigDataSource(
 
     private fun savedConfig(): GlobalConfig? = preferences.getString(cacheKey())?.let { raw ->
         runCatching { requireNotNull(gson.fromJson(raw, GlobalConfigRemote::class.java)).toDomain() }.getOrNull()
+    }
+
+    // The nova-utils mirror lives on the nova-infra host but is addressed by a build constant (see NovaUtilsMirror),
+    // so nothing but this log tells when the two drift apart.
+    private fun logMirrorHostMismatch(config: GlobalConfig) {
+        val infraHost = config.infraUrl?.toHttpUrlOrNull()?.host ?: return
+        val mirrorHost = BuildConfig.NOVA_UTILS_MIRROR_URL.toHttpUrlOrNull()?.host
+        if (infraHost == mirrorHost) return
+
+        logger.log("[GlobalConfig] infraUrl host $infraHost differs from the nova-utils mirror host $mirrorHost")
     }
 
     // Different build configurations must never inherit each other's infrastructure origin.

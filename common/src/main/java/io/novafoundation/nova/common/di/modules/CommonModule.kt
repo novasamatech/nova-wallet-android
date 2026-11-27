@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import coil.util.CoilUtils
 import com.google.android.play.core.integrity.IntegrityManagerFactory
 import com.google.gson.Gson
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -28,6 +29,7 @@ import io.novafoundation.nova.common.data.config.RealGlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.NovaUtilsMirror
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.providers.deviceid.AndroidDeviceIdProvider
 import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
@@ -125,6 +127,7 @@ import io.novasama.substrate_sdk_android.icon.IconGenerator
 import java.security.SecureRandom
 import java.util.Random
 import javax.inject.Qualifier
+import okhttp3.OkHttpClient
 
 const val SHARED_PREFERENCES_FILE = "fearless_prefs"
 
@@ -149,7 +152,18 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun imageLoader(context: Context) = ImageLoader.Builder(context)
+    fun imageLoader(
+        context: Context,
+        novaUtilsMirror: NovaUtilsMirror
+    ) = ImageLoader.Builder(context)
+        // Coil's default client plus the mirror: configs carry absolute GitHub URLs of nova-utils images
+        .okHttpClient {
+            val coilDefaultClient = OkHttpClient.Builder()
+                .cache(CoilUtils.createDefaultCache(context))
+                .build()
+
+            novaUtilsMirror.addTo(coilDefaultClient)
+        }
         .componentRegistry {
             add(SvgDecoder(context))
         }

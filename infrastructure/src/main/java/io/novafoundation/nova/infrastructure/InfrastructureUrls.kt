@@ -10,6 +10,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
  *
  * Read from the global remote config (`infraUrl`) rather than baked into the build, so the backend can
  * move without an app release, and dev and release builds follow their own config file.
+ *
+ * The one exception is the address of the nova-utils config mirror, see `NovaUtilsMirror`.
  */
 fun interface InfrastructureUrls {
 

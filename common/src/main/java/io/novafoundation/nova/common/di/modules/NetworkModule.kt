@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.di.modules
 
 import android.content.Context
+import android.os.SystemClock
 import com.google.gson.Gson
 import com.neovisionaries.ws.client.WebSocketFactory
 import dagger.Module
@@ -10,6 +11,8 @@ import io.novafoundation.nova.common.data.network.AndroidLogger
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.network.NovaUtilsMirror
+import io.novafoundation.nova.common.data.network.NovaUtilsMirrorCoolDown
 import io.novafoundation.nova.common.data.network.TimeHeaderInterceptor
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -27,6 +30,7 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
 import io.novasama.substrate_sdk_android.wsrpc.request.RequestExecutor
 import okhttp3.Cache
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import io.novafoundation.nova.common.data.network.DebugHttpLoggingInterceptor
 import io.novafoundation.nova.common.data.storage.DebugSettings
@@ -36,6 +40,17 @@ import java.util.concurrent.TimeUnit
 private const val HTTP_CACHE = "http_cache"
 private const val CACHE_SIZE = 50L * 1024L * 1024L // 50 MiB
 private const val TIMEOUT_SECONDS = 20L
+
+// One deadline for a whole mirror attempt, from the first address to the last byte of the body, so that a dead mirror
+// delays the GitHub fallback by this much at most
+private const val NOVA_UTILS_MIRROR_ATTEMPT_DEADLINE_SECONDS = 10L
+
+// Largest mirror answer that is held in memory. The largest nova-utils file is about 0.5 MiB
+private const val NOVA_UTILS_MIRROR_MAX_BODY_BYTES = 8L * 1024L * 1024L
+
+// How long the mirror is skipped after a mirror-wide failure. Doubles while it keeps failing, up to the maximum
+private const val NOVA_UTILS_MIRROR_PAUSE_SECONDS = 60L
+private const val NOVA_UTILS_MIRROR_MAX_PAUSE_MINUTES = 30L
 
 private const val SOCKET_CONNECTION_TIMEOUT = 5_000
 
@@ -78,8 +93,27 @@ class NetworkModule {
 
     @Provides
     @ApplicationScope
+    fun provideNovaUtilsMirror(logger: Logger): NovaUtilsMirror {
+        val coolDown = NovaUtilsMirrorCoolDown(
+            initialMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_PAUSE_SECONDS),
+            maxMillis = TimeUnit.MINUTES.toMillis(NOVA_UTILS_MIRROR_MAX_PAUSE_MINUTES),
+            clock = SystemClock::elapsedRealtime
+        )
+
+        return NovaUtilsMirror(
+            mirrorBaseUrl = BuildConfig.NOVA_UTILS_MIRROR_URL.toHttpUrl(),
+            maxAttemptMillis = TimeUnit.SECONDS.toMillis(NOVA_UTILS_MIRROR_ATTEMPT_DEADLINE_SECONDS),
+            maxBodyBytes = NOVA_UTILS_MIRROR_MAX_BODY_BYTES,
+            coolDown = coolDown,
+            logger = logger
+        )
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideOkHttpClient(
         context: Context,
+        novaUtilsMirror: NovaUtilsMirror,
         loggingInterceptor: DebugHttpLoggingInterceptor
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
@@ -94,7 +128,8 @@ class NetworkModule {
             builder.addInterceptor(loggingInterceptor)
         }
 
-        return builder.build()
+        // Last, on the finished client: the mirror attempt runs on that client, see NovaUtilsMirror.addTo
+        return novaUtilsMirror.addTo(builder.build())
     }
 
     @Provides
