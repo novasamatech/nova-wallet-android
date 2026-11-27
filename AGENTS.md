@@ -24,7 +24,7 @@ Then read every topic touched by the task; do not load unrelated topic files.
 | Screens, layouts, navigation, widgets, formatting, strings | [UI](docs/engineering/ui.md) |
 | Flows, repositories, API, cache, runtime decoding | [Data and state](docs/engineering/data-and-state.md) |
 | Amounts, Max, fees, validation, signing, submission | [Transactions](docs/engineering/transactions.md) |
-| Analytics events, consent | [Analytics](docs/engineering/analytics.md) |
+| New or moved screens, flows, entry points; analytics events, consent; any review | [Analytics](docs/engineering/analytics.md) |
 | Infrastructure authentication, attestation, tokens | [Infrastructure auth](docs/engineering/infrastructure-auth.md) |
 | Any Bittensor behavior or presentation | [Bittensor constraints](docs/engineering/bittensor.md), plus the applicable general topics |
 | Build, tests, CI, verification | [Testing](docs/engineering/testing.md) |

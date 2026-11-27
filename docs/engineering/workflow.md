@@ -38,6 +38,8 @@ Review the final changed files and callers, not only the newly added lines, in s
   preserve subscription lifetime, cancellation and ordering. Check for speculative abstractions, redundant
   state, needless wrappers, copied formatters, or checks already owned by a type. Build, test and lint success
   do not replace this pass.
+- **Analytics:** new or moved screens, flows and entry points are covered, existing events still fire, and no
+  event carries an exact number or an identifier. See [analytics](analytics.md).
 
 For each finding, name the concrete problem, fix and verification. Refactor within scope before handoff;
 separate behavior changes from behavior-preserving edits. Rerun affected checks after the last fix.
