@@ -21,30 +21,6 @@ when building an event. A navigation payload may carry an analytics-only source 
 
 Analytics consent controls analytics collection, queued events and uploads, not the lifetime or availability of authentication shared with other features. Opt-out must cancel analytics work and clear its queue without disabling unrelated authenticated requests.
 
-## Coverage of new features
-
-Every new user-facing feature, screen, flow or entry point ships with its analytics in the same change.
-Coverage is part of the feature, not a follow-up task. Decide the events before implementation: take them
-from the task's tracking plan, or propose a short one (event, trigger, properties, question it answers)
-when the task has none. The minimum:
-
-- **Entry:** one "opened" event per screen or flow, with a closed-enum `source` naming each entry point.
-- **Operation funnel:** initiated (setup validations passed), confirmed (handed to signing), completed,
-  failed with a closed-enum `reason`, and abandoned with the `stage` the user left from.
-- **Decisions that change the outcome:** selection method, changed settings such as slippage, retry.
-- **Blockers:** a refusal the user cannot fix by input (wallet type, missing account, unavailable config)
-  is its own event and must not be counted as abandonment.
-
-Reuse an existing wire event and add a property when the semantics match, so the feature appears in existing
-insights; add a new event only for a new meaning. Event names, property keys and values must match iOS
-byte-for-byte. Cover emission with a unit test of the owning ViewModel/presenter, including the path
-where the event must not fire. If a feature intentionally sends nothing, say so and why in the PR description.
-
-Moving or replacing a screen is a change to its analytics. Events tied to a navigation destination id, a
-back-stack host or a ViewModel's `init`/`onCleared` silently stop or change frequency when the screen moves
-to another graph, becomes a tab or gets a longer-lived owner. Re-verify every existing event of the moved
-screen and keep its trigger meaning ("user opened", "user left") rather than the old lifecycle hook.
-
 ## What an event may carry
 
 An event must not contain a value that singles out a user or can be matched against public chain data.
@@ -62,11 +38,22 @@ bucketed, follow the bucket's own rule (`UNKNOWN` or omitting the property); nev
 
 ## Review
 
-When reviewing a change that adds or modifies user-facing behavior, report analytics as its own section:
+Analytics coverage is checked in review, not left to the author's memory. Every review of a change with
+user-facing behavior has an analytics pass and reports it as its own section:
 
-1. List every new or moved screen, sheet, flow and entry point in the diff and mark each one covered or
-   not covered. Uncovered items are findings, not notes.
-2. Check that events of moved or replaced screens still fire with the same meaning and frequency.
-3. Check every new or changed property against "What an event may carry"; an exact number or an identifier
-   is a blocking finding.
-4. Check that names and values match the tracking plan and iOS, and that emission is tested.
+1. Walk the diff and list each place where user-facing code was added or changed: a new screen, sheet,
+   flow, entry point or action, a changed outcome of an existing action, and a moved or replaced screen.
+2. For each place decide whether it is covered by an event, existing or added in the change. A place
+   without one is a finding that names the place and the missing event (name, trigger, properties); the
+   events are then added in the same change, taken from the tracking plan when the task has one.
+3. For a moved or replaced screen, check that its existing events still fire with the same meaning and
+   frequency. Events tied to a navigation destination id, a back-stack host or a ViewModel's
+   `init`/`onCleared` silently stop or change when the screen moves to another graph, becomes a tab or
+   gets a longer-lived owner.
+4. Check every new or changed property against "What an event may carry"; an exact number or an
+   identifier is a blocking finding.
+5. Check that names and values match the tracking plan and iOS byte-for-byte, that an existing wire event
+   is reused with a new property where the meaning matches, and that emission is unit-tested, including
+   the path where the event must not fire.
+
+If a place intentionally sends nothing, the review records that and why.
