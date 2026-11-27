@@ -29,13 +29,9 @@ Separate fetching a remote response from transforming its contents. Extract nest
 
 Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
 
-Express absence with a nullable type, not with a `NONE` enum constant that every `when` must then handle.
-Use one type for one concept: do not declare parallel enums for the same set of values at different call
-sites (for example a query kind and a site kind); map to another layer's type only at that layer's boundary.
-Do not give two declarations the same simple name to match a wire name; a fully qualified type in a signature
-means one of them needs a more specific name.
-
-Put a property that every variant of a sealed type has on the type itself, not in a consumer's `when` extension.
+Reuse a type when multiple callers within a layer share the same concept. For sealed types, declare
+properties that are part of every variant's contract on the sealed type itself. Give analytics event
+classes and their property enums distinct names, independent of the event's wire name.
 
 Model finite UI choices with enums or sealed types instead of magic integers. Keep semantic options such as `MAX` distinct from numeric amounts; do not encode them as a sentinel amount such as zero or rely on enum ordinals.
 

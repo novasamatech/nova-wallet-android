@@ -55,14 +55,13 @@ subtitle just because it is quicker. Outside staking, use an existing accessible
 than importing another feature's implementation. Inspect the widget and bound state first.
 For loading/error/empty/value rendering also read [data and state](data-and-state.md).
 
-When a ViewModel needs the user's choice from a dialog or bottom sheet before it continues, use
-`ActionAwaitableMixin`: create it from the injected `ActionAwaitableMixin.Factory`, suspend on `awaitAction(payload)`
-and continue in the same coroutine. The Fragment observes `awaitableActionLiveData` and answers with `onSuccess`
-or `onCancel`. Do not model this with a `LiveData<Event>` plus a pending field and one ViewModel callback per
-button: the pending value outlives the sheet and each callback has to guard against a stale or repeated call.
-Dismissing without a choice is `onCancel`, not a silent no-op. Dismiss a sheet the Fragment owns in
-`onDestroyView`. Keep the launched `Job` when a second tap must not start the flow again, and cancel it when
-the user leaves the screen.
+When the ViewModel must wait for a user choice from a dialog or bottom sheet, use `ActionAwaitableMixin`
+from the injected factory. Call `awaitAction(payload)` and continue in the same coroutine. The Fragment
+responds with `onSuccess` for a selection or `onCancel` when the user dismisses the dialog without one.
+Guard against repeated taps when they could replace an active request. For example, track the active
+request with a `Job` and cancel it on leaving the screen. Dismiss a manually managed sheet in
+`onDestroyView` when the Fragment owns it.
+
 Preserve accessibility, touch targets, font scaling, insets and long/localized content. Use resources
 for dimensions/styles where shared; do not shrink RadioButton bounds to imitate a screenshot.
 Constrain a control's ripple to its visible shape with an explicit mask and the existing pressed-state
