@@ -54,6 +54,14 @@ master uses these in `item_dashboard_has_stake.xml`. Do not replace a status bad
 subtitle just because it is quicker. Outside staking, use an existing accessible counterpart rather
 than importing another feature's implementation. Inspect the widget and bound state first.
 For loading/error/empty/value rendering also read [data and state](data-and-state.md).
+
+When the ViewModel must wait for a user choice from a dialog or bottom sheet, use `ActionAwaitableMixin`
+from the injected factory. Call `awaitAction(payload)` and continue in the same coroutine. The Fragment
+responds with `onSuccess` for a selection or `onCancel` when the user dismisses the dialog without one.
+Guard against repeated taps when they could replace an active request. For example, track the active
+request with a `Job` and cancel it on leaving the screen. Dismiss a manually managed sheet in
+`onDestroyView` when the Fragment owns it.
+
 Preserve accessibility, touch targets, font scaling, insets and long/localized content. Use resources
 for dimensions/styles where shared; do not shrink RadioButton bounds to imitate a screenshot.
 Constrain a control's ripple to its visible shape with an explicit mask and the existing pressed-state

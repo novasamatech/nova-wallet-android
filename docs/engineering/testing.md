@@ -61,7 +61,12 @@ not apply. The setting is shared by all worktrees of a clone; a worktree on a br
   Data transformations also need focused tests that verify the affected records survive correctly.
 - Auth: no credential logging; expiry, cancellation/coalescing, rejected generation and replay tests.
 
-Use existing test-shared helpers and neighboring test patterns; dependencies are named and injected.
+Use existing test-shared helpers and neighboring test patterns. Create named dependencies and inject
+them into the subject. In Mockito tests, use typed stubbing with the shared helpers (`whenever`, `any`,
+`eq`, `argThat`) and assert interactions with `verify`. For tests that exercise how an awaited UI choice
+resumes or cancels the flow, `CommonModule().actionAwaitableMixinFactory()` provides the real factory.
+When a test needs a static mock of a platform class such as `Uri`, check which layer owns that work
+before changing the test setup.
 Do not use wall-clock sleeps as synchronization when a deterministic scheduler/flow assertion is available.
 A mock is not live integration evidence. Keep failed commands visible in the handoff.
 

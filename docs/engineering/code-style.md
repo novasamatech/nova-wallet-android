@@ -29,6 +29,10 @@ Separate fetching a remote response from transforming its contents. Extract nest
 
 Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
 
+Reuse a type when multiple callers within a layer share the same concept. For sealed types, declare
+properties that are part of every variant's contract on the sealed type itself. Give analytics event
+classes and their property enums distinct names, independent of the event's wire name.
+
 Model finite UI choices with enums or sealed types instead of magic integers. Keep semantic options such as `MAX` distinct from numeric amounts; do not encode them as a sentinel amount such as zero or rely on enum ordinals.
 
 Refactor to solve a concrete correctness, ownership, consistency, duplication, testability, or complexity problem, not personal stylistic preference. Inspect existing implementations first. Keep authoritative state in one place and derive dependent values; inject dependencies rather than constructing them inside consumers. Distinguish unavailable data from zero or empty data, and do not disguise mocks or incomplete integrations as working functionality.
