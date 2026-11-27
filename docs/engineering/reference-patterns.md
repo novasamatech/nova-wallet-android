@@ -69,5 +69,8 @@ Do not copy blindly: Do not generalize a configured rate to other chains or take
 Find a mature analogous flow in master; inspect the collaborator/component contract too.
 Record the exact aspect being reused and any conflict with current rules. A random nearby file or a
 large class is not an architectural standard merely because it already exists.
+The same holds for code already in the file being changed: when the new behavior needs the pattern it uses,
+check that pattern against the written rules first and replace it within scope if a rule names another one,
+rather than extending it.
 Ordinary reuse of these approved aspects does not need another approval. Adding or widening baseline
 examples requires review and user approval; whole-file copying remains explicitly excluded.

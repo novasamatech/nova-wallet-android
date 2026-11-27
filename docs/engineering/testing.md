@@ -62,6 +62,13 @@ not apply. The setting is shared by all worktrees of a clone; a worktree on a br
 - Auth: no credential logging; expiry, cancellation/coalescing, rejected generation and replay tests.
 
 Use existing test-shared helpers and neighboring test patterns; dependencies are named and injected.
+Stub with the `test-shared` Mockito helpers (`whenever`, `any`, `eq`, `argThat`) and assert with `verify`; add
+`testImplementation project(':test-shared')` to a module that lacks it. Do not build a mock with a default
+`Answer` that switches on method names or hand-roll call recorders. Take shared infrastructure from its DI
+module (`CommonModule().actionAwaitableMixinFactory()`), not from a hand-made fake.
+A unit test that needs `mockStatic` on an Android class (`Uri`, `TextUtils`) or a fake of shared infrastructure
+points at production code in the wrong layer: move the dependency behind the interactor or a shared JVM helper
+and fix the code, not the test setup.
 Do not use wall-clock sleeps as synchronization when a deterministic scheduler/flow assertion is available.
 A mock is not live integration evidence. Keep failed commands visible in the handoff.
 
