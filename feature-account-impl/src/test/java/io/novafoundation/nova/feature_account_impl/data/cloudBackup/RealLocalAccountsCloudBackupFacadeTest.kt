@@ -516,7 +516,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(secretStore).putMetaAccountSecrets(eq(0), metaAccountSecretsWithEntropy(bytes32))
         verify(secretStore).putChainAccountSecrets(eq(0), byteArrayEq(bytes32), chainAccountSecretsWithEntropy(bytes32))
 
-        // Secrets wallet doesnt have any additional secrets
+        // Secrets wallet doesn't have any additional secrets
         verifyNoAdditionalSecretsInserted()
 
         // no deletes happened
@@ -656,7 +656,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verifyEvent(expectedEvent)
     }
 
-    // Tests that we will apply chan account deletion and entropy change
+    // Tests that we will apply chain account deletion and entropy change
     @Test
     fun shouldApplyModifyAccountDiff(): Unit = runBlocking {
         val changedBytes32 = bytes32of(3)
@@ -887,7 +887,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(metaAccountDao).insertMetaAccount(metaAccountWithUuid(walletUUid(0)))
         verify(metaAccountDao).insertChainAccounts(singleChainAccountWithAccountId(bytes32))
 
-        // there is not base secrets for ledger accounts to there should be no attempts to store base secrets
+        // there are no base secrets for ledger accounts so there should be no attempts to store base secrets
         verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
         // the only secret for ledger is chainAccount and it is put to additional and not to chain account secrets
         verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())
@@ -961,7 +961,7 @@ class RealLocalAccountsCloudBackupFacadeTest {
         verify(metaAccountDao).insertMetaAccount(metaAccountWithUuid(walletUUid(0)))
         verify(metaAccountDao, never()).insertChainAccounts(any())
 
-        // there is not base secrets for ledger accounts to there should be no attempts to store base secrets
+        // there are no base secrets for ledger accounts so there should be no attempts to store base secrets
         verify(secretStore, never()).putMetaAccountSecrets(anyLong(), any())
         // the only secret for ledger is chainAccount and it is put to additional and not to chain account secrets
         verify(secretStore, never()).putChainAccountSecrets(anyLong(), any(), any())
